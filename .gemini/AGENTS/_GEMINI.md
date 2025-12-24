@@ -3,19 +3,19 @@
 ## 1. Gitによるバージョン管理
 
 - 作業開始前にローカルブランチをリモートの最新状態に完全に同期させるために次の操作を実行する。
-  `git pull --rebase origin <base_branch>`
+  `run_shell_command{command: "git pull --rebase origin <base_branch>"}`
 
 - 作業ブランチを新規に作成する時は、通常 `base_branch` を明示的に指定して `feature_branch` を作成する。
-  `git checkout -b <feature_branch> <base_branch>`
+  `run_shell_command{command: "git checkout -b <feature_branch> <base_branch>"}`
 
 - 変更内容を確認する時は、次の操作を実行する。
-  `git status`
+  `run_shell_command{command: "git status"}`
 
 - 変更内容をコミット対象にする時は、すべての変更をステージングエリアに追加する。
-  `git add .`
+  `run_shell_command{command: "git add ."}`
 
 - 変更内容をローカルリポジトリに記録する時は、次の操作を実行する。
-  `git commit -m "..."`
+  `run_shell_command{command: "git commit -m \"...\""}`
 
   **コミットメッセージの書き方:**
   `...` の部分には、変更内容を分かりやすく記述する。
@@ -34,23 +34,23 @@
 
 - 作業完了後、コンフリクトをチェックしてからリモートに反映させるために次の手順で操作する。
   1. まず、マージ先の最新の変更を取り込む。
-     `git pull --rebase origin <base_branch>`
+     `run_shell_command{command: "git pull --rebase origin <base_branch>"}`
   2. **マージコンフリクトが発生した場合:**
      以下の手順でコンフリクトを解消する。
-     1. まず`git status`でコンフリクトしているファイルをすべて特定する。
+     1. まず`run_shell_command{command: "git status"}`でコンフリクトしているファイルをすべて特定する。
      2. 各ファイルの内容を`read_file`で読み込み、コンフリクトマーカー(`<<<<<<<`, `=======`, `>>>>>>>`)を確認する。
      3. 手動で解決策を構築し、`write_file`や`replace`を使ってファイルを修正する。
-     4. 修正後、`git add .`で解決済みとしてマークし、`git status`で解消されたことを確認する。
-        `git add . && git status`
+     4. 修正後、`run_shell_command{command: "git add ."}`で解決済みとしてマークし、`run_shell_command{command: "git status"}`で解消されたことを確認する。
+        `run_shell_command{command: "git add . && git status"}`
   3. コンフリクトがなければ、プッシュを実行する。
-     `git push`
+`run_shell_command{command: "git push"}`
 
 - プルリクエストの管理
   変更のマージレビューを依頼する時や、その後の運用は次の手順で操作する。
 
   1. **コミット前の品質チェック:**
      すべての変更をコミットする前に、`pre-commit`フックをフル実行して品質を保証する。
-     `pre-commit run --all-files`
+     `run_shell_command{command: "pre-commit run --all-files"}`
   
   2. **既存PRの確認:**
      まず、既存のプルリクエストがないか確認する。
@@ -112,30 +112,30 @@
 
 1.  **Linterと型チェック (事前):**
     まず、Linterと型チェッカーを実行し、問題を修正する。
-    `ruff check . && ruff format .`
-    `mypy .`
+    `run_shell_command{command: "ruff check . && ruff format ."}`
+    `run_shell_command{command: "mypy ."}`
 
 2.  **自動テストとデバッグ:**
     次に、自動テストを実行する。テストが失敗した場合は、以下のワークフローで効率的に修正と確認を行う。
 
     1.  **失敗箇所の特定:**
         まず `-v` オプションをつけて実行し、どのテストが失敗しているか把握する。
-        `pytest -v`
+        `run_shell_command{command: "pytest -v"}`
     2.  **失敗テストへの集中:**
         前回失敗したテストのみを対象に実行し、確認サイクルを高速化する。
-        `pytest --lf`
+        `run_shell_command{command: "pytest --lf"}`
     3.  **詳細なデバッグ:**
         `-s` (print文の表示) や `--pdb` (対話的デバッガの起動) と組み合わせて原因を調査する。
-        `pytest --lf -s` または `pytest --lf --pdb`
+        `run_shell_command{command: "pytest --lf -s"}` または `run_shell_command{command: "pytest --lf --pdb"}`
     4.  **修正と再実行:**
-        コードを修正し、`pytest --lf` で素早く確認する。
+        コードを修正し、`run_shell_command{command: "pytest --lf"}` で素早く確認する。
     5.  **最終確認:**
-        失敗したテストがすべて通ったら、最後に全テスト (`pytest`) を実行して他に影響がないか確認する。
+        失敗したテストがすべて通ったら、最後に全テスト (`run_shell_command{command: "pytest"}`) を実行して他に影響がないか確認する。
 
 3.  **Linterと型チェック (事後):**
     自動テストの修正が他の問題を引き起こしていないか確認するため、再度Linterと型チェックを実行する。
-    `ruff check . && ruff format .`
-    `mypy .`
+    `run_shell_command{command: "ruff check . && ruff format ."}`
+    `run_shell_command{command: "mypy ."}`
 
 ---
 
@@ -202,4 +202,4 @@
 ### 2. ケース別対応
 - **`git push`失敗時 (`non-fast-forward`エラー):**
   次の操作でローカルブランチを更新する。
-  `git pull --rebase`
+  `run_shell_command{command: "git pull --rebase"}`
