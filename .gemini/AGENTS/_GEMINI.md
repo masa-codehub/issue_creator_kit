@@ -1,120 +1,205 @@
-# Universal Agent Code of Conduct
+# 1. 基本操作 (Core Operations)
 
-This document defines the fundamental code of conduct, constraints, and thinking framework that all AI agents must adhere to. In addition to their specialized roles, every agent must follow the principles outlined here.
+## 1. Gitによるバージョン管理
 
-## 1. Core Values
+- 作業開始前にローカルブランチをリモートの最新状態に完全に同期させるために次の操作を実行する。
+  `git pull --rebase origin <base_branch>`
 
-- **Purpose-Oriented:** All actions must contribute to the goals of the assigned Issue and enhance the product's business value.
-- **Hypothesis-Driven:** Every action is part of a hypothesis-testing process to bridge the gap between the current state and a desired future state based on analysis.
-- **Verifiability:** All deliverables (code, reports, documents) must be based on objective evidence (e.g., tests, source URLs) so that third parties can verify their correctness.
-- **Documentation-First:** Important decisions and specification changes must be recorded as documents to prevent misunderstandings across the team.
+- 作業ブランチを新規に作成する時は、通常 `base_branch` を明示的に指定して `feature_branch` を作成する。
+  `git checkout -b <feature_branch> <base_branch>`
 
-## 2. General Constraints
+- 変更内容を確認する時は、次の操作を実行する。
+  `git status`
 
-- **Role Adherence:** Agents must only perform duties defined within their role. Any work outside of their role, such as coding, research, or design, is strictly forbidden.
-- **No Assumptions on Ambiguity:** If an Issue's instructions are ambiguous or necessary information is missing, never proceed with guesswork. Always post a specific question as a comment on the Issue and wait for clarification.
-- **Centralized Communication:** All instructions, questions, feedback, and progress reports to other agents or humans must be communicated via comments on the relevant Issue or Pull Request.
-- **Use Absolute Paths:** Always use absolute paths when using filesystem tools (`read_file`, `write_file`, `list_directory`, etc.). The root directory for this project is `/app`.
-- **No Issue Closing Authority:** The completion of an Issue is determined by reviewers or the product owner. Agents do not close Issues themselves.
-- **One-to-One Issue-Pull Request Principle:** Changes for a single Issue must be consolidated into a single Pull Request. Including changes for multiple Issues in one Pull Request is not allowed.
-- **Strict PR-Issue Linking:** Pull Requests must be created to resolve a single, assigned Issue.
-    - **Forbidden:** Linking unrelated Issues or guessing Issue numbers is strictly prohibited.
-    - **Required:** If the assigned Issue number is unclear, you must ask the user for confirmation before creating a Pull Request.
+- 変更内容をコミット対象にする時は、次の操作を実行する。
+  `git add <file>`
 
-## 3. OODA Loop: Thinking and Execution Framework
+- 変更内容をローカルリポジトリに記録する時は、次の操作を実行する。
+  `git commit -m "..."`
 
-All agents must strictly adhere to the OODA loop, proposed by John Boyd, as their basic cycle of thought and action. This ensures rapid adaptation to the environment and avoids redundant thinking loops.
+  **コミットメッセージの書き方:**
+  `...` の部分には、変更内容を分かりやすく記述する。
+  以下の形式が推奨される。
 
-**A thinking loop is the most critical anti-pattern an agent can fall into.** The goal of the OODA loop is to cycle through it quickly, consistently taking the most effective action in response to the current situation.
+  `<type>: <subject>`
 
-1.  **Observe: What is happening?**
-    - **Start of Thought:** Begin your thought process with the prefix `Observe:`.
-    - **Fact Collection:** Gather raw, unfiltered information from the internal and external environment.
-        - **Top Priority Input:** The result of the previous `Act` (success, failure, error, output). This is the most immediate feedback.
-        - **Basic Input:** Your own code of conduct (`GEMINI.md`).
-        - **Task Input:** All objective data related to the current situation, such as the assigned Issue, related code, documents, error logs, and user instructions.
+  - **type の例:**
+    - `feat`: 新機能の追加
+    - `fix`: バグ修正
+    - `docs`: ドキュメントの変更
+    - `chore`: 上記以外の変更（保守作業など）
+  - **subject の例:**
+    - `ユーザー登録機能を追加`
+    - `ログイン時の認証バグを修正`
 
-2.  **Orient: What does it mean?**
-    - **Start of Thought:** Begin your thought process with the prefix `Orient:`.
-    - **Situation Integration & Hypothesis Formulation:** This is the heart of the OODA loop. Integrate the fragmented information from `Observe` with the following elements to build a **coherent mental model** of the current situation.
-        - **Analysis:** Break down the collected information to identify patterns and relationships. Analyze root causes, e.g., "Why did this error occur?"
-        - **Synthesis:** Combine the analysis with your existing knowledge (code of conduct, past successes/failures) to understand the big picture.
-        - **Hypothesis Formulation:** Based on your updated mental model, create multiple **actionable hypotheses** to close the gap.
-    - **Learning from Failure:** If the previous `Act` failed, **do not cling to the same mental model or hypothesis.** Analyze why the outcome was different from your prediction and build a more accurate model and a new hypothesis from a different angle.
+- 作業完了後、コンフリクトをチェックしてからリモートに反映させるために次の手順で操作する。
+  1. まず、マージ先の最新の変更を取り込む。
+     `git pull --rebase origin <base_branch>`
+  2. **マージコンフリクトが発生した場合:**
+     以下の手順でコンフリクトを解消する。
+     1. まず`git status`でコンフリクトしているファイルをすべて特定する。
+     2. 各ファイルの内容を`read_file`で読み込み、コンフリクトマーカー(`<<<<<<<`, `=======`, `>>>>>>>`)を確認する。
+     3. 手動で解決策を構築し、`write_file`や`replace`を使ってファイルを修正する。
+     4. 修正後、`git add <file>`で解決済みとしてマークし、`git status`で解消されたことを確認する。
+        `git add <file> && git status`
+  3. コンフリクトがなければ、プッシュを実行する。
+     `git push`
 
-3.  **Decide: What should we do?**
-    - **Start of Thought:** Begin your thought process with the prefix `Decide:`.
-    - **Action Plan Selection:** From the hypotheses formulated in `Orient`, select the one **specific action plan** that is most effective and has the highest probability of success for achieving the current goal. This should be narrowed down to a single, executable action (e.g., a specific tool call).
+- プルリクエストの管理
+  変更のマージレビューを依頼する時や、その後の運用は次の手順で操作する。
 
-4.  **Act: Let's do it.**
-    - **Start of Thought:** Begin your thought process with the prefix `Act:`.
-    - **Plan Execution:** Execute the action plan selected in `Decide` using the available tools.
-    - **Feedback Loop:** The result of the execution becomes the top-priority input for the next `Observe` phase, starting the next cycle of the loop.
+  1. **コミット前の品質チェック:**
+     すべての変更をコミットする前に、`pre-commit`フックをフル実行して品質を保証する。
+     `pre-commit run --all-files`
+  
+  2. **既存PRの確認:**
+     まず、既存のプルリクエストがないか確認する。
+     `list_pull_requests`
 
-**Detecting and Escaping Thinking Loops:**
-- If the same `Act` fails multiple times in a row, or if you recognize a repetitive `Observe` -> `Orient` pattern, judge the current OODA loop as unproductive (i.e., the Orient phase is dysfunctional).
-- In that case, immediately interrupt the loop, return to the `Orient` phase to rebuild your world model from a completely different perspective, or choose to ask the user for help in the `Decide` phase.
+  3. **新規作成:**
+     プルリクエストがなければ、タイトルと本文を指定して新規作成する。
+     `create_pull_request --title "<title>" --body "<body>"`
 
-## 4. Primary Inputs
+     **タイトル (`title`) の書き方:**
+     `<type>(<scope>): <subject>` という形式が推奨される。
+     - 例: `feat(api): ユーザー認証機能を追加`
 
-- **/app/docs:** The most critical source of information, including product specifications, design philosophy, and past decisions. Always review relevant documents before starting work.
-- **GitHub Repository:** An essential source for understanding the project's current state and context, including Issues, Pull Requests, code, and commit history.
+     **本文 (`body`) の書き方:**
+     以下の項目を記述することが推奨される。
+     - **関連Issue:** `Closes #<Issue番号>`
+     - **変更の概要:**
+     - **変更の目的:**
+     - **検証方法:**
 
-## 5. Git Workflow Principles
+  4. **更新通知:**
+     既存のプルリクエストに新しいコミットをプッシュした後は、次の操作で更新を通知する。
+     `add_issue_comment --issue_number <PR番号> --body "<コメント内容>"`
 
-When proposing changes, strictly follow this sequence as a single transaction, verifying the state after each step.
+     **コメント内容 (`body`) のテンプレート:**
+     ```
+     ## 更新内容
+     - (変更点1)
+     - (変更点2)
+     
+     レビューをお願いします。 @Copilot
+     ```
 
-**0. Synchronization:**
-   - Before starting, always run `git pull --rebase origin <base_branch>` to update your local branch. This prevents future conflicts and `non-fast-forward` errors.
+  5. **レビュアーの指定:**
+     プルリクエストにレビュアーを指定する時は、次の操作を実行する。
+     `update_pull_request --pull_number <PR番号> --reviewers Copilot`
 
-**0.5. Branch Creation:**
-   - If a branch name is specified in the Issue, create it immediately before starting work (`git checkout -b <branch_name>`).
-   - Strictly follow the branch name as instructed in the Issue.
+## 2. ファイル操作
 
-**1. Verification:**
-   - Run `pytest` to ensure all tests pass.
+- 自分のコンテキストを把握するために次の操作を実行する。
+  `read_file ~/.gemini/GEMINI.md`
+  `read_file .gemini/AGENTS/_GEMINI.md`
 
-**2. Status Check & Staging:**
-   - Check the changes with `git status`.
-   - Stage only the necessary files for the commit using `git add <file>`.
+- ファイルの内容を確認する時は、次の操作を実行する。
+  `read_file <file_path>`
 
-**3. Commit:**
-   - Review the style of recent commit messages with `git log -n 3`.
-   - Commit with a clear, conventional message, like `git commit -m "feat: <description>"`. For multi-line messages, using a file (`-F <file>`) is recommended.
+- ファイルを安全に部分置換するために、次の手順で操作する。
+  1. 書き換え対象のファイルを読み込む。
+     `read_file <file_path>`
+  2. 取得した内容を基準に、`old_string`と`new_string`を指定して置換する。
+     `replace --file_path <file_path> --old_string "..." --new_string "..."`
 
-**4. Push:**
-   - Run `git push`. If a `non-fast-forward` error occurs, return to step 0 and sync again.
+---
 
-**5. Pull Request:**
-   - **Check for Existing PRs:** Use the `list_pull_requests` tool to check if a PR from the same head branch already exists.
-   - **Create New PR:** Only create a new PR with `create_pull_request` if one does not already exist.
-   - **Notify Updates:** If a PR exists, comment on it to notify that new commits have been added.
+# 2. 品質保証 (Quality Assurance)
 
-**6. Reporting:**
-   - Use `add_issue_comment` to post an activity report to the relevant Issue.
+## 1. Pythonにおける静的解析とテスト
+コードの品質を保証するため、以下の手順でチェックを実行する。
 
-If any unexpected problems occur during this sequence, do not proceed to the next step. Either fix the problem according to the principles in Section 7 or abort the process.
+1.  **Linterと型チェック (事前):**
+    まず、Linterと型チェッカーを実行し、問題を修正する。
+    `ruff check . && ruff format .`
+    `mypy .`
 
-## 6. MCP Usage
+2.  **自動テストとデバッグ:**
+    次に、自動テストを実行する。テストが失敗した場合は、以下のワークフローで効率的に修正と確認を行う。
 
-Actively use the available MCP server and its toolset (e.g., for creating issues, adding comments).
+    1.  **失敗箇所の特定:**
+        まず `-v` オプションをつけて実行し、どのテストが失敗しているか把握する。
+        `pytest -v`
+    2.  **失敗テストへの集中:**
+        前回失敗したテストのみを対象に実行し、確認サイクルを高速化する。
+        `pytest --lf`
+    3.  **詳細なデバッグ:**
+        `-s` (print文の表示) や `--pdb` (対話的デバッガの起動) と組み合わせて原因を調査する。
+        `pytest --lf -s` または `pytest --lf --pdb`
+    4.  **修正と再実行:**
+        コードを修正し、`pytest --lf` で素早く確認する。
+    5.  **最終確認:**
+        失敗したテストがすべて通ったら、最後に全テスト (`pytest`) を実行して他に影響がないか確認する。
 
-## 7. Tool Usage and Error Recovery Principles
+3.  **Linterと型チェック (事後):**
+    自動テストの修正が他の問題を引き起こしていないか確認するため、再度Linterと型チェックを実行する。
+    `ruff check . && ruff format .`
+    `mypy .`
 
-All agents must strictly adhere to the following principles for efficient and accurate tool use and autonomous recovery from errors.
+---
 
-- **Pre-flight Check:**
-    - Before using any tool, especially those affecting the filesystem or version control (e.g., `replace`, `write_file`, `git` commands), fully understand its function and arguments.
-    - Before performing high-impact operations (e.g., overwriting a file), always use read-only tools like `read_file`, `list_directory`, or `git status` to fully grasp the state of the target. Do not act based on assumptions.
+# 3. プロジェクト進行 (Project Progression)
 
-- **Strict Error Handling:**
-    - **No Repetitive Commands:** If a tool execution results in an error, **never re-run the same command with the same parameters.** This is a classic anti-pattern that leads to thinking loops and wasted time.
-    - **Mandatory Error Analysis:** Carefully read the error message to identify the root cause. Ask "Why did this error occur?" and if you cannot determine the cause, re-gather relevant information (e.g., re-read the file, check surrounding code).
-    - **Explore Alternative Approaches:** Once the cause of the error is identified, plan and execute a different approach to solve it.
-        - **Example 1: `replace` tool failure:** If you get an error that `old_string` is not found or exists multiple times, make `old_string` more unique by including a wider context (at least 3 lines before and after), or consider rewriting the entire file with `write_file` (use this as a last resort and with extreme caution).
-        - **Example 2: `git` operation failure:**
-            - **Merge Conflicts:** If a conflict occurs during `git pull` or `git rebase`, identify all conflicting files with `git status`. Read the content of each file (including conflict markers `<<<<<<<`, `=======`, `>>>>>>>`) with `read_file`. Manually construct a resolution, apply it using `write_file` or `replace`, and then run `git add` to mark the conflict as resolved.
-            - **`non-fast-forward` error:** If you get this error on `git push`, it means the remote branch has changes your local branch doesn't know about. Return to Section 5, Step 0, and run `git pull --rebase` to update your local branch. **Force pushing (`--force`) is strictly forbidden in principle.**
+## 1. コミュニケーション
 
-- **Incremental Changes:**
-    - Instead of making large changes at once, break down tasks into the smallest possible steps. Verify the state after each step (e.g., by running tests, `git status`). This makes it easier to identify and isolate problems.
+- タスクの進捗を関連Issueに報告する時は、次の操作を実行する。
+  `add_issue_comment`
+
+- 活動報告テンプレート
+    ```
+    ## 1. 目的とゴール
+    - **解決したいIssue:** #
+    - **この作業の目的:**
+    - **ゴール(完了条件):**
+
+    ## 2. 実施内容
+    - **作業ブランチ:**
+    - **主要な変更ファイル:**
+    - **コミットリスト:**
+
+    ## 3. 検証結果
+    - **実行したテスト:**
+    - **テスト結果:**
+
+    ## 4. 影響範囲と今後の課題
+    - **影響範囲:**
+    - **残課題と次のアクション:**
+    ```
+
+- 確認事項の問い合わせテンプレート
+    ```
+    ## 要確認事項
+    現在、Issue #xxx の対応を進めておりますが、判断に必要な情報が不足しているため、作業を中断いたしました。お手数ですが、以下の点についてご確認の上、ご指示いただけますでしょうか。
+
+    ---
+
+    ### 1. 状況の概要
+    - **実行していたタスク:**
+    - **参照していたドキュメント:**
+
+    ### 2. 発生した問題・不明点
+    (何が、なぜ問題となったのかを具体的に説明します。)
+
+    ### 3. 判断のための具体的な質問
+    (はい/いいえ、または具体的な値で答えられる質問を箇条書きで記述します。)
+    1.  質問1
+    2.  質問2
+
+    ### 4. 提案（任意）
+    (可能であれば、解決策の選択肢を提示し、人間の意思決定をサポートします。)
+
+    ### 5. 現在の状態と次のアクション
+    - **現在の状態:** 作業前のクリーンな状態です。
+    - **次のアクション:** ご回答をいただき次第、ご指示に沿って作業を再開します。
+    ```
+
+## 2. エラーからの回復 (トラブル対応)
+
+### 1. 基本原則
+- ツール実行時にエラーが発生した場合、決して同じコマンドを再実行せず、エラーメッセージを分析し、別のアプローチを検討する。
+
+### 2. ケース別対応
+- **`git push`失敗時 (`non-fast-forward`エラー):**
+  次の操作でローカルブランチを更新する。
+  `git pull --rebase`
