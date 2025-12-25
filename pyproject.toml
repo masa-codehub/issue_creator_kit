@@ -11,7 +11,7 @@ build-backend = "setuptools.build_meta"
 # ===================================================================
 # パッケージの「名札」となる部分です。
 [project]
-name = "gemini_agent"
+name = "visualize_app"
 version = "0.1.0"
 authors = [
   { name="Your Name", email="your@email.com" },
@@ -32,6 +32,7 @@ dependencies = [
     "pydantic",
     "PyGithub",
     "pyyaml",
+    "python-frontmatter",
     "redis",
     "requests",
     "uvicorn[standard]",
@@ -48,17 +49,20 @@ test = [
     "pytest",
     "pytest-cov", # テストカバレッジを計測するツール
     "httpx",
+    "trio",
+    "pytest-xdist", # テストの並列実行を可能にする
 ]
 dev = [
-    "ruff==0.13.0",          # 高速なリンター兼フォーマッター
+    "visualize_app[test]",  # testの依存関係をすべて含める
+    "ruff==0.6.0",          # 高速なリンター兼フォーマッター
     "mypy==1.10.1",          # 型チェッカー
-    "pytest",
-    "pytest-cov",
     "pre-commit",    # Git フック管理
-    "httpx",
     "types-PyYAML",
     "types-requests",
     "types-redis",
+    "commitizen",
+    "python-semantic-release",
+    "build",
 ]
 ml = [
     "scikit-learn",  # 機械学習ライブラリ
@@ -73,25 +77,22 @@ ml = [
 # --- Black (コードフォーマッター) の設定 ---
 [tool.black]
 line-length = 88
-target-version = ['py313']
-include = '\.pyi?$'
+target-version = ["py313"]
+include = ".pyi?$"
 extend-exclude = '''
-/(
+/( 
   # ディレクトリを除外
-  \.eggs
-  | \.git
-  | \.hg
-  | \.mypy_cache
-  | \.tox
-  | \.venv
+  \\.eggs
+  | \\.git
+  | \\.hg
+  | \\.mypy_cache
+  | \\.tox
+  | \\.venv
   | _build
   | buck-out
   | build
   | dist
-)/
-'''
-
-
+)/'''
 
 # --- Ruff (高速リンター) の設定 ---
 [tool.ruff]
@@ -154,7 +155,8 @@ filterwarnings = [
 ]
 
 # 出力設定
-addopts = "-v --tb=short --strict-markers --cov=gemini_agent --cov-report=term-missing"
+addopts = "-v --tb=short --strict-markers --cov=visualize_app --cov-report=term-missing -n auto"
+asyncio_mode = "auto"
 
 # カスタムマーカーの定義
 markers = [
@@ -168,15 +170,21 @@ junit_family = "xunit2"
 
 # --- setuptoolsの設定 (パッケージを自動検出させる) ---
 [tool.setuptools.packages.find]
-where = ["."]  # プロジェクトのルートディレクトリを探す
-include = ["gemini_agent*"]  # "gemini_agent"で始まるディレクトリをパッケージとして含める
+where = ["."]
+include = ["visualize_app*"]  # "visualize_app"で始まるディレクトリをパッケージとして含める
 exclude = ["tests*"]  # "tests"ディレクトリはパッケージに含めない
 
 # --- mypyの設定 ---
 [tool.mypy]
 python_version = "3.13"
 ignore_missing_imports = false
+packages = ["visualize_app", "issue_creator_kit"]
+mypy_path = "."
 
 [[tool.mypy.overrides]]
 module = "punq"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "frontmatter"
 ignore_missing_imports = true

@@ -2,7 +2,7 @@ import logging
 import os
 import time
 
-from github_broker import AgentClient, GeminiExecutor
+from visualize_app import AgentClient, GeminiExecutor
 
 # --- ロギング設定 ---
 logging.basicConfig(
