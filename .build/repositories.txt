@@ -1,1 +1,0 @@
-git+https://${GITHUB_PAT}@github.com/masa-codehub/github_broker.git
