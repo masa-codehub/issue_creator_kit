@@ -58,7 +58,7 @@
 
   3. **新規作成:**
      プルリクエストがなければ、タイトルと本文を指定して新規作成する。
-     `create_pull_request --title "<title>" --body "<body>"`
+     `create_pull_request --title "<title>" --body "<body>" --head "<feature_branch>" --base "<base_branch>"`
 
      **タイトル (`title`) の書き方:**
      `<type>(<scope>): <subject>` という形式が推奨される。
@@ -102,6 +102,18 @@
      `read_file <file_path>`
   2. 取得した内容を基準に、`old_string`と`new_string`を指定して置換する。
      `replace --file_path <file_path> --old_string "..." --new_string "..."`
+  3. 最後に `read_file <file_path>` でファイルの内容を確認する。
+
+- ファイルの末尾に行を追加する時は、次の手順で操作する。
+  1. `read_file <file_path>` でファイルの内容を全て読み込む。
+  2. 読み込んだ内容の末尾に、追加したい文字列を結合する。
+  3. `write_file --file_path <file_path> --content "<結合した内容>"` でファイルを上書きする。
+  4. 最後に `read_file <file_path>` でファイルの内容を確認する。
+
+- ファイルの特定の行間にコードを追加する時は、次の手順で操作する。
+  1. `read_file <file_path>` でファイルの内容を全て読み込む。
+  2. 読み込んだ内容（文字列）に対して、追加したい箇所に新しいコードを挿入する。
+  3. `write_file --file_path <file_path> --content "<挿入後の内容>"` でファイルを上書きする。
 
 ---
 
