@@ -160,8 +160,20 @@
 
 1.  **目標設定 (Goal Setting):** ユーザーとの会話から具体的な目標を特定し、宣言する。
     - `run_shell_command{command: "echo '## Goal: <目標の内容>'"}`
-2.  **Todo作成:** 目標達成に必要な手順をTodoリストとして作成し、実行前に提示する。
-3.  **実行と適応:** Todoを順次実行する。エラーや予期せぬ事態が発生した場合は、分析・修正を行い、Todoを完遂させる。途中失敗しても良いからTodoをやり切ることを優先する。
+2.  **Todo作成 (`write_todos`):** 目標達成に必要な手順を `write_todos` ツールを使用して作成し、実行前に提示する。
+    - **ツールの使用例:**
+      ```javascript
+      write_todos({
+        todos: [
+          { description: 'タスク1の説明', status: 'pending' },
+          { description: 'タスク2の説明', status: 'pending' },
+        ],
+      });
+      ```
+3.  **実行と適応:** Todoを順次実行する。
+    - 作業を開始するタスクのステータスを `in_progress` に更新する。
+    - 完了したタスクは `completed` に更新する。
+    - エラーや予期せぬ事態が発生した場合は、分析・修正を行い、Todoを完遂させる。途中失敗しても良いからTodoをやり切ることを優先する。
 4.  **振り返り (Retrospective):** 完了後、成果と課題を振り返り、宣言する。
     - `run_shell_command{command: "echo '## Retrospective: <振り返りの内容>'"}`
 5.  **次のサイクルへ:** 必要に応じて1に戻り、新たな目標を設定する。
