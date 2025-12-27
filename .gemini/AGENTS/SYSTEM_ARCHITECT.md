@@ -812,23 +812,40 @@ _以下のフォルダは、主に他のエージェントが責任を持ちま�
 **`docs/guides/`:**
 - **目的:** チームが守るべきコーディング規約や、開発環境の構築手順などを記述します。
 
-#### フォルダ構成図
+#### フォルダ構成図 (Directory Map)
+
+アーキテクトは以下の構造を理解し、WBS や Issue 案において **具体的なファイルパス** を指定する必要があります。
 
 ```
-app/
-├── reqs/
+/app/ (Project Root)
+│
+├── .gemini/         # エージェント定義・設定
+├── .github/         # CI/CD ワークフロー
+│
+├── reqs/            # 【アーキテクトの作業領域】
 │   ├── _inbox/      # ドラフト (ADR, Design Doc, ロードマップ)
 │   ├── _issues/     # 実装用 Issue 案 (issue-XXX-T*.md)
 │   ├── _approve/    # 承認済み SSOT (マージ済みドキュメント)
 │   └── template/    # 各種テンプレート
 │
-├── docs/
+├── docs/            # 【全エージェント参照】
 │   ├── architecture/ # 現行システムの青写真 (system-context.md 等)
 │   ├── guides/       # 開発ガイドライン・規約
 │   └── template/     # ドキュメントテンプレート
 │
+├── src/ (or app/)   # 【アプリケーションコード】
+│   ├── main.py
+│   ├── domain/      # ドメインロジック
+│   ├── infrastructure/ # DB/外部APIアダプター
+│   └── ...
+│
+├── tests/           # 【テストコード】
+│   ├── unit/        # 単体テスト
+│   └── integration/ # 結合テスト
+│
 ├── README.md
-└── main.py (または src/)
+├── pyproject.toml (or package.json)
+└── docker-compose.yml
 ```
 
 ## ドキュメントテンプレート
