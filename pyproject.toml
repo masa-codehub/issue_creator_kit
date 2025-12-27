@@ -9,50 +9,147 @@ build-backend = "setuptools.build_meta"
 # 2. プロジェクトの基本情報
 # ===================================================================
 [project]
-name = "issue_creator_kit"
+name = "visualize_app"
 version = "0.1.0"
 authors = [
   { name="Your Name", email="your@email.com" },
 ]
-description = "Automate GitHub Issue creation and documentation approval workflows."
+description = "Project with Issue Creator Kit automation."
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.13"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
+# --- プロジェクトが動作するために必要なライブラリ ---
 dependencies = [
+    "fastapi",
+    "google-generativeai",
+    "punq",
+    "pydantic",
+    "PyGithub",
+    "pyyaml",
+    "python-frontmatter",
+    "redis",
     "requests",
+    "uvicorn[standard]",
+    "pydantic-settings",
 ]
 
 [project.scripts]
+# 新機能: 自動化ツールのCLI
 issue-kit = "issue_creator_kit.cli:main"
 
+# ===================================================================
+# 3. 開発・テスト時にのみ必要なライブラリ
+# ===================================================================
 [project.optional-dependencies]
-dev = [
+test = [
     "pytest",
-    "ruff",
-    "mypy",
+    "pytest-cov",
+    "httpx",
+    "trio",
+    "pytest-xdist",
+]
+dev = [
+    "visualize_app[test]",
+    "ruff==0.6.0",
+    "mypy==1.10.1",
+    "pre-commit",
+    "types-PyYAML",
     "types-requests",
+    "types-redis",
+    "commitizen",
+    "python-semantic-release",
+    "build",
+]
+ml = [
+    "scikit-learn",
+    "matplotlib",
+    "seaborn",
 ]
 
 # ===================================================================
-# 3. ツールごとの設定
+# 4. ツールごとの設定
 # ===================================================================
 
-[tool.setuptools.packages.find]
-where = ["src"]
-include = ["issue_creator_kit*"]
+# --- Black ---
+[tool.black]
+line-length = 88
+target-version = ["py313"]
+include = ".pyi?.$"
+extend-exclude = [
+    ".eggs",
+    ".git",
+    ".hg",
+    ".mypy_cache",
+    ".tox",
+    ".venv",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+]
 
+# --- Ruff ---
 [tool.ruff]
 line-length = 88
-target-version = "py310"
+target-version = "py313"
 
 [tool.ruff.lint]
-select = ["E", "W", "F", "I", "B", "T201"]
-ignore = []
+select = [
+    "E", "W", "F", "I", "B", "C4", "UP", "N", "T20", "SIM", "RET", "ERA"
+]
+ignore = [
+    "E501", "B008", "C901"
+]
 
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["N802", "N803"]
+# CLIツールはprint許可
+"src/issue_creator_kit/cli.py" = ["T201"]
+"src/issue_creator_kit/scripts/create_issues.py" = ["T201"]
+
+# --- pytest ---
+[tool.pytest.ini_options]
+minversion = "6.0"
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+pythonpath = "."
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning",
+    "ignore::UserWarning",
+]
+addopts = "-v --tb=short --strict-markers --cov=visualize_app --cov-report=term-missing -n auto"
+asyncio_mode = "auto"
+markers = [
+    "slow: marks tests as slow",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+]
+junit_family = "xunit2"
+
+# --- setuptools ---
+[tool.setuptools.packages.find]
+where = ["src", "."]  # srcとルート両方を検索対象にする
+include = ["visualize_app*", "issue_creator_kit*"]
+exclude = ["tests*"]
+
+# --- mypy ---
 [tool.mypy]
-python_version = "3.10"
+python_version = "3.13"
+ignore_missing_imports = false
+packages = ["visualize_app", "issue_creator_kit"]
+mypy_path = "."
+
+[[tool.mypy.overrides]]
+module = "punq"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "frontmatter"
 ignore_missing_imports = true
