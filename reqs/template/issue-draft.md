@@ -2,6 +2,7 @@
 
 - **Roadmap**: [ロードマップへのリンク]
 - **Task ID**: (T1, T2...)
+- **Depends-On**: (issue-XXX.md, issue-YYY.md)
 - **Status**: (Draft)
 
 ## 1. 目的と背景
