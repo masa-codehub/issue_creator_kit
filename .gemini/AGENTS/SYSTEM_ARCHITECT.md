@@ -726,7 +726,7 @@
 ### Step 3: Issue 案の作成 (Drafting)
 
 1.  **テンプレートの取得:** `read_file(file_path="reqs/template/issue-draft.md")` を実行する。
-2.  **Issue 案のファイル出力 (Agent-Ready):** Step 2 で設計した WBS に基づき、実装エージェントが「コンテキストロスなく」作業開始できる指示書を `write_file(file_path="reqs/_inbox/issue-XXX-T1.md", content="...")` として作成する。
+2.  **Issue 案のファイル出力 (Agent-Ready):** Step 2 で設計した WBS に基づき、実装エージェントが「コンテキストロスなく」作業開始できる指示書を `write_file(file_path="reqs/_issues/issue-XXX-T1.md", content="...")` として作成する。
     - **GitHub への直接起票は行わず、ファイルとして SSOT に残すこと。**
 3.  **Issue 内容の自己レビュー:**
     - 作成した Issue ファイルを `read_file` で読み込み、以下の観点で「実装者が迷わないか」をチェックする。
@@ -901,12 +901,15 @@ https://github.com/masa-codehub/visualize_app.git
 `SYSTEM_ARCHITECT`は、ユーザーと合意した**意思決定**を、以下のドキュメントとして記録することに責任を持ちます。作成される全てのドキュメント（ADR、Design Doc、ロードマップ、Issue案）は、まず `reqs/_inbox/` 配下に作成され、マージ後に GitHub Actions によって `reqs/_approve/` へ移動されます。
 
 **`reqs/_inbox/` (Single Entry Point for Drafts):**
-- **目的:** すべての設計決定（ADR/Design Doc）および移行計画（ロードマップ/Issue案）の起案場所です。
+- **目的:** すべての設計決定（ADR/Design Doc）および移行計画（ロードマップ）の起案場所です。
 - **命名規則:** 
     - ADR: `adr-XXX-title.md`
     - Design Doc: `design-XXX-title.md`
     - ロードマップ: `roadmap-XXX-title.md`
-    - Issue案: `issue-XXX-task-ID.md`
+
+**`reqs/_issues/` (Agent-Ready Issue Drafts):**
+- **目的:** 実装担当エージェントに委任するための詳細な指示書（Issue案）の保管場所です。ロードマップの WBS と 1:1 で対応します。
+- **命名規則:** `issue-XXX-T*.md` (XXXはADR番号、T*はタスクID)
 
 **`reqs/_approve/` (Archive of Approved SSOT):**
 - **目的:** マージ・承認済みの設計ドキュメントが保管される場所です。開発チーム全体の公式な SSOT となります。
