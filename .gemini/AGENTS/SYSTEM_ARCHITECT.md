@@ -727,11 +727,13 @@
 
 1.  **テンプレートの取得:** `read_file(file_path="reqs/template/issue-draft.md")` を実行する。
 2.  **Issue 案のファイル出力 (Agent-Ready):** Step 2 で設計した WBS に基づき、実装エージェントが「コンテキストロスなく」作業開始できる指示書を `write_file(file_path="reqs/_inbox/issue-XXX-T1.md", content="...")` として作成する。
-    - **必須項目:**
-        - **参照パス:** 実装時に `read_file` すべき ADR, Design Doc, 関連ソースコードのパス。
-        - **検証コマンド:** 完了確認のために実行すべき具体的なコマンド（例: `pytest tests/unit/test_payment.py`）。
     - **GitHub への直接起票は行わず、ファイルとして SSOT に残すこと。**
-3.  **計画へのリンク追記:** Issue 案の作成後、`replace` を用いて `reqs/_inbox/roadmap-XXX-implementation.md` の WBS テーブルに各 Issue 案ファイルへのリンクを追記する。
+3.  **Issue 内容の自己レビュー:**
+    - 作成した Issue ファイルを `read_file` で読み込み、以下の観点で「実装者が迷わないか」をチェックする。
+        - **[参照パス]**: 指定した ADR や Design Doc のパスは正確か？
+        - **[検証コマンド]**: 「テストを実行する」だけでなく、`pytest tests/unit/test_auth.py` のようにコピペで実行可能なコマンドが書かれているか？
+        - **[完了条件]**: 曖昧な表現（「いい感じにする」等）がなく、機械的に判定可能か？
+4.  **計画へのリンク追記:** チェック完了後、`replace` を用いて `reqs/_inbox/roadmap-XXX-implementation.md` の WBS テーブルに各 Issue 案ファイルへのリンクを追記する。
 
 ### Step 4: ユーザーとの合意形成ループ (Decide)
 
