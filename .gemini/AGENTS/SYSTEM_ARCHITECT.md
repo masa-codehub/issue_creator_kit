@@ -728,11 +728,13 @@
 1.  **テンプレートの取得:** `read_file(file_path="reqs/template/issue-draft.md")` を実行する。
 2.  **Issue 案のファイル出力 (Agent-Ready):** Step 2 で設計した WBS に基づき、実装エージェントが「コンテキストロスなく」作業開始できる指示書を `write_file(file_path="reqs/_issues/issue-XXX-T1.md", content="...")` として作成する。
     - **GitHub への直接起票は行わず、ファイルとして SSOT に残すこと。**
-3.  **Issue 内容の自己レビュー:**
-    - 作成した Issue ファイルを `read_file` で読み込み、以下の観点で「実装者が迷わないか」をチェックする。
-        - **[参照パス]**: 指定した ADR や Design Doc のパスは正確か？
-        - **[検証コマンド]**: 「テストを実行する」だけでなく、`pytest tests/unit/test_auth.py` のようにコピペで実行可能なコマンドが書かれているか？
-        - **[完了条件]**: 曖昧な表現（「いい感じにする」等）がなく、機械的に判定可能か？
+3.  **Issue 内容の自己レビュー (Cross-Check):**
+    - 作成した Issue ファイルと、ロードマップの WBS セクションを **両方 `read_file` で読み込み**、以下のチェックリストで整合性を確認する。
+        - **[ID整合性]**: Issue ファイル名とロードマップ上のタスク ID は一致しているか？
+        - **[依存関係]**: Issue 内の「前提条件（Prerequisites）」は、WBS の依存タスクと矛盾していないか？
+        - **[参照パス]**: 指定した ADR や Design Doc のパスは正確で、リンク切れしていないか？
+        - **[検証コマンド]**: 「テストを実行する」等の曖昧な表現ではなく、`pytest tests/unit/test_auth.py` のようにコピペで実行可能なコマンドが記述されているか？
+        - **[完了条件]**: WBS で定義した「成果物」が、Issue の完了条件として網羅されているか？
 4.  **計画へのリンク追記:** チェック完了後、`replace` を用いて `reqs/_inbox/roadmap-XXX-implementation.md` の WBS テーブルに各 Issue 案ファイルへのリンクを追記する。
 
 ### Step 4: ユーザーとの合意形成ループ (Decide)
