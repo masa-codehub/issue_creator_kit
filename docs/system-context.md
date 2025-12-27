@@ -19,6 +19,7 @@ GitHubを用いたソフトウェア開発において、アーキテクチャ�
 | **Inbox (インボックス)** | 提案段階のドキュメントやIssue案が配置される場所。 | `reqs/_inbox/` など |
 | **Approve (承認済み)** | 合意形成されたドキュメントの保管場所。 | `reqs/_approve/` |
 | **Draft Issue (Issue案)** | Issueとして起票される前のMarkdownファイル。 | `Depends-On` メタデータを持つ |
+| **Archive (アーカイブ)** | 処理が完了した（マージ済みのADRや、起票済みのIssue案）の保管場所。 | `reqs/_issues/created/` など |
 | **Kit (キット)** | CLI、自動化スクリプト、ワークフロー定義の総称。 | |
 
 ## 3. システムの境界と責務 (System Boundary)
@@ -34,11 +35,12 @@ GitHubを用いたソフトウェア開発において、アーキテクチャ�
 
 ## 4. アクターと外部システム (Actors & External Systems)
 
-### 4.1 アクター (ユーザー)
+### 4.1 アクター (ユーザー・エージェント)
 | アクター名 | 役割 / 目的 |
 | :--- | :--- |
-| **Architect** | 設計ドキュメントとIssue案を作成・レビューし、Inboxへ配置する。 |
-| **Developer** | 自動起票されたIssueと紐づいた設計ドキュメントを参照して実装を行う。 |
+| **Architect (Human)** | 高レベルな設計（ADR/Design Doc）を作成・承認し、ビジネス価値を定義する。 |
+| **AI Agent** | 承認された設計を解析し、依存関係（`Depends-On`）を含む Draft Issue へ分解・作成する。 |
+| **Developer (Human/Agent)** | 自動起票されたIssueと紐づいた設計ドキュメントを参照して実装を行う。 |
 
 ### 4.2 外部システム
 | システム名 | 連携内容 / プロトコル |
@@ -68,5 +70,6 @@ C4Context
 ## 7. 設計原則とデータ信頼性 (Design Principles & Kleppmann's View)
 - **Zero Configuration**: `init` コマンドで即座に動作環境が整い、ユーザーにYAMLの記述を強いない。
 - **Idempotency (冪等性)**: 同じ処理が複数回実行されても、同じ結果（重複Issueの回避など）が得られるよう設計する。
+- **Fail-Fast Reliability**: APIレート制限の不足や依存関係の不整合（循環参照）を検知した場合、中途半端な状態更新を避け、処理を1件も実行せずに安全に停止する。
 - **Dependency First**: タスクは依存先が解決されない限り起票されない。これにより、不完全なタスクがバックログに溢れるのを防ぐ。
 - **Human in the Loop**: 自動化は常にプルリクエストやブランチ移動という「人間によるマージ」の後に発生し、意図しない破壊的な変更を防ぐ。
