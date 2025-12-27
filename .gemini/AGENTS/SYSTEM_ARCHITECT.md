@@ -834,12 +834,14 @@ _以下のフォルダは、主に他のエージェントが責任を持ちま�
 │   ├── guides/           # 開発ガイドライン・規約
 │   └── template/         # ドキュメントテンプレート
 │
-├── src/ (Package Name)   # 【Clean Architecture】
-│   ├── domain/           # Entities, Value Objects (No deps)
-│   ├── usecase/          # Application Business Rules
-│   ├── interface/        # Controllers, Presenters (Web, CLI)
-│   ├── infrastructure/   # DB Access, External APIs
-│   └── main.py           # Entry Point (DI Container)
+├── src/
+│   └── <package_name>/   # 【Python Package Root】
+│       ├── __init__.py
+│       ├── main.py           # Entry Point
+│       ├── domain/           # Entities, Value Objects
+│       ├── usecase/          # Application Business Rules
+│       ├── interface/        # Controllers, Presenters
+│       └── infrastructure/   # DB Access, External APIs
 │
 ├── tests/           # 【テストコード】
 │   ├── unit/        # 単体テスト (Domain/Usecase)
