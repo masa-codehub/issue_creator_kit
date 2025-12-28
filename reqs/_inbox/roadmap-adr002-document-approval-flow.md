@@ -26,8 +26,11 @@
 **WBS**
 | Task ID | Category | タスク内容 | 対象ファイル | 依存先 | Issue案リンク |
 | :---: | :---: | :--- | :--- | :---: | :--- |
-| T1-1 | Spike | 既存のメタデータ解析ロジックの共通化検討 | `src/issue_creator_kit/scripts/create_issues.py` | - | [issue-003-T1-1-T1-2.md](../_issues/issue-003-T1-1-T1-2.md) |
-| T1-2 | Pre | メタデータ置換およびファイル操作ユーティリティの実装 | `src/issue_creator_kit/utils.py` | T1-1 | [issue-003-T1-1-T1-2.md](../_issues/issue-003-T1-1-T1-2.md) |
+| T1-1 | Setup | 作業ブランチ `feature/phase-1-foundation` の作成 | - | - | |
+| T1-2 | Spike | 既存のメタデータ解析ロジックの共通化検討 | `src/issue_creator_kit/scripts/create_issues.py` | T1-1 | [issue-003-T1-1-T1-2.md](../_issues/issue-003-T1-1-T1-2.md) |
+| T1-3 | Pre | メタデータ置換およびファイル操作ユーティリティの実装 | `src/issue_creator_kit/utils.py` | T1-2 | [issue-003-T1-1-T1-2.md](../_issues/issue-003-T1-1-T1-2.md) |
+| T1-4 | Verify | ユーティリティの単体テスト実装と実行 | `tests/unit/test_utils.py` | T1-3 | |
+| T1-5 | Review | Phase 1 成果物のレビューと Phase 2 計画の確定 | - | T1-4 | |
 
 ### Phase 2: コアロジックの実装と検証 (Core Implementation & Verification)
 - **Goal (狙い)**: 承認フローの全ロジック（移動、追記、APIコール）をPython上で完成させ、単体テストで品質を保証する。
@@ -42,9 +45,11 @@
 **WBS**
 | Task ID | Category | タスク内容 | 対象ファイル | 依存先 | Issue案リンク |
 | :---: | :---: | :--- | :--- | :---: | :--- |
-| T2-1 | Impl | ドキュメント承認プロセッサのコアロジック実装 | `src/issue_creator_kit/scripts/process_approvals.py` | T1-2 | |
-| T2-2 | Impl | トラッキング Issue 起票機能の実装 | `src/issue_creator_kit/scripts/process_approvals.py` | T2-1 | |
-| T2-3 | Verify | メタデータ更新と Issue ペイロードの単体テスト | `tests/unit/test_process_approvals.py` | T2-2 | |
+| T2-1 | Setup | 作業ブランチ `feature/phase-2-core` の作成と T1 のマージ | - | T1-5 | |
+| T2-2 | Impl | ドキュメント承認プロセッサのコアロジック実装（移動・Status更新） | `src/issue_creator_kit/scripts/process_approvals.py` | T2-1 | |
+| T2-3 | Impl | トラッキング Issue 起票・Issue番号追記機能の実装 | `src/issue_creator_kit/scripts/process_approvals.py` | T2-2 | |
+| T2-4 | Verify | メタデータ更新と Issue ペイロードの単体テスト | `tests/unit/test_process_approvals.py` | T2-3 | |
+| T2-5 | Review | Phase 2 成果物のレビューと Phase 3 計画の確定 | - | T2-4 | |
 
 ### Phase 3: ワークフローの差し替え (Swap & Release)
 - **Goal (狙い)**: CI/CDパイプラインを切り替え、本番環境（GitHub Actions）で新ロジックを稼働させる。
@@ -59,8 +64,10 @@
 **WBS**
 | Task ID | Category | タスク内容 | 対象ファイル | 依存先 | Issue案リンク |
 | :---: | :---: | :--- | :--- | :---: | :--- |
-| T3-1 | Impl | CLI サブコマンド `approve` の追加 | `src/issue_creator_kit/cli.py` | T2-3 | |
-| T3-2 | Impl | GitHub Actions ワークフローの差し替え | `.github/workflows/auto-approve-docs.yml` | T3-1 | |
+| T3-1 | Setup | 作業ブランチ `feature/phase-3-swap` の作成と T2 のマージ | - | T2-5 | |
+| T3-2 | Impl | CLI サブコマンド `approve` の追加 | `src/issue_creator_kit/cli.py` | T3-1 | |
+| T3-3 | Impl | GitHub Actions ワークフローの差し替え | `.github/workflows/auto-approve-docs.yml` | T3-2 | |
+| T3-4 | Review | Phase 3 成果物のレビューと Phase 4 計画の確定 | - | T3-3 | |
 
 ### Phase 4: 資産の同期とクリーンアップ (Sync & Cleanup)
 - **Goal (狙い)**: 配布用テンプレート（Assets）を最新化し、プロジェクト全体の一貫性を回復する。
@@ -73,8 +80,10 @@
 **WBS**
 | Task ID | Category | タスク内容 | 対象ファイル | 依存先 | Issue案リンク |
 | :---: | :---: | :--- | :--- | :---: | :--- |
-| T4-1 | Verify | 統合検証（ローカルまたはテスト環境） | - | T3-2 | |
-| T4-2 | Clean | `assets/workflows` 内のテンプレート同期 | `src/issue_creator_kit/assets/workflows/auto-approve-docs.yml` | T4-1 | |
+| T4-1 | Setup | 作業ブランチ `feature/phase-4-cleanup` の作成と T3 のマージ | - | T3-4 | |
+| T4-2 | Verify | 統合検証（ローカルまたはテスト環境） | - | T4-1 | |
+| T4-3 | Clean | `assets/workflows` 内のテンプレート同期 | `src/issue_creator_kit/assets/workflows/auto-approve-docs.yml` | T4-2 | |
+| T4-4 | Review | 最終成果物のレビューとロードマップ完了承認 | - | T4-3 | |
 
 ## 3. リスク管理とロールバック
 - **リスク**: メタデータ置換時の正規表現の誤りによるファイル破損。
