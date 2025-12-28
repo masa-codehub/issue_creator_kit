@@ -775,18 +775,55 @@
 WBS で定義した最小単位のタスク1つにつき、必ず1つの Issue ファイルを作成する。複数のタスクを1つの Issue にまとめてはならない。
 
 #### フォルダ構成図 (Directory Map)
+
+アーキテクトは以下の構造を理解し、WBS や Issue 案において **具体的なファイルパス** を指定する必要があります。
+
 ```
-/app/
-├── reqs/
-│   ├── design/
-│   │   ├── _inbox/      # 提案中
-│   │   └── _approved/   # 承認済み (SSOT)
-│   ├── roadmap/
-│   │   ├── _inbox/      # 策定中
-│   │   └── active/      # 実行中
-│   └── tasks/
-│       ├── _queue/      # 起票待ち (自動化対象)
-│       └── drafts/      # 控室 (adr-002/phase-1/...)
+/app/ (Project Root)
+│
+├── .gemini/         # エージェント定義・設定
+├── .github/         # CI/CD ワークフロー
+│
+├── reqs/            # 【アーキテクトの作業領域】
+│   ├── design/           # 【仕様・決定】 (ADR/Design Doc)
+│   │   ├── _inbox/       # 提案中 (マージされると承認フローが動く)
+│   │   ├── _approved/    # 承認済み SSOT
+│   │   └── template/     # 各種テンプレート
+│   │
+│   ├── roadmap/          # 【計画・工程】 (Roadmap)
+│   │   ├── _inbox/       # 策定中
+│   │   ├── active/       # 実行中
+│   │   ├── archive/      # 完了
+│   │   └── template/     # テンプレート
+│   │
+│   └── tasks/            # 【実装タスク】 (Issue Draft)
+│       ├── _queue/       # 起票待ち (ここに置くとGitHub Issue化される)
+│       ├── drafts/       # 控室 (adr-XXX/phase-Y/issue-T*.md)
+│       ├── archive/      # 起票済み
+│       └── template/     # テンプレート
+│
+├── docs/            # 【全エージェント参照】
+│   ├── system-context.md # 【最重要】システムの全体像と境界
+│   ├── architecture/     # 詳細設計図 (C4, シーケンス図等)
+│   ├── guides/           # 開発ガイドライン・規約
+│   └── template/         # ドキュメントテンプレート
+│
+├── src/
+│   └── <package_name>/   # 【Python Package Root】
+│       ├── __init__.py
+│       ├── main.py           # Entry Point
+│       ├── domain/           # Entities, Value Objects
+│       ├── usecase/          # Application Business Rules
+│       ├── interface/        # Controllers, Presenters
+│       └── infrastructure/   # DB Access, External APIs
+│
+├── tests/           # 【テストコード】
+│   ├── unit/        # 単体テスト (Domain/Usecase)
+│   ├── integration/ # 結合テスト (Infrastructure)
+│   └── e2e/         # シナリオテスト
+│
+├── README.md
+└── pyproject.toml   # pip install -e . 対応
 ```
 
 ## ドキュメントテンプレート
