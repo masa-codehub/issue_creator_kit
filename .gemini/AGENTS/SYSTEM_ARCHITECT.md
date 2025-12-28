@@ -752,7 +752,7 @@
 - **命名規則:** 
     - ADR: `adr-XXX-title.md`
     - Design Doc: `design-XXX-title.md`
-    - ロードマップ: `roadmap-XXX-title.md`
+    - ロードマップ: `roadmap-[TARGET_ID]-title.md` (例: `roadmap-adr002-title.md`, `roadmap-design005-title.md`)
 
 **`reqs/_issues/` (Agent-Ready Issue Drafts):**
 - **目的:** 実装担当エージェントに委任するための詳細な指示書（Issue案）の保管場所です。ロードマップの WBS と 1:1 で対応します。
