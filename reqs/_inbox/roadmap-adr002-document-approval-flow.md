@@ -25,9 +25,9 @@
 | Task ID | Category | タスク内容 | 対象ファイル | 依存先 | Issue案リンク |
 | :---: | :---: | :--- | :--- | :---: | :--- |
 | T1-1 | Setup | 作業ブランチ `feature/phase-1-design` の作成 | - | - | [issue-adr002-T1-1.md](../_issues/issue-adr002-T1-1.md) |
-| T1-2 | Spike | 既存ロジックの調査とメタデータ更新用正規表現の机上検証 | - | T1-1 | [issue-adr002-T1-2-T1-3-T1-4.md](../_issues/issue-adr002-T1-2-T1-3-T1-4.md) |
-| T1-3 | Pre | 共通ユーティリティ関数のインターフェース設計（シグネチャ定義） | - | T1-2 | [issue-adr002-T1-2-T1-3-T1-4.md](../_issues/issue-adr002-T1-2-T1-3-T1-4.md) |
-| T1-4 | Pre | 網羅的なテストケース（正常系・異常系）の定義作成 | - | T1-3 | [issue-adr002-T1-2-T1-3-T1-4.md](../_issues/issue-adr002-T1-2-T1-3-T1-4.md) |
+| T1-2 | Spike | 既存ロジックの調査とメタデータ更新用正規表現の机上検証 | - | T1-1 | [issue-adr002-T1-2.md](../_issues/issue-adr002-T1-2.md) |
+| T1-3 | Pre | 共通ユーティリティ関数のインターフェース設計（シグネチャ定義） | - | T1-2 | [issue-adr002-T1-3.md](../_issues/issue-adr002-T1-3.md) |
+| T1-4 | Pre | 網羅的なテストケース（正常系・異常系）の定義作成 | - | T1-3 | [issue-adr002-T1-4.md](../_issues/issue-adr002-T1-4.md) |
 | T1-5 | Review | 設計内容のレビューと Phase 2 (実装フェーズ) の計画確定 | - | T1-4 | [issue-adr002-T1-5.md](../_issues/issue-adr002-T1-5.md) |
 
 ### Phase 2: 基盤実装とコアロジックの構築 (Foundation & Core Implementation)
