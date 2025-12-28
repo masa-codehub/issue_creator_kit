@@ -1,6 +1,6 @@
 # Issue案: ロードマップ完了承認
 
-- **Roadmap**: [roadmap-adr002-document-approval-flow.md](../../../_inbox/roadmap-adr002-document-approval-flow.md)
+- **Roadmap**: [roadmap-adr002-document-approval-flow.md](../../../../roadmap/_inbox/roadmap-adr002-document-approval-flow.md)
 - **Task ID**: T4-3
 - **Depends-On**: issue-T4-2.md
 - **Status**: Draft

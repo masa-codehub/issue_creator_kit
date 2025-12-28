@@ -1,6 +1,6 @@
 # Issue案: テンプレート更新とクリーンアップ
 
-- **Roadmap**: [roadmap-adr002-document-approval-flow.md](../../../_inbox/roadmap-adr002-document-approval-flow.md)
+- **Roadmap**: [roadmap-adr002-document-approval-flow.md](../../../../roadmap/_inbox/roadmap-adr002-document-approval-flow.md)
 - **Task ID**: T4-2
 - **Depends-On**: issue-T4-1.md
 - **Status**: Draft

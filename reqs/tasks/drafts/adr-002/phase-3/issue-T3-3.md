@@ -1,6 +1,6 @@
 # Issue案: GitHub Actions ワークフローの刷新
 
-- **Roadmap**: [roadmap-adr002-document-approval-flow.md](../../../_inbox/roadmap-adr002-document-approval-flow.md)
+- **Roadmap**: [roadmap-adr002-document-approval-flow.md](../../../../roadmap/_inbox/roadmap-adr002-document-approval-flow.md)
 - **Task ID**: T3-3
 - **Depends-On**: issue-T3-2.md
 - **Status**: Draft

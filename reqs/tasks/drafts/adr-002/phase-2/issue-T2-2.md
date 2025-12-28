@@ -1,6 +1,6 @@
 # Issue案: 共通ユーティリティ (utils.py) の実装
 
-- **Roadmap**: [roadmap-adr002-document-approval-flow.md](../../../_inbox/roadmap-adr002-document-approval-flow.md)
+- **Roadmap**: [roadmap-adr002-document-approval-flow.md](../../../../roadmap/_inbox/roadmap-adr002-document-approval-flow.md)
 - **Task ID**: T2-2
 - **Depends-On**: issue-T2-1.md
 - **Status**: Draft

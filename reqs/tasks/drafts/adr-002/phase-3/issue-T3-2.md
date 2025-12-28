@@ -1,6 +1,6 @@
 # Issue案: CLI コマンド (approve) の統合
 
-- **Roadmap**: [roadmap-adr002-document-approval-flow.md](../../../_inbox/roadmap-adr002-document-approval-flow.md)
+- **Roadmap**: [roadmap-adr002-document-approval-flow.md](../../../../roadmap/_inbox/roadmap-adr002-document-approval-flow.md)
 - **Task ID**: T3-2
 - **Depends-On**: issue-T3-1.md
 - **Status**: Draft

@@ -1,6 +1,6 @@
 # Issue案: 既存スクリプトの回帰テスト
 
-- **Roadmap**: [roadmap-adr002-document-approval-flow.md](../../../_inbox/roadmap-adr002-document-approval-flow.md)
+- **Roadmap**: [roadmap-adr002-document-approval-flow.md](../../../../roadmap/_inbox/roadmap-adr002-document-approval-flow.md)
 - **Task ID**: T2-4
 - **Depends-On**: issue-T2-3.md
 - **Status**: Draft

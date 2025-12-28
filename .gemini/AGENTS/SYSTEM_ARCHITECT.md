@@ -744,70 +744,49 @@
 
 # フォルダ構成 (Folder Structure)
 
-`SYSTEM_ARCHITECT` は、合意された意思決定をドキュメントとして記録する責任を持ちます。すべてのドラフトは `reqs/_inbox/` または `reqs/_issues/` に作成され、承認・マージ後に `reqs/_approve/` へ移動されます。
+`SYSTEM_ARCHITECT` は、合意された意思決定をドキュメントとして記録し、タスクとして展開する責任を持ちます。
 
-**`reqs/_inbox/` (Single Entry Point for Drafts):**
-- **目的:** すべての設計決定（ADR/Design Doc）および移行計画（ロードマップ）の起案場所です。
-- **命名規則:** 
-    - ADR: `adr-XXX-title.md`
-    - Design Doc: `design-XXX-title.md`
-    - ロードマップ: `roadmap-[TARGET_ID]-title.md` (例: `roadmap-adr002-title.md`, `roadmap-design005-title.md`)
+### 1. `reqs/design/` (仕様・決定)
+- **`_inbox/`**: ADR や Design Doc の提案場所。マージされると自動的に `_approved/` へ移動し、トラッキング Issue が起票される。
+- **`_approved/`**: 承認済み SSOT。
+- **`template/`**: ADR/Design Doc 用テンプレート。
 
-**`reqs/_issues/` (Agent-Ready Issue Drafts):**
-- **目的:** 実装担当エージェントに委任するための詳細な指示書（Issue案）の保管場所です。ロードマップの WBS と 1:1 で対応します。
-- **命名規則:** `adr-XXX/phase-Y/issue-T*.md` (階層化して管理)
+### 2. `reqs/roadmap/` (計画・工程)
+- **`_inbox/`**: 移行計画（ロードマップ）の策定場所。
+- **`active/`**: 実行中のロードマップ。進捗に応じて更新される。
+- **`archive/`**: 完了したプロジェクトの記録。
+- **`template/`**: ロードマップ用テンプレート。
 
-**`reqs/_approve/` (Archive of Approved SSOT):**
-- **目的:** マージ・承認済みの設計決定およびロードマップが保管される場所です。開発チーム全体の公式な SSOT となります。
+### 3. `reqs/tasks/` (実装タスク)
+- **`_queue/`**: **【自動起票トリガー】** ここに配置された Draft Issue は自動で GitHub Issue 化され、`archive/` へ移動する。
+- **`drafts/`**: 将来のフェーズで実行予定のタスク案。ADR ID や Phase 別に階層管理する。
+- **`archive/`**: 起票済み Issue の記録（ファイル内に Issue 番号が追記される）。
+- **`template/`**: Issue 案用テンプレート。
 
 ---
 
-_以下のフォルダは、主に他のエージェントが責任を持ちますが、`SYSTEM_ARCHITECT`も全体の一貫性を保つために内容を把握している必要があります。_
+#### 命名規則 (Naming Conventions)
+- **ADR**: `adr-XXX-title.md`
+- **Design Doc**: `design-XXX-title.md`
+- **ロードマップ**: `roadmap-[TARGET_ID]-title.md` (例: `roadmap-adr002-title.md`)
+- **タスク (Issue案)**: `issue-T*.md` (Task ID と対応)
 
-**`docs/architecture/`:**
-- **目的:** システムの現在の全体像（境界、外部依存、主要データフロー）を示す「北極星」ドキュメント。
-
-**`docs/guides/`:**
-- **目的:** チームが守るべきコーディング規約や、開発環境の構築手順などを記述します。
+#### 1タスク1Issueの原則
+WBS で定義した最小単位のタスク1つにつき、必ず1つの Issue ファイルを作成する。複数のタスクを1つの Issue にまとめてはならない。
 
 #### フォルダ構成図 (Directory Map)
-
-アーキテクトは以下の構造を理解し、WBS や Issue 案において **具体的なファイルパス** を指定する必要があります。
-
 ```
-/app/ (Project Root)
-│
-├── .gemini/         # エージェント定義・設定
-├── .github/         # CI/CD ワークフロー
-│
-├── reqs/            # 【アーキテクトの作業領域】
-│   ├── _inbox/      # ドラフト (ADR, Design Doc, ロードマップ)
-│   ├── _issues/     # 実装用 Issue 案 (issue-XXX-T*.md)
-│   ├── _approve/    # 承認済み SSOT (マージ済みドキュメント)
-│   └── template/    # 各種テンプレート
-│
-├── docs/            # 【全エージェント参照】
-│   ├── system-context.md # 【最重要】システムの全体像と境界
-│   ├── architecture/     # 詳細設計図 (C4, シーケンス図等)
-│   ├── guides/           # 開発ガイドライン・規約
-│   └── template/         # ドキュメントテンプレート
-│
-├── src/
-│   └── <package_name>/   # 【Python Package Root】
-│       ├── __init__.py
-│       ├── main.py           # Entry Point
-│       ├── domain/           # Entities, Value Objects
-│       ├── usecase/          # Application Business Rules
-│       ├── interface/        # Controllers, Presenters
-│       └── infrastructure/   # DB Access, External APIs
-│
-├── tests/           # 【テストコード】
-│   ├── unit/        # 単体テスト (Domain/Usecase)
-│   ├── integration/ # 結合テスト (Infrastructure)
-│   └── e2e/         # シナリオテスト
-│
-├── README.md
-└── pyproject.toml   # pip install -e . 対応
+/app/
+├── reqs/
+│   ├── design/
+│   │   ├── _inbox/      # 提案中
+│   │   └── _approved/   # 承認済み (SSOT)
+│   ├── roadmap/
+│   │   ├── _inbox/      # 策定中
+│   │   └── active/      # 実行中
+│   └── tasks/
+│       ├── _queue/      # 起票待ち (自動化対象)
+│       └── drafts/      # 控室 (adr-002/phase-1/...)
 ```
 
 ## ドキュメントテンプレート

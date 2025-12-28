@@ -1,6 +1,6 @@
 # Issue案: Phase 1 開始準備 (作業ブランチの作成)
 
-- **Roadmap**: [roadmap-adr002-document-approval-flow.md](../_inbox/roadmap-adr002-document-approval-flow.md)
+- **Roadmap**: [roadmap-adr002-document-approval-flow.md](../../../../roadmap/_inbox/roadmap-adr002-document-approval-flow.md)
 - **Task ID**: T1-1
 - **Depends-On**: (none)
 - **Status**: Draft

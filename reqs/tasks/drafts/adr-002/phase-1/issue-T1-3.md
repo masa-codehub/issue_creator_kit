@@ -1,8 +1,8 @@
 # Issue案: 共通ユーティリティ関数のインターフェース設計
 
-- **Roadmap**: [roadmap-adr002-document-approval-flow.md](../_inbox/roadmap-adr002-document-approval-flow.md)
+- **Roadmap**: [roadmap-adr002-document-approval-flow.md](../../../../roadmap/_inbox/roadmap-adr002-document-approval-flow.md)
 - **Task ID**: T1-3
-- **Depends-On**: issue-adr002-T1-2.md
+- **Depends-On**: issue-T1-2.md
 - **Status**: Draft
 
 ## 1. 目的と背景

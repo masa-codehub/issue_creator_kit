@@ -1,6 +1,6 @@
 # Issue案: Phase 3 完了レビュー
 
-- **Roadmap**: [roadmap-adr002-document-approval-flow.md](../../../_inbox/roadmap-adr002-document-approval-flow.md)
+- **Roadmap**: [roadmap-adr002-document-approval-flow.md](../../../../roadmap/_inbox/roadmap-adr002-document-approval-flow.md)
 - **Task ID**: T3-4
 - **Depends-On**: issue-T3-3.md
 - **Status**: Draft
