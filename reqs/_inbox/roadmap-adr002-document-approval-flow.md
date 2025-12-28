@@ -26,11 +26,11 @@
 **WBS**
 | Task ID | Category | タスク内容 | 対象ファイル | 依存先 | Issue案リンク |
 | :---: | :---: | :--- | :--- | :---: | :--- |
-| T1-1 | Setup | 作業ブランチ `feature/phase-1-foundation` の作成 | - | - | |
-| T1-2 | Spike | 既存のメタデータ解析ロジックの共通化検討 | `src/issue_creator_kit/scripts/create_issues.py` | T1-1 | [issue-003-T1-1-T1-2.md](../_issues/issue-003-T1-1-T1-2.md) |
-| T1-3 | Pre | メタデータ置換およびファイル操作ユーティリティの実装 | `src/issue_creator_kit/utils.py` | T1-2 | [issue-003-T1-1-T1-2.md](../_issues/issue-003-T1-1-T1-2.md) |
-| T1-4 | Verify | ユーティリティの単体テスト実装と実行 | `tests/unit/test_utils.py` | T1-3 | |
-| T1-5 | Review | Phase 1 成果物のレビューと Phase 2 計画の確定 | - | T1-4 | |
+| T1-1 | Setup | 作業ブランチ `feature/phase-1-foundation` の作成 | - | - | [issue-adr002-T1-1.md](../_issues/issue-adr002-T1-1.md) |
+| T1-2 | Spike | 既存のメタデータ解析ロジックの共通化検討 | `src/issue_creator_kit/scripts/create_issues.py` | T1-1 | [issue-adr002-T1-2-T1-3-T1-4.md](../_issues/issue-adr002-T1-2-T1-3-T1-4.md) |
+| T1-3 | Pre | メタデータ置換およびファイル操作ユーティリティの実装 | `src/issue_creator_kit/utils.py` | T1-2 | [issue-adr002-T1-2-T1-3-T1-4.md](../_issues/issue-adr002-T1-2-T1-3-T1-4.md) |
+| T1-4 | Verify | ユーティリティの単体テスト実装と実行 | `tests/unit/test_utils.py` | T1-3 | [issue-adr002-T1-2-T1-3-T1-4.md](../_issues/issue-adr002-T1-2-T1-3-T1-4.md) |
+| T1-5 | Review | Phase 1 成果物のレビューと Phase 2 計画の確定 | - | T1-4 | [issue-adr002-T1-5.md](../_issues/issue-adr002-T1-5.md) |
 
 ### Phase 2: コアロジックの実装と検証 (Core Implementation & Verification)
 - **Goal (狙い)**: 承認フローの全ロジック（移動、追記、APIコール）をPython上で完成させ、単体テストで品質を保証する。
