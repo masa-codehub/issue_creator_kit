@@ -16,19 +16,19 @@
 
 | 担当 (Actor) | 技術的手段 (Technical Means) | 具体的な成果物・動作 |
 | :--- | :--- | :--- |
-| **AI Agent** | **静的依存定義** | `reqs/_issues/*.md` 作成時、メタデータ部に `- **Depends-On**: ./issue-A.md` 形式で相対パスを記述する。 |
+| **AI Agent** | **静的依存定義** | `reqs/tasks/drafts/` 等でDraftを作成し、起票対象を `reqs/tasks/_queue/*.md` へ配置する。メタデータ部は `- **Depends-On**: ./issue-A.md` 形式で相対パスを記述する。 |
 | **issue-kit (src/)** | **依存関係解析** | Python の `graphlib.TopologicalSorter` を用い、`Depends-On` から有向非巡回グラフ (DAG) を構築・ソートする。 |
 | **issue-kit (src/)** | **Fail-Fast 検証** | 起票開始前に GitHub API `GET /rate_limit` を確認し、起票予定数以上の残弾がない場合は、1件も起票せずに `sys.exit(1)` する。 |
 | **issue-kit (src/)** | **循環参照の可視化** | `CycleError` 検知時、循環パス（例: `A -> B -> A`）をログに出力し、処理を停止する。 |
 | **issue-kit (src/)** | **動的番号解決** | `POST /issues` 直後に取得した実 Issue 番号を保持し、後続 Issue の本文内にある「ファイル名」を `#123` 形式へ動的に置換する。 |
-| **issue-kit (src/)** | **ライフサイクル管理** | 起票に成功した Markdown ファイルは、`os.rename` を用いて `reqs/_issues/created/` へ即座に移動（アーカイブ）する。 |
+| **issue-kit (src/)** | **ライフサイクル管理** | 起票に成功した Markdown ファイルは、`os.rename` を用いて `reqs/tasks/archive/` へ即座に移動（アーカイブ）する。 |
 | **AI / Developer** | **単体テスト (pytest)** | `tests/` 内に `unittest.mock` で GitHub API 通信を擬似化したテストを「実装前」に作成し、ロジックを検証する。 |
 | **GitHub Actions** | **統合テスト (act)** | ワークフロー変更時、`act` を用いてローカルの Docker 環境で Actions の完遂（終了コード 0）を確認する。 |
 
 ### 2. 詳細仕様規定
 - **置換アルゴリズム**: 本文 (Body) 全体をスキャンし、依存グラフに含まれるファイル名（例: `issue-001.md`）と一致する文字列を、実 Issue 番号（例: `#101`）へ置換する。
 - **認証**: `GH_TOKEN` 環境変数を使用し、`requests` の Header に `Authorization: token ...` を付与して通信する。
-- **ディレクトリ制約**: `reqs/_issues/` 直下の `.md` ファイルのみを対象とし、サブディレクトリは走査しない。
+- **ディレクトリ制約**: `reqs/tasks/_queue/` 直下の `.md` ファイルのみを対象とし、サブディレクトリは走査しない。
 
 ## 検討した代替案 / Alternatives Considered
 - **案B: 並列起票**: 依存関係を無視して起票する。管理コストが増大するため不採用。
