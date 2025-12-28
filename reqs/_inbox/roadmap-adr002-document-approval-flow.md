@@ -24,11 +24,11 @@
 **WBS**
 | Task ID | Category | タスク内容 | 対象ファイル | 依存先 | Issue案リンク |
 | :---: | :---: | :--- | :--- | :---: | :--- |
-| T1-1 | Setup | 作業ブランチ `feature/phase-1-design` の作成 | - | - | [issue-adr002-T1-1.md](../_issues/issue-adr002-T1-1.md) |
-| T1-2 | Spike | 既存ロジックの調査とメタデータ更新用正規表現の机上検証 | - | T1-1 | [issue-adr002-T1-2.md](../_issues/issue-adr002-T1-2.md) |
-| T1-3 | Pre | 共通ユーティリティ関数のインターフェース設計（シグネチャ定義） | - | T1-2 | [issue-adr002-T1-3.md](../_issues/issue-adr002-T1-3.md) |
-| T1-4 | Pre | 網羅的なテストケース（正常系・異常系）の定義作成 | - | T1-3 | [issue-adr002-T1-4.md](../_issues/issue-adr002-T1-4.md) |
-| T1-5 | Review | 設計内容のレビューと Phase 2 (実装フェーズ) の計画確定 | - | T1-4 | [issue-adr002-T1-5.md](../_issues/issue-adr002-T1-5.md) |
+| T1-1 | Setup | 作業ブランチ `feature/phase-1-design` の作成 | - | - | [issue-T1-1.md](../_issues/adr-002/phase-1/issue-T1-1.md) |
+| T1-2 | Spike | 既存ロジックの調査とメタデータ更新用正規表現の机上検証 | - | T1-1 | [issue-T1-2.md](../_issues/adr-002/phase-1/issue-T1-2.md) |
+| T1-3 | Pre | 共通ユーティリティ関数のインターフェース設計（シグネチャ定義） | - | T1-2 | [issue-T1-3.md](../_issues/adr-002/phase-1/issue-T1-3.md) |
+| T1-4 | Pre | 網羅的なテストケース（正常系・異常系）の定義作成 | - | T1-3 | [issue-T1-4.md](../_issues/adr-002/phase-1/issue-T1-4.md) |
+| T1-5 | Review | 設計内容のレビューと Phase 2 (実装フェーズ) の計画確定 | - | T1-4 | [issue-T1-5.md](../_issues/adr-002/phase-1/issue-T1-5.md) |
 
 ### Phase 2: 基盤実装とコアロジックの構築 (Foundation & Core Implementation)
 - **Goal (狙い)**: Phase 1 で確定した設計に基づき、ユーティリティおよび承認プロセッサの実装・単体テストを完遂する。
@@ -42,11 +42,11 @@
 **WBS**
 | Task ID | Category | タスク内容 | 対象ファイル | 依存先 | Issue案リンク |
 | :---: | :---: | :--- | :--- | :---: | :--- |
-| T2-1 | Setup | 作業ブランチ `feature/phase-2-implementation` の作成 | - | T1-5 | |
-| T2-2 | Impl | `utils.py` の実装と単体テスト実行 | `src/issue_creator_kit/utils.py` | T2-1 | |
-| T2-3 | Impl | `process_approvals.py` の実装と単体テスト実行 | `src/issue_creator_kit/scripts/process_approvals.py` | T2-2 | |
-| T2-4 | Verify | 既存 `create_issues.py` のリファクタリングと回帰テスト | - | T2-3 | |
-| T2-5 | Review | 実装コードのレビューと Phase 3 計画の確定 | - | T2-4 | |
+| T2-1 | Setup | 作業ブランチ `feature/phase-2-implementation` の作成 | - | T1-5 | [issue-T2-1.md](../_issues/adr-002/phase-2/issue-T2-1.md) |
+| T2-2 | Impl | `utils.py` の実装と単体テスト実行 | `src/issue_creator_kit/utils.py` | T2-1 | [issue-T2-2.md](../_issues/adr-002/phase-2/issue-T2-2.md) |
+| T2-3 | Impl | `process_approvals.py` の実装と単体テスト実行 | `src/issue_creator_kit/scripts/process_approvals.py` | T2-2 | [issue-T2-3.md](../_issues/adr-002/phase-2/issue-T2-3.md) |
+| T2-4 | Verify | 既存 `create_issues.py` のリファクタリングと回帰テスト | - | T2-3 | [issue-T2-4.md](../_issues/adr-002/phase-2/issue-T2-4.md) |
+| T2-5 | Review | 実装コードのレビューと Phase 3 計画の確定 | - | T2-4 | [issue-T2-5.md](../_issues/adr-002/phase-2/issue-T2-5.md) |
 
 ### Phase 3: ワークフローの差し替えと統合 (Swap & Release)
 - **Goal (狙い)**: CI/CDパイプラインを刷新し、本番環境で Python ベースの安全な承認フローを稼働させる。
@@ -59,10 +59,10 @@
 **WBS**
 | Task ID | Category | タスク内容 | 対象ファイル | 依存先 | Issue案リンク |
 | :---: | :---: | :--- | :--- | :---: | :--- |
-| T3-1 | Setup | 作業ブランチ `feature/phase-3-integration` の作成 | - | T2-5 | |
-| T3-2 | Impl | CLI サブコマンド `approve` の統合 | `src/issue_creator_kit/cli.py` | T3-1 | |
-| T3-3 | Impl | GitHub Actions ワークフローの差し替え | `.github/workflows/auto-approve-docs.yml` | T3-2 | |
-| T3-4 | Review | 統合検証結果のレビューと Phase 4 計画の確定 | - | T3-3 | |
+| T3-1 | Setup | 作業ブランチ `feature/phase-3-integration` の作成 | - | T2-5 | [issue-T3-1.md](../_issues/adr-002/phase-3/issue-T3-1.md) |
+| T3-2 | Impl | CLI サブコマンド `approve` の統合 | `src/issue_creator_kit/cli.py` | T3-1 | [issue-T3-2.md](../_issues/adr-002/phase-3/issue-T3-2.md) |
+| T3-3 | Impl | GitHub Actions ワークフローの差し替え | `.github/workflows/auto-approve-docs.yml` | T3-2 | [issue-T3-3.md](../_issues/adr-002/phase-3/issue-T3-3.md) |
+| T3-4 | Review | 統合検証結果のレビューと Phase 4 計画の確定 | - | T3-3 | [issue-T3-4.md](../_issues/adr-002/phase-3/issue-T3-4.md) |
 
 ### Phase 4: 資産の同期とクリーンアップ (Sync & Cleanup)
 - **Goal (狙い)**: 配布用テンプレートを最新化し、旧負債を完全に排除する。
@@ -74,9 +74,9 @@
 **WBS**
 | Task ID | Category | タスク内容 | 対象ファイル | 依存先 | Issue案リンク |
 | :---: | :---: | :--- | :--- | :---: | :--- |
-| T4-1 | Setup | 作業ブランチ `feature/phase-4-cleanup` の作成 | - | T3-4 | |
-| T4-2 | Clean | `assets/workflows` 内のテンプレート同期と旧スクリプト削除 | - | T4-1 | |
-| T4-3 | Review | 最終成果物のレビューとロードマップ完了承認 | - | T4-2 | |
+| T4-1 | Setup | 作業ブランチ `feature/phase-4-cleanup` の作成 | - | T3-4 | [issue-T4-1.md](../_issues/adr-002/phase-4/issue-T4-1.md) |
+| T4-2 | Clean | `assets/workflows` 内のテンプレート同期と旧スクリプト削除 | - | T4-1 | [issue-T4-2.md](../_issues/adr-002/phase-4/issue-T4-2.md) |
+| T4-3 | Review | 最終成果物のレビューとロードマップ完了承認 | - | T4-2 | [issue-T4-3.md](../_issues/adr-002/phase-4/issue-T4-3.md) |
 
 ## 3. リスク管理とロールバック
 - **リスク**: 設計（インターフェース）の考慮漏れによる実装時の大幅な修正。

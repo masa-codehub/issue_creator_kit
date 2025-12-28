@@ -755,7 +755,7 @@
 
 **`reqs/_issues/` (Agent-Ready Issue Drafts):**
 - **目的:** 実装担当エージェントに委任するための詳細な指示書（Issue案）の保管場所です。ロードマップの WBS と 1:1 で対応します。
-- **命名規則:** `issue-XXX-T*.md` (XXXは連番、T*はタスクID)
+- **命名規則:** `adr-XXX/phase-Y/issue-T*.md` (階層化して管理)
 
 **`reqs/_approve/` (Archive of Approved SSOT):**
 - **目的:** マージ・承認済みの設計決定およびロードマップが保管される場所です。開発チーム全体の公式な SSOT となります。
