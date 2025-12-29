@@ -46,13 +46,13 @@
     - **戦略パターンの選択:** 以下の「3つの型」から案件に最適なものを選択する。
     - **フェーズの定義:** 選択した型に従い、Phase 1〜3 の「目的」と「成果物」を具体的に定義する。
     - **ブランチ戦略の定義 (Define Branching Strategy):**
-        - **Foundation Branch:** 各フェーズの開始時（Setup Task）に、そのフェーズの基点となるブランチ（例: `feature/phase-X-foundation`）を作成する。これが全タスクの Base Branch となる。
-        - **Task Branches:** 各実装タスク（Issue）は、Foundation Branch から派生した個別の作業ブランチ（例: `feature/task-ID-desc`）で実行する。
-        - **Merge Flow:** 実装完了後は Foundation Branch へマージし、フェーズ完了時（Review Task）に Foundation Branch を `main` へマージする流れを WBS に組み込む。
+        - **Phase Base Branch (Foundation):** 各フェーズの開始時（Setup Task）に、そのフェーズの基点となるブランチ（例: `feature/phase-X-foundation`）を作成する。これを当該フェーズにおける **ベースブランチ (Base Branch)** とする。
+        - **Task Working Branch (Feature):** 各実装タスク（Issue）は、ベースブランチから派生した個別の **作業ブランチ (Feature Branch)** （例: `feature/task-ID-desc`）で実行する。
+        - **Merge Flow:** 実装完了後は作業ブランチをベースブランチへマージし、フェーズ完了時（Review Task）にベースブランチを `main` へマージする流れを WBS に組み込む。
     - **WBS の展開:** 定義した各フェーズの直下に、以下の標準構造でタスクテーブル（WBS）を作成し、ロードマップの「## 2. 実装フェーズとWBS」を埋める。
-        - **[先頭] Setup Task:** フェーズ用 Foundation Branch の作成と環境準備。
-        - **[中間] Implementation Tasks:** 具体的な実装・テスト・移行作業（Spike, Pre, Impl, Verify, Clean）。各タスクは固有の Task Branch で行われる。
-        - **[末尾] Review Task:** フェーズ完了の承認（Gate チェック）と、Foundation Branch の Main へのマージ。
+        - **[先頭] Setup Task:** フェーズ用ベースブランチ（Foundation）の作成と環境準備。
+        - **[中間] Implementation Tasks:** 具体的な実装・テスト・移行作業（Spike, Pre, Impl, Verify, Clean）。各タスクは固有の作業ブランチ（Feature Branch）で行われる。
+        - **[末尾] Review Task:** フェーズ完了の承認（Gate チェック）と、ベースブランチの Main へのマージ。
         - **依存関係の明示:** 各タスクの「依存先 ID」および「外部チーム/APIへの依存」を特定し、クリティカルパスを明確にする。
 
 **アウトプット例 (戦略パターン別のフェーズ定義):**
@@ -146,16 +146,16 @@
 1.  **テンプレートの取得:** `read_file(file_path="reqs/template/issue-draft.md")` を実行する。
 2.  **Issue 案のファイル出力 (Agent-Ready):** Step 2 で設計した WBS に基づき、以下の3種類の Issue 案を作成する。
     - **A. Phase 開始 Issue (Setup):**
-        - 各フェーズの冒頭に配置。Foundation Branch（例: `feature/phase-1-setup`）の作成と、後続タスクへのブランチ共有を指示する。
+        - 各フェーズの冒頭に配置。ベースブランチ（Foundation, 例: `feature/phase-1-setup`）の作成と、後続タスクへのブランチ共有を指示する。
     - **B. 実装タスク Issue (Implementation):**
         - WBS の各タスクに対応。`write_file(file_path="reqs/_issues/issue-XXX-T1.md", content="...")` として作成する。
         - **1タスク1Issueの原則:** WBS で定義したタスク1つにつき、必ず1つの Issue ファイルを作成する。複数のタスクを1つの Issue にまとめてはならない。
         - **ブランチ戦略 (Branching Strategy):** テンプレートに従い、以下を明記する。
             - **Base Branch:** そのフェーズの Foundation Branch (例: `feature/phase-X-foundation`)
-            - **Feature Branch:** タスク固有のブランチ (例: `feature/task-ID-desc`)
+            - **Feature Branch:** タスク固有の作業ブランチ (例: `feature/task-ID-desc`)
         - **必須項目:** 参照パス、検証コマンド、依存ブランチ名。
     - **C. Phase 完了 Issue (Review & Plan):**
-        - 各フェーズの末尾に配置。全タスクの完了確認、成果物の検証（Gate チェック）、および**Foundation Branch の Main へのマージ**を指示する。
+        - 各フェーズの末尾に配置。全タスクの完了確認、成果物の検証（Gate チェック）、および**ベースブランチの Main へのマージ**を指示する。
     - **共通ルール:** GitHub への直接起票は行わず、すべてファイルとして SSOT に残すこと。
 3.  **Issue 内容の自己レビュー (Cross-Check):**
     - 作成した Issue ファイルと、ロードマップの WBS セクションを **両方 `read_file` で読み込み**、以下のチェックリストで整合性を確認する。
