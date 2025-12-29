@@ -8,7 +8,12 @@
     1.  `issue_read(method="get", issue_number=XXX)` を実行し、アーキテクチャ更新の目的と範囲を把握する。
     2.  `issue_read(method="get_sub_issues", issue_number=XXX)` を使い、依存タスク（子Issue）が全て **CLOSED** になっていることを確認する。完了していない場合は作業を開始せず報告する。
 
-2.  **先行タスク成果物の実在検証 (Verification of Deliverables):**
+2.  **作業ブランチの準備:**
+    1.  **ベースブランチの特定:** 担当Issueの記述（本文やコメント）を確認し、作業の基点となる「ベースブランチ」の指定がないか確認する（明示がなければ `main` をベースとする）。
+    2.  **ベースの最新化:** `run_shell_command("git checkout <base_branch> && git pull")` を実行し、ベースブランチをリモートの最新状態に同期する。
+    3.  **作業ブランチの作成:** `create_branch` (または `git checkout -b`) を使用し、Issue番号を含んだ作業用ブランチ（例: `feature/arch-update-issue-XXX`）をベースブランチから作成する。
+
+3.  **先行タスク成果物の実在検証 (Verification of Deliverables):**
     1.  **成果物の特定:** `issue_read(method="get_comments", issue_number=XXX)` を実行し、子Issueの完了報告コメントから「Pull Request番号」や「作成されたファイルパス」の情報を特定する。
     2.  **変更内容の把握:** PR番号が特定できた場合は `pull_request_read(method="get_diff", pullNumber=YYY)` を、ファイルパスのみの場合は `read_file` を実行し、アーキテクチャ図に反映すべき「新しい構造的事実」を抽出する。
     3.  **実在確認:** `list_directory` や `read_file` を使い、特定した主要な変更ファイルがファイルシステム上に実際に存在することを自分の目で確認する。
@@ -36,12 +41,13 @@
 
 ### Step 1: 構造化と図解ドラフト作成 (Orient)
 
-Step 0 の**ギャップ分析結果（As-Is/To-Be）に基づき**、更新が必要なコンテナ・コンポーネントを特定して詳細定義を行い、ドラフトを作成します。
+Step 0 の**ギャップ分析結果（As-Is/To-Be）に基づき**、ADR等の一次情報源と照らし合わせながら詳細定義を行い、ドラフトを作成します。
 
 1.  **コンテナレベルの分析・定義 (Level 2):**
     1.  **フォーマットの確認:** `read_file(file_path="docs/template/c4-model-template.md")` を読み込む。
     2.  **更新対象の特定:** ギャップ分析レポートに基づき、新規追加・変更があった「実行プロセス（docker-composeのservice等）」に焦点を当てる。
     3.  **選定分析:** 各プロセスについて、アーキテクチャ図に「コンテナ」として載せるべきか判断する。
+        - **Check:** `search_file_content` 等を用いて関連するADRを検索し、そのコンテナ構成が `reqs/design/_approved/` 内の方針（マイクロサービス化等）と整合しているか確認する。
 
     **選定分析アウトプット例**
     ```markdown
@@ -58,6 +64,8 @@ Step 0 の**ギャップ分析結果（As-Is/To-Be）に基づき**、更新が�
 2.  **コンポーネントレベルの分析・定義 (Level 3):**
     1.  **更新対象の特定:** ギャップ分析で特定されたコンテナ、またはモジュール構成に変更があったコンテナを選択する。
     2.  **コンポーネント分析:** パッケージ構造や主要クラスを調査し、アーキテクチャ的に意味のある「論理グループ」を特定・グルーピングする。
+        - **Action:** 必要に応じて `read_file` で主要クラスのソースコード（import文やクラス定義）を読み込み、実際の依存関係や責務を確認する。
+        - **Check:** 特定したコンポーネント粒度は、プロジェクトの設計原則（Clean Architecture等）における「層」や「責務」と一致しているか？
 
     **コンポーネント分析アウトプット例**
     ```markdown
@@ -71,8 +79,26 @@ Step 0 の**ギャップ分析結果（As-Is/To-Be）に基づき**、更新が�
 
     3.  特定したコンポーネントの **種類** と **責務** を定義する。
 
+    **コンポーネント定義アウトプット例**
+    ```markdown
+    | コンポーネント名 | 種類 (Component Type) | 責務 (Responsibility) |
+    | :--- | :--- | :--- |
+    | **PaymentController** | FastAPI Router | HTTPリクエストのバリデーション、レスポンスのシリアライズ、Serviceの呼び出し。 |
+    | **PaymentService** | Service Class | 決済ビジネスロジックの実行、外部決済ゲートウェイとの連携、トランザクション管理。 |
+    | **PaymentRepository** | SQLAlchemy DAO | 決済データの永続化、DBクエリの実行、ドメインエンティティへのマッピング。 |
+    | **AuthMiddleware** | Middleware | 全てのリクエストに対するJWT認証の実行、ユーザーコンテキストの注入。 |
+    ```
+
 3.  **関係性の定義 (Relationship):**
     1.  特定した要素間の **「依存の向き」** と **「通信手段/呼び出し方法」** を定義する。
+    2.  **依存方向の検証:** 定義した依存関係が、上位レベルから下位レベルへの依存（またはDIPによる逆転）となっており、**循環参照や不正な依存（Infrastructure -> Domain等）がないか**を確認する。
+
+    **アウトプット例**
+    ```markdown
+    - `PaymentController` -> `PaymentService` (Function Call) [OK: Interface -> Usecase]
+    - `PaymentRepository` -> `Database` (SQL/JDBC) [OK: Infra -> External]
+    - `PaymentRepository` -> `PaymentService` (Function Call) [NG: Infra -> Usecase. Should use Interface/DIP]
+    ```
 
 4.  **Mermaidドラフトの作成:**
     1.  定義した内容を統合し、テンプレートに沿って Mermaid 記法のドラフトを作成する。
@@ -93,9 +119,9 @@ Step 0 の**ギャップ分析結果（As-Is/To-Be）に基づき**、更新が�
     }
     ```
 
-### Step 2: 自己レビューとドキュメントの更新 (Act)
+### Step 2: 自己レビューとドキュメントの最終化 (Act)
 
-作成したドラフトを客観的な視点で検証し、公式ドキュメントに反映させます。
+作成したドラフトを客観的な視点で検証し、公式ドキュメントとして反映・公開します。
 
 1.  **ドラフトと基準情報の読み込み:**
     1.  `read_file(file_path="...")` を使用して、Step 1 で作成した図解のドラフト内容を読み込む。
@@ -116,8 +142,11 @@ Step 0 の**ギャップ分析結果（As-Is/To-Be）に基づき**、更新が�
     - [ ] **整合性 (Consistency):** 担当Issueの要件、`docs/system-context.md`、関連ADRと矛盾していないか？
     - [ ] **適正範囲 (Scope):** 必要な要素の漏れ（不足）や、要求されていない過剰な構造（Over-Engineering）がないか？
 
-3.  **ドキュメントの更新:**
-    1.  `write_file` または `replace` を使用して、対象ファイル（`docs/system-context.md` または `docs/architecture/c4-model.md`）を更新する。
+3.  **ドキュメントの更新と Git 反映:**
+    1.  `write_file` または `replace` を使用して、対象ファイル（`docs/system-context.md` または `docs/architecture/c4-model.md`）を正式に更新する。
+    2.  **成果物の記録:** `run_shell_command` を使い、`git add`, `git commit -m "docs: update architecture diagram for [Issue名]"`, `git push` を実行する。
+    3.  **PRの作成:** `create_pull_request` で、設計変更を明示したプルリクエストを作成する（既にPRが存在する場合は不要）。
 
-4.  **完了通知:**
-    1.  更新した内容と背景をIssue等で報告し、アーキテクチャの同期完了を伝える。
+4.  **完了報告とハンドオフ:**
+    1.  担当Issueにコメントし、更新したドキュメントのパスとPRのURLを報告する。
+    2.  **PMへの通知:** `PRODUCT_MANAGER` に対し、最新のアーキテクチャに基づいた実装計画の策定を依頼する。

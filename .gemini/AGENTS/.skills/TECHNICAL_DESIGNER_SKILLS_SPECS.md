@@ -8,12 +8,17 @@ SYSTEM_ARCHITECTが策定した抽象的な意思決定（ADR/Design Doc）を�
     1.  `issue_read(method="get", issue_number=XXX)` を実行し、担当Issueの要件、背景、および親Issue/子Issueの情報を正確に把握する。
     2.  `issue_read(method="get_sub_issues", issue_number=XXX)` で依存するタスクが全て完了（CLOSED）していることを確認する。完了していない場合は作業を開始せず報告する。
 
-2.  **決定事項・テンプレート・先行成果物の精読:**
+2.  **作業ブランチの準備:**
+    1.  **ベースブランチの特定:** 担当Issueの記述（本文やコメント）を確認し、作業の基点となる「ベースブランチ」の指定がないか確認する（明示がなければ `main` をベースとする）。
+    2.  **ベースの最新化:** `run_shell_command("git checkout <base_branch> && git pull")` を実行し、ベースブランチをリモートの最新状態に同期する。
+    3.  **作業ブランチの作成:** `create_branch` (または `git checkout -b`) を使用し、Issue番号を含んだ作業用ブランチ（例: `feature/spec-update-issue-XXX`）をベースブランチから作成する。
+
+3.  **決定事項・テンプレート・先行成果物の精読:**
     1.  `read_file(file_path="reqs/design/_approved/adr-XXX.md")` (またはDesign Doc) を読み込み、設計の目的、スコープ、ユビキタス言語、制約、検証基準を完全に把握する。
     2.  `read_file(file_path="docs/template/spec-template.md")` を読み込み、仕様書の標準フォーマットを確認する。
     3.  先行タスク（子Issue）で作成された成果物（ドキュメントやコード）がファイルシステム上に実在することを `list_directory` や `read_file` で検証する。
 
-3.  **既存アーキテクチャ・関連ドキュメントの横断調査:**
+4.  **既存アーキテクチャ・関連ドキュメントの横断調査:**
     1.  `glob(pattern="docs/specs/**/*.md")` で関連する既存の仕様書を特定し、命名規則、データ構造、通信パターンの一貫性を調査する。
     2.  `read_file(file_path="docs/architecture/system-context.md")` や既存の `reqs/design/_approved/` 内の関連する決定事項を読み込み、システム全体の設計原則（クリーンアーキテクチャのレイヤー定義、エラーハンドリング方針等）を再確認する。
     3.  `search_file_content` を用い、`src/` 内の既存実装パターン（ベースクラス、共通ユーティリティ、インターフェース定義）を調査し、再利用可能な要素を特定する。
@@ -26,8 +31,8 @@ SYSTEM_ARCHITECTが策定した抽象的な意思決定（ADR/Design Doc）を�
     - **実装パターン:** `src/shared/base_controller.py` を再利用可能。
     ```
 
-4.  **成果物の定義 (Analysis-Driven Definition):**
-    1.  Step 0-3 の分析結果に基づき、**「新規作成が必要なドキュメント」** と **「更新が必要な既存ドキュメント」** を整理し、作成するファイルパスを決定する。
+5.  **成果物の定義 (Analysis-Driven Definition):**
+    1.  Step 0-4 の分析結果に基づき、**「新規作成が必要なドキュメント」** と **「更新が必要な既存ドキュメント」** を整理し、作成するファイルパスを決定する。
     2.  **選定基準:**
         *   既存の仕様（API定義やDBスキーマ）への変更がある場合は、新規ファイルではなく既存ファイルの更新を優先する。
         *   複雑な新規ロジックやデータ構造が導入される場合は、詳細仕様書（`docs/specs/`）を新規作成する。
@@ -146,7 +151,7 @@ SYSTEM_ARCHITECTが策定した抽象的な意思決定（ADR/Design Doc）を�
 
 ### Step 2: 自己レビューと仕様書の完成 (Act)
 
-作成したドラフトを客観的な視点でレビューし、品質を高めてから完成版とします。
+作成したドラフトを客観的な視点でレビューし、品質を高めてから完成版として公開します。
 
 1.  **ドラフトの再読込:**
     1.  `read_file(file_path="docs/specs/xxx.md")` を実行し、Step 1 で作成した内容を客観的に読み返す。
@@ -162,7 +167,11 @@ SYSTEM_ARCHITECTが策定した抽象的な意思決定（ADR/Design Doc）を�
     - [ ] **視覚化:** 複雑なロジックやデータ構造が Mermaid で図解されているか？
     - [ ] **追跡可能性:** この仕様がどの ADR/Design Doc に基づくか、リンクが明記されているか？
 
-3.  **修正と完成:**
-    1.  チェックリストでの指摘事項があれば `replace` ツールで修正する。
-    2.  修正が完了したら、関連するIssueやPRにコメントし、仕様書の作成完了を報告する。
-    3.  次の担当者（PRODUCT_MANAGERや開発者）に実装タスクの開始を促す。
+3.  **ドキュメントの更新と Git 反映:**
+    1.  チェックリストでの指摘事項があれば `replace` ツールで修正し、仕様書を完成させる。
+    2.  **成果物の記録:** `run_shell_command` を使い、`git add`, `git commit -m "docs: add/update specifications for [Issue名]"`, `git push` を実行する。
+    3.  **PRの作成:** `create_pull_request` で、仕様変更を明示したプルリクエストを作成する（既にPRが存在する場合は不要）。
+
+4.  **完了報告とハンドオフ:**
+    1.  担当Issueにコメントし、更新したドキュメントのパスとPRのURLを報告する。
+    2.  **PMへの通知:** `PRODUCT_MANAGER` に対し、策定された詳細仕様に基づいた実装計画の策定を依頼する。
