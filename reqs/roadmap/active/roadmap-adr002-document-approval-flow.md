@@ -18,8 +18,8 @@
 - **Input (前提)**: ADR-002, 既存の `create_issues.py`
 - **Deliverables (成果物)**:
     - **メタデータ操作仕様書**: `docs/specs/metadata-logic-spec.md` (T1-2 で作成)
-    - **インターフェース定義案**: `docs/specs/interface-spec.md` および `src/issue_creator_kit/utils.py` (T1-3 で作成)
-    - **検証基準リスト (Acceptance Criteria)**: 正常系・異常系・境界値を含むテストシナリオの言語化。
+    - **インターフェース定義案**: `docs/specs/interface-spec.md` (T1-3 で作成)
+    - **検証基準リスト (Acceptance Criteria)**: `docs/specs/test-criteria-spec.md` (T1-4 で作成)
 - **Gate (承認条件)**: 定義されたインターフェースとテストシナリオが、ADR-002 の意図を完全に網羅していると合意されること。
 
 **WBS**
@@ -27,8 +27,8 @@
 | :---: | :---: | :--- | :--- | :---: | :--- |
 | T1-1 | Setup | [x] 作業ブランチ `feature/phase-1-foundation` の作成 | - | - | [issue-T1-1.md](../../tasks/archive/adr-002/phase-1/issue-T1-1.md) |
 | T1-2 | Spike | [x] 既存ロジックの調査とメタデータ更新用正規表現の机上検証 | `docs/specs/metadata-logic-spec.md` | T1-1 | [issue-T1-2.md](../../tasks/archive/adr-002/phase-1/issue-T1-2.md) |
-| T1-3 | Pre | [x] 共通ユーティリティ関数のインターフェース設計（シグネチャ定義） | `src/issue_creator_kit/utils.py` | T1-2 | [issue-T1-3.md](../../tasks/archive/adr-002/phase-1/issue-T1-3.md) |
-| T1-4 | Pre | 網羅的なテストケース（正常系・異常系）の定義作成 | - | T1-3 | [issue-T1-4.md](../../tasks/archive/adr-002/phase-1/issue-T1-4.md) |
+| T1-3 | Pre | [x] 共通ユーティリティ関数のインターフェース設計（シグネチャ定義） | `docs/specs/interface-spec.md` | T1-2 | [issue-T1-3.md](../../tasks/archive/adr-002/phase-1/issue-T1-3.md) |
+| T1-4 | Pre | [x] 網羅的なテストケース（正常系・異常系）の定義作成 | `docs/specs/test-criteria-spec.md` | T1-3 | [issue-T1-4.md](../../tasks/archive/adr-002/phase-1/issue-T1-4.md) |
 | T1-5 | Review | 設計内容のレビューと Phase 2 (実装フェーズ) の計画確定 | - | T1-4 | [issue-T1-5.md](../../tasks/archive/adr-002/phase-1/issue-T1-5.md) |
 
 ### Phase 2: 基盤実装とコアロジックの構築 (Foundation & Core Implementation)
