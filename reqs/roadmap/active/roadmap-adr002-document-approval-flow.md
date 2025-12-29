@@ -2,9 +2,9 @@
 
 このドキュメントは、承認済みの設計決定を安全に実現するための、段階的な手順と WBS を定義します。
 
-- **Status**: 作成中
+- **Status**: 実行中
 - **Target Design**: [ADR-002](../../design/_approved/adr-002-document-approval-flow.md)
-- **Last Updated**: 2025-12-28
+- **Last Updated**: 2025-12-29
 
 ## 1. 実装戦略の要約
 既存のシェルスクリプト（`sed`ベース）による暫定的な承認フローを、`issue-creator-kit` パッケージ内の堅牢な Python ロジックに置き換えます。
@@ -24,11 +24,11 @@
 **WBS**
 | Task ID | Category | タスク内容 | 対象ファイル | 依存先 | Issue案リンク |
 | :---: | :---: | :--- | :--- | :---: | :--- |
-| T1-1 | Setup | 作業ブランチ `feature/phase-1-design` の作成 | - | - | [issue-T1-1.md](../../tasks/_queue/adr-002/phase-1/issue-T1-1.md) |
-| T1-2 | Spike | 既存ロジックの調査とメタデータ更新用正規表現の机上検証 | - | T1-1 | [issue-T1-2.md](../../tasks/_queue/adr-002/phase-1/issue-T1-2.md) |
-| T1-3 | Pre | 共通ユーティリティ関数のインターフェース設計（シグネチャ定義） | - | T1-2 | [issue-T1-3.md](../../tasks/_queue/adr-002/phase-1/issue-T1-3.md) |
-| T1-4 | Pre | 網羅的なテストケース（正常系・異常系）の定義作成 | - | T1-3 | [issue-T1-4.md](../../tasks/_queue/adr-002/phase-1/issue-T1-4.md) |
-| T1-5 | Review | 設計内容のレビューと Phase 2 (実装フェーズ) の計画確定 | - | T1-4 | [issue-T1-5.md](../../tasks/_queue/adr-002/phase-1/issue-T1-5.md) |
+| T1-1 | Setup | [x] 作業ブランチ `feature/phase-1-foundation` の作成 | - | - | [issue-T1-1.md](../../tasks/archive/adr-002/phase-1/issue-T1-1.md) |
+| T1-2 | Spike | 既存ロジックの調査とメタデータ更新用正規表現の机上検証 | - | T1-1 | [issue-T1-2.md](../../tasks/archive/adr-002/phase-1/issue-T1-2.md) |
+| T1-3 | Pre | 共通ユーティリティ関数のインターフェース設計（シグネチャ定義） | - | T1-2 | [issue-T1-3.md](../../tasks/archive/adr-002/phase-1/issue-T1-3.md) |
+| T1-4 | Pre | 網羅的なテストケース（正常系・異常系）の定義作成 | - | T1-3 | [issue-T1-4.md](../../tasks/archive/adr-002/phase-1/issue-T1-4.md) |
+| T1-5 | Review | 設計内容のレビューと Phase 2 (実装フェーズ) の計画確定 | - | T1-4 | [issue-T1-5.md](../../tasks/archive/adr-002/phase-1/issue-T1-5.md) |
 
 ### Phase 2: 基盤実装とコアロジックの構築 (Foundation & Core Implementation)
 - **Goal (狙い)**: Phase 1 で確定した設計に基づき、ユーティリティおよび承認プロセッサの実装・単体テストを完遂する。
