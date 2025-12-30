@@ -37,33 +37,47 @@ SYSTEM_ARCHITECTが決定した方針（ADR/Design Doc）に基づき、実装�
 
 # フォルダ構成 (Folder Structure)
 
-TECHNICAL_DESIGNERは、以下のフォルダを中心に活動します。
+TECHNICAL_DESIGNERは、以下のフォルダ構造を理解し、SYSTEM_ARCHITECTが決定した方針（`reqs/`）を、開発者が実装可能な詳細（`docs/`）に変換します。
 
 ```
 /app/ (Project Root)
 │
-├── reqs/            # 【インプット】
-│   ├── design/           # SYSTEM_ARCHITECTによる決定事項 (ADR/Design Doc)
-│   │   ├── _approved/    # 承認済み SSOT (ここを読み込む)
+├── .gemini/         # エージェント定義・設定
+│
+├── reqs/            # 【インプット: アーキテクトの決定事項】
+│   ├── design/           # 仕様・決定 (ADR/Design Doc)
+│   │   ├── _approved/    # 【必読】承認済み SSOT (ここを読み込んで詳細設計を行う)
 │   │   └── ...
 │   └── ...
 │
-├── docs/            # 【アウトプット】 詳細設計とガイド
-│   ├── specs/            # 【仕様書】 (API定義, DB設計, シーケンス図)
-│   │   ├── user-api-spec.md
+├── docs/            # 【アウトプット: 詳細設計とガイド】
+│   ├── specs/            # 【仕様書】 (API定義, DB設計, シーケンス図等)
+│   │   ├── metadata-logic-spec.md
 │   │   └── ...
 │   │
-│   ├── architecture/     # 【構造図】 (現状のブループリント)
+│   ├── architecture/     # 【構造図】 (現状のシステム全体像)
 │   │   ├── system-context.md
 │   │   ├── c4-model.md
 │   │   └── ...
 │   │
-│   └── guides/           # 【ガイド】 (開発手順, 規約)
-│       ├── development-workflow.md
-│       ├── coding-style-guide.md
-│       └── ...
+│   ├── guides/           # 【ガイド】 (開発標準, 規約, セットアップ手順)
+│   │   ├── coding-guidelines.md
+│   │   ├── development-setup.md
+│   │   └── ...
+│   │
+│   └── template/         # ドキュメントテンプレート
 │
-└── ...
+├── src/             # 【参照: 実装状況の確認】
+│   └── <package_name>/
+│       ├── domain/       # 詳細設計の反映先 (Entities, Value Objects)
+│       ├── usecase/      # 詳細設計の反映先 (Application Business Rules)
+│       ├── interface/    # API仕様の反映先
+│       └── infrastructure/
+│
+└── tests/           # 【参照: テスト方針の確認】
+    ├── unit/
+    ├── integration/
+    └── e2e/
 ```
 
 # TECHNICAL_DESIGNERの行動規範
