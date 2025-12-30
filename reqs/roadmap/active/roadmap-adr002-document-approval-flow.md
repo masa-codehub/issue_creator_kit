@@ -29,7 +29,7 @@
 | T1-2 | Spike | [x] 既存ロジックの調査とメタデータ更新用正規表現の机上検証 | `docs/specs/metadata-logic-spec.md` | T1-1 | [issue-T1-2.md](../../tasks/archive/adr-002/phase-1/issue-T1-2.md) |
 | T1-3 | Pre | [x] 共通ユーティリティ関数のインターフェース設計（シグネチャ定義） | `docs/specs/interface-spec.md` | T1-2 | [issue-T1-3.md](../../tasks/archive/adr-002/phase-1/issue-T1-3.md) |
 | T1-4 | Pre | [x] 網羅的なテストケース（正常系・異常系）の定義作成 | `docs/specs/test-criteria-spec.md` | T1-3 | [issue-T1-4.md](../../tasks/archive/adr-002/phase-1/issue-T1-4.md) |
-| T1-5 | Review | 設計内容のレビューと Phase 2 (実装フェーズ) の計画確定 | - | T1-4 | [issue-T1-5.md](../../tasks/archive/adr-002/phase-1/issue-T1-5.md) |
+| T1-5 | Review | [x] 設計内容のレビューと Phase 2 (実装フェーズ) の計画確定 | - | T1-4 | [issue-T1-5.md](../../tasks/archive/adr-002/phase-1/issue-T1-5.md) |
 
 ### Phase 2: 基盤実装とコアロジックの構築 (Foundation & Core Implementation)
 - **Goal (狙い)**: Phase 1 で確定した設計に基づき、ユーティリティおよび承認プロセッサの実装・単体テストを完遂する。
