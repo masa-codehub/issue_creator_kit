@@ -1,30 +1,42 @@
 # 詳細設計: 共通ユーティリティ関数インターフェース (ADR-002)
 
 ## 1. 目的
-ADR-002 の実装（Phase 2）に先立ち、共通で使用するユーティリティ関数のインターフェース（型、引数、戻り値）を定義し、一貫性を確保する。
+ADR-002 の実装（Phase 2）に先立ち、共通で使用するユーティリティ関数のインターフェース（型、引数、戻り値）を定義する。
+本仕様は、メタデータ管理に **YAML Frontmatter** を使用することを前提とする。
 
 ## 2. 関数定義
 
-### 2.1. `parse_metadata(content: str) -> Dict[str, str]`
-Markdownコンテンツからメタデータセクションを解析し、辞書形式で返す。
+### 2.1. `load_document(file_path: Path) -> Tuple[Dict[str, Any], str]`
+Markdownファイルを読み込み、メタデータと本文を分離して返す。
 
 - **引数**: 
-    - `content`: Markdown形式の文字列
+    - `file_path`: 読み込むファイルのパス
 - **戻り値**: 
-    - キーと値のペアを含む辞書
-- **設計の根拠**: 既存の `create_issues.py` のロジックを一般化し、`docs/specs/metadata-logic-spec.md` で定義された正規表現パターンをサポートする。
+    - `(metadata, content)` のタプル
+    - `metadata`: YAML Frontmatter から解析された辞書
+    - `content`: Frontmatter を除いた本文
+- **設計の根拠**: `python-frontmatter` をラップし、ファイルI/Oと解析を一括で行うことで呼び出し側のコードを簡素化する。
 
-### 2.2. `update_metadata(content: str, updates: Dict[str, str]) -> str`
-Markdownコンテンツ内の既存のメタデータを指定された値で更新し、更新後のコンテンツを返す。
+### 2.2. `save_document(file_path: Path, metadata: Dict[str, Any], content: str) -> None`
+メタデータと本文を指定して、Markdownファイルとして保存（上書き）する。
 
 - **引数**:
-    - `content`: 元のMarkdown文字列
-    - `updates`: 更新したいキーと値の辞書
-- **戻り値**:
-    - 更新後のMarkdown文字列
-- **設計の根拠**: `metadata-logic-spec.md` で確立された置換用正規表現を使用して、メタデータの値を安全に書き換える。
+    - `file_path`: 保存先のパス
+    - `metadata`: 更新後のメタデータ辞書
+    - `content`: 本文（変更がない場合は元の本文を渡す）
+- **戻り値**: なし
+- **設計の根拠**: `frontmatter.dumps` を使用して正しい形式でファイルを再構築する。
 
-### 2.3. `safe_move_file(src_path: Path, dst_dir: Path, overwrite: bool = False) -> Path`
+### 2.3. `update_metadata(file_path: Path, updates: Dict[str, Any]) -> None`
+指定されたファイルのメタデータのみを部分的に更新し、保存する。便利関数。
+
+- **引数**:
+    - `file_path`: 対象ファイルのパス
+    - `updates`: 更新・追加したいキーと値の辞書
+- **戻り値**: なし
+- **設計の根拠**: `load_document` -> 辞書更新 -> `save_document` の一連の流れをカプセル化する。
+
+### 2.4. `safe_move_file(src_path: Path, dst_dir: Path, overwrite: bool = False) -> Path`
 ファイルを指定されたディレクトリへ安全に移動する。
 
 - **引数**:
@@ -36,12 +48,11 @@ Markdownコンテンツ内の既存のメタデータを指定された値で更
 - **例外**:
     - `FileNotFoundError`: 移動元が存在しない場合
     - `FileExistsError`: 上書き禁止かつ移動先が既に存在する場合
-- **設計の根拠**: InboxからApprovedへの移動やアーカイブ処理を、例外処理を含めて共通化する。
 
 ## 3. 利用ライブラリ
-- `typing`: 型ヒントの提供
-- `pathlib`: オブジェクト指向なパス操作
-- `re`: 正規表現によるテキスト処理
+- `typing`: 型ヒント
+- `pathlib`: パス操作
+- `frontmatter`: YAML Frontmatter 解析 (`python-frontmatter`)
 
 ## 4. 今後の予定
-本定義に基づき、Phase 2 において `pytest` によるテスト駆動開発（TDD）で実装を行う。
+Phase 2 の実装において、これらの関数を `src/issue_creator_kit/utils.py` に実装する。
