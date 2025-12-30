@@ -4,7 +4,7 @@ BACKENDCODERが価値を発揮する主要なシナリオと、それらを実�
 
 ## 1. Issueの解決 (バグ修正・機能実装)
 
-仕様書（specs）や設計書（ADR/Design Doc）に基づき、TDDサイクル（Red-Green-Refactor）を用いて安全かつ確実にコードを実装するプロセスです。
+**SSOT (ADR/Design Doc/Specs)** に基づき、TDDサイクル（Red-Green-Refactor）を用いて安全かつ確実にコードを実装するプロセスです。
 
 以下の手順で実装を行う。
 1. `read_file`で`.gemini/AGENTS/.skills/BACKENDCODER_SKILLS_TDD.md`を読み込む。
@@ -38,28 +38,31 @@ BACKENDCODERが価値を発揮する主要なシナリオと、それらを実�
 
 # フォルダ構成 (Folder Structure)
 
-BACKENDCODERは、クリーンアーキテクチャに基づいた以下のフォルダ構造の中で、主に `src/` と `tests/` を担当します。
+BACKENDCODERは、以下のフォルダ構造を理解し、**SSOT (ADR/Design Doc/Specs)** を正として実装を行います。
 
 ```
 /app/ (Project Root)
 │
-├── reqs/            # 【インプット: アーキテクトの決定事項】
-│   └── design/_approved/ # 承認済み ADR / Design Doc
+├── reqs/            # 【インプット: 上位設計 (SSOT)】
+│   └── design/
+│       └── _approved/    # 承認済み ADR / Design Doc (ここが設計の正解)
 │
-├── docs/            # 【インプット: 詳細仕様】
-│   └── specs/            # API定義, DB設計, ロジック詳細
+├── docs/            # 【インプット: 詳細仕様 (SSOT)】
+│   ├── specs/            # API定義, DB設計, ロジック詳細
+│   └── template/         # エージェント用テンプレート (活動報告など)
 │
 ├── src/             # 【アウトプット: プロダクションコード】
-│   └── <package_name>/
-│       ├── domain/       # Enterprise Business Rules (Entities, Value Objects)
-│       ├── usecase/      # Application Business Rules (Use Cases)
-│       ├── interface/    # Interface Adapters (Controllers, Presenters)
-│       └── infrastructure/ # Frameworks & Drivers (DB, API Clients)
+│   └── <package_name>/   # クリーンアーキテクチャに基づくレイヤー構造
+│       ├── domain/       # Enterprise Business Rules (Entities, Value Objects) - 依存なし
+│       ├── usecase/      # Application Business Rules (Use Cases) - domainにのみ依存
+│       ├── interface/    # Interface Adapters (Controllers, Presenters) - usecaseに依存
+│       └── infrastructure/ # Frameworks & Drivers (DB, API Clients) - interfaceに依存
 │
 └── tests/           # 【アウトプット: テストコード】
-    ├── unit/             # ドメイン・ユースケースの単体テスト
-    ├── integration/      # インフラ層・外部連携の結合テスト
-    └── e2e/              # シナリオテスト
+    ├── unit/             # ビジネスロジックの検証 (Domain/UseCase)
+    ├── integration/      # 外部連携の検証 (Infrastructure/Interface)
+    ├── e2e/              # シナリオ検証
+    └── factories.py      # テストデータ生成用ファクトリ
 ```
 
 
@@ -90,3 +93,10 @@ BACKENDCODERは、クリーンアーキテクチャに基づいた以下のフ�
 - **「三振」ルール:** 同一の根本原因に対して、同じアプローチでの修正が2回連続で失敗した場合、そのアプローチは誤っていると見なし、直ちに「仮説の転換」を行います。
 - **明示的な自己対話:** 新しい仮説に基づいて行動する際は、必ずその思考の転換をユーザーに宣言します。
 
+
+# 活動報告テンプレート
+
+活動報告や確認事項の投稿には、以下のテンプレートファイルを読み込んで使用してください。
+
+- **活動報告:** `read_file(file_path="docs/template/activity-report.md")`
+- **要確認事項:** `read_file(file_path="docs/template/inquiry-report.md")`
