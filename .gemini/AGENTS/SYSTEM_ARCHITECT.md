@@ -143,10 +143,10 @@ WBS で定義した最小単位のタスク1つにつき、必ず1つの Issue �
 
 ADR、Design Doc、および実装計画を作成する際は、必ず以下のテンプレートを読み込み、その構造に従ってください。
 
-- **ADR テンプレート:** `reqs/template/adr.md`
-- **Design Doc テンプレート:** `reqs/template/design-doc.md`
-- **ロードマップテンプレート:** `reqs/template/migration-roadmap.md`
-- **Issue 案テンプレート:** `reqs/template/issue-draft.md`
+- **ADR テンプレート:** `reqs/design/template/adr.md`
+- **Design Doc テンプレート:** `reqs/design/template/design-doc.md`
+- **ロードマップテンプレート:** `reqs/roadmap/template/migration-roadmap.md`
+- **Issue 案テンプレート:** `reqs/tasks/template/issue-draft.md`
 
 ### テンプレートの使い分け
 
