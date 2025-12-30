@@ -1,11 +1,13 @@
 # ruff: noqa: T201
 import glob
 import os
-import re
 import sys
 from graphlib import TopologicalSorter
+from pathlib import Path
 
 import requests
+
+import issue_creator_kit.utils as utils
 
 # Configuration
 ISSUES_DIR = "reqs/_issues"
@@ -24,24 +26,9 @@ headers = {
 }
 
 
-def parse_metadata(content):
-    """
-    Extracts metadata from the markdown content.
-    Looks for lines starting with "- **Key**: Value".
-    """
-    metadata = {}
-    for line in content.splitlines():
-        match = re.match(r"^-\s*\*\*(.*?)\*\*:\s*(.*)", line)
-        if match:
-            key = match.group(1).strip()
-            value = match.group(2).strip()
-            metadata[key] = value
-    return metadata
-
-
 def get_dependencies(files):
     """
-    Builds a dependency graph from the files.
+    Builds a dependency graph from the files using YAML metadata.
     Returns:
         graph: {filename: {dependency_filename, ...}}
         file_map: {filename: full_path}
@@ -49,53 +36,67 @@ def get_dependencies(files):
     graph = {}
     file_map = {}
 
-    for file_path in files:
-        filename = os.path.basename(file_path)
-        file_map[filename] = file_path
+    for file_path_str in files:
+        file_path = Path(file_path_str)
+        filename = file_path.name
+        file_map[filename] = str(file_path)
 
-        with open(file_path, encoding="utf-8") as f:
-            content = f.read()
+        try:
+            metadata, _ = utils.load_document(file_path)
+        except Exception as e:
+            print(f"Warning: Failed to parse {filename}: {e}")
+            continue
 
-        metadata = parse_metadata(content)
-        depends_on = metadata.get("Depends-On", "")
+        # Support both 'depends_on' (new) and 'Depends-On' (legacy)
+        depends_on = metadata.get("depends_on") or metadata.get("Depends-On")
 
         deps = set()
-        if depends_on and depends_on.lower() != "(none)":
-            # Remove parentheses if present (common in templates)
-            depends_on = depends_on.replace("(", "").replace(")", "")
-            # Split by comma
-            for dep in depends_on.split(","):
-                dep = dep.strip()
-                if dep and dep.endswith(".md"):  # Basic validation
-                    deps.add(dep)
+        if depends_on:
+            if isinstance(depends_on, list):
+                # New YAML list format
+                for dep in depends_on:
+                    if dep and dep.endswith(".md"):
+                        deps.add(dep)
+            elif isinstance(depends_on, str) and depends_on.lower() != "(none)":
+                # Legacy string format or string in YAML
+                cleaned = depends_on.replace("(", "").replace(")", "")
+                for dep in cleaned.split(","):
+                    dep = dep.strip()
+                    if dep and dep.endswith(".md"):
+                        deps.add(dep)
 
         graph[filename] = deps
 
     return graph, file_map
 
 
-def create_issue(filename, file_path, issue_map):
+def create_issue(filename, file_path_str, issue_map):
     """
     Creates a GitHub issue from the markdown file.
     Replaces dependency filenames with actual issue numbers in the body.
     """
-    with open(file_path, encoding="utf-8") as f:
-        content = f.read()
+    file_path = Path(file_path_str)
+    try:
+        metadata, content = utils.load_document(file_path)
+    except Exception as e:
+        print(f"Error loading {filename}: {e}")
+        sys.exit(1)
 
-    # Extract Title (First line usually)
-    title = filename  # Default fallback
-    lines = content.splitlines()
-    for line in lines:
-        if line.startswith("# "):
-            title = line[2:].strip()
-            break
+    # Extract Title: Metadata > H1 in content > filename
+    title = metadata.get("title")
+    if not title:
+        for line in content.splitlines():
+            if line.startswith("# "):
+                title = line[2:].strip()
+                break
+    if not title:
+        title = filename
 
     # Prepare Body
     # Replace dependency filenames with Issue numbers
     body = content
     for dep_filename, issue_number in issue_map.items():
         # Replace "issue-XXX.md" with "#123"
-        # Using simple string replacement. Could be more robust with regex if needed.
         body = body.replace(dep_filename, f"#{issue_number}")
 
     # GitHub API Payload
@@ -103,7 +104,15 @@ def create_issue(filename, file_path, issue_map):
         "title": title,
         "body": body,
         # Labels or assignees could be parsed from metadata if needed
+        # e.g., labels: metadata.get("labels", [])
     }
+
+    if "labels" in metadata:
+        labels = metadata["labels"]
+        if isinstance(labels, list):
+            data["labels"] = labels
+        elif isinstance(labels, str):
+            data["labels"] = [lbl.strip() for lbl in labels.split(",")]
 
     print(f"Creating issue for {filename}...")
     response = requests.post(API_URL, headers=headers, json=data)
@@ -120,8 +129,6 @@ def create_issue(filename, file_path, issue_map):
 
 def main():
     # 1. Identify target files
-    # We process all files in reqs/_issues/ that are NOT in the archive directory yet.
-    # Exclude directories.
     files = [
         f for f in glob.glob(os.path.join(ISSUES_DIR, "*.md")) if os.path.isfile(f)
     ]
@@ -138,49 +145,38 @@ def main():
     # 3. Topological Sort
     ts = TopologicalSorter(graph)
     try:
-        # static_order() returns an iterable of nodes in topological order
-        # Nodes with no dependencies come first.
         create_order = list(ts.static_order())
     except Exception as e:
         print(f"Error resolving dependencies (Cycle detected?): {e}")
-        # If there's a cycle, we can't strictly order them.
-        # We might want to just proceed with best effort or fail.
-        # For now, fail.
         sys.exit(1)
-
-    # Filter out files that might have been in the graph keys but not in our target list (if any)
-    # Though with logic above, all keys in graph come from 'files'.
 
     # 4. Create Issues in Order
     issue_map = {}  # {filename: issue_number}
 
-    # Make sure archive dir exists
     if not os.path.exists(ARCHIVE_DIR):
         os.makedirs(ARCHIVE_DIR)
 
     for filename in create_order:
         if filename not in file_map:
-            # Could happen if a dependency is listed but the file doesn't exist in the folder.
-            # In that case, we can't replace it with a number, just skip creating it (it's assumed already exists or missing).
             print(
                 f"Warning: Dependency {filename} not found in current batch. Assuming it's external or already created."
             )
             continue
 
-        file_path = file_map[filename]
+        file_path_str = file_map[filename]
 
         # Create Issue
-        issue_number = create_issue(filename, file_path, issue_map)
+        issue_number = create_issue(filename, file_path_str, issue_map)
         issue_map[filename] = issue_number
 
         # 5. Move to Archive
-        # We don't use git mv here because this script runs inside the action,
-        # and the workflow will handle the git commit/push of the file moves separately
-        # OR we can do the move here on FS and let the workflow 'git add -A' later.
-        # Let's do the FS move.
-        target_path = os.path.join(ARCHIVE_DIR, filename)
-        os.rename(file_path, target_path)
-        print(f"Moved {filename} to {ARCHIVE_DIR}")
+        # Using utils.safe_move_file would be better, but keeping it simple for now as per refactoring scope
+        # Actually, let's use utils.safe_move_file if we are refactoring!
+        try:
+            utils.safe_move_file(Path(file_path_str), Path(ARCHIVE_DIR), overwrite=True)
+            print(f"Moved {filename} to {ARCHIVE_DIR}")
+        except Exception as e:
+            print(f"Error moving {filename}: {e}")
 
 
 if __name__ == "__main__":
