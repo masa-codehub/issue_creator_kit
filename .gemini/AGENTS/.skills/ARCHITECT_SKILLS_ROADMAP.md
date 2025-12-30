@@ -3,12 +3,12 @@
 
 ### Step 0: 事前準備（承認済み設計の確認）
 
-1.  **前提設計の読み込み:** `reqs/_approve/` 配下にある **承認済み** の ADR または Design Doc を `read_file` し、設計思想、データモデル、決定事項を完全に理解する。
+1.  **前提設計の読み込み:** `reqs/design/_approved/` 配下にある **承認済み** の ADR または Design Doc を `read_file` し、設計思想、データモデル、決定事項を完全に理解する。
 2.  **作業ブランチの作成:** `run_shell_command(command="git checkout -b design/plan-XXX-feature-name")` を実行し、安全な作業環境を確保する。
 
 ### Step 1: 実装戦略の策定と不確実性の検証 (Observe & Orient)
 
-1.  **テンプレートの取得:** `read_file(file_path="reqs/template/migration-roadmap.md")` を実行し、計画書の構成を把握する。
+1.  **テンプレートの取得:** `read_file(file_path="reqs/roadmap/template/migration-roadmap.md")` を実行し、計画書の構成を把握する。
 2.  **不確実性と阻害要因の特定:**
     - **ドキュメントの再調査（観点の網羅と重点化）:** 
         1.  以下の観点リストから、今回の変更においてリスクが高い項目を評価し、重点チェック対象を特定する。
@@ -38,7 +38,7 @@
 ```
 
 3.  **実装戦略の定義 (Write):**
-    - `write_file(file_path="reqs/_inbox/roadmap-XXX-implementation.md", content="...")` でドラフトを作成し、安全な着地の「型（戦略）」を記述する。この際、Step 2 で特定した懸念に対する「調査タスク (Spike)」を計画の冒頭に組み込むことを検討する。ステータスは `作成中` とする。
+    - `write_file(file_path="reqs/roadmap/_inbox/roadmap-XXX-implementation.md", content="...")` でドラフトを作成し、安全な着地の「型（戦略）」を記述する。この際、Step 2 で特定した懸念に対する「調査タスク (Spike)」を計画の冒頭に組み込むことを検討する。ステータスは `作成中` とする。
 
 ### Step 2: 実装フェーズと標準カテゴリに基づく WBS 設計 (Orient)
 
@@ -143,12 +143,12 @@
 
 ### Step 3: Issue 案の作成 (Drafting)
 
-1.  **テンプレートの取得:** `read_file(file_path="reqs/template/issue-draft.md")` を実行する。
+1.  **テンプレートの取得:** `read_file(file_path="reqs/tasks/template/issue-draft.md")` を実行する。
 2.  **Issue 案のファイル出力 (Agent-Ready):** Step 2 で設計した WBS に基づき、以下の3種類の Issue 案を作成する。
     - **A. Phase 開始 Issue (Setup):**
         - 各フェーズの冒頭に配置。ベースブランチ（Foundation, 例: `feature/phase-1-setup`）の作成と、後続タスクへのブランチ共有を指示する。
     - **B. 実装タスク Issue (Implementation):**
-        - WBS の各タスクに対応。`write_file(file_path="reqs/_issues/issue-XXX-T1.md", content="...")` として作成する。
+        - WBS の各タスクに対応。`write_file(file_path="reqs/tasks/drafts/issue-XXX-T1.md", content="...")` として作成する。
         - **1タスク1Issueの原則:** WBS で定義したタスク1つにつき、必ず1つの Issue ファイルを作成する。複数のタスクを1つの Issue にまとめてはならない。
         - **ブランチ戦略 (Branching Strategy):** テンプレートに従い、以下を明記する。
             - **Base Branch:** そのフェーズの Foundation Branch (例: `feature/phase-X-foundation`)
@@ -164,7 +164,7 @@
         - **[参照パス]**: 指定した ADR や Design Doc のパスは正確で、リンク切れしていないか？
         - **[検証コマンド]**: 「テストを実行する」等の曖昧な表現ではなく、`pytest tests/unit/test_auth.py` のようにコピペで実行可能なコマンドが記述されているか？
         - **[完了条件]**: WBS で定義した「成果物」が、Issue の完了条件として網羅されているか？
-4.  **計画へのリンク追記:** チェック完了後、`replace` を用いて `reqs/_inbox/roadmap-XXX-implementation.md` の WBS テーブルに各 Issue 案ファイルへのリンクを追記する。
+4.  **計画へのリンク追記:** チェック完了後、`replace` を用いて `reqs/roadmap/_inbox/roadmap-XXX-implementation.md` の WBS テーブルに各 Issue 案ファイルへのリンクを追記する。
 
 ### Step 4: ユーザーとの合意形成ループ (Decide)
 
