@@ -1,8 +1,10 @@
+import os
 from datetime import datetime
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
+from github import GithubException
 
 from issue_creator_kit.scripts import process_approvals
 
@@ -147,3 +149,36 @@ def test_process_approval_last_updated_key(mock_utils, mock_github):
     first_update_args = mock_utils.update_metadata.call_args_list[0][0]
     assert "Last Updated" in first_update_args[1]
     assert first_update_args[1]["Last Updated"] == datetime.now().strftime("%Y-%m-%d")
+
+
+def test_main_missing_token(capsys):
+    # 環境変数を空にしてトークン欠如エラーを確認
+    with (
+        patch.dict(os.environ, {}, clear=True),
+        patch("sys.argv", ["script.py", "test.md", "--repo", "o/r"]),
+        pytest.raises(SystemExit) as exc,
+    ):
+        process_approvals.main()
+    assert exc.value.code == 1
+    captured = capsys.readouterr()
+    assert "GitHub Token is required" in captured.err
+
+
+def test_main_github_exception(capsys, mock_github, mock_utils):
+    # GithubException 発生時のエラー出力を確認
+    with (
+        patch.dict(os.environ, {"GITHUB_TOKEN": "token"}),
+        patch("sys.argv", ["script.py", "test.md", "--repo", "o/r"]),
+    ):
+        mock_utils.load_document.return_value = ({"title": "T"}, "C")
+        mock_utils.safe_move_file.return_value = Path("moved.md")
+        # GithubException をシミュレート
+        mock_github.return_value.get_repo.side_effect = GithubException(
+            404, {"message": "Not Found"}
+        )
+
+        with pytest.raises(SystemExit) as exc:
+            process_approvals.main()
+        assert exc.value.code == 1
+        captured = capsys.readouterr()
+        assert "GitHub API Error" in captured.err
