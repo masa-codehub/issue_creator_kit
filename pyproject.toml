@@ -9,7 +9,7 @@ build-backend = "setuptools.build_meta"
 # 2. プロジェクトの基本情報
 # ===================================================================
 [project]
-name = "visualize_app"
+name = "issue_creator_kit"
 version = "0.1.0"
 authors = [
   { name="Your Name", email="your@email.com" },
@@ -35,6 +35,7 @@ dependencies = [
     "requests",
     "uvicorn[standard]",
     "pydantic-settings",
+    "github_broker @ git+https://github.com/masa-codehub/github_broker.git",
 ]
 
 [project.scripts]
@@ -53,7 +54,7 @@ test = [
     "pytest-xdist",
 ]
 dev = [
-    "visualize_app[test]",
+    "issue_creator_kit[test]",
     "ruff==0.6.0",
     "mypy==1.10.1",
     "pre-commit",
@@ -125,7 +126,7 @@ filterwarnings = [
     "ignore::PendingDeprecationWarning",
     "ignore::UserWarning",
 ]
-addopts = "-v --tb=short --strict-markers --cov=visualize_app --cov-report=term-missing -n auto"
+addopts = "-v --tb=short --strict-markers --cov=issue_creator_kit --cov-report=term-missing -n auto"
 asyncio_mode = "auto"
 markers = [
     "slow: marks tests as slow",
@@ -137,14 +138,14 @@ junit_family = "xunit2"
 # --- setuptools ---
 [tool.setuptools.packages.find]
 where = ["src", "."]  # srcとルート両方を検索対象にする
-include = ["visualize_app*", "issue_creator_kit*"]
+include = ["issue_creator_kit*"]
 exclude = ["tests*"]
 
 # --- mypy ---
 [tool.mypy]
 python_version = "3.13"
 ignore_missing_imports = false
-packages = ["visualize_app", "issue_creator_kit"]
+packages = ["issue_creator_kit"]
 mypy_path = "."
 
 [[tool.mypy.overrides]]
@@ -153,4 +154,8 @@ ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
 module = "frontmatter"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "github_broker"
 ignore_missing_imports = true
