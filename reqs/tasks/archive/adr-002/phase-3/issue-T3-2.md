@@ -45,3 +45,6 @@ status: "Draft"
 
 ## 6. 成果物 (Deliverables)
 - 更新された `src/issue_creator_kit/cli.py`
+
+---
+**Created Issue**: #45

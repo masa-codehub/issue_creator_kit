@@ -45,3 +45,6 @@ status: "Draft"
 ## 6. 成果物 (Deliverables)
 - 修正された Phase 4 の Issue 案（必要に応じて）
 - 更新準備が整ったロードマップ案
+
+---
+**Created Issue**: #47

@@ -38,3 +38,6 @@ status: "Draft"
 
 ## 6. 成果物 (Deliverables)
 - `feature/phase-3-integration` ブランチ
+
+---
+**Created Issue**: #44
