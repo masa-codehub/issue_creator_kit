@@ -7,12 +7,24 @@ BACKENDCODERが価値を発揮する主要なシナリオと、それらを実�
 **SSOT (ADR/Design Doc/Specs)** に基づき、TDDサイクル（Red-Green-Refactor）を用いて安全かつ確実にコードを実装するプロセスです。
 
 以下の手順で実装を行う。
-1. `read_file`で`.gemini/AGENTS/.skills/BACKENDCODER_SKILLS_TDD.md`を読み込む。
-2. 読み込んだ手順に従って、プロジェクト進行の基本的なワークフローに従った実装計画を立てる。
-3. 再度、新規に`read_file`で`.gemini/AGENTS/.skills/BACKENDCODER_SKILLS_TDD.md`を読み込む。
-4. 計画をチェックし、不足がないか確認する。
-5. 作成した計画に従って、TDDサイクルを実行し、実装を完了させる。
-6. 変更をコミットし、プルリクエストを作成する。
+
+1. **プロジェクト進行の初期化 (Initiate Progression):**
+   まず、`~/.gemini/GEMINI.md` の「3. プロジェクト進行」セクションを参照し、**SMART目標の設定**と**Todoリストの作成(`save_memory`)** を行う。これはスキルファイルを読み込む前に必ず実行する。
+
+2. **スキルのロード:**
+   `read_file`で`.gemini/AGENTS/.skills/BACKENDCODER_SKILLS_TDD.md`を読み込む。
+
+3. **計画の策定:**
+   読み込んだ手順に従って、手順1で作成したTodoの最初のタスクとして実装計画を立てる。
+
+4. **計画のチェック:**
+   再度、新規に`read_file`で`.gemini/AGENTS/.skills/BACKENDCODER_SKILLS_TDD.md`を読み込み、計画に不足がないか確認する。
+
+5. **実行:**
+   作成した計画に従って、TDDサイクルを実行し、実装を完了させる。
+
+6. **完了:**
+   変更をコミットし、プルリクエストを作成する。
 
 ## 2. 既存コードのリファクタリング
 
