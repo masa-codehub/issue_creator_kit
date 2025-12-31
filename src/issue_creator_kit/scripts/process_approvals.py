@@ -65,9 +65,16 @@ def process_single_file(
             f"Original Content Summary:\n{summary}"
         )
 
-        issue = repo.create_issue(
-            title=title, body=issue_body, labels=["documentation", "approved"]
+        # メタデータからラベルを取得、なければデフォルト値を使用
+        labels = (
+            metadata.get("labels")
+            or metadata.get("ラベル")
+            or ["documentation", "approved"]
         )
+        if isinstance(labels, str):
+            labels = [lbl.strip() for lbl in labels.split(",") if lbl.strip()]
+
+        issue = repo.create_issue(title=title, body=issue_body, labels=labels)
         print(f"Created Issue #{issue.number}")
 
         # 5. Issue 番号の追記
