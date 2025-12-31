@@ -7,44 +7,84 @@
 システムの全体像（システムの境界、外部システム、ユーザー、主要なデータフロー）を定義し、常に最新の状態に保つための最優先プロセスです。すべての設計決定（ADR/Design Doc）の「北極星」となります。
 
 以下の手順でシステムコンテキストの作成・維持管理を行う。
-1. `read_file`で`.gemini/AGENTS/.skills/ARCHITECT_SKILLS_CONTEXT.md`を読み込む。
-2. 読み込んだ手順に従って、システムコンテキストの作成・維持管理の計画を立てる。
-3. 再度、新規に`read_file`で`.gemini/AGENTS/.skills/ARCHITECT_SKILLS_CONTEXT.md`を読み込む。
-4. 計画をチェックする。
-5. 計画に従って、システムコンテキストの作成・維持管理を実行する。
+
+1. **プロジェクト進行の初期化 (Initiate Progression):**
+   まず、`~/.gemini/GEMINI.md` の「3. プロジェクト進行」セクションを参照し、**SMART目標の設定**と**Todoリストの作成(`save_memory`)** を行う。これはスキルファイルを読み込む前に必ず実行する。
+
+2. **スキルのロード:**
+   `read_file`で`.gemini/AGENTS/.skills/ARCHITECT_SKILLS_CONTEXT.md`を読み込む。
+
+3. **計画の策定:**
+   読み込んだ手順に従って、手順1で作成したTodoの最初のタスクとしてシステムコンテキストの作成・維持管理の計画を立てる。
+
+4. **計画のチェック:**
+   再度、新規に`read_file`で`.gemini/AGENTS/.skills/ARCHITECT_SKILLS_CONTEXT.md`を読み込み、計画に不足がないか確認する。
+
+5. **実行:**
+   計画に従って、システムコンテキストの作成・維持管理を実行する。
 
 ## 2. アーキテクチャの意思決定 (ADR の作成)
 
 技術選定、パターン採用、および**技術的負債の抜本的な解消**など、長期的影響が大きい決定を行うための標準プロセスです。ユーザーの曖昧な指示や現状の「痛み」を「検証可能な仮説」へと昇華させ、SSOT を構築します。
 
 以下の手順でADR の作成を行う。
-1. `read_file`で`.gemini/AGENTS/.skills/ARCHITECT_SKILLS_ADR.md`を読み込む。
-2. 読み込んだ手順に従って、ADR を作成するための計画を立てる。
-3. 再度、新規に`read_file`で`.gemini/AGENTS/.skills/ARCHITECT_SKILLS_ADR.md`を読み込む。
-4. 計画をチェックする。
-5. 計画に従って、ADR を作成する。
+
+1. **プロジェクト進行の初期化 (Initiate Progression):**
+   まず、`~/.gemini/GEMINI.md` の「3. プロジェクト進行」セクションを参照し、**SMART目標の設定**と**Todoリストの作成(`save_memory`)** を行う。これはスキルファイルを読み込む前に必ず実行する。
+
+2. **スキルのロード:**
+   `read_file`で`.gemini/AGENTS/.skills/ARCHITECT_SKILLS_ADR.md`を読み込む。
+
+3. **計画の策定:**
+   読み込んだ手順に従って、手順1で作成したTodoの最初のタスクとしてADRを作成するための計画を立てる。
+
+4. **計画のチェック:**
+   再度、新規に`read_file`で`.gemini/AGENTS/.skills/ARCHITECT_SKILLS_ADR.md`を読み込み、計画に不足がないか確認する。
+
+5. **実行:**
+   計画に従って、ADR を作成する。
 
 ## 3. 新機能の概念設計 (Design Doc の作成)
 
 ビジネス要求や**既存機能の大規模なリファクタリング**を具体的なシステム構造やデータフローに落とし込み、実装の SSOT となる Design Doc を作成するためのプロセスです。
 
 以下の手順でDesign Doc の作成を行う。
-1. `read_file`で`.gemini/AGENTS/.skills/ARCHITECT_SKILLS_DESIGN_DOC.md`を読み込む。
-2. 読み込んだ手順に従って、Design Doc を作成するための計画を立てる。
-3. 再度、新規に`read_file`で`.gemini/AGENTS/.skills/ARCHITECT_SKILLS_DESIGN_DOC.md`を読み込む。
-4. 計画をチェックする。
-5. 計画に従って、Design Doc を作成する。
+
+1. **プロジェクト進行の初期化 (Initiate Progression):**
+   まず、`~/.gemini/GEMINI.md` の「3. プロジェクト進行」セクションを参照し、**SMART目標の設定**と**Todoリストの作成(`save_memory`)** を行う。これはスキルファイルを読み込む前に必ず実行する。
+
+2. **スキルのロード:**
+   `read_file`で`.gemini/AGENTS/.skills/ARCHITECT_SKILLS_DESIGN_DOC.md`を読み込む。
+
+3. **計画の策定:**
+   読み込んだ手順に従って、手順1で作成したTodoの最初のタスクとしてDesign Docを作成するための計画を立てる。
+
+4. **計画のチェック:**
+   再度、新規に`read_file`で`.gemini/AGENTS/.skills/ARCHITECT_SKILLS_DESIGN_DOC.md`を読み込み、計画に不足がないか確認する。
+
+5. **実行:**
+   計画に従って、Design Doc を作成する。
 
 ## 4. 安全な実装・リファクタリング計画 (ADR/Design Doc の実現)
 
 承認済みの ADR または Design Doc（あるべき姿）を、稼働中のシステムを壊さずに実現するための「段階的な実装・修正手順」を設計するプロセスです。設計ドキュメントが「目的地」を定義していることを前提に、本ユースケースはそこへ至る「安全な着地ステップ」の策定のみに責任を持ちます。
 
 以下の手順で安全な実装のためのロードマップ・リファクタリング計画・Issue の作成を行う。
-1. `read_file`で`.gemini/AGENTS/.skills/ARCHITECT_SKILLS_ROADMAP.md`を読み込む。
-2. 読み込んだ手順に従って、安全な実装のためのロードマップ・リファクタリング計画・Issue を作成するための計画を立てる。
-3. 再度、新規に`read_file`で`.gemini/AGENTS/.skills/ARCHITECT_SKILLS_ROADMAP.md`を読み込む。
-4. 計画をチェックする。
-5. 計画に従って、安全な実装のためのロードマップ・リファクタリング計画・Issue を作成する。
+
+1. **プロジェクト進行の初期化 (Initiate Progression):**
+   まず、`~/.gemini/GEMINI.md` の「3. プロジェクト進行」セクションを参照し、**SMART目標の設定**と**Todoリストの作成(`save_memory`)** を行う。これはスキルファイルを読み込む前に必ず実行する。
+
+2. **スキルのロード:**
+   `read_file`で`.gemini/AGENTS/.skills/ARCHITECT_SKILLS_ROADMAP.md`を読み込む。
+
+3. **計画の策定:**
+   読み込んだ手順に従って、手順1で作成したTodoの最初のタスクとして実装計画（ロードマップ・Issue）を立てる。
+
+4. **計画のチェック:**
+   再度、新規に`read_file`で`.gemini/AGENTS/.skills/ARCHITECT_SKILLS_ROADMAP.md`を読み込み、計画に不足がないか確認する。
+
+5. **実行:**
+   計画に従って、安全な実装のためのロードマップ・リファクタリング計画・Issue を作成する。
 
 ## 5. 開発スタンダードと非機能要件の定義
 

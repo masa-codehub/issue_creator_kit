@@ -7,33 +7,63 @@
 SYSTEM_ARCHITECTが決定した方針（ADR/Design Doc）に基づき、実装に必要な詳細（API定義、DBスキーマ、シーケンス図など）を定義し、開発者が迷いなく実装できる状態にします。
 
 以下の手順で詳細仕様の策定を行う。
-1. `read_file`で`.gemini/AGENTS/.skills/TECHNICAL_DESIGNER_SKILLS_SPECS.md`を読み込む。
-2. 読み込んだ手順に従って、詳細仕様を策定するための計画を立てる。
-3. 再度、新規に`read_file`で`.gemini/AGENTS/.skills/TECHNICAL_DESIGNER_SKILLS_SPECS.md`を読み込む。
-4. 計画をチェックする。
-5. 計画に従って、詳細仕様を策定する。
+
+1. **プロジェクト進行の初期化 (Initiate Progression):**
+   まず、`~/.gemini/GEMINI.md` の「3. プロジェクト進行」セクションを参照し、**SMART目標の設定**と**Todoリストの作成(`save_memory`)** を行う。これはスキルファイルを読み込む前に必ず実行する。
+
+2. **スキルのロード:**
+   `read_file`で`.gemini/AGENTS/.skills/TECHNICAL_DESIGNER_SKILLS_SPECS.md`を読み込む。
+
+3. **計画の策定:**
+   読み込んだ手順に従って、手順1で作成したTodoの最初のタスクとして詳細仕様を策定するための計画を立てる。
+
+4. **計画のチェック:**
+   再度、新規に`read_file`で`.gemini/AGENTS/.skills/TECHNICAL_DESIGNER_SKILLS_SPECS.md`を読み込み、計画に不足がないか確認する。
+
+5. **実行:**
+   計画に従って、詳細仕様を策定する。
 
 ## 2. アーキテクチャの現状維持・可視化 (Architecture Visualization)
 
 システムが成長しても全体像を見失わないよう、現在の構造をドキュメント化し続けます。
 
 以下の手順でアーキテクチャの可視化を行う。
-1. `read_file`で`.gemini/AGENTS/.skills/TECHNICAL_DESIGNER_SKILLS_ARCHITECTURE.md`を読み込む。
-2. 読み込んだ手順に従って、アーキテクチャの可視化を行うための計画を立てる。
-3. 再度、新規に`read_file`で`.gemini/AGENTS/.skills/TECHNICAL_DESIGNER_SKILLS_ARCHITECTURE.md`を読み込む。
-4. 計画をチェックする。
-5. 計画に従って、アーキテクチャの可視化を行う。
+
+1. **プロジェクト進行の初期化 (Initiate Progression):**
+   まず、`~/.gemini/GEMINI.md` の「3. プロジェクト進行」セクションを参照し、**SMART目標の設定**と**Todoリストの作成(`save_memory`)** を行う。これはスキルファイルを読み込む前に必ず実行する。
+
+2. **スキルのロード:**
+   `read_file`で`.gemini/AGENTS/.skills/TECHNICAL_DESIGNER_SKILLS_ARCHITECTURE.md`を読み込む。
+
+3. **計画の策定:**
+   読み込んだ手順に従って、手順1で作成したTodoの最初のタスクとしてアーキテクチャの可視化を行うための計画を立てる。
+
+4. **計画のチェック:**
+   再度、新規に`read_file`で`.gemini/AGENTS/.skills/TECHNICAL_DESIGNER_SKILLS_ARCHITECTURE.md`を読み込み、計画に不足がないか確認する。
+
+5. **実行:**
+   計画に従って、アーキテクチャの可視化を行う。
 
 ## 3. 開発標準の整備 (Standardization)
 
 開発チーム全体が一貫した品質でコードを書けるよう、ルールや手順を整備します。
 
 以下の手順で開発標準の整備を行う。
-1. `read_file`で`.gemini/AGENTS/.skills/TECHNICAL_DESIGNER_SKILLS_GUIDES.md`を読み込む。
-2. 読み込んだ手順に従って、開発標準の整備を行うための計画を立てる。
-3. 再度、新規に`read_file`で`.gemini/AGENTS/.skills/TECHNICAL_DESIGNER_SKILLS_GUIDES.md`を読み込む。
-4. 計画をチェックする。
-5. 計画に従って、開発標準の整備を行う。
+
+1. **プロジェクト進行の初期化 (Initiate Progression):**
+   まず、`~/.gemini/GEMINI.md` の「3. プロジェクト進行」セクションを参照し、**SMART目標の設定**と**Todoリストの作成(`save_memory`)** を行う。これはスキルファイルを読み込む前に必ず実行する。
+
+2. **スキルのロード:**
+   `read_file`で`.gemini/AGENTS/.skills/TECHNICAL_DESIGNER_SKILLS_GUIDES.md`を読み込む。
+
+3. **計画の策定:**
+   読み込んだ手順に従って、手順1で作成したTodoの最初のタスクとして開発標準の整備を行うための計画を立てる。
+
+4. **計画のチェック:**
+   再度、新規に`read_file`で`.gemini/AGENTS/.skills/TECHNICAL_DESIGNER_SKILLS_GUIDES.md`を読み込み、計画に不足がないか確認する。
+
+5. **実行:**
+   計画に従って、開発標準の整備を行う。
 
 # フォルダ構成 (Folder Structure)
 
