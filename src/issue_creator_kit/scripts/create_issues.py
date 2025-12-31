@@ -1,47 +1,24 @@
-# ruff: noqa: T201
+# ruff: noqa: T201, ERA001
 import glob
 import os
-import re
 import sys
 from graphlib import TopologicalSorter
+from pathlib import Path
 
 import requests
+import yaml
+
+import issue_creator_kit.utils as utils
 
 # Configuration
 ISSUES_DIR = "reqs/_issues"
 ARCHIVE_DIR = "reqs/_issues/created"
-REPO = os.environ.get("GITHUB_REPOSITORY")  # e.g., "owner/repo"
-TOKEN = os.environ.get("GH_TOKEN")
-API_URL = f"https://api.github.com/repos/{REPO}/issues"
-
-if not REPO or not TOKEN:
-    print("Error: GITHUB_REPOSITORY or GH_TOKEN environment variable is missing.")
-    sys.exit(1)
-
-headers = {
-    "Authorization": f"token {TOKEN}",
-    "Accept": "application/vnd.github.v3+json",
-}
-
-
-def parse_metadata(content):
-    """
-    Extracts metadata from the markdown content.
-    Looks for lines starting with "- **Key**: Value".
-    """
-    metadata = {}
-    for line in content.splitlines():
-        match = re.match(r"^-\s*\*\*(.*?)\*\*:\s*(.*)", line)
-        if match:
-            key = match.group(1).strip()
-            value = match.group(2).strip()
-            metadata[key] = value
-    return metadata
 
 
 def get_dependencies(files):
     """
-    Builds a dependency graph from the files.
+    YAML メタデータから依存関係グラフを構築します。
+
     Returns:
         graph: {filename: {dependency_filename, ...}}
         file_map: {filename: full_path}
@@ -49,79 +26,133 @@ def get_dependencies(files):
     graph = {}
     file_map = {}
 
-    for file_path in files:
-        filename = os.path.basename(file_path)
-        file_map[filename] = file_path
+    for file_path_str in files:
+        file_path = Path(file_path_str)
+        filename = file_path.name
+        file_map[filename] = str(file_path)
 
-        with open(file_path, encoding="utf-8") as f:
-            content = f.read()
+        try:
+            metadata, _ = utils.load_document(file_path)
+        except FileNotFoundError as e:
+            print(f"Error: {e}", file=sys.stderr)
+            sys.exit(1)
+        except yaml.YAMLError as e:
+            print(f"Warning: YAML parsing failed for {filename}: {e}", file=sys.stderr)
+            continue
+        except Exception as e:
+            print(f"Warning: Failed to parse {filename}: {e}", file=sys.stderr)
+            continue
 
-        metadata = parse_metadata(content)
-        depends_on = metadata.get("Depends-On", "")
+        # depends_on キーの存在チェック (空リストの場合を考慮)
+        depends_on = (
+            metadata.get("depends_on")
+            if "depends_on" in metadata
+            else metadata.get("Depends-On")
+        )
 
         deps = set()
-        if depends_on and depends_on.lower() != "(none)":
-            # Remove parentheses if present (common in templates)
-            depends_on = depends_on.replace("(", "").replace(")", "")
-            # Split by comma
-            for dep in depends_on.split(","):
-                dep = dep.strip()
-                if dep and dep.endswith(".md"):  # Basic validation
-                    deps.add(dep)
+        if depends_on:
+            if isinstance(depends_on, list):
+                # 新しい YAML リスト形式
+                for dep in depends_on:
+                    if isinstance(dep, str) and dep.endswith(".md"):
+                        deps.add(dep)
+            elif isinstance(depends_on, str) and depends_on.lower() != "(none)":
+                # 旧形式のカンマ区切り文字列
+                cleaned = depends_on.replace("(", "").replace(")", "")
+                for dep in cleaned.split(","):
+                    dep = dep.strip()
+                    if dep and dep.endswith(".md"):
+                        deps.add(dep)
 
         graph[filename] = deps
 
     return graph, file_map
 
 
-def create_issue(filename, file_path, issue_map):
+def create_issue(filename, file_path_str, issue_map, repo, token):
     """
-    Creates a GitHub issue from the markdown file.
-    Replaces dependency filenames with actual issue numbers in the body.
+    Markdown ファイルから GitHub Issue を作成します。
+    本文内の依存ファイル名を実際の Issue 番号に置換します。
     """
-    with open(file_path, encoding="utf-8") as f:
-        content = f.read()
+    api_url = f"https://api.github.com/repos/{repo}/issues"
+    headers = {
+        "Authorization": f"token {token}",
+        "Accept": "application/vnd.github.v3+json",
+    }
 
-    # Extract Title (First line usually)
-    title = filename  # Default fallback
-    lines = content.splitlines()
-    for line in lines:
-        if line.startswith("# "):
-            title = line[2:].strip()
-            break
+    file_path = Path(file_path_str)
+    try:
+        metadata, content = utils.load_document(file_path)
+    except FileNotFoundError as e:
+        print(f"Error: {e}", file=sys.stderr)
+        sys.exit(1)
+    except yaml.YAMLError as e:
+        print(f"Error parsing YAML in {filename}: {e}", file=sys.stderr)
+        sys.exit(1)
+    except Exception as e:
+        print(f"Error loading {filename}: {e}", file=sys.stderr)
+        sys.exit(1)
 
-    # Prepare Body
-    # Replace dependency filenames with Issue numbers
+    # タイトルの決定: メタデータ > 本文のH1 > ファイル名
+    title = metadata.get("title")
+    if not title:
+        for line in content.splitlines():
+            if line.startswith("# "):
+                title = line[2:].strip()
+                break
+    if not title:
+        title = filename
+
+    # 本文の準備: 依存ファイル名を Issue 番号に置換
     body = content
     for dep_filename, issue_number in issue_map.items():
-        # Replace "issue-XXX.md" with "#123"
-        # Using simple string replacement. Could be more robust with regex if needed.
         body = body.replace(dep_filename, f"#{issue_number}")
 
-    # GitHub API Payload
     data = {
         "title": title,
         "body": body,
-        # Labels or assignees could be parsed from metadata if needed
     }
 
+    # ラベルの設定
+    if "labels" in metadata:
+        labels = metadata["labels"]
+        if isinstance(labels, list):
+            data["labels"] = [
+                lbl for lbl in labels if isinstance(lbl, str) and lbl.strip()
+            ]
+        elif isinstance(labels, str):
+            data["labels"] = [lbl.strip() for lbl in labels.split(",") if lbl.strip()]
+
     print(f"Creating issue for {filename}...")
-    response = requests.post(API_URL, headers=headers, json=data)
+    response = requests.post(api_url, headers=headers, json=data)
 
     if response.status_code == 201:
         issue = response.json()
         issue_number = issue["number"]
         print(f"Success! Created issue #{issue_number} for {filename}")
         return issue_number
-    print(f"Failed to create issue for {filename}. Status: {response.status_code}")
-    print(response.text)
+
+    print(
+        f"Failed to create issue for {filename}. Status: {response.status_code}",
+        file=sys.stderr,
+    )
+    print(response.text, file=sys.stderr)
     sys.exit(1)
 
 
 def main():
-    # 1. Identify target files
-    # We process all files in reqs/_issues/ that are NOT in the archive directory yet.
-    # Exclude directories.
+    repo = os.environ.get("GITHUB_REPOSITORY")
+    token = os.environ.get("GH_TOKEN")
+
+    if not repo or not token:
+        print(
+            "Error: GITHUB_REPOSITORY or GH_TOKEN environment variable is missing.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+    # 1. 対象ファイルの特定
     files = [
         f for f in glob.glob(os.path.join(ISSUES_DIR, "*.md")) if os.path.isfile(f)
     ]
@@ -132,55 +163,43 @@ def main():
 
     print(f"Found {len(files)} files to process.")
 
-    # 2. Build Dependency Graph
+    # 2. 依存関係グラフの構築
     graph, file_map = get_dependencies(files)
 
-    # 3. Topological Sort
+    # 3. トポロジカルソート
     ts = TopologicalSorter(graph)
     try:
-        # static_order() returns an iterable of nodes in topological order
-        # Nodes with no dependencies come first.
         create_order = list(ts.static_order())
     except Exception as e:
-        print(f"Error resolving dependencies (Cycle detected?): {e}")
-        # If there's a cycle, we can't strictly order them.
-        # We might want to just proceed with best effort or fail.
-        # For now, fail.
+        print(f"Error resolving dependencies (Cycle detected?): {e}", file=sys.stderr)
         sys.exit(1)
 
-    # Filter out files that might have been in the graph keys but not in our target list (if any)
-    # Though with logic above, all keys in graph come from 'files'.
-
-    # 4. Create Issues in Order
+    # 4. 順序に従って Issue を作成
     issue_map = {}  # {filename: issue_number}
 
-    # Make sure archive dir exists
     if not os.path.exists(ARCHIVE_DIR):
         os.makedirs(ARCHIVE_DIR)
 
     for filename in create_order:
         if filename not in file_map:
-            # Could happen if a dependency is listed but the file doesn't exist in the folder.
-            # In that case, we can't replace it with a number, just skip creating it (it's assumed already exists or missing).
-            print(
-                f"Warning: Dependency {filename} not found in current batch. Assuming it's external or already created."
-            )
             continue
 
-        file_path = file_map[filename]
+        file_path_str = file_map[filename]
 
-        # Create Issue
-        issue_number = create_issue(filename, file_path, issue_map)
-        issue_map[filename] = issue_number
+        # Issue の作成
+        issue_number = create_issue(filename, file_path_str, issue_map, repo, token)
 
-        # 5. Move to Archive
-        # We don't use git mv here because this script runs inside the action,
-        # and the workflow will handle the git commit/push of the file moves separately
-        # OR we can do the move here on FS and let the workflow 'git add -A' later.
-        # Let's do the FS move.
-        target_path = os.path.join(ARCHIVE_DIR, filename)
-        os.rename(file_path, target_path)
-        print(f"Moved {filename} to {ARCHIVE_DIR}")
+        # 5. アーカイブへの移動 (成功後のみ issue_map に記録)
+        try:
+            utils.safe_move_file(Path(file_path_str), Path(ARCHIVE_DIR), overwrite=True)
+            print(f"Moved {filename} to {ARCHIVE_DIR}")
+            issue_map[filename] = issue_number
+        except FileExistsError as e:
+            print(f"Error: Destination file exists: {e}", file=sys.stderr)
+            sys.exit(1)
+        except Exception as e:
+            print(f"Error moving {filename}: {e}", file=sys.stderr)
+            sys.exit(1)
 
 
 if __name__ == "__main__":

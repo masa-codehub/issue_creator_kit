@@ -110,6 +110,7 @@ ignore = [
 # CLIツールはprint許可
 "src/issue_creator_kit/cli.py" = ["T201"]
 "src/issue_creator_kit/scripts/create_issues.py" = ["T201"]
+"src/issue_creator_kit/scripts/process_approvals.py" = ["T201"]
 
 # --- pytest ---
 [tool.pytest.ini_options]
@@ -118,7 +119,7 @@ testpaths = ["tests"]
 python_files = ["test_*.py", "*_test.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
-pythonpath = "."
+pythonpath = ["src", "."]
 filterwarnings = [
     "ignore::DeprecationWarning",
     "ignore::PendingDeprecationWarning",
