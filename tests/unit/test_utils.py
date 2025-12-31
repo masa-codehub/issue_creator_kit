@@ -128,7 +128,7 @@ def test_save_document_types(tmp_path: Path):
 
 
 def test_save_document_multibyte(tmp_path: Path):
-    """U-E1: Multibyte characters"""
+    """U-5: Multibyte characters"""
     file_path = tmp_path / "test.md"
     metadata = {"title": "テスト"}
     content = "本文"
@@ -141,7 +141,7 @@ def test_save_document_multibyte(tmp_path: Path):
 
 
 def test_update_metadata_empty(tmp_path: Path):
-    """U-E2: Empty Update"""
+    """U-6: Empty Update"""
     file_path = tmp_path / "test.md"
     original_content = "---\ntitle: A\n---\nBody"
     file_path.write_text(original_content, encoding="utf-8")
