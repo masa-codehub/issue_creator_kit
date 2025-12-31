@@ -155,7 +155,3 @@ ignore_missing_imports = true
 [[tool.mypy.overrides]]
 module = "frontmatter"
 ignore_missing_imports = true
-
-[[tool.mypy.overrides]]
-module = "github_broker"
-ignore_missing_imports = true
