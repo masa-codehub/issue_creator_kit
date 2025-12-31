@@ -43,11 +43,11 @@
 **WBS**
 | Task ID | Category | タスク内容 | 対象ファイル | 依存先 | Issue案リンク |
 | :---: | :---: | :--- | :--- | :---: | :--- |
-| T2-1 | Setup | 作業ブランチ `feature/phase-2-implementation` の作成 | - | T1-5 | [issue-T2-1.md](../../tasks/drafts/adr-002/phase-2/issue-T2-1.md) |
-| T2-2 | Impl | `utils.py` の実装と単体テスト実行 | `src/issue_creator_kit/utils.py` | T2-1 | [issue-T2-2.md](../../tasks/drafts/adr-002/phase-2/issue-T2-2.md) |
-| T2-3 | Impl | `process_approvals.py` の実装と単体テスト実行 | `src/issue_creator_kit/scripts/process_approvals.py` | T2-2 | [issue-T2-3.md](../../tasks/drafts/adr-002/phase-2/issue-T2-3.md) |
-| T2-4 | Verify | 既存 `create_issues.py` のリファクタリングと回帰テスト | - | T2-3 | [issue-T2-4.md](../../tasks/drafts/adr-002/phase-2/issue-T2-4.md) |
-| T2-5 | Review | 実装コードのレビューと Phase 3 計画の確定 | - | T2-4 | [issue-T2-5.md](../../tasks/drafts/adr-002/phase-2/issue-T2-5.md) |
+| T2-1 | Setup | [x] 作業ブランチ `feature/phase-2-implementation` の作成 | - | T1-5 | [issue-T2-1.md](../../tasks/archive/adr-002/phase-2/issue-T2-1.md) |
+| T2-2 | Impl | [x] `utils.py` の実装と単体テスト実行 | `src/issue_creator_kit/utils.py` | T2-1 | [issue-T2-2.md](../../tasks/archive/adr-002/phase-2/issue-T2-2.md) |
+| T2-3 | Impl | [x] `process_approvals.py` の実装と単体テスト実行 | `src/issue_creator_kit/scripts/process_approvals.py` | T2-2 | [issue-T2-3.md](../../tasks/archive/adr-002/phase-2/issue-T2-3.md) |
+| T2-4 | Verify | [x] 既存 `create_issues.py` のリファクタリングと回帰テスト | - | T2-3 | [issue-T2-4.md](../../tasks/archive/adr-002/phase-2/issue-T2-4.md) |
+| T2-5 | Review | [x] 実装コードのレビューと Phase 3 計画の確定 | - | T2-4 | [issue-T2-5.md](../../tasks/archive/adr-002/phase-2/issue-T2-5.md) |
 
 ### Phase 3: ワークフローの差し替えと統合 (Swap & Release)
 - **Goal (狙い)**: CI/CDパイプラインを刷新し、本番環境で Python ベースの安全な承認フローを稼働させる。
