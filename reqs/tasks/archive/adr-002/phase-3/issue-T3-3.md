@@ -43,3 +43,6 @@ status: "Draft"
 
 ## 6. 成果物 (Deliverables)
 - 更新された `.github/workflows/auto-approve-docs.yml`
+
+---
+**Created Issue**: #46
