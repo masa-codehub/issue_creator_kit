@@ -1,10 +1,11 @@
 # ruff: noqa: T201
 import argparse
+import os
 import shutil
 import sys
 from pathlib import Path
 
-from issue_creator_kit.scripts import create_issues
+from issue_creator_kit.scripts import create_issues, process_approvals
 
 PACKAGE_ROOT = Path(__file__).parent
 ASSETS_DIR = PACKAGE_ROOT / "assets"
@@ -61,6 +62,37 @@ def run_automation(args):
         sys.exit(1)
 
 
+def approve_document(args):
+    """Run the approval process."""
+    repo = args.repo or os.environ.get("GITHUB_REPOSITORY")
+    token = args.token or os.environ.get("GITHUB_TOKEN")
+
+    if not repo:
+        print(
+            "Error: Repository not specified. Use --repo or set GITHUB_REPOSITORY.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+    if not token:
+        print(
+            "Error: Token not specified. Use --token or set GITHUB_TOKEN.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+    print(f"Approving document: {args.file_path}")
+    try:
+        process_approvals.process_single_file(
+            file_path=args.file_path,
+            approved_dir=args.approved_dir,
+            repo_name=repo,
+            token=token,
+        )
+    except Exception as e:
+        print(f"Approval process failed: {e}", file=sys.stderr)
+        sys.exit(1)
+
+
 def main():
     parser = argparse.ArgumentParser(description="Issue Creator Kit CLI")
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
@@ -77,12 +109,35 @@ def main():
     # Assigning to a variable to avoid F841 if not used, or just don't assign.
     subparsers.add_parser("run", help="Run the issue creation automation")
 
+    # approve command
+    approve_parser = subparsers.add_parser(
+        "approve", help="Process an approved document"
+    )
+    approve_parser.add_argument(
+        "file_path", type=Path, help="Path to the document to approve"
+    )
+    approve_parser.add_argument(
+        "--repo",
+        help="GitHub repository (owner/repo). Defaults to GITHUB_REPOSITORY env var.",
+    )
+    approve_parser.add_argument(
+        "--token", help="GitHub token. Defaults to GITHUB_TOKEN env var."
+    )
+    approve_parser.add_argument(
+        "--approved-dir",
+        type=Path,
+        default=Path("reqs/design/_approved"),
+        help="Directory to move approved files to",
+    )
+
     args = parser.parse_args()
 
     if args.command == "init":
         init_project(args)
     elif args.command == "run":
         run_automation(args)
+    elif args.command == "approve":
+        approve_document(args)
     else:
         parser.print_help()
         sys.exit(1)
