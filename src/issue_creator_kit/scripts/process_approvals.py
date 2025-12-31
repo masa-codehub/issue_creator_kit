@@ -95,6 +95,46 @@ def process_single_file(
         raise e
 
 
+def process_all_files(
+    inbox_dir: Path, approved_dir: Path, repo_name: str, token: str
+) -> bool:
+    """
+    inbox ディレクトリ内のすべてのファイルを処理します。
+
+    Args:
+        inbox_dir (Path): 処理対象のディレクトリ。
+        approved_dir (Path): 承認済みファイルを移動するディレクトリ。
+        repo_name (str): GitHub リポジトリ名。
+        token (str): GitHub トークン。
+
+    Returns:
+        bool: 1つ以上のファイルが処理された場合は True、そうでない場合は False。
+    """
+    if not inbox_dir.exists() or not inbox_dir.is_dir():
+        print(f"Inbox directory not found or is not a directory: {inbox_dir}")
+        return False
+
+    files = [f for f in inbox_dir.glob("*") if f.is_file()]
+    if not files:
+        print("No files found in inbox.")
+        return False
+
+    processed_any = False
+    for file_path in files:
+        print(f"Processing {file_path}...")
+        try:
+            process_single_file(file_path, approved_dir, repo_name, token)
+            processed_any = True
+        except Exception as e:
+            print(f"Failed to process {file_path}: {e}", file=sys.stderr)
+            # Fail-fast: 1つのファイルで失敗したら全体を止めるべきか？
+            # ADR-002 では「Fail-Fast Reliability」が原則。
+            # 依存関係がある場合、中途半端な適用は危険。
+            raise e
+
+    return processed_any
+
+
 def main():
     parser = argparse.ArgumentParser(description="承認済みドキュメントを処理します。")
     parser.add_argument("file_path", type=Path, help="承認するドキュメントへのパス")

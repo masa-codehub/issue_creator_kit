@@ -52,26 +52,18 @@ jobs:
           echo "Creating branch: $BRANCH_NAME"
           git checkout -b "$BRANCH_NAME"
 
-          has_processed=false
-          # Process each file in inbox
-          for file in reqs/_inbox/*; do
-            if [ -f "$file" ]; then
-              echo "Processing $file..."
-              issue-kit approve "$file" --repo "${{ github.repository }}" --token "${{ secrets.GITHUB_TOKEN }}"
-              has_processed=true
-            fi
-          done
+          echo "Running batch approval..."
+          # The Python script handles iteration, moving files, and updating metadata
+          issue-kit approve-all \
+            --inbox-dir "reqs/_inbox" \
+            --approved-dir "reqs/design/_approved" \
+            --repo "${{ github.repository }}" \
+            --token "${{ secrets.GITHUB_TOKEN }}"
           
-          if [ "$has_processed" = "false" ]; then
-             echo "No files processed."
-             echo "has_changes=false" >> $GITHUB_OUTPUT
-             exit 0
-          fi
-
           # Check for changes
           git add .
           if git diff --staged --quiet; then
-            echo "No changes to commit."
+            echo "No changes to commit (process might have failed or found no valid files)."
             echo "has_changes=false" >> $GITHUB_OUTPUT
           else
             git commit -m "docs: approve documents and create tracking issues"
