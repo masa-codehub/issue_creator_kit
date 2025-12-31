@@ -106,6 +106,19 @@ def test_save_document_multibyte(tmp_path: Path):
     assert "本文" in text
 
 
+def test_update_metadata_empty(tmp_path: Path):
+    """U-5: 空の更新"""
+    file_path = tmp_path / "test.md"
+    original_content = "---\ntitle: A\n---\nBody"
+    file_path.write_text(original_content, encoding="utf-8")
+
+    update_metadata(file_path, {})
+
+    metadata, body = load_document(file_path)
+    assert metadata == {"title": "A"}
+    assert body.strip() == "Body"
+
+
 def test_safe_move_file_success(tmp_path: Path):
     """S-1: ファイルの移動成功"""
     src_dir = tmp_path / "src"

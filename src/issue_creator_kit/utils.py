@@ -25,6 +25,7 @@ def load_document(file_path: Path) -> tuple[dict[str, Any], str]:
 
     Raises:
         FileNotFoundError: ファイルが存在しない場合。
+        yaml.YAMLError: フロントマターの解析に失敗した場合。
     """
     if not file_path.exists():
         raise FileNotFoundError(f"ファイルが見つかりません: {file_path}")
@@ -71,6 +72,11 @@ def save_document(file_path: Path, metadata: dict[str, Any], content: str) -> No
         file_path (Path): 保存先のパス。
         metadata (dict[str, Any]): メタデータの辞書。
         content (str): ファイルの本文。
+
+    Raises:
+        PermissionError: 権限不足でファイルが書き込めない場合。
+        OSError: ファイル書き込み中にOSレベルのエラーが発生した場合。
+        Exception: フロントマターまたはコンテンツのシリアライズに失敗した場合。
     """
     use_frontmatter = True
     if file_path.exists():
@@ -82,6 +88,7 @@ def save_document(file_path: Path, metadata: dict[str, Any], content: str) -> No
         post = frontmatter.Post(content, **metadata)
         text = frontmatter.dumps(post)
     else:
+        # Markdown リスト形式を維持
         metadata_lines = [f"- **{key}**: {value}" for key, value in metadata.items()]
         lines = content.splitlines()
         header_line_idx = -1
@@ -126,6 +133,8 @@ def update_metadata(file_path: Path, updates: dict[str, Any]) -> None:
 
     Raises:
         FileNotFoundError: ファイルが存在しない場合。
+        yaml.YAMLError: 既存ドキュメントの読み込みまたは解析に失敗した場合。
+        OSError: 更新されたドキュメントのディスクへの書き込みに失敗した場合。
     """
     if not file_path.exists():
         raise FileNotFoundError(f"ファイルが見つかりません: {file_path}")
