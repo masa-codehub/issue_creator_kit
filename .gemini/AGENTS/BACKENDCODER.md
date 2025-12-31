@@ -31,36 +31,72 @@ BACKENDCODERが価値を発揮する主要なシナリオと、それらを実�
 ボーイスカウト・ルールに基づき、テストで振る舞いを保護しながら、コードの可読性や保守性を向上させるプロセスです。
 
 以下の手順でリファクタリングを行う。
-1. `read_file`で`.gemini/AGENTS/.skills/BACKENDCODER_SKILLS_REFACTORING.md`を読み込む。
-2. 読み込んだ手順に従って、プロジェクト進行の基本的なワークフローに従ったリファクタリング計画を立てる。
-3. 再度、新規に`read_file`で`.gemini/AGENTS/.skills/BACKENDCODER_SKILLS_REFACTORING.md`を読み込む。
-4. 計画をチェックし、安全網（テスト）の存在を確認する。
-5. 作成した計画に従って、リファクタリングを段階的に実行・検証する。
-6. 変更をコミットし、プルリクエストを作成する。
+
+1. **プロジェクト進行の初期化 (Initiate Progression):**
+   まず、`~/.gemini/GEMINI.md` の「3. プロジェクト進行」セクションを参照し、**SMART目標の設定**と**Todoリストの作成(`save_memory`)** を行う。これはスキルファイルを読み込む前に必ず実行する。
+
+2. **スキルのロード:**
+   `read_file`で`.gemini/AGENTS/.skills/BACKENDCODER_SKILLS_REFACTORING.md`を読み込む。
+
+3. **計画の策定:**
+   読み込んだ手順に従って、手順1で作成したTodoの最初のタスクとしてリファクタリング計画を立てる。
+
+4. **計画のチェック:**
+   再度、新規に`read_file`で`.gemini/AGENTS/.skills/BACKENDCODER_SKILLS_REFACTORING.md`を読み込み、計画に不足がないか、安全網（テスト）が存在するか確認する。
+
+5. **実行:**
+   作成した計画に従って、リファクタリングを段階的に実行・検証する。
+
+6. **完了:**
+   変更をコミットし、プルリクエストを作成する。
 
 ## 3. テストカバレッジの向上
 
 テストが不足している既存ロジックに対し、仕様を再確認した上でテストコードを追加し、システムの信頼性を高めるプロセスです。
 
 以下の手順でテスト追加を行う。
-1. `read_file`で`.gemini/AGENTS/.skills/BACKENDCODER_SKILLS_TESTING.md`を読み込む。
-2. 読み込んだ手順に従って、プロジェクト進行の基本的なワークフローに従ったテストを追加する箇所とシナリオを計画する。
-3. 再度、新規に`read_file`で`.gemini/AGENTS/.skills/BACKENDCODER_SKILLS_TESTING.md`を読み込む。
-4. 計画をチェックする。
-5. 作成した計画に従って、テストコードを追加・検証する。
-6. 変更をコミットし、プルリクエストを作成する。
+
+1. **プロジェクト進行の初期化 (Initiate Progression):**
+   まず、`~/.gemini/GEMINI.md` の「3. プロジェクト進行」セクションを参照し、**SMART目標の設定**と**Todoリストの作成(`save_memory`)** を行う。これはスキルファイルを読み込む前に必ず実行する。
+
+2. **スキルのロード:**
+   `read_file`で`.gemini/AGENTS/.skills/BACKENDCODER_SKILLS_TESTING.md`を読み込む。
+
+3. **計画の策定:**
+   読み込んだ手順に従って、手順1で作成したTodoの最初のタスクとしてテスト追加の計画を立てる。
+
+4. **計画のチェック:**
+   再度、新規に`read_file`で`.gemini/AGENTS/.skills/BACKENDCODER_SKILLS_TESTING.md`を読み込み、計画に不足がないか確認する。
+
+5. **実行:**
+   作成した計画に従って、テストコードを追加・検証する。
+
+6. **完了:**
+   変更をコミットし、プルリクエストを作成する。
 
 ## 4. コードレビューへの対応
 
 プルリクエストに対してレビュアーから指摘を受けた際、その内容を理解し、適切に修正・回答を行うプロセスです。
 
 以下の手順で対応を行う。
-1. `read_file`で`.gemini/AGENTS/.skills/BACKENDCODER_SKILLS_REVIEW_RESPONSE.md`を読み込む。
-2. 読み込んだ手順に従って、プロジェクト進行の基本的なワークフローに従ったレビュー内容の分析と修正計画を立てる。
-3. 再度、新規に`read_file`で`.gemini/AGENTS/.skills/BACKENDCODER_SKILLS_REVIEW_RESPONSE.md`を読み込む。
-4. 計画をチェックし、レビュアーの意図との乖離がないか確認する。
-5. 作成した計画に従って、修正の実装とコメントへの回答を行う。
-6. 変更をコミットし、プルリクエストを作成する。
+
+1. **プロジェクト進行の初期化 (Initiate Progression):**
+   まず、`~/.gemini/GEMINI.md` の「3. プロジェクト進行」セクションを参照し、**SMART目標の設定**と**Todoリストの作成(`save_memory`)** を行う。これはスキルファイルを読み込む前に必ず実行する。
+
+2. **スキルのロード:**
+   `read_file`で`.gemini/AGENTS/.skills/BACKENDCODER_SKILLS_REVIEW_RESPONSE.md`を読み込む。
+
+3. **計画の策定:**
+   読み込んだ手順に従って、手順1で作成したTodoの最初のタスクとして修正計画を立てる。
+
+4. **計画のチェック:**
+   再度、新規に`read_file`で`.gemini/AGENTS/.skills/BACKENDCODER_SKILLS_REVIEW_RESPONSE.md`を読み込み、計画とレビュアーの意図に乖離がないか確認する。
+
+5. **実行:**
+   作成した計画に従って、修正の実装とコメントへの回答を行う。
+
+6. **完了:**
+   変更をコミットし、プルリクエストを作成する。
 
 
 # フォルダ構成 (Folder Structure)
