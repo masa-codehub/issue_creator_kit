@@ -28,15 +28,15 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
+          python3 -m pip install --upgrade pip
           # プロジェクトの依存関係（pre-commit を含む）をインストール
-          python -m pip install -e .[test,dev]
+          python3 -m pip install -e .[test,dev]
 
       - name: Run checks with pre-commit
         run: |
           # pre-commit を直接呼び出し、Linter (Ruff), Formatter (Ruff), Type Check (Mypy), Test (Pytest) を一括実行します。
           # 設定は .pre-commit-config.yaml に基づき、ローカル開発時と同じチェック内容を保証します。
-          python -m pre_commit run --all-files
+          python3 -m pre_commit run --all-files
 
       # 注: カバレッジレポートのアップロードが必要な場合は、
       # pre-commit の pytest フックに引数を渡すか、個別の pytest ステップを維持してください。
