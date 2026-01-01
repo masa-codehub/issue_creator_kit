@@ -48,6 +48,7 @@ jobs:
           echo "branch_name=$BRANCH_NAME" >> $GITHUB_OUTPUT
 
           echo "Running approval workflow..."
+          # Note: issue-kit run-workflow handles "git checkout -b <branch>" internally.
           # ファイルの移動、メタデータ更新、Issue起票、Gitコミット＆プッシュのロジックは CLI 内にカプセル化されています。
           issue-kit run-workflow \
             --inbox-dir "reqs/design/_inbox" \
@@ -55,6 +56,15 @@ jobs:
             --branch "$BRANCH_NAME" \
             --repo "${{ github.repository }}" \
             --token "${{ secrets.GITHUB_TOKEN }}"
+
+          # Verify if changes were made (Explicit check for visibility in logs)
+          if git diff --quiet origin/main HEAD; then
+            echo "No changes detected."
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "Changes detected."
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          fi
 
       - name: Create PR
         if: steps.process.outputs.has_changes == 'true'
@@ -67,6 +77,6 @@ jobs:
           # 最終的な確認のため、自動生成された PR を作成します。
           gh pr create \
             --title "docs(arch): Approve documents from inbox" \
-            --body "This PR automatically moves documents from reqs/design/_inbox to reqs/design/_approved and updates their status to 'Approved' (承認済み). Tracking issues have been created." \
+            --body "This PR automatically moves documents from \`reqs/design/_inbox\` to \`reqs/design/_approved\` and updates their status to 'Approved' (承認済み). Tracking issues have been created." \
             --base main \
             --head "$BRANCH_NAME"
