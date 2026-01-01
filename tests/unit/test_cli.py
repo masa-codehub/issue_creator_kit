@@ -1,80 +1,83 @@
+import os
 import sys
 from pathlib import Path
-from unittest.mock import patch
-
-import pytest
+from unittest.mock import mock_open, patch
 
 from issue_creator_kit import cli
 
 
-def test_approve_command(tmp_path):
-    """Test that 'approve' command calls process_single_file with correct args."""
-
-    # Create a dummy file
-    dummy_file = tmp_path / "test_doc.md"
-    dummy_file.touch()
-
+def test_run_workflow_command():
+    """Test 'run-workflow' command execution."""
     with (
-        patch(
-            "issue_creator_kit.scripts.process_approvals.process_single_file"
-        ) as mock_process,
-        patch.dict(
-            "os.environ",
-            {"GITHUB_REPOSITORY": "test/repo", "GITHUB_TOKEN": "test_token"},
-        ),
+        patch("issue_creator_kit.cli.FileSystemAdapter") as mock_fs,
+        patch("issue_creator_kit.cli.GitHubAdapter") as mock_github,
+        patch("issue_creator_kit.cli.GitAdapter") as mock_git,
+        patch("issue_creator_kit.cli.ApprovalUseCase") as mock_approval,
+        patch("issue_creator_kit.cli.WorkflowUseCase") as mock_workflow,
     ):
-        # Simulate CLI args
-        test_args = ["approve", str(dummy_file)]
-        with patch.object(sys, "argv", ["issue-kit"] + test_args):
-            cli.main()
+        # Setup args
+        inbox = "reqs/design/_inbox"
+        approved = "reqs/design/_approved"
+        branch = "auto-approve/docs"
 
-        mock_process.assert_called_once()
-        call_args = mock_process.call_args
-        # process_single_file uses file_path as first arg, but we should check how it is called.
-        # If called with keywords:
-        if "file_path" in call_args.kwargs:
-            assert call_args.kwargs["file_path"] == Path(dummy_file)
-        else:
-            # If positional
-            assert call_args.args[0] == Path(dummy_file)
-
-        assert call_args.kwargs.get("repo_name") == "test/repo"
-        assert call_args.kwargs.get("token") == "test_token"
-
-
-def test_approve_command_custom_args(tmp_path):
-    """Test 'approve' command with custom --repo and --token."""
-    dummy_file = tmp_path / "test_doc.md"
-    dummy_file.touch()
-
-    with patch(
-        "issue_creator_kit.scripts.process_approvals.process_single_file"
-    ) as mock_process:
         test_args = [
-            "approve",
-            str(dummy_file),
-            "--repo",
-            "custom/repo",
-            "--token",
-            "custom_token",
+            "run-workflow",
+            "--inbox-dir",
+            inbox,
+            "--approved-dir",
+            approved,
+            "--branch",
+            branch,
         ]
+
         with patch.object(sys, "argv", ["issue-kit"] + test_args):
             cli.main()
 
-        mock_process.assert_called_once()
-        assert mock_process.call_args.kwargs.get("repo_name") == "custom/repo"
-        assert mock_process.call_args.kwargs.get("token") == "custom_token"
+        # Verify instantiation
+        mock_fs.assert_called_once()
+        mock_github.assert_called_once()
+        mock_git.assert_called_once()
+
+        # Verify UseCase instantiation
+        mock_approval.assert_called_once_with(
+            mock_fs.return_value, mock_github.return_value
+        )
+        mock_workflow.assert_called_once_with(
+            mock_approval.return_value, mock_git.return_value
+        )
+
+        # Verify run called with correct args
+        mock_workflow.return_value.run.assert_called_once()
+        call_kwargs = mock_workflow.return_value.run.call_args.kwargs
+
+        # Check args
+        assert call_kwargs["inbox_dir"] == Path(inbox)
+        assert call_kwargs["approved_dir"] == Path(approved)
+        assert call_kwargs["branch_name"] == branch
 
 
-def test_approve_command_missing_env(tmp_path):
-    """Test failure when repo/token are missing."""
-    dummy_file = tmp_path / "test_doc.md"
-    dummy_file.touch()
-
-    # Ensure no env vars
-    with patch.dict("os.environ", {}, clear=True):
-        test_args = ["approve", str(dummy_file)]
+def test_run_workflow_outputs():
+    """Test that run-workflow writes to GITHUB_OUTPUT."""
+    with (
+        patch("issue_creator_kit.cli.WorkflowUseCase") as mock_workflow,
+        patch("issue_creator_kit.cli.FileSystemAdapter"),
+        patch("issue_creator_kit.cli.GitHubAdapter"),
+        patch("issue_creator_kit.cli.GitAdapter"),
+        patch("issue_creator_kit.cli.ApprovalUseCase"),
+        patch.dict(os.environ, {"GITHUB_OUTPUT": "/tmp/output"}),
+        patch("builtins.open", mock_open()) as mock_file,
+    ):
+        # Case 1: Changes (True)
+        mock_workflow.return_value.run.return_value = True
+        test_args = ["run-workflow", "--branch", "test"]
         with patch.object(sys, "argv", ["issue-kit"] + test_args):
-            with pytest.raises(SystemExit) as excinfo:
-                cli.main()
-            assert excinfo.value.code == 1
+            cli.main()
+
+        mock_file().write.assert_called_with("has_changes=true\n")
+
+        # Case 2: No Changes (False)
+        mock_workflow.return_value.run.return_value = False
+        with patch.object(sys, "argv", ["issue-kit"] + test_args):
+            cli.main()
+
+        mock_file().write.assert_called_with("has_changes=false\n")
