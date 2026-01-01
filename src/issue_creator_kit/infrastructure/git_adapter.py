@@ -9,7 +9,16 @@ class GitAdapter:
             )
             return result.stdout.strip()
         except subprocess.CalledProcessError as e:
-            raise RuntimeError(f"Git command failed: {e.stderr}") from e
+            stderr = (e.stderr or "").strip()
+            if stderr:
+                first_line = stderr.splitlines()[0]
+                max_len = 200
+                if len(first_line) > max_len:
+                    first_line = first_line[: max_len - 3] + "..."
+                message = f"Git command failed: {first_line}"
+            else:
+                message = "Git command failed"
+            raise RuntimeError(message) from e
 
     def checkout(self, branch: str, create: bool = False):
         cmd = ["checkout"]
