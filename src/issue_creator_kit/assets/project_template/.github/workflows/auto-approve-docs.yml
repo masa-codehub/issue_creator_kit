@@ -97,7 +97,9 @@ jobs:
           gh pr create \
             --title "docs(arch): Approve documents from inbox" \
             --body "This PR automatically moves documents from 
-`reqs/design/_inbox` to 
-`reqs/design/_approved` and updates their status to 'Approved' (承認済み). Tracking issues have been created." \
+reqs/design/_inbox
+to 
+reqs/design/_approved
+ and updates their status to 'Approved' (承認済み). Tracking issues have been created." \
             --base main \
             --head "$BRANCH_NAME"
