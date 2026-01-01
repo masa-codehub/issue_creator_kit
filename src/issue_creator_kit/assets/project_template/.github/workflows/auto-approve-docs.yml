@@ -1,7 +1,7 @@
 name: Auto Approve Docs
 
 # ADR-002: マージされた設計ドキュメントの承認処理を自動化します。
-# ロジックは YAMLではなく Python CLI (issue-kit) に集約し、テスタビリティを確保しています。
+# ロジックは YAML ではなく Python CLI (issue-kit) に集約し、テスタビリティを確保しています。
 # 実行環境 (Self-Hosted Runner) に Python 3.13 および gh cli がプリインストールされていることを前提に、
 # 冗長なセットアップステップを省略して最適化されています。
 
@@ -19,7 +19,7 @@ permissions:
 
 jobs:
   approve-and-move:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
