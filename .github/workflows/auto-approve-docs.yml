@@ -35,8 +35,8 @@ jobs:
 
       - name: Install Issue Creator Kit
         run: |
-          python3.13 -m pip install --upgrade pip
-          python3.13 -m pip install git+https://github.com/masa-codehub/issue_creator_kit.git
+          python3 -m pip install --upgrade pip
+          python3 -m pip install git+https://github.com/masa-codehub/issue_creator_kit.git
 
       - name: Configure Git
         run: |
@@ -71,8 +71,8 @@ jobs:
           echo "branch_name=$BRANCH_NAME" >> $GITHUB_OUTPUT
 
           echo "Running workflow..."
-          # Note: issue-kit run-workflow は内部で git checkout -b を行います。
-          issue-kit run-workflow \
+          # Note: PATH環境変数に依存しないよう、python3 -m でモジュールを直接実行します。
+          python3 -m issue_creator_kit run-workflow \
             --inbox-dir "reqs/design/_inbox" \
             --approved-dir "reqs/design/_approved" \
             --branch "$BRANCH_NAME" \
