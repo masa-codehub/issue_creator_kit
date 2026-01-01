@@ -47,7 +47,7 @@ jobs:
       # 実行環境に gh がない場合は、以下のインストール処理をステップとして追加してください。
       # - name: Ensure GitHub CLI is installed
       #   run: |
-      #     if ! command -v gh &> /dev/null;
+      #     if ! command -v gh &> /dev/null; then
       #       sudo mkdir -p -m 755 /etc/apt/keyrings
       #       wget -qO- https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null
       #       sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg
@@ -80,7 +80,7 @@ jobs:
             --token "${{ secrets.GITHUB_TOKEN }}"
 
           # 変更の有無を確認
-          if git diff --quiet origin/main HEAD;
+          if git diff --quiet origin/main HEAD; then
             echo "No changes detected."
             echo "has_changes=false" >> $GITHUB_OUTPUT
           else
