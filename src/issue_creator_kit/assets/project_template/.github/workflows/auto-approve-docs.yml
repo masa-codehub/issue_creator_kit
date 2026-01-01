@@ -8,7 +8,7 @@ on:
     branches:
       - main
     paths:
-      - 'reqs/_inbox/**'
+      - 'reqs/design/_inbox/**'
 
 permissions:
   contents: write
@@ -43,7 +43,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # 処理対象（inbox）の有無を確認。空の場合は早期リターン。
-          if [ ! -d "reqs/_inbox" ] || [ -z "$(ls -A reqs/_inbox/)" ]; then
+          if [ ! -d "reqs/design/_inbox" ] || [ -z "$(ls -A reqs/design/_inbox/)" ]; then
             echo "No files in inbox."
             echo "has_changes=false" >> $GITHUB_OUTPUT
             exit 0
@@ -55,12 +55,22 @@ jobs:
           echo "branch_name=$BRANCH_NAME" >> $GITHUB_OUTPUT
 
           echo "Running workflow..."
+          # Note: issue-kit run-workflow handles "git checkout -b <branch>" internally.
           issue-kit run-workflow \
-            --inbox-dir "reqs/_inbox" \
+            --inbox-dir "reqs/design/_inbox" \
             --approved-dir "reqs/design/_approved" \
+            --branch "$BRANCH_NAME" \
             --repo "${{ github.repository }}" \
-            --token "${{ secrets.GITHUB_TOKEN }}" \
-            --branch "$BRANCH_NAME"
+            --token "${{ secrets.GITHUB_TOKEN }}"
+
+          # Verify if changes were made (Explicit check for visibility in logs)
+          if git diff --quiet origin/main HEAD; then
+            echo "No changes detected."
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "Changes detected."
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          fi
 
       - name: Create PR
         if: steps.process.outputs.has_changes == 'true'
@@ -71,6 +81,6 @@ jobs:
           # 最終的な確認のため、自動生成された PR を作成します。
           gh pr create \
             --title "docs(arch): Approve documents from inbox" \
-            --body "This PR automatically moves documents from \`reqs/_inbox\` to \`reqs/_approve\` and updates their status to 'Approved' (承認済み). Tracking issues have been created." \
+            --body "This PR automatically moves documents from \`reqs/design/_inbox\` to \`reqs/design/_approved\` and updates their status to 'Approved' (承認済み). Tracking issues have been created." \
             --base main \
             --head "$BRANCH_NAME"
