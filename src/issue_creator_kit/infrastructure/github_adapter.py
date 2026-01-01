@@ -11,8 +11,13 @@ class GitHubAdapter:
         )
         self.repo = repo or os.environ.get("GITHUB_REPOSITORY")
 
-        if not self.token or not self.repo:
-            # We allow initialization without credentials, but methods will fail
+        if not self.token:
+            raise ValueError("GitHub token is required.")
+        if not self.repo:
+            # Repo might be optional for some operations?
+            # But usually needed. Let's not break if repo missing unless strictly required?
+            # Reviewer specifically mentioned Token.
+            # But let's check token.
             pass
 
     def _get_headers(self) -> dict[str, str]:
