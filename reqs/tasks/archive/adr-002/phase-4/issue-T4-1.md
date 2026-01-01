@@ -8,7 +8,8 @@ roadmap: "reqs/roadmap/active/roadmap-adr002-document-approval-flow.md"
 task_id: "T4-1"
 depends_on:
   - "../phase-3/issue-T3-4.md"
-status: "Draft"
+status: "Created"
+issue: "#53"
 ---
 # {{title}}
 

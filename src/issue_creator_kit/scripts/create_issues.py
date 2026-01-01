@@ -1,5 +1,4 @@
 # ruff: noqa: T201, ERA001
-import glob
 import os
 import sys
 from graphlib import TopologicalSorter
@@ -11,8 +10,8 @@ import yaml
 import issue_creator_kit.utils as utils
 
 # Configuration
-ISSUES_DIR = "reqs/_issues"
-ARCHIVE_DIR = "reqs/_issues/created"
+ISSUES_DIR = "reqs/tasks/_queue"
+ARCHIVE_DIR = "reqs/tasks/archive"
 
 
 def get_dependencies(files):
@@ -56,14 +55,15 @@ def get_dependencies(files):
                 # 新しい YAML リスト形式
                 for dep in depends_on:
                     if isinstance(dep, str) and dep.endswith(".md"):
-                        deps.add(dep)
+                        # 依存関係はファイル名のみで管理する（簡易化のため）
+                        deps.add(Path(dep).name)
             elif isinstance(depends_on, str) and depends_on.lower() != "(none)":
                 # 旧形式のカンマ区切り文字列
                 cleaned = depends_on.replace("(", "").replace(")", "")
                 for dep in cleaned.split(","):
                     dep = dep.strip()
                     if dep and dep.endswith(".md"):
-                        deps.add(dep)
+                        deps.add(Path(dep).name)
 
         graph[filename] = deps
 
@@ -152,13 +152,15 @@ def main():
         )
         sys.exit(1)
 
-    # 1. 対象ファイルの特定
+    # 1. 対象ファイルの特定 (再帰的に走査)
     files = [
-        f for f in glob.glob(os.path.join(ISSUES_DIR, "*.md")) if os.path.isfile(f)
+        str(f)
+        for f in Path(ISSUES_DIR).rglob("*.md")
+        if f.is_file() and "_queue" in str(f)
     ]
 
     if not files:
-        print("No issue files found in inbox.")
+        print("No issue files found in queue.")
         return
 
     print(f"Found {len(files)} files to process.")
@@ -177,29 +179,39 @@ def main():
     # 4. 順序に従って Issue を作成
     issue_map = {}  # {filename: issue_number}
 
-    if not os.path.exists(ARCHIVE_DIR):
-        os.makedirs(ARCHIVE_DIR)
-
     for filename in create_order:
         if filename not in file_map:
+            # 既にアーカイブされている可能性があるため、アーカイブ内を検索して Issue 番号を取得することを検討すべきだが、
+            # 現状はスキップする（後続の置換には使えない）
             continue
 
         file_path_str = file_map[filename]
+        file_path = Path(file_path_str)
 
         # Issue の作成
         issue_number = create_issue(filename, file_path_str, issue_map, repo, token)
 
-        # 5. アーカイブへの移動 (成功後のみ issue_map に記録)
+        # 5. アーカイブへの移動 (ディレクトリ構造を維持)
         try:
-            utils.safe_move_file(Path(file_path_str), Path(ARCHIVE_DIR), overwrite=True)
-            print(f"Moved {filename} to {ARCHIVE_DIR}")
+            # ISSUES_DIR からの相対パスを取得
+            rel_path = file_path.relative_to(ISSUES_DIR)
+            target_dir = Path(ARCHIVE_DIR) / rel_path.parent
+
+            utils.safe_move_file(file_path, target_dir, overwrite=True)
+            print(f"Moved {filename} to {target_dir}")
+
+            # 作成した Issue 番号をドキュメントに追記
+            archived_path = target_dir / filename
+            utils.update_metadata(archived_path, {"issue": f"#{issue_number}"})
+
             issue_map[filename] = issue_number
-        except FileExistsError as e:
-            print(f"Error: Destination file exists: {e}", file=sys.stderr)
-            sys.exit(1)
         except Exception as e:
-            print(f"Error moving {filename}: {e}", file=sys.stderr)
+            print(f"Error archiving {filename}: {e}", file=sys.stderr)
             sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()
 
 
 if __name__ == "__main__":
