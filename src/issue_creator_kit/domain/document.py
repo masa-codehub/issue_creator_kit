@@ -5,9 +5,8 @@ import yaml
 
 try:
     from yaml import CDumper as Dumper
-    from yaml import CLoader as Loader
 except ImportError:
-    from yaml import Dumper, Loader  # type: ignore
+    from yaml import Dumper  # type: ignore
 
 
 class Document:
@@ -31,7 +30,7 @@ class Document:
                 if len(parts) >= 3:
                     yaml_text = parts[1]
                     body = parts[2]
-                    parsed_yaml = yaml.load(yaml_text, Loader=Loader)
+                    parsed_yaml = yaml.safe_load(yaml_text)
                     if isinstance(parsed_yaml, dict):
                         metadata = parsed_yaml
                         # Convert first char of body if it starts with newline
