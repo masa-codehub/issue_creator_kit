@@ -60,24 +60,30 @@
 **WBS**
 | Task ID | Category | タスク内容 | 対象ファイル | 依存先 | Issue案リンク |
 | :---: | :---: | :--- | :--- | :---: | :--- |
-| T3-1 | Setup | 作業ブランチ `feature/phase-3-integration` の作成 | - | T2-5 | [issue-T3-1.md](../../tasks/drafts/adr-002/phase-3/issue-T3-1.md) |
-| T3-2 | Impl | CLI サブコマンド `approve` の統合 | `src/issue_creator_kit/cli.py` | T3-1 | [issue-T3-2.md](../../tasks/drafts/adr-002/phase-3/issue-T3-2.md) |
-| T3-3 | Impl | GitHub Actions ワークフローの差し替え | `.github/workflows/auto-approve-docs.yml` | T3-2 | [issue-T3-3.md](../../tasks/drafts/adr-002/phase-3/issue-T3-3.md) |
-| T3-4 | Review | 統合検証結果のレビューと Phase 4 計画の確定 | - | T3-3 | [issue-T3-4.md](../../tasks/drafts/adr-002/phase-3/issue-T3-4.md) |
+| T3-1 | Setup | [x] 作業ブランチ `feature/phase-3-integration` の作成 | - | T2-5 | [issue-T3-1.md](../../tasks/archive/adr-002/phase-3/issue-T3-1.md) |
+| T3-2 | Impl | [x] CLI サブコマンド `approve` の統合 | `src/issue_creator_kit/cli.py` | T3-1 | [issue-T3-2.md](../../tasks/archive/adr-002/phase-3/issue-T3-2.md) |
+| T3-3 | Impl | [x] GitHub Actions ワークフローの差し替え | `.github/workflows/auto-approve-docs.yml` | T3-2 | [issue-T3-3.md](../../tasks/archive/adr-002/phase-3/issue-T3-3.md) |
+| T3-4 | Review | [x] 統合検証結果のレビューと Phase 4 計画の確定 | - | T3-3 | [issue-T3-4.md](../../tasks/archive/adr-002/phase-3/issue-T3-4.md) |
 
 ### Phase 4: 資産の同期とクリーンアップ (Sync & Cleanup)
-- **Goal (狙い)**: 配布用テンプレートを最新化し、旧負債を完全に排除する。
+- **Goal (狙い)**: 配布用テンプレートを最新化し、旧負債を完全に排除する。また、ワークフローのロジックを **Clean Architecture Lite** (Domain/Usecase/Infrastructure) に基づく Python コードとして再実装し、テスト容易性を最大化する。
 - **Input (前提)**: 稼働中の新ワークフロー。
 - **Deliverables (成果物)**:
-    - **テンプレート更新**: `assets/` 内の最新化。
-- **Gate (承認条件)**: 全てのドキュメントとコードが一貫した最新状態にあること。
+    - **アーキテクチャ刷新**: `domain/`, `usecase/`, `infrastructure/` への分離。
+    - **アセット構造化**: `project_template/` 配下へのテンプレート集約。
+    - **Usecase実装**: `WorkflowUseCase` によるオーケストレーション。
+    - **単体テスト**: Infrastructure 層をモック化した Usecase テスト。
+- **Gate (承認条件)**: 全てのドキュメントとコードが一貫した最新状態にあり、テストが全てパスすること。
 
 **WBS**
 | Task ID | Category | タスク内容 | 対象ファイル | 依存先 | Issue案リンク |
 | :---: | :---: | :--- | :--- | :---: | :--- |
-| T4-1 | Setup | 作業ブランチ `feature/phase-4-cleanup` の作成 | - | T3-4 | [issue-T4-1.md](../../tasks/drafts/adr-002/phase-4/issue-T4-1.md) |
-| T4-2 | Clean | `assets/workflows` 内のテンプレート同期と旧スクリプト削除 | - | T4-1 | [issue-T4-2.md](../../tasks/drafts/adr-002/phase-4/issue-T4-2.md) |
-| T4-3 | Review | 最終成果物のレビューとロードマップ完了承認 | - | T4-2 | [issue-T4-3.md](../../tasks/drafts/adr-002/phase-4/issue-T4-3.md) |
+| T4-1 | Setup | 作業ブランチ `feature/phase-4-cleanup` の作成 | - | T3-4 | [issue-T4-1.md](../../tasks/_queue/adr-002/phase-4/issue-T4-1.md) |
+| T4-2 | Arch | ディレクトリ再編 (Clean Arch Lite) と不要資産の削除 | `src/issue_creator_kit/` | T4-1 | [issue-T4-2.md](../../tasks/_queue/adr-002/phase-4/issue-T4-2.md) |
+| T4-3 | Impl | `Process Documents` ロジックの Usecase 実装と CLI 統合 | `usecase/workflow.py` | T4-2 | [issue-T4-3.md](../../tasks/_queue/adr-002/phase-4/issue-T4-3.md) |
+| T4-4 | Test | Infrastructure モックを活用した Usecase テスト実装 | `tests/unit/` | T4-3 | [issue-T4-4.md](../../tasks/_queue/adr-002/phase-4/issue-T4-4.md) |
+| T4-5 | Refactor | ワークフローYAMLをリファクタリングし、CLIコマンドのみを呼ぶ形に変更 | `.github/workflows/auto-approve-docs.yml` | T4-4 | [issue-T4-5.md](../../tasks/_queue/adr-002/phase-4/issue-T4-5.md) |
+| T4-6 | Review | 最終成果物のレビューとロードマップ完了承認 | - | T4-2, T4-5 | [issue-T4-6.md](../../tasks/_queue/adr-002/phase-4/issue-T4-6.md) |
 
 ## 3. リスク管理とロールバック
 - **リスク**: 設計（インターフェース）の考慮漏れによる実装時の大幅な修正。

@@ -20,18 +20,28 @@
 -->
 以下の方式を採用し、設計の承認から公式記録化、および実装トラッキング開始までのライフサイクルを自動化する。
 
-### 1. 責務と技術的手段の完全対応表 (Strict Mapping)
+### 1. アーキテクチャ方針: Clean Architecture Lite
+CLIツールの実装において、テスト容易性と保守性を高めるため、以下の「関心の分離」を適用する。
 
-| 担当 (Actor) | 技術적手段 (Technical Means) | 具体的な成果物・動作 |
+- **Infrastructure層**: Git操作 (`subprocess`), GitHub API (`PyGithub`), ファイルシステム操作 (`open`) などの IO 処理を Adapter として実装する。
+- **Usecase層**: 承認フローのビジネスルールやワークフロー全体の制御（オーケストレーション）を担当する。ここは純粋な Python コードであり、Infrastructure 層のインターフェースにのみ依存する（依存性逆転）。
+- **Domain層**: ドキュメントやメタデータのデータ構造を定義する。
+- **CLI層**: ユーザー入力（引数）を受け取り、Usecase に適切な Adapter を注入 (DI) して実行する。
+
+これにより、IO を伴う処理（特に Git 操作）のテストにおいて、Infrastructure 層をモック化することでロジックの完全な検証が可能となる。
+
+### 2. 責務と技術的手段の完全対応表 (Strict Mapping)
+
+| 担当 (Actor) | 技術的手段 (Technical Means) | 具体的な成果物・動作 |
 | :--- | :--- | :--- |
 | **Architect** | **マージ操作** | `reqs/design/_inbox/` 内のファイルを `main` ブランチへマージする（これが承認の意思表示となる）。 |
-| **issue-kit (src/)** | **一括承認コマンド** | `issue-kit approve-all` コマンドにより、`_inbox` 内の全ファイルをスキャンし、移動・更新・Issue起票を一括で行う。ループ処理や条件分岐はこのコマンド内にカプセル化される。 |
-| **issue-kit (src/)** | **メタデータ置換** | `Status` を `承認済み` へ、日付を `当日` へ、さらに作成した `Issue番号` をファイル内に自動追記する。 |
-| **issue-kit (src/)** | **トラッキングIssue起票** | 承認されたドキュメントに対し、`[ADR-XXX]` 等のタイトルで GitHub Issue を作成する。これが後続タスクの親となる。 |
-| **GitHub Actions** | **ワークフロー実行** | YAML は Python 環境のセットアップと `issue-kit approve-all` の実行、そして結果（Git差分）に基づく PR 作成のみを担当する。 |
-| **AI / Developer** | **単体テスト (pytest)** | 承認ロジック全体（ファイル操作、Git操作、APIコール）を Python コードとして実装し、モックを用いた単体テストで品質を担保する。 |
+| **issue-kit (CLI/Usecase)** | **ワークフロー実行 (`run-workflow`)** | YAML内のシェルスクリプトを排除し、Gitの変更検知からコミットまでの全行程を Usecase として実行する。 |
+| **issue-kit (Usecase)** | **一括承認 (`process_all_files`)** | `_inbox` 内の全ファイルをスキャンし、移動・更新・Issue起票を一括で行う。 |
+| **issue-kit (Infrastructure)** | **Git Adapter** | `git add`, `git commit` 等のコマンド発行をカプセル化する。 |
+| **issue-kit (Infrastructure)** | **GitHub Adapter** | `PyGithub` を用いた Issue 起票や PR 作成操作をカプセル化する。 |
+| **GitHub Actions** | **ワークフロー定義** | YAML は Python 環境のセットアップと `issue-kit run-workflow` の 1行呼び出しのみを担当する。 |
 
-### 2. 詳細仕様規定
+### 3. 詳細仕様規定
 - **トラッキングIssueの内容**:
     - **タイトル**: ドキュメントの見出し（例：`# 概要 / Summary` の次の行）を採用。
     - **本文**: 承認済みファイルへのパーマリンクを含める。
@@ -39,29 +49,29 @@
     - `Status`: `承認済み` に更新。
     - `Date` / `Last Updated`: 実行日の日付に更新。
     - `Issue`: 起票されたトラッキングIssueの番号（例：`#123`）を新規に追記、または既存項目を更新する。
-- **テスタビリティ**: ロジックを Python スクリプトに寄せることで、Docker がない環境でも `pytest` により大部分の検証を可能にする。
 
 ### 実装上の制約 (Constraints)
 - **インフラ要件**: 本システムを Self-hosted runner で実行する場合、ランナーの OS 環境にあらかじめ GitHub CLI (`gh`) がインストールされており、`gh` コマンドが実行可能な状態でなければならない。
 
 ## 検討した代替案 / Alternatives Considered
-- **案B: YAML 内でのループ処理**: シェルスクリプトでループや条件分岐を書く。
-    - *不採用理由*: テストが困難であり、複雑なロジック（エラーハンドリングや条件分岐）が増えると保守性が下がるため。
+- **案B: フラットなスクリプト構成**: `scripts/` にロジックをベタ書きする。
+    - *不採用理由*: Phase 3 までの実装で採用していたが、Git 操作やファイル操作が混在し、単体テストで `subprocess` をパッチする箇所が複雑化するため、Phase 4 でリファクタリングする。
 - **案C: マージ時に直接 main にコミット**:
     - *不採用理由*: マージ後の変更を直接 `main` に入れると、Branch Protection Rule（ブランチ保護ルール）に抵触する場合があり、安全性を考慮して PR 経由での最終確認フローを残す。
 
 ## 結果 / Consequences
 ### メリット (Positive consequences)
 - 設計ドキュメントのステータスと物理的な配置が、承認実態と常に同期される。
-- ロジックが Python コード化されることで、単体テストが容易になり、品質が向上する。
+- **IO の分離により、Git コマンドや API コールの失敗系も含めたテストカバレッジを 100% に近づけられる。**
 - 承認済みフォルダ（`_approved/`）を見れば、常に最新かつ確定した設計のみが並んでいる状態が保証される。
 
 ### デメリット (Negative consequences)
+- ファイル数やクラス数が増加し、初期実装コストが若干上がる（が、保守コスト低下で回収可能）。
 - 自動作成された PR を再度マージするという 1 ステップが追加される。
 
 ## 検証基準 / Verification Criteria
-1. `pytest` によるロジック検証がパスすること。
+1. `pytest` において、Infrastructure 層をモック化した状態で Usecase の全分岐がパスすること。
 2. 実際の GitHub Actions 上で、`reqs/design/_inbox/` のファイルが正しく処理され、PR が作成されること。
 
 ## 実装状況 / Implementation Status
-実装中 (T3-3)
+Phase 4 (Refactoring & Cleanup) 実施中
