@@ -2,7 +2,8 @@ name: Auto Approve Docs
 
 # ADR-002: マージされた設計ドキュメントの承認処理を自動化します。
 # ロジックは YAML ではなく Python CLI (issue-kit) に集約し、テスタビリティを確保しています。
-# 実行環境 (Self-Hosted Runner) に Python 3.13 および gh cli がプリインストールされていることを前提に最適化されています。
+# 実行環境 (Self-Hosted Runner) に Python 3.13 および gh cli がプリインストールされていることを前提に、
+# 冗長なセットアップステップを省略して最適化されています。
 
 on:
   push:
@@ -25,12 +26,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.13'
-          # Self-hosted runner に Python 3.13 が既設されている場合はインストールをスキップし、
-          # 未設置の場合や GitHub ホストランナーでの実行時は、このステップでインストールが行われます。
+      # [環境依存のセットアップ]
+      # 実行環境に Python 3.13 がない場合は、以下のステップを追加してください。
+      # - name: Set up Python
+      #   uses: actions/setup-python@v5
+      #   with:
+      #     python-version: '3.13'
 
       - name: Install Issue Creator Kit
         run: |
@@ -41,6 +42,18 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      # [GitHub CLI (gh) のセットアップ]
+      # 実行環境に gh がない場合は、以下のインストール処理をステップとして追加してください。
+      # - name: Ensure GitHub CLI is installed
+      #   run: |
+      #     if ! command -v gh &> /dev/null;
+      #       sudo mkdir -p -m 755 /etc/apt/keyrings
+      #       wget -qO- https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null
+      #       sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg
+      #       echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/common/sources.list.d/github-cli.list > /dev/null
+      #       sudo apt update && sudo apt install gh -y
+      #     fi
 
       - name: Process Documents
         id: process
@@ -58,6 +71,7 @@ jobs:
           echo "branch_name=$BRANCH_NAME" >> $GITHUB_OUTPUT
 
           echo "Running workflow..."
+          # Note: issue-kit run-workflow は内部で git checkout -b を行います。
           issue-kit run-workflow \
             --inbox-dir "reqs/design/_inbox" \
             --approved-dir "reqs/design/_approved" \
@@ -79,8 +93,7 @@ jobs:
         env:
           BRANCH_NAME: ${{ steps.process.outputs.branch_name }}
         run: |
-          # 最終的な確認のため、自動生成された PR を作成します。
-          # gh cli は環境にインストール済みのため、そのまま実行可能です。
+          # 自動生成された PR を作成（gh コマンドは環境にプリインストールされている前提）。
           gh pr create \
             --title "docs(arch): Approve documents from inbox" \
             --body "This PR automatically moves documents from 
