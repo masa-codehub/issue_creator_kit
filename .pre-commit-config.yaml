@@ -1,3 +1,4 @@
+fail_fast: true
 repos:
 -   repo: https://github.com/astral-sh/ruff-pre-commit
     # Ruff version.
@@ -10,14 +11,14 @@ repos:
         - id: ruff-format
 -   repo: local
     hooks:
+    -   id: mypy
+        name: mypy
+        entry: python3 -m mypy
+        language: system
+        types: [python]
     -   id: pytest
         name: pytest
-        entry: pytest
+        entry: python3 -m pytest
         language: system
         types: [python]
         pass_filenames: false
-    -   id: mypy
-        name: mypy
-        entry: mypy
-        language: system
-        types: [python]
