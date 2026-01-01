@@ -121,7 +121,7 @@ class TestApprovalUseCase:
         # 1. Status/Date
         # 2. Issue (Capitalized)
         # 3. issue (Lowercase)
-        assert len(calls) >= 3
+        assert len(calls) == 3
         lowercase_update = calls[2]
         assert lowercase_update[0][0] == moved_path
         assert lowercase_update[0][1] == {"issue": "#124"}
@@ -184,6 +184,9 @@ class TestApprovalUseCase:
 
         with pytest.raises(RuntimeError, match="Issue Error"):
             usecase.process_single_file(file_path, approved_dir)
+
+        # Verify safe_move_file was called twice (move + rollback attempt)
+        assert fs_adapter.safe_move_file.call_count == 2
 
     def test_process_single_file_rollback(self, mocks):
         """
