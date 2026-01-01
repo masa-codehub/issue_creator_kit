@@ -29,7 +29,8 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.13'
-          # 注: Self-hosted runner で Python が既設の場合は高速にスキップされます。
+          # Self-hosted runner に Python 3.13 が既設されている場合はインストールをスキップし、
+          # 未設置の場合や GitHub ホストランナーでの実行時は、このステップでインストールが行われます。
 
       - name: Install Issue Creator Kit
         run: |
