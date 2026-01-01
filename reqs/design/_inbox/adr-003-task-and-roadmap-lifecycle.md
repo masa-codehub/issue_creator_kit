@@ -69,4 +69,4 @@ ADR-002 により、設計ドキュメント（ADR/Design Doc）の承認フロ�
 完了
 
 ---
-- **Ultimate Trigger**: Thu Jan  1 14:05:00 UTC 2026
+- **Absolute Final Trigger**: Thu Jan  1 14:10:00 UTC 2026
