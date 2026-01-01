@@ -84,7 +84,9 @@ class ApprovalUseCase:
                 labels = [lbl.strip() for lbl in labels_raw.split(",") if lbl.strip()]
             elif isinstance(labels_raw, list):
                 labels = [
-                    lbl for lbl in labels_raw if isinstance(lbl, str) and lbl.strip()
+                    lbl.strip()
+                    for lbl in labels_raw
+                    if isinstance(lbl, str) and lbl.strip()
                 ]
 
             issue_number = self.github.create_issue(
