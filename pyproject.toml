@@ -146,7 +146,7 @@ exclude = ["tests*"]
 python_version = "3.13"
 ignore_missing_imports = false
 packages = ["issue_creator_kit"]
-mypy_path = "."
+mypy_path = "src"
 
 [[tool.mypy.overrides]]
 module = "punq"
