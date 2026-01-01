@@ -18,6 +18,9 @@ permissions:
 jobs:
   approve-and-move:
     runs-on: ubuntu-latest
+    env:
+      # 全ステップ共通で GitHub Token を利用可能にします（gh コマンドおよび issue-kit 用）
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -39,8 +42,6 @@ jobs:
 
       - name: Process Documents
         id: process
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # 処理対象（inbox）の有無を確認。空の場合は早期リターン。
           if [ ! -d "reqs/design/_inbox" ] || [ -z "$(ls -A reqs/design/_inbox/)" ]; then
@@ -75,7 +76,6 @@ jobs:
       - name: Create PR
         if: steps.process.outputs.has_changes == 'true'
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH_NAME: ${{ steps.process.outputs.branch_name }}
         run: |
           # 最終的な確認のため、自動生成された PR を作成します。
