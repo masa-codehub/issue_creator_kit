@@ -30,7 +30,7 @@ jobs:
       - name: Install Issue Creator Kit
         run: |
           python -m pip install --upgrade pip
-          pip install .
+          pip install git+https://github.com/masa-codehub/issue_creator_kit.git
 
       - name: Configure Git
         run: |
