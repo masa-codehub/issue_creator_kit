@@ -1,13 +1,16 @@
 # ruff: noqa: T201
 import argparse
+import os
 import shutil
 import sys
 from pathlib import Path
 
 from issue_creator_kit.infrastructure.filesystem import FileSystemAdapter
+from issue_creator_kit.infrastructure.git_adapter import GitAdapter
 from issue_creator_kit.infrastructure.github_adapter import GitHubAdapter
 from issue_creator_kit.usecase.approval import ApprovalUseCase
 from issue_creator_kit.usecase.creation import IssueCreationUseCase
+from issue_creator_kit.usecase.workflow import WorkflowUseCase
 
 PACKAGE_ROOT = Path(__file__).parent
 PROJECT_TEMPLATE_DIR = PACKAGE_ROOT / "assets" / "project_template"
@@ -55,6 +58,37 @@ def run_automation(args):
         usecase.create_issues_from_queue(queue_dir, archive_dir)
     except Exception as e:
         print(f"Automation failed: {e}", file=sys.stderr)
+        sys.exit(1)
+
+
+def run_workflow(args):
+    """Run the approval workflow (orchestration)."""
+    # Initialize dependencies
+    fs = FileSystemAdapter()
+    gh = GitHubAdapter(repo=args.repo, token=args.token)
+    approval_usecase = ApprovalUseCase(fs, gh)
+    git_adapter = GitAdapter()
+    workflow = WorkflowUseCase(approval_usecase, git_adapter)
+
+    print(f"Running workflow... Branch: {args.branch}")
+    try:
+        changed = workflow.run(
+            inbox_dir=args.inbox_dir,
+            approved_dir=args.approved_dir,
+            branch_name=args.branch,
+        )
+        if changed:
+            print(f"Workflow completed. Changes pushed to {args.branch}.")
+            if "GITHUB_OUTPUT" in os.environ:
+                with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+                    f.write("pushed=true\n")
+        else:
+            print("No changes to process.")
+            if "GITHUB_OUTPUT" in os.environ:
+                with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+                    f.write("pushed=false\n")
+    except Exception as e:
+        print(f"Workflow failed: {e}", file=sys.stderr)
         sys.exit(1)
 
 
@@ -107,6 +141,36 @@ def main():
     # run command (issue creation)
     subparsers.add_parser("run", help="Run the issue creation automation")
 
+    # run-workflow command
+    workflow_parser = subparsers.add_parser(
+        "run-workflow", help="Run the approval workflow orchestration"
+    )
+    workflow_parser.add_argument(
+        "--inbox-dir",
+        type=Path,
+        default=Path("reqs/design/_inbox"),
+        help="Directory containing documents to process",
+    )
+    workflow_parser.add_argument(
+        "--approved-dir",
+        type=Path,
+        default=Path("reqs/design/_approved"),
+        help="Directory to move approved files to",
+    )
+    workflow_parser.add_argument(
+        "--branch",
+        required=True,
+        help="Target branch to push changes to",
+    )
+    workflow_parser.add_argument(
+        "--repo",
+        help="GitHub repository (owner/repo).",
+    )
+    workflow_parser.add_argument(
+        "--token",
+        help="GitHub token.",
+    )
+
     # approve command
     approve_parser = subparsers.add_parser(
         "approve", help="Process an approved document"
@@ -158,6 +222,8 @@ def main():
         init_project(args)
     elif args.command == "run":
         run_automation(args)
+    elif args.command == "run-workflow":
+        run_workflow(args)
     elif args.command == "approve":
         approve_document(args)
     elif args.command == "approve-all":
