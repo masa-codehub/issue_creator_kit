@@ -8,7 +8,7 @@ on:
     branches:
       - main
     paths:
-      - 'reqs/_inbox/**'
+      - 'reqs/design/_inbox/**'
 
 permissions:
   contents: write
@@ -42,51 +42,31 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # 処理対象（inbox）の有無を確認。空の場合は早期リターン。
-          if [ ! -d "reqs/_inbox" ] || [ -z "$(ls -A reqs/_inbox/)" ]; then
-            echo "No files in inbox."
-            echo "has_changes=false" >> $GITHUB_OUTPUT
-            exit 0
-          fi
-
           # main ブランチ保護ルールを回避するため、作業ブランチを作成して PR 経由で反映します。
           TIMESTAMP=$(date +%s)
           BRANCH_NAME="chore/approve-docs-${TIMESTAMP}"
-          
-          echo "Creating branch: $BRANCH_NAME"
-          git checkout -b "$BRANCH_NAME"
+          echo "branch_name=$BRANCH_NAME" >> $GITHUB_OUTPUT
 
-          echo "Running batch approval..."
-          # ファイルの移動、メタデータ更新、Issue起票のロジックは CLI 内にカプセル化されています。
-          # これにより、YAML の肥大化を防ぎ、ローカルでの単体テストを可能にしています。
-          issue-kit approve-all \
-            --inbox-dir "reqs/_inbox" \
+          echo "Running approval workflow..."
+          # ファイルの移動、メタデータ更新、Issue起票、Gitコミット＆プッシュのロジックは CLI 内にカプセル化されています。
+          issue-kit run-workflow \
+            --inbox-dir "reqs/design/_inbox" \
             --approved-dir "reqs/design/_approved" \
+            --branch "$BRANCH_NAME" \
             --repo "${{ github.repository }}" \
             --token "${{ secrets.GITHUB_TOKEN }}"
-          
-          # CLI による変更（ファイルの移動や Issue 番号の追記）をコミットします。
-          git add .
-          if git diff --staged --quiet; then
-            echo "No changes to commit (process might have failed or found no valid files)."
-            echo "has_changes=false" >> $GITHUB_OUTPUT
-          else
-            git commit -m "docs: approve documents and create tracking issues"
-            echo "has_changes=true" >> $GITHUB_OUTPUT
-            echo "branch_name=$BRANCH_NAME" >> $GITHUB_OUTPUT
-          fi
 
-      - name: Push and Create PR
+      - name: Create PR
         if: steps.process.outputs.has_changes == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH_NAME: ${{ steps.process.outputs.branch_name }}
         run: |
-          git push origin "$BRANCH_NAME"
-          
+          # Note: Push is already handled by issue-kit run-workflow
+
           # 最終的な確認のため、自動生成された PR を作成します。
           gh pr create \
             --title "docs(arch): Approve documents from inbox" \
-            --body "This PR automatically moves documents from \`reqs/_inbox\` to \`reqs/_approve\` and updates their status to 'Approved' (承認済み). Tracking issues have been created." \
+            --body "This PR automatically moves documents from reqs/design/_inbox to reqs/design/_approved and updates their status to 'Approved' (承認済み). Tracking issues have been created." \
             --base main \
             --head "$BRANCH_NAME"
