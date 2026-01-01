@@ -60,7 +60,9 @@ class TestWorkflowUseCase(unittest.TestCase):
             self.inbox_dir, self.approved_dir
         )
         self.mock_git_adapter.add.assert_called_once_with(["."])
-        self.mock_git_adapter.commit.assert_called_once()
+        self.mock_git_adapter.commit.assert_called_once_with(
+            "docs: approve documents and create tracking issues"
+        )
         self.mock_git_adapter.push.assert_called_once_with(
             branch=self.branch_name, set_upstream=True
         )

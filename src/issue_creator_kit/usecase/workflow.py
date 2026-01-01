@@ -25,7 +25,9 @@ class WorkflowUseCase:
         if processed:
             # 3. Commit and Push
             self.git_adapter.add(["."])
-            self.git_adapter.commit("feat: process approved documents")
+            self.git_adapter.commit(
+                "docs: approve documents and create tracking issues"
+            )
             self.git_adapter.push(branch=branch_name, set_upstream=True)
             return True
 
