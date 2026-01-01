@@ -52,38 +52,22 @@ jobs:
           # main ブランチ保護ルールを回避するため、作業ブランチを作成して PR 経由で反映します。
           TIMESTAMP=$(date +%s)
           BRANCH_NAME="chore/approve-docs-${TIMESTAMP}"
-          
-          echo "Creating branch: $BRANCH_NAME"
-          git checkout -b "$BRANCH_NAME"
+          echo "branch_name=$BRANCH_NAME" >> $GITHUB_OUTPUT
 
-          echo "Running batch approval..."
-          # ファイルの移動、メタデータ更新、Issue起票のロジックは CLI 内にカプセル化されています。
-          # これにより、YAML の肥大化を防ぎ、ローカルでの単体テストを可能にしています。
-          issue-kit approve-all \
+          echo "Running workflow..."
+          issue-kit run-workflow \
             --inbox-dir "reqs/_inbox" \
             --approved-dir "reqs/design/_approved" \
             --repo "${{ github.repository }}" \
-            --token "${{ secrets.GITHUB_TOKEN }}"
-          
-          # CLI による変更（ファイルの移動や Issue 番号の追記）をコミットします。
-          git add .
-          if git diff --staged --quiet; then
-            echo "No changes to commit (process might have failed or found no valid files)."
-            echo "has_changes=false" >> $GITHUB_OUTPUT
-          else
-            git commit -m "docs: approve documents and create tracking issues"
-            echo "has_changes=true" >> $GITHUB_OUTPUT
-            echo "branch_name=$BRANCH_NAME" >> $GITHUB_OUTPUT
-          fi
+            --token "${{ secrets.GITHUB_TOKEN }}" \
+            --branch "$BRANCH_NAME"
 
-      - name: Push and Create PR
+      - name: Create PR
         if: steps.process.outputs.has_changes == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH_NAME: ${{ steps.process.outputs.branch_name }}
         run: |
-          git push origin "$BRANCH_NAME"
-          
           # 最終的な確認のため、自動生成された PR を作成します。
           gh pr create \
             --title "docs(arch): Approve documents from inbox" \
