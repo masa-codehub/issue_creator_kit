@@ -11,41 +11,32 @@ permissions:
 
 jobs:
   build:
-    runs-on: [self-hosted] # ラベルは適宜調整してください
+    runs-on: self-hosted
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
 
-      # Dockerイメージにインストール済みのため、このステップは不要
-      # - name: Install system dependencies
-      #  run: sudo apt-get update && sudo apt-get install -y libsqlite3-dev lsb-release
+      # [環境依存のセットアップ]
+      # 実行環境に Python 3.13 がない場合は、以下のステップを追加してください。
+      # - name: Set up Python
+      #   uses: actions/setup-python@v5
+      #   with:
+      #     python-version: '3.13.3'
+      #     cache: 'pip'
+      #     cache-dependency-path: '**/pyproject.toml'
 
-      # actions/setup-python を使うことで、pipのキャッシュが効くようになります
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.13.3'
-          cache: 'pip'
-          cache-dependency-path: '**/pyproject.toml'
-
-      - name: Upgrade pip
-        run: python -m pip install --upgrade pip
-
-      # 毎回依存関係をインストールする
       - name: Install dependencies
-        run: pip install -e .[test,dev]
-      - name: Lint with ruff
-        run: ruff check .
-      - name: Format with ruff
-        run: ruff format --check .
-      - name: Type check with mypy
-        run: mypy . --ignore-missing-imports
-      - name: Test with pytest
-        run: pytest -m "unit" --cov=. --cov-report=xml
-      - name: Upload coverage report
-        if: success()
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-report
-          path: coverage.xml
+        run: |
+          python -m pip install --upgrade pip
+          # プロジェクトの依存関係（pre-commit を含む）をインストール
+          pip install -e .[test,dev]
+
+      - name: Run checks with pre-commit
+        run: |
+          # pre-commit を直接呼び出し、Linter (Ruff), Formatter (Ruff), Type Check (Mypy), Test (Pytest) を一括実行します。
+          # 設定は .pre-commit-config.yaml に基づき、ローカル開発時と同じチェック内容を保証します。
+          pre-commit run --all-files
+
+      # 注: カバレッジレポートのアップロードが必要な場合は、
+      # pre-commit の pytest フックに引数を渡すか、個別の pytest ステップを維持してください。
