@@ -2,6 +2,7 @@ name: Auto Approve Docs
 
 # ADR-002: マージされた設計ドキュメントの承認処理を自動化します。
 # ロジックは YAML ではなく Python CLI (issue-kit) に集約し、テスタビリティを確保しています。
+# 実行環境 (Self-Hosted Runner) に Python 3.13 および gh cli がプリインストールされていることを前提に最適化されています。
 
 on:
   push:
@@ -19,7 +20,6 @@ jobs:
   approve-and-move:
     runs-on: ubuntu-latest
     env:
-      # 全ステップ共通で GitHub Token を利用可能にします（gh コマンドおよび issue-kit 用）
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout repository
@@ -29,6 +29,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.13'
+          # 注: Self-hosted runner で Python が既設の場合は高速にスキップされます。
 
       - name: Install Issue Creator Kit
         run: |
@@ -40,21 +41,6 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Ensure GitHub CLI is installed
-        run: |
-          if ! command -v gh &> /dev/null; then
-            echo "GitHub CLI not found. Installing..."
-            (type -p wget >/dev/null || (sudo apt update && sudo apt-get install wget -y)) \
-            && sudo mkdir -p -m 755 /etc/apt/keyrings \
-            && wget -qO- https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null \
-            && sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg \
-            && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/common/sources.list.d/github-cli.list > /dev/null \
-            && sudo apt update \
-            && sudo apt install gh -y
-          else
-            echo "GitHub CLI is already installed."
-          fi
-
       - name: Process Documents
         id: process
         run: |
@@ -65,13 +51,12 @@ jobs:
             exit 0
           fi
 
-          # main ブランチ保護ルールを回避するため、作業ブランチを作成して PR 経由で反映します。
+          # 作業ブランチ名の決定
           TIMESTAMP=$(date +%s)
           BRANCH_NAME="chore/approve-docs-${TIMESTAMP}"
           echo "branch_name=$BRANCH_NAME" >> $GITHUB_OUTPUT
 
           echo "Running workflow..."
-          # Note: issue-kit run-workflow handles "git checkout -b <branch>" internally.
           issue-kit run-workflow \
             --inbox-dir "reqs/design/_inbox" \
             --approved-dir "reqs/design/_approved" \
@@ -79,7 +64,7 @@ jobs:
             --repo "${{ github.repository }}" \
             --token "${{ secrets.GITHUB_TOKEN }}"
 
-          # Verify if changes were made (Explicit check for visibility in logs)
+          # 変更の有無を確認
           if git diff --quiet origin/main HEAD; then
             echo "No changes detected."
             echo "has_changes=false" >> $GITHUB_OUTPUT
@@ -94,8 +79,11 @@ jobs:
           BRANCH_NAME: ${{ steps.process.outputs.branch_name }}
         run: |
           # 最終的な確認のため、自動生成された PR を作成します。
+          # gh cli は環境にインストール済みのため、そのまま実行可能です。
           gh pr create \
             --title "docs(arch): Approve documents from inbox" \
-            --body "This PR automatically moves documents from \`reqs/design/_inbox\` to \`reqs/design/_approved\` and updates their status to 'Approved' (承認済み). Tracking issues have been created." \
+            --body "This PR automatically moves documents from 
+`reqs/design/_inbox` to 
+`reqs/design/_approved` and updates their status to 'Approved' (承認済み). Tracking issues have been created." \
             --base main \
             --head "$BRANCH_NAME"
