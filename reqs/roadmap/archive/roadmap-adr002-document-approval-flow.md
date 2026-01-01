@@ -2,9 +2,9 @@
 
 このドキュメントは、承認済みの設計決定を安全に実現するための、段階的な手順と WBS を定義します。
 
-- **Status**: 実行中
+- **Status**: 完了
 - **Target Design**: [ADR-002](../../design/_approved/adr-002-document-approval-flow.md)
-- **Last Updated**: 2025-12-29
+- **Last Updated**: 2026-01-01
 
 ## 1. 実装戦略の要約
 既存のシェルスクリプト（`sed`ベース）による暫定的な承認フローを、`issue-creator-kit` パッケージ内の堅牢な Python ロジックに置き換えます。
@@ -78,12 +78,12 @@
 **WBS**
 | Task ID | Category | タスク内容 | 対象ファイル | 依存先 | Issue案リンク |
 | :---: | :---: | :--- | :--- | :---: | :--- |
-| T4-1 | Setup | 作業ブランチ `feature/phase-4-cleanup` の作成 | - | T3-4 | [issue-T4-1.md](../../tasks/_queue/adr-002/phase-4/issue-T4-1.md) |
-| T4-2 | Arch | ディレクトリ再編 (Clean Arch Lite) と不要資産の削除 | `src/issue_creator_kit/` | T4-1 | [issue-T4-2.md](../../tasks/_queue/adr-002/phase-4/issue-T4-2.md) |
-| T4-3 | Impl | `Process Documents` ロジックの Usecase 実装と CLI 統合 | `usecase/workflow.py` | T4-2 | [issue-T4-3.md](../../tasks/_queue/adr-002/phase-4/issue-T4-3.md) |
-| T4-4 | Test | Infrastructure モックを活用した Usecase テスト実装 | `tests/unit/` | T4-3 | [issue-T4-4.md](../../tasks/_queue/adr-002/phase-4/issue-T4-4.md) |
-| T4-5 | Refactor | ワークフローYAMLをリファクタリングし、CLIコマンドのみを呼ぶ形に変更 | `.github/workflows/auto-approve-docs.yml` | T4-4 | [issue-T4-5.md](../../tasks/_queue/adr-002/phase-4/issue-T4-5.md) |
-| T4-6 | Review | 最終成果物のレビューとロードマップ完了承認 | - | T4-2, T4-5 | [issue-T4-6.md](../../tasks/_queue/adr-002/phase-4/issue-T4-6.md) |
+| T4-1 | Setup | [x] 作業ブランチ `feature/phase-4-cleanup` の作成 | - | T3-4 | [issue-T4-1.md](../../tasks/archive/adr-002/phase-4/issue-T4-1.md) |
+| T4-2 | Arch | [x] ディレクトリ再編 (Clean Arch Lite) と不要資産の削除 | `src/issue_creator_kit/` | T4-1 | [issue-T4-2.md](../../tasks/archive/adr-002/phase-4/issue-T4-2.md) |
+| T4-3 | Impl | [x] `Process Documents` ロジックの Usecase 実装と CLI 統合 | `usecase/workflow.py` | T4-2 | [issue-T4-3.md](../../tasks/archive/adr-002/phase-4/issue-T4-3.md) |
+| T4-4 | Test | [x] Infrastructure モックを活用した Usecase テスト実装 | `tests/unit/` | T4-3 | [issue-T4-4.md](../../tasks/archive/adr-002/phase-4/issue-T4-4.md) |
+| T4-5 | Refactor | [x] ワークフローYAMLをリファクタリングし、CLIコマンドのみを呼ぶ形に変更 | `.github/workflows/auto-approve-docs.yml` | T4-4 | [issue-T4-5.md](../../tasks/archive/adr-002/phase-4/issue-T4-5.md) |
+| T4-6 | Review | [x] 最終成果物のレビューとロードマップ完了承認 | - | T4-2, T4-5 | [issue-T4-6.md](../../tasks/archive/adr-002/phase-4/issue-T4-6.md) |
 
 ## 3. リスク管理とロールバック
 - **リスク**: 設計（インターフェース）の考慮漏れによる実装時の大幅な修正。
@@ -92,8 +92,8 @@
 - **対策/切り戻し**: Phase 1 で定義するテストケースに、エッジケース（複雑な Markdown 構造）を必ず含める。
 
 ## 4. 完了の定義
-- [ ] 承認済みドキュメントのステータスが「承認済み」に自動更新される。
-- [ ] 承認されたドキュメントに対応するトラッキング Issue が GitHub 上に作成される。
-- [ ] ドキュメント内に作成された Issue 番号（例: `#123`）が追記される。
-- [ ] 全てのテスト（Unit/Integration）がパスする。
-- [ ] アセット内のテンプレートが刷新されている。
+- [x] 承認済みドキュメントのステータスが「承認済み」に自動更新される。
+- [x] 承認されたドキュメントに対応するトラッキング Issue が GitHub 上に作成される。
+- [x] ドキュメント内に作成された Issue 番号（例: `#123`）が追記される。
+- [x] 全てのテスト（Unit/Integration）がパスする。
+- [x] アセット内のテンプレートが刷新されている。
