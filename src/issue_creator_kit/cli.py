@@ -93,6 +93,41 @@ def approve_document(args):
         sys.exit(1)
 
 
+def approve_all_documents(args):
+    """Run the batch approval process for all files in inbox."""
+    repo = args.repo or os.environ.get("GITHUB_REPOSITORY")
+    token = args.token or os.environ.get("GITHUB_TOKEN")
+
+    if not repo:
+        print(
+            "Error: Repository not specified. Use --repo or set GITHUB_REPOSITORY.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+    if not token:
+        print(
+            "Error: Token not specified. Use --token or set GITHUB_TOKEN.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+    print(f"Approving all documents in: {args.inbox_dir}")
+    try:
+        processed = process_approvals.process_all_files(
+            inbox_dir=args.inbox_dir,
+            approved_dir=args.approved_dir,
+            repo_name=repo,
+            token=token,
+        )
+        if not processed:
+            print("No documents processed.")
+            # This is not necessarily an error for the CLI, but we might want to signal it.
+            # For now, exit 0 is fine.
+    except Exception as e:
+        print(f"Batch approval process failed: {e}", file=sys.stderr)
+        sys.exit(1)
+
+
 def main():
     parser = argparse.ArgumentParser(description="Issue Creator Kit CLI")
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
@@ -130,6 +165,30 @@ def main():
         help="Directory to move approved files to",
     )
 
+    # approve-all command
+    approve_all_parser = subparsers.add_parser(
+        "approve-all", help="Process all approved documents in inbox"
+    )
+    approve_all_parser.add_argument(
+        "--inbox-dir",
+        type=Path,
+        default=Path("reqs/design/_inbox"),
+        help="Directory containing approved documents",
+    )
+    approve_all_parser.add_argument(
+        "--repo",
+        help="GitHub repository (owner/repo). Defaults to GITHUB_REPOSITORY env var.",
+    )
+    approve_all_parser.add_argument(
+        "--token", help="GitHub token. Defaults to GITHUB_TOKEN env var."
+    )
+    approve_all_parser.add_argument(
+        "--approved-dir",
+        type=Path,
+        default=Path("reqs/design/_approved"),
+        help="Directory to move approved files to",
+    )
+
     args = parser.parse_args()
 
     if args.command == "init":
@@ -138,6 +197,8 @@ def main():
         run_automation(args)
     elif args.command == "approve":
         approve_document(args)
+    elif args.command == "approve-all":
+        approve_all_documents(args)
     else:
         parser.print_help()
         sys.exit(1)
