@@ -38,7 +38,7 @@ ADR-002 により、設計ドキュメント（ADR/Design Doc）の承認フロ�
 - **Queue Monitor**:
     - GitHub Actions が `reqs/tasks/_queue/` へのファイル追加（`main` ブランチへの push/merge）を検知し、ワークフローを起動する。
     - **階層構造の維持**: `_queue/` 内のサブディレクトリ（例: `adr-002/phase-1/`）も再帰的にスキャン対象とする。これにより、起票対象のタスクがどの文脈に属するかを維持したまま投入できる。
-    - **厳密なトリガー**: PR 段階では起票せず、`main` に確定した時点でのみ起票する。
+    - **階層的なトリガー**: PR 段階では起票せず、`main` に確定した時点でのみ起票する。
 - **Atomic Archiving (一括コミット)**:
     - 投入された全てのタスクについて、依存関係解決と API 残弾チェック（Fail-Fast）を行う。
     - 全て正常に起票できた場合のみ、全ファイルを `archive/` へ移動する。この際、`_queue/` 内の階層構造（`adr-XXX/phase-Y/`）を維持したまま `archive/` へ配置し、**1回のコミット** で Git に反映させる。
@@ -67,3 +67,6 @@ ADR-002 により、設計ドキュメント（ADR/Design Doc）の承認フロ�
 
 ## 実装状況 / Implementation Status
 完了
+
+---
+- **Test Trigger**: Thu Jan  1 13:50:00 UTC 2026
