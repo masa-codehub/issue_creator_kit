@@ -35,8 +35,8 @@ jobs:
 
       - name: Install Issue Creator Kit
         run: |
-          python3 -m pip install --upgrade pip
-          python3 -m pip install git+https://github.com/masa-codehub/issue_creator_kit.git
+          python3.13 -m pip install --upgrade pip
+          python3.13 -m pip install git+https://github.com/masa-codehub/issue_creator_kit.git
 
       - name: Configure Git
         run: |
@@ -94,9 +94,8 @@ jobs:
           BRANCH_NAME: ${{ steps.process.outputs.branch_name }}
         run: |
           # 自動生成された PR を作成（gh コマンドは環境にプリインストールされている前提）。
-                    gh pr create \
-                      --title "docs(arch): Approve documents from inbox" \
-                      --body "This PR automatically moves documents from \`reqs/design/_inbox\` to \`reqs/design/_approved\` and updates their status to 'Approved' (承認済み). Tracking issues have been created." \
-                      --base main \
-                      --head "$BRANCH_NAME"
-          
+          gh pr create \
+            --title "docs(arch): Approve documents from inbox" \
+            --body "This PR automatically moves documents from \`reqs/design/_inbox\` to \`reqs/design/_approved\` and updates their status to 'Approved' (承認済み). Tracking issues have been created." \
+            --base main \
+            --head "$BRANCH_NAME"
