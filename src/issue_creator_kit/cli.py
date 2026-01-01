@@ -81,12 +81,12 @@ def run_workflow(args):
             print(f"Workflow completed. Changes pushed to {args.branch}.")
             if "GITHUB_OUTPUT" in os.environ:
                 with open(os.environ["GITHUB_OUTPUT"], "a") as f:
-                    f.write("pushed=true\n")
+                    f.write("has_changes=true\n")
         else:
             print("No changes to process.")
             if "GITHUB_OUTPUT" in os.environ:
                 with open(os.environ["GITHUB_OUTPUT"], "a") as f:
-                    f.write("pushed=false\n")
+                    f.write("has_changes=false\n")
     except Exception as e:
         print(f"Workflow failed: {e}", file=sys.stderr)
         sys.exit(1)
