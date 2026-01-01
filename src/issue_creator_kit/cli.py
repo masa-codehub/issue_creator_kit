@@ -1,92 +1,73 @@
 # ruff: noqa: T201
 import argparse
-import os
 import shutil
 import sys
 from pathlib import Path
 
-from issue_creator_kit.scripts import create_issues, process_approvals
+from issue_creator_kit.infrastructure.filesystem import FileSystemAdapter
+from issue_creator_kit.infrastructure.github_adapter import GitHubAdapter
+from issue_creator_kit.usecase.approval import ApprovalUseCase
+from issue_creator_kit.usecase.creation import IssueCreationUseCase
 
 PACKAGE_ROOT = Path(__file__).parent
-ASSETS_DIR = PACKAGE_ROOT / "assets"
+PROJECT_TEMPLATE_DIR = PACKAGE_ROOT / "assets" / "project_template"
 
 
 def init_project(args):
-    """Deploy workflows and templates to the current directory."""
-    print("Initializing Issue Creator Kit...")
+    """Deploy project template to the current directory."""
+    print("Initializing Issue Creator Kit Project...")
 
-    # Define targets
-    targets = {
-        ASSETS_DIR / "workflows": Path(".github/workflows"),
-        ASSETS_DIR / "templates": Path("reqs/template"),
-    }
+    if not PROJECT_TEMPLATE_DIR.exists():
+        print(
+            f"Error: Project template not found at {PROJECT_TEMPLATE_DIR}",
+            file=sys.stderr,
+        )
+        sys.exit(1)
 
-    for src_dir, dst_dir in targets.items():
-        if not src_dir.exists():
-            print(f"Error: Asset directory not found: {src_dir}")
-            continue
+    # Recursive copy
+    for item in PROJECT_TEMPLATE_DIR.glob("**/*"):
+        if item.is_file():
+            rel_path = item.relative_to(PROJECT_TEMPLATE_DIR)
+            dst_path = Path.cwd() / rel_path
 
-        if not dst_dir.exists():
-            dst_dir.mkdir(parents=True, exist_ok=True)
-            print(f"Created directory: {dst_dir}")
+            if dst_path.exists() and not args.force:
+                print(f"Skipping existing file: {rel_path} (use --force to overwrite)")
+            else:
+                dst_path.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(item, dst_path)
+                print(f"Created: {rel_path}")
 
-        for item in src_dir.glob("*"):
-            if item.is_file():
-                dst_file = dst_dir / item.name
-                if dst_file.exists() and not args.force:
-                    print(
-                        f"Skipping existing file: {dst_file} (use --force to overwrite)"
-                    )
-                else:
-                    shutil.copy2(item, dst_file)
-                    print(f"Deployed: {dst_file}")
-
-    # Also deploy the runner script itself?
-    # Ideally, if installed via pip, the workflow should use the installed command.
-    # But GitHub Actions environment might need a setup.
-    # For now, we assume the user installs this package in the workflow.
     print("\nInitialization complete.")
-    print("Please ensure your workflow installs this package:")
-    print("  pip install git+https://github.com/your-org/issue_creator_kit.git")
 
 
 def run_automation(args):
     """Run the issue creation automation."""
     print("Running issue automation...")
-    # Delegate to the logic in create_issues.py
-    # We need to make sure create_issues.py exposes a main function or logic we can call.
+
+    fs = FileSystemAdapter()
+    gh = GitHubAdapter()
+    usecase = IssueCreationUseCase(fs, gh)
+
+    queue_dir = Path("reqs/tasks/_queue")
+    archive_dir = Path("reqs/tasks/archive")
+
     try:
-        create_issues.main()
+        usecase.create_issues_from_queue(queue_dir, archive_dir)
     except Exception as e:
-        print(f"Automation failed: {e}")
+        print(f"Automation failed: {e}", file=sys.stderr)
         sys.exit(1)
 
 
 def approve_document(args):
-    """Run the approval process."""
-    repo = args.repo or os.environ.get("GITHUB_REPOSITORY")
-    token = args.token or os.environ.get("GITHUB_TOKEN")
-
-    if not repo:
-        print(
-            "Error: Repository not specified. Use --repo or set GITHUB_REPOSITORY.",
-            file=sys.stderr,
-        )
-        sys.exit(1)
-    if not token:
-        print(
-            "Error: Token not specified. Use --token or set GITHUB_TOKEN.",
-            file=sys.stderr,
-        )
-        sys.exit(1)
+    """Run the approval process for a single file."""
+    fs = FileSystemAdapter()
+    gh = GitHubAdapter(repo=args.repo, token=args.token)
+    usecase = ApprovalUseCase(fs, gh)
 
     print(f"Approving document: {args.file_path}")
     try:
-        process_approvals.process_single_file(
-            file_path=args.file_path,
-            approved_dir=args.approved_dir,
-            repo_name=repo,
-            token=token,
+        usecase.process_single_file(
+            file_path=args.file_path, approved_dir=args.approved_dir
         )
     except Exception as e:
         print(f"Approval process failed: {e}", file=sys.stderr)
@@ -94,35 +75,18 @@ def approve_document(args):
 
 
 def approve_all_documents(args):
-    """Run the batch approval process for all files in inbox."""
-    repo = args.repo or os.environ.get("GITHUB_REPOSITORY")
-    token = args.token or os.environ.get("GITHUB_TOKEN")
-
-    if not repo:
-        print(
-            "Error: Repository not specified. Use --repo or set GITHUB_REPOSITORY.",
-            file=sys.stderr,
-        )
-        sys.exit(1)
-    if not token:
-        print(
-            "Error: Token not specified. Use --token or set GITHUB_TOKEN.",
-            file=sys.stderr,
-        )
-        sys.exit(1)
+    """Run the batch approval process."""
+    fs = FileSystemAdapter()
+    gh = GitHubAdapter(repo=args.repo, token=args.token)
+    usecase = ApprovalUseCase(fs, gh)
 
     print(f"Approving all documents in: {args.inbox_dir}")
     try:
-        processed = process_approvals.process_all_files(
-            inbox_dir=args.inbox_dir,
-            approved_dir=args.approved_dir,
-            repo_name=repo,
-            token=token,
+        processed = usecase.process_all_files(
+            inbox_dir=args.inbox_dir, approved_dir=args.approved_dir
         )
         if not processed:
             print("No documents processed.")
-            # This is not necessarily an error for the CLI, but we might want to signal it.
-            # For now, exit 0 is fine.
     except Exception as e:
         print(f"Batch approval process failed: {e}", file=sys.stderr)
         sys.exit(1)
@@ -140,8 +104,7 @@ def main():
         "--force", "-f", action="store_true", help="Overwrite existing files"
     )
 
-    # run command (for CI usage)
-    # Assigning to a variable to avoid F841 if not used, or just don't assign.
+    # run command (issue creation)
     subparsers.add_parser("run", help="Run the issue creation automation")
 
     # approve command

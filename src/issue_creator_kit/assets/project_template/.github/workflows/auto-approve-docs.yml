@@ -1,0 +1,92 @@
+name: Auto Approve Docs
+
+# ADR-002: マージされた設計ドキュメントの承認処理を自動化します。
+# ロジックは YAML ではなく Python CLI (issue-kit) に集約し、テスタビリティを確保しています。
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'reqs/_inbox/**'
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  approve-and-move:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install Issue Creator Kit
+        run: |
+          python -m pip install --upgrade pip
+          pip install .
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Process Documents
+        id: process
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # 処理対象（inbox）の有無を確認。空の場合は早期リターン。
+          if [ ! -d "reqs/_inbox" ] || [ -z "$(ls -A reqs/_inbox/)" ]; then
+            echo "No files in inbox."
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          # main ブランチ保護ルールを回避するため、作業ブランチを作成して PR 経由で反映します。
+          TIMESTAMP=$(date +%s)
+          BRANCH_NAME="chore/approve-docs-${TIMESTAMP}"
+          
+          echo "Creating branch: $BRANCH_NAME"
+          git checkout -b "$BRANCH_NAME"
+
+          echo "Running batch approval..."
+          # ファイルの移動、メタデータ更新、Issue起票のロジックは CLI 内にカプセル化されています。
+          # これにより、YAML の肥大化を防ぎ、ローカルでの単体テストを可能にしています。
+          issue-kit approve-all \
+            --inbox-dir "reqs/_inbox" \
+            --approved-dir "reqs/design/_approved" \
+            --repo "${{ github.repository }}" \
+            --token "${{ secrets.GITHUB_TOKEN }}"
+          
+          # CLI による変更（ファイルの移動や Issue 番号の追記）をコミットします。
+          git add .
+          if git diff --staged --quiet; then
+            echo "No changes to commit (process might have failed or found no valid files)."
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            git commit -m "docs: approve documents and create tracking issues"
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            echo "branch_name=$BRANCH_NAME" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Push and Create PR
+        if: steps.process.outputs.has_changes == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH_NAME: ${{ steps.process.outputs.branch_name }}
+        run: |
+          git push origin "$BRANCH_NAME"
+          
+          # 最終的な確認のため、自動生成された PR を作成します。
+          gh pr create \
+            --title "docs(arch): Approve documents from inbox" \
+            --body "This PR automatically moves documents from \`reqs/_inbox\` to \`reqs/_approve\` and updates their status to 'Approved' (承認済み). Tracking issues have been created." \
+            --base main \
+            --head "$BRANCH_NAME"
