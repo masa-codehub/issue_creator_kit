@@ -47,15 +47,16 @@ list_key:
    - **正規表現**: `r"^- \*\*([^*]+)\*\*: (.*)$"`
    - 例: `- **Status**: Open` -> Key: `Status`, Value: `Open`
 3. **探索の終了条件**:
-   - メタデータが一度見つかった後、空行以外の非マッチ行が現れた場合（本文の開始とみなす）。
-   - ファイルの先頭から **15行** を超えてもメタデータが見つからない場合（パフォーマンスと誤検知防止のため）。
+   - 以下のいずれかの条件を満たした時点で、メタデータ探索を終了する。
+     - メタデータが一度でも見つかった後に、空行を含む当該正規表現にマッチしない行が現れた場合（その行以降を本文の開始とみなす）。
+     - 行インデックスが **15** を超えた場合（つまり 16 行目以降）は、メタデータの有無にかかわらずそれ以降の行をメタデータ探索の対象にしない（パフォーマンスと誤検知防止のため）。
 
 ### 3.3. 更新・保存 (`Document.to_string`)
 1. **推奨形式 (YAML)**: デフォルトでは YAML Frontmatter 形式で再構築して保存する。
-2. **形式維持**: 読み込み時に YAML 形式でなかった場合でも、書き出し時に `use_frontmatter=False` を指定することで、Markdown List 形式での再構築をサポートする（`src/issue_creator_kit/infrastructure/filesystem.py` の `update_metadata` 実装依存）。
+2. **形式維持**: `FileSystemAdapter.update_metadata` が元のファイルの先頭が `---` で始まるかどうかをチェックして元形式（YAML Frontmatter か Markdown List か）を検出し、その結果に応じて `Document.to_string(use_frontmatter=...)` に適切な `use_frontmatter` パラメータを指定することで、既存ファイルの形式を維持したままメタデータを更新できる（実装は `src/issue_creator_kit/infrastructure/filesystem.py` の `update_metadata` に依存）。
 
 ## 4. エラーハンドリング
-- **YAMLパースエラー**: `yaml.safe_load` が失敗した場合、例外を捕捉（握りつぶし）し、自動的に Markdown List 解析へフォールバックする。これにより、Frontmatter の記述ミスがあっても最低限の本文取得が可能となる場合がある。
+- **Frontmatter解析エラー**: YAML Frontmatterブロックの解析中に例外が発生した場合、例外を捕捉し、自動的に Markdown List 解析へフォールバックします。これにより、Frontmatter の記述ミスがあっても最低限の本文取得が可能となる場合があります。
 - **ファイル読み込みエラー**: `FileNotFoundError` 等は呼び出し元（Adapter）で処理される。
 
 ## 5. 検証パターン
@@ -64,9 +65,9 @@ list_key:
 | :--- | :--- | :--- |
 | **YAML (正常)** | `---`<br>`status: Draft`<br>`---` | Phase 1 で成功。`{"status": "Draft"}` を取得。 |
 | **Markdown List (正常)** | `# Title`<br>`- **status**: Draft` | Phase 1 スキップ -> Phase 2 で成功。`{"status": "Draft"}` を取得。 |
-| **YAML 構文エラー** | `---`<br>`key: value: error`<br>`---` | Phase 1 失敗（例外捕捉） -> Phase 2 へフォールバック（結果的にメタデータなしか、誤検知されなければ空）。 |
+| **YAML 構文エラー** | `---`<br>`key: value: error`<br>`---` | Phase 1 失敗（例外捕捉） -> Phase 2 へフォールバック（Phase 2 でもメタデータが検出されない場合は空の辞書 `{}` が返る）。 |
 | **混在 (YAML優先)** | `---`<br>`a: 1`<br>`---`<br>`- **b**: 2` | Phase 1 が優先され `{"a": 1}` のみ取得。本文中のリストは本文として扱われる。 |
-| **探索範囲外** | (20行目)<br>`- **key**: val` | Phase 2 の15行制限により無視される。 |
+| **探索範囲外** | (17行目以降)<br>`- **key**: val` | Phase 2 の16行制限（インデックス15まで探索）により無視される。 |
 
 ## 6. 利用ライブラリ
 - `PyYAML`: YAML解析
