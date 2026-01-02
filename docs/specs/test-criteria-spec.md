@@ -7,9 +7,9 @@ Phase 4 以降のアーキテクチャ刷新に伴い、テスト戦略は以下
 1.  **Usecase テスト (Unit/Mock)**:
     - ビジネスロジック (`usecase/`) の振る舞いを検証する。
     - 外部依存 (`infrastructure/`) はすべて **Mock** 化し、純粋なロジックフローと例外ハンドリング（ロールバック等）を高速に検証する。
-2.  **Infrastructure テスト (Unit/Real I/O)**:
+2.  **Infrastructure テスト (Unit/Real I/O + Mock)**:
     - 外部システム（ファイルシステム, Git, GitHub）との接続部分 (`infrastructure/`) を検証する。
-    - 可能な限り実際の I/O（`tmp_path` や `unittest.mock` の部分利用）を用いて、アダプタが正しく動作することを保証する。
+    - ファイル操作など実ファイルシステムに対しては `tmp_path` を用いた実 I/O を行い、GitHub API クライアントや `subprocess.run` による Git コマンドなど外部サービス呼び出しは `unittest.mock` でモック化して検証する。
 
 ## 2. 品質基準 (Quality Standards)
 - **カバレッジ (Coverage)**:
@@ -29,14 +29,14 @@ Phase 4 以降のアーキテクチャ刷新に伴い、テスト戦略は以下
 | :--- | :--- | :--- | :--- |
 | A-1 | 単一ファイルの承認フロー | 正常なドキュメントが存在 | 1. ファイル読み込み<br>2. メタデータ更新 (Status, Date)<br>3. `approved` フォルダへの移動<br>4. GitHub Issue 作成<br>5. メタデータ更新 (Issue番号) |
 | A-2 | 複数ファイルの承認 | 複数のドキュメントが存在 | 全てのファイルに対して A-1 のフローが実行されること |
-| A-3 | ラベル処理 | リスト形式のラベル (`['A', 'B']`) | GitHub Adapter にリストとして正しく渡されること |
-| A-4 | 長文コンテンツ | 本文が長いドキュメント | Issue 作成時に本文が要約（切り捨て）されていること |
+| A-3 | ラベル処理 | リスト形式のラベル (`['A', 'B ']`) | 各ラベルの前後空白がトリムされた上で `['A', 'B']` のように GitHub Adapter にリストとして正しく渡されること |
+| A-4 | 長文コンテンツ | 本文が長いドキュメント | Issue 作成時に本文が切り捨てられ、末尾に '...' が追加されること |
 
 #### 3.1.2. 異常系・ロールバック (Error & Rollback Cases)
 | ID | シナリオ | 発生エラー (When) | 検証内容 (Then) |
 | :--- | :--- | :--- | :--- |
 | A-E1 | GitHub 連携失敗 | `create_issue` で例外発生 | 1. 例外が再送出されること<br>2. **ロールバック実行**: 移動したファイルが元の場所に戻される (`safe_move_file` が逆向きに呼ばれる) こと |
-| A-E2 | ロールバック失敗 | ロールバック移動も失敗 | 1. 元の例外が送出されること<br>2. ロールバック失敗のログ/出力がなされること |
+| A-E2 | ロールバック失敗 | ロールバック移動も失敗 | 1. 元の例外が送出されること<br>2. ロールバック処理として `safe_move_file` が 2 回呼び出されること |
 | A-E3 | ファイルなし | Inbox が空 | 処理を行わず `False` を返すこと |
 
 ### 3.2. WorkflowUseCase (`usecase/workflow.py`)
@@ -54,18 +54,22 @@ Phase 4 以降のアーキテクチャ刷新に伴い、テスト戦略は以下
 
 ### 4.1. FileSystemAdapter (`infrastructure/filesystem.py`)
 `pytest` の `tmp_path` フィクスチャを利用し、実際のファイル操作を検証する。
+(`tests/unit/infrastructure/test_filesystem.py` に実装)
 
 | ID | メソッド | シナリオ | 期待値 |
 | :--- | :--- | :--- | :--- |
 | F-1 | `read_document` | 正常な Frontmatter 付き MD | 正しい Metadata と Content が分離されて読み込まれること |
-| F-2 | `read_document` | YAML パースエラー | `FrontmatterParsingError` (または適切な例外) が発生すること |
+| F-2 | `read_document` | YAML パースエラー | 例外は発生せず、パース失敗として扱われる（メタデータ空、本文保持）こと |
 | F-3 | `save_document` | 新規保存 | ファイルが作成され、UTF-8 で書き込まれること |
 | F-4 | `update_metadata` | 部分更新 | 指定したキーのみ更新され、他のキーや本文、コメントが維持されること |
 | F-5 | `safe_move_file` | 移動成功 | 元ファイルが消え、先ファイルが存在すること |
 | F-6 | `safe_move_file` | 移動先重複 (overwrite=False) | `FileExistsError` が発生すること |
 
 ### 4.2. GitHubAdapter / GitAdapter
-API クライアントのラッパーであるため、主に以下の点を検証する（必要に応じて通信を Mock 化）。
+API クライアントのラッパーであるため、外部通信部分を Mock 化した最小限の検証を行う。
 
-- **GitHubAdapter**: トークン欠落時のエラーハンドリング (`ValueError`)。
-- **GitAdapter**: コマンド実行時の引数組み立てが正しいか（`subprocess.run` の Mock 検証で可）。
+- **GitHubAdapter**:
+    - トークン欠落時やリポジトリ未設定時のエラーハンドリング (`ValueError`)。
+- **GitAdapter**:
+    - コマンド実行時の引数組み立てとエラー時の出力サニタイズ（`subprocess.run` の Mock 検証）。
+    - ※ 現在の実装は最小限であり、詳細なコマンド成功パターンの網羅は今後の拡張項目とする。
