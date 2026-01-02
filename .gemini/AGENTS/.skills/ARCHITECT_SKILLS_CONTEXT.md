@@ -8,7 +8,7 @@
 
 計画策定時に、以下の情報を「偵察 (Reconnaissance)」によって収集し、Todoリストの具体化に利用してください。
 
-### 1.1 事実の収集と現状分析 (Observe)
+### 1.1 能動的偵察 (Active Reconnaissance)
 *   **既存資産の棚卸しと「行間」の読解:** `read_file(file_path="docs/system-context.md")` 等で既存定義を確認し、現在の設計思想や未解決の課題を読み取る。
 *   **構造の地図化:** `glob(pattern="**/*")` を実行し、主要ディレクトリ（`src`, `infra`, `docs`等）から全体像を把握する。
 *   **外部依存の特定:** `search_file_content(pattern="import|http://")` で外部システムとの接続点を洗い出す。
