@@ -75,7 +75,7 @@
      ```
 
   5. **レビュアー指定:**
-     `update_pull_request` を使用し、レビュアーには必ず **`Copilot`** を指定する。
+     `update_pull_request --pull_number <PR番号> --reviewers Copilot` を実行する。
 
 ## 2. ファイル操作
 
