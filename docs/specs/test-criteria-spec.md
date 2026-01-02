@@ -1,46 +1,75 @@
 # 詳細設計: 検証基準（テストケース）定義 (ADR-002)
 
-## 1. 目的
-Phase 2 での実装において、`utils.py` の各関数が YAML Frontmatter を正しく扱い、ADR-002 の要件を満たすことを保証するためのテストシナリオを定義する。
+## 1. 目的と方針
+本ドキュメントは、Issue Creator Kit の品質を保証するためのテスト戦略と具体的な検証シナリオを定義する。
+Phase 4 以降のアーキテクチャ刷新に伴い、テスト戦略は以下の二層構造を採用する。
 
-## 2. `load_document` のテストケース
+1.  **Usecase テスト (Unit/Mock)**:
+    - ビジネスロジック (`usecase/`) の振る舞いを検証する。
+    - 外部依存 (`infrastructure/`) はすべて **Mock** 化し、純粋なロジックフローと例外ハンドリング（ロールバック等）を高速に検証する。
+2.  **Infrastructure テスト (Unit/Real I/O + Mock)**:
+    - 外部システム（ファイルシステム, Git, GitHub）との接続部分 (`infrastructure/`) を検証する。
+    - ファイル操作など実ファイルシステムに対しては `tmp_path` を用いた実 I/O を行い、GitHub API クライアントや `subprocess.run` による Git コマンドなど外部サービス呼び出しは `unittest.mock` でモック化して検証する。
 
-### 2.1. 正常系 (Success Cases)
-| ID | シナリオ | 入力ファイル内容 | 期待される戻り値 (Metadata, Content) |
+## 2. 品質基準 (Quality Standards)
+- **カバレッジ (Coverage)**:
+    - Unit Test による Branch Coverage **100%** を維持する。
+- **Mocking**:
+    - Usecase 層のテストでは、原則として Infrastructure 層のクラス（`FileSystemAdapter`, `GitHubAdapter` 等）を実体化せず、`unittest.mock` を使用する。
+
+---
+
+## 3. Usecase 層の検証シナリオ
+
+### 3.1. ApprovalUseCase (`usecase/approval.py`)
+`FileSystemAdapter` と `GitHubAdapter` を Mock 化して検証する。
+
+#### 3.1.1. 正常系 (Success Cases)
+| ID | シナリオ | 条件 (Given) | 検証内容 (Then) |
 | :--- | :--- | :--- | :--- |
-| L-1 | 標準的なFrontmatter | `---`<br>`title: Test`<br>`---`<br>`# Body` | `{'title': 'Test'}`, `"# Body"` |
-| L-2 | メタデータなし | `# Body Only` | `{}`, `"# Body Only"` |
-| L-3 | 複雑な型 | `---`<br>`tags: [a, b]`<br>`count: 1`<br>`---` | `{'tags': ['a', 'b'], 'count': 1}`, `""` |
-| L-4 | 空のFrontmatter | `---`<br>`---`<br>`Body` | `{}`, `"Body"` |
+| A-1 | 単一ファイルの承認フロー | 正常なドキュメントが存在 | 1. ファイル読み込み<br>2. メタデータ更新 (Status, Date)<br>3. `approved` フォルダへの移動<br>4. GitHub Issue 作成<br>5. メタデータ更新 (Issue番号) |
+| A-2 | 複数ファイルの承認 | 複数のドキュメントが存在 | 全てのファイルに対して A-1 のフローが実行されること |
+| A-3 | ラベル処理 | リスト形式のラベル (`['A', 'B ']`) | 各ラベルの前後空白がトリムされた上で `['A', 'B']` のように GitHub Adapter にリストとして正しく渡されること |
+| A-4 | 長文コンテンツ | 本文が長いドキュメント | Issue 作成時に本文が切り捨てられ、末尾に '...' が追加されること |
 
-### 2.2. 異常系 (Error Cases)
-| ID | シナリオ | 入力ファイル内容 | 期待される挙動 |
+#### 3.1.2. 異常系・ロールバック (Error & Rollback Cases)
+| ID | シナリオ | 発生エラー (When) | 検証内容 (Then) |
 | :--- | :--- | :--- | :--- |
-| L-E1 | ファイル非存在 | (存在しないパス) | `FileNotFoundError` |
-| L-E2 | 不正なYAML | `---`<br>`key: : value`<br>`---` | `yaml.scanner.ScannerError` (またはそれに準ずる例外) |
+| A-E1 | GitHub 連携失敗 | `create_issue` で例外発生 | 1. 例外が再送出されること<br>2. **ロールバック実行**: 移動したファイルが元の場所に戻される (`safe_move_file` が逆向きに呼ばれる) こと |
+| A-E2 | ロールバック失敗 | ロールバック移動も失敗 | 1. 元の例外が送出されること<br>2. ロールバック処理として `safe_move_file` が 2 回呼び出されること |
+| A-E3 | ファイルなし | Inbox が空 | 処理を行わず `False` を返すこと |
 
-## 3. `save_document` / `update_metadata` のテストケース
+### 3.2. WorkflowUseCase (`usecase/workflow.py`)
+`ApprovalUseCase` と `GitAdapter` を Mock 化して検証する。
 
-### 3.1. 正常系 (Success Cases)
-- **U-1 (新規保存)**: メタデータと本文を渡して、正しい形式のファイルが生成されること。
-- **U-2 (メタデータ更新)**: 既存のキーを更新し、値が書き換わること。本文は維持されること。
-- **U-3 (キー追加)**: 新しいキーを追加し、YAMLに含まれること。
-- **U-4 (型維持)**: リストや数値を更新しても、YAML上で正しい型（`[ ]` や数値）として保存されること。
+#### 3.2.1. シナリオ
+| ID | シナリオ | Approval 結果 | 検証内容 (Then) |
+| :--- | :--- | :--- | :--- |
+| W-1 | 変更ありコミット | `True` (処理あり) | 1. ブランチ作成/Checkout<br>2. 承認プロセス実行<br>3. `git add .`<br>4. `git commit`<br>5. `git push` |
+| W-2 | 変更なし (No-op) | `False` (処理なし) | 1. ブランチ作成/Checkout<br>2. 承認プロセス実行<br>3. **Commit/Push が実行されないこと** |
 
-### 3.2. エッジケース
-- **U-E1 (マルチバイト)**: 日本語を含むメタデータを保存しても文字化けしないこと（UTF-8）。
-- **U-E2 (空更新)**: `updates={}` で呼び出しても、ファイルが破損しないこと。
+---
 
-## 4. `safe_move_file` のテストケース
+## 4. Infrastructure 層の検証シナリオ
 
-### 4.1. 正常系
-- **S-1**: ディレクトリ自動作成と移動が成功すること。
-- **S-2**: `overwrite=True` で既存ファイルを上書き移動できること。
+### 4.1. FileSystemAdapter (`infrastructure/filesystem.py`)
+`pytest` の `tmp_path` フィクスチャを利用し、実際のファイル操作を検証する。
+(`tests/unit/infrastructure/test_filesystem.py` に実装)
 
-### 4.2. 異常系
-- **S-E1**: 移動元がない場合 `FileNotFoundError`。
-- **S-E2**: 移動先があり `overwrite=False` の場合 `FileExistsError`。
+| ID | メソッド | シナリオ | 期待値 |
+| :--- | :--- | :--- | :--- |
+| F-1 | `read_document` | 正常な Frontmatter 付き MD | 正しい Metadata と Content が分離されて読み込まれること |
+| F-2 | `read_document` | YAML パースエラー | 例外は発生せず、パース失敗として扱われる（メタデータ空、本文保持）こと |
+| F-3 | `save_document` | 新規保存 | ファイルが作成され、UTF-8 で書き込まれること |
+| F-4 | `update_metadata` | 部分更新 | 指定したキーのみ更新され、他のキーや本文、コメントが維持されること |
+| F-5 | `safe_move_file` | 移動成功 | 元ファイルが消え、先ファイルが存在すること |
+| F-6 | `safe_move_file` | 移動先重複 (overwrite=False) | `FileExistsError` が発生すること |
 
-## 5. テスト実装方針
-- `pytest` と `tmp_path` フィクスチャを使用して、実際のファイルI/Oを伴うテストを行う。
-- `python-frontmatter` の仕様に依存する部分は、ライブラリのテストではなく、ラッパー関数としての振る舞い（正しくロード/ダンプできているか）を検証する。
+### 4.2. GitHubAdapter / GitAdapter
+API クライアントのラッパーであるため、外部通信部分を Mock 化した最小限の検証を行う。
+
+- **GitHubAdapter**:
+    - トークン欠落時やリポジトリ未設定時のエラーハンドリング (`ValueError`)。
+- **GitAdapter**:
+    - コマンド実行時の引数組み立てとエラー時の出力サニタイズ（`subprocess.run` の Mock 検証）。
+    - ※ 現在の実装は最小限であり、詳細なコマンド成功パターンの網羅は今後の拡張項目とする。
