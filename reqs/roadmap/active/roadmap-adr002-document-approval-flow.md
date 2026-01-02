@@ -67,23 +67,24 @@
 
 ### Phase 4: 資産の同期とクリーンアップ (Sync & Cleanup)
 - **Goal (狙い)**: 配布用テンプレートを最新化し、旧負債を完全に排除する。また、ワークフローのロジックを **Clean Architecture Lite** (Domain/Usecase/Infrastructure) に基づく Python コードとして再実装し、テスト容易性を最大化する。
-- **Input (前提)**: 稼働中の新ワークフロー。
+- **Status**: 完了
+
+### Phase 5: ドキュメントの整合性確保 (Documentation Sync)
+- **Goal (狙い)**: Phase 4 で刷新されたアーキテクチャ（Clean Architecture Lite）と実装内容に合わせて、`docs/` 配下の詳細設計書を最新化する。
+- **Input (前提)**: Phase 4 の実装コード。
 - **Deliverables (成果物)**:
-    - **アーキテクチャ刷新**: `domain/`, `usecase/`, `infrastructure/` への分離。
-    - **アセット構造化**: `project_template/` 配下へのテンプレート集約。
-    - **Usecase実装**: `WorkflowUseCase` によるオーケストレーション。
-    - **単体テスト**: Infrastructure 層をモック化した Usecase テスト。
-- **Gate (承認条件)**: 全てのドキュメントとコードが一貫した最新状態にあり、テストが全てパスすること。
+    - **最新化された詳細設計書**: `docs/specs/` 配下の各ファイル。
+    - **クリーンアップ済みの設定ファイル**: `pyproject.toml` 等。
+- **Gate (承認条件)**: 設計ドキュメントと実装コード（クラス構造、パースロジック）が完全に一致していること。
 
 **WBS**
 | Task ID | Category | タスク内容 | 対象ファイル | 依存先 | Issue案リンク |
 | :---: | :---: | :--- | :--- | :---: | :--- |
-| T4-1 | Setup | [x] 作業ブランチ `feature/phase-4-cleanup` の作成 | - | T3-4 | [issue-T4-1.md](../../tasks/archive/adr-002/phase-4/issue-T4-1.md) |
-| T4-2 | Arch | [x] ディレクトリ再編 (Clean Arch Lite) と不要資産の削除 | `src/issue_creator_kit/` | T4-1 | [issue-T4-2.md](../../tasks/archive/adr-002/phase-4/issue-T4-2.md) |
-| T4-3 | Impl | [x] `Process Documents` ロジックの Usecase 実装と CLI 統合 | `usecase/workflow.py` | T4-2 | [issue-T4-3.md](../../tasks/archive/adr-002/phase-4/issue-T4-3.md) |
-| T4-4 | Test | [x] Infrastructure モックを活用した Usecase テスト実装 | `tests/unit/` | T4-3 | [issue-T4-4.md](../../tasks/archive/adr-002/phase-4/issue-T4-4.md) |
-| T4-5 | Refactor | [x] ワークフローYAMLをリファクタリングし、CLIコマンドのみを呼ぶ形に変更 | `.github/workflows/auto-approve-docs.yml` | T4-4 | [issue-T4-5.md](../../tasks/archive/adr-002/phase-4/issue-T4-5.md) |
-| T4-6 | Review | [x] 最終成果物のレビューとロードマップ完了承認 | - | T4-2, T4-5 | [issue-T4-6.md](../../tasks/archive/adr-002/phase-4/issue-T4-6.md) |
+| T5-0 | Docs | システムコンテキストの用語と境界定義を最新化 | `docs/system-context.md` | Phase 4 | [issue-T5-0.md](../../tasks/archive/adr-002/phase-5/issue-T5-0.md) |
+| T5-1 | Docs | 詳細設計書（インターフェース定義）をクラスベースに更新 | `docs/specs/interface-spec.md` | T5-0 | [issue-T5-1.md](../../tasks/archive/adr-002/phase-5/issue-T5-1.md) |
+| T5-2 | Docs | メタデータ操作ロジックをハイブリッドパース仕様に更新 | `docs/specs/metadata-logic-spec.md` | T5-1 | [issue-T5-2.md](../../tasks/archive/adr-002/phase-5/issue-T5-2.md) |
+| T5-3 | Docs | 検証基準を現在のテスト構造（unit/）に同期 | `docs/specs/test-criteria-spec.md` | T5-2 | [issue-T5-3.md](../../tasks/archive/adr-002/phase-5/issue-T5-3.md) |
+| T5-4 | Cleanup | `pyproject.toml` 等の設定ファイルから旧スクリプト参照を削除 | `pyproject.toml` | T5-3 | [issue-T5-4.md](../../tasks/archive/adr-002/phase-5/issue-T5-4.md) |
 
 ## 3. リスク管理とロールバック
 - **リスク**: 設計（インターフェース）の考慮漏れによる実装時の大幅な修正。
