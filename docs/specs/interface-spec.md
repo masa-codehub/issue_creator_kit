@@ -21,14 +21,16 @@ Markdownファイルの構造（メタデータと本文）を表現するドメ
     - `text`: ファイルの全文
 - **戻り値**: `Document` インスタンス
 - **仕様**:
-    - YAML Frontmatter (`---` 区切り) に対応する。
-    - Markdown List Metadata (`- **Key**: Value`) にも対応する（後方互換性のため）。
+    - YAML Frontmatter (`---` 区切り) を優先的に解析します。
+    - Frontmatterが存在しない、または解析に失敗した場合は、後方互換性のためにMarkdown List Metadata (`- **Key**: Value`) 形式の解析を試みます。
 
 ##### `to_string(self, use_frontmatter: bool = True) -> str`
 `Document` オブジェクトを文字列（ファイル保存用フォーマット）に変換する。
 - **引数**:
     - `use_frontmatter`: `True` の場合、YAML Frontmatter 形式を使用する。 `False` の場合、Markdown List Metadata 形式を使用する。
 - **戻り値**: 文字列化されたドキュメント
+- **仕様**:
+    - `use_frontmatter=False` の場合、ドキュメントの最初のH1見出し (`# `) の後にメタデータを挿入しようと試みます。
 
 ## 3. インフラストラクチャ
 
@@ -63,6 +65,7 @@ Markdownファイルを読み込み、`Document` オブジェクトとして返�
     - `FileNotFoundError`: 指定されたファイルが存在しない場合
 - **仕様**:
     - `fcntl` が利用可能な環境ではファイルロックを使用し、競合を防ぐ。
+    - 既存ファイルの形式（YAML FrontmatterかMarkdown Listか）を検出し、更新後もその形式を維持します。
 
 ##### `safe_move_file(self, src_path: Path, dst_dir: Path, overwrite: bool = False) -> Path`
 ファイルを指定されたディレクトリへ安全に移動する。
@@ -90,6 +93,8 @@ GitHub API へのアクセスを抽象化するアダプター。
 - **引数**:
     - `token`: GitHub Personal Access Token (省略時は環境変数 `GH_TOKEN` または `GITHUB_TOKEN` を使用)
     - `repo`: リポジトリ名 (例: `owner/repo`, 省略時は環境変数 `GITHUB_REPOSITORY` を使用)
+- **例外**:
+    - `ValueError`: `token` が引数および環境変数（`GH_TOKEN`, `GITHUB_TOKEN`）のいずれからも取得できない場合
 
 #### メソッド
 
