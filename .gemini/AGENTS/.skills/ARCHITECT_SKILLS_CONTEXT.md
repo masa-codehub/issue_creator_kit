@@ -87,23 +87,9 @@ Todoを実行する際、以下のアクションパターンと具体的な記�
     *   **[地図としての役割]** 後続の ADR や Design Doc を作成する際、このドキュメントが「迷いのない判断基準」として機能するか？
 
 ### 3.2 成果物の定着
-`~/.gemini/GEMINI.md` の「1. Gitによるバージョン管理」に従い、以下のガードレールを遵守してコミット・PRを行ってください。
+`~/.gemini/GEMINI.md` の「1. Gitによるバージョン管理」および **「プルリクエストの管理 (PR Protocol)」** に従い、成果物を提出してください。
 
-*   **コミット:**
-    *   `run_shell_command(command="git add docs/system-context.md")`
-    *   **Message Template:** `docs(arch): update system context (SSOT)`
-*   **PR起票:**
-    *   `create_pull_request` を使用。
-    *   **Body Template:**
-        ```markdown
-        ## 概要
-        プロジェクトの全体像と境界を定義するシステムコンテキスト (SSOT) を作成/更新しました。
-
-        ## 根拠としたコード (Evidence)
-        - `src/infrastructure/...` (外部連携の特定)
-        - `src/domain/...` (ユビキタス言語の抽出)
-
-        ## 主な決定事項
-        - システム境界の画定 (In-Scope / Out-of-Scope)
-        - 主要なトレードオフ (例: 正確性 vs 鮮度)
-        ```
+*   **コミットメッセージ:** `docs(arch): update system context (SSOT)` を基本とする。
+*   **PR内容のガードレール:**
+    - **概要/目的:** 本スキルで実施した「能動的偵察」の結果と、それに基づく設計判断（境界、用語）を具体的に記述する。
+    - **根拠:** どのファイルやコードを証拠（Evidence）としたかを明記する。

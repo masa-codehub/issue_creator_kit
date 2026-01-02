@@ -45,36 +45,26 @@
   3. コンフリクトがなければ、プッシュを実行する。
 `run_shell_command{command: "git push"}`
 
-- プルリクエストの管理
-  ドキュメントやコード実装の完了後、プルリクエストを実行する。運用は次の手順で行う。
+- プルリクエストの管理 (PR Protocol)
+  ドキュメントやコード実装の完了後、以下の規約（ガードレール）を遵守してプルリクエストを作成・管理する。
 
-  1. **コミット前の品質チェック:**
-     すべての変更をコミットする前に、`pre-commit`フックをフル実行して品質を保証する。
-     `run_shell_command{command: "pre-commit run --all-files"}`
+  1. **品質チェック (Quality Gate):**
+     コミット前に、必ずプロジェクト指定のチェック（例: `pre-commit run --all-files`）をフル実行し、全項目パスさせる。
   
   2. **既存PRの確認:**
-     まず、既存のプルリクエストがないか確認する。
-     `list_pull_requests`
+     重複を防ぐため、`list_pull_requests` で関連する既存PRがないか確認する。
 
-  3. **新規作成:**
-     プルリクエストがなければ、タイトルと本文を指定して新規作成する。
-     `create_pull_request --title "<title>" --body "<body>" --head "<feature_branch>" --base "<base_branch>"`
-
-     **タイトル (`title`) の書き方:**
-     `<type>(<scope>): <subject>` という形式が推奨される。
-     - 例: `feat(api): ユーザー認証機能を追加`
-
-     **本文 (`body`) の書き方:**
-     以下の項目を記述することが推奨される。
-     - **関連Issue:** `Closes #<Issue番号>`
-     - **変更の概要:**
-     - **変更の目的:**
-     - **検証方法:**
+  3. **新規作成 (Creation):**
+     `create_pull_request` を実行する際は、**`head` (作業ブランチ) と `base` (マージ先) を必ず明示的に指定する**。デフォルト値に依存してはならない。
+     - **Title:** `<type>(<scope>): <subject>` 形式。
+     - **Body:**
+       - **関連Issue:** `Closes #<Issue番号>`
+       - **変更の概要:** 何をどのように変更したか。
+       - **変更の目的:** なぜこの変更が必要か（背景とアウトカム）。
+       - **検証方法:** 実施したテストや動作確認の手順。
 
   4. **更新通知:**
-     既存のプルリクエストに新しいコミットをプッシュした後は、次の操作で更新を通知する。
-     `add_issue_comment --issue_number <PR番号> --body "<コメント内容>"`
-
+     既存PRへの追記時は `add_issue_comment` で変更点を要約して通知する。
      **コメント内容 (`body`) のテンプレート:**
      ```
      ## 更新内容
@@ -84,9 +74,8 @@
      レビューをお願いします。 @Copilot
      ```
 
-  5. **レビュアーの指定:**
-     プルリクエストにレビュアーを指定する時は、次の操作を実行する。
-     `update_pull_request --pull_number <PR番号> --reviewers Copilot`
+  5. **レビュアー指定:**
+     `update_pull_request` を使用し、レビュアーには必ず **`Copilot`** を指定する。
 
 ## 2. ファイル操作
 
