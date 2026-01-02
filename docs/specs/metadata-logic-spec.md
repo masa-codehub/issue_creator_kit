@@ -1,56 +1,73 @@
 # 詳細設計: メタデータ操作ロジック (ADR-002)
 
 ## 1. 目的
-ADR-002（ドキュメント承認フローの自動化）において、Markdownファイルのメタデータを安全かつ正確に読み取り・更新するための技術仕様を定義する。
-本仕様では、構造化データの扱いやすさと拡張性を考慮し、**YAML Frontmatter** を採用する。
+ADR-002（ドキュメント承認フローの自動化）において、Markdownファイルのメタデータを柔軟かつ堅牢に読み取り・更新するための技術仕様を定義する。
+本仕様では、既存資産との互換性と将来の拡張性を両立させるため、**ハイブリッドパースロジック（YAML Frontmatter 優先 + Markdown List フォールバック）** を採用する。
 
 ## 2. メタデータの構造
-ドキュメントの最上部に、YAML形式でメタデータを記述する（Frontmatter）。
 
-- **形式**:
-  ```markdown
-  ---
-  key1: value1
-  key2: value2
-  list_key:
-    - item1
-    - item2
-  ---
-  # タイトル
-  ...
-  ```
-- **必須キー (Issue Draftの場合)**:
-    - `title`: 文字列
-    - `status`: 文字列 (Draft, Open, Closed, etc.)
-    - `roadmap`: 文字列 (パス)
-    - `task_id`: 文字列
-    - `depends_on`: リスト (依存ファイル名)
+### 2.1. YAML Frontmatter (推奨)
+ドキュメントの最上部に、YAML形式でメタデータを記述する。新規作成されるファイルはこの形式となる。
 
-## 3. 操作ロジック
+```markdown
+---
+key1: value1
+status: Draft
+list_key:
+  - item1
+  - item2
+---
+# タイトル
+...
+```
 
-### 3.1. ライブラリ選定
-Python の `python-frontmatter` ライブラリを使用する。
-正規表現による独自解析は行わない（保守性と堅牢性のため）。
+### 2.2. Markdown List Metadata (互換性維持)
+ドキュメントの冒頭（主にタイトルの直後など）に、リスト形式でメタデータを記述する。既存のファイルはこの形式である場合がある。
 
-### 3.2. 読み込み (Load)
-`frontmatter.load(file_path)` または `frontmatter.loads(content)` を使用して、メタデータ（辞書）と本文を取得する。
+```markdown
+# タイトル
 
-### 3.3. 更新・保存 (Update & Save)
-1. ファイルを読み込み、Postオブジェクト（メタデータ + 本文）を取得する。
-2. Postオブジェクトのメタデータ辞書を更新する。
-3. `frontmatter.dumps(post)` を使用して文字列に再変換し、ファイルに書き込む。
+- **key1**: value1
+- **status**: Draft
+```
 
-## 4. 検証パターン
-YAML Frontmatter の仕様に準拠するため、以下のケースを検証対象とする。
+## 3. 操作ロジック (`Document.parse`)
+
+メタデータの抽出は以下の優先順位とロジックで行われる。
+
+### 3.1. Phase 1: YAML Frontmatter 解析
+1. ファイルの先頭が `---` で始まっているかを確認する。
+2. `---` で区切られたブロック（Frontmatter）を抽出し、`PyYAML` (`yaml.safe_load`) で辞書としてパースを試みる。
+3. **成功した場合**: パースされた辞書をメタデータとし、以降の本文をコンテンツとして取得して終了する。
+4. **失敗した場合** (例外発生時) または先頭が `---` でない場合: Phase 2 へ進む。
+
+### 3.2. Phase 2: Markdown List Metadata 解析 (フォールバック)
+1. ファイルを行単位で走査する。
+2. 以下の正規表現パターンにマッチする行をメタデータとして抽出する。
+   - **正規表現**: `r"^- \*\*([^*]+)\*\*: (.*)$"`
+   - 例: `- **Status**: Open` -> Key: `Status`, Value: `Open`
+3. **探索の終了条件**:
+   - メタデータが一度見つかった後、空行以外の非マッチ行が現れた場合（本文の開始とみなす）。
+   - ファイルの先頭から **15行** を超えてもメタデータが見つからない場合（パフォーマンスと誤検知防止のため）。
+
+### 3.3. 更新・保存 (`Document.to_string`)
+1. **推奨形式 (YAML)**: デフォルトでは YAML Frontmatter 形式で再構築して保存する。
+2. **形式維持**: 読み込み時に YAML 形式でなかった場合でも、書き出し時に `use_frontmatter=False` を指定することで、Markdown List 形式での再構築をサポートする（`src/issue_creator_kit/infrastructure/filesystem.py` の `update_metadata` 実装依存）。
+
+## 4. エラーハンドリング
+- **YAMLパースエラー**: `yaml.safe_load` が失敗した場合、例外を捕捉（握りつぶし）し、自動的に Markdown List 解析へフォールバックする。これにより、Frontmatter の記述ミスがあっても最低限の本文取得が可能となる場合がある。
+- **ファイル読み込みエラー**: `FileNotFoundError` 等は呼び出し元（Adapter）で処理される。
+
+## 5. 検証パターン
 
 | ケース | 入力例 | 期待される動作 |
 | :--- | :--- | :--- |
-| 標準形式 | `---`<br>`status: Draft`<br>`---` | `{"status": "Draft"}` として解析可能 |
-| リスト形式 | `labels:`<br>`  - bug` | `{"labels": ["bug"]}` として解析可能 |
-| Frontmatterなし | (本文のみ) | メタデータは空 `{}`、本文はそのまま取得 |
-| 不正なYAML | `key: value: error` | `yaml.scanner.ScannerError` 等の例外が発生 |
+| **YAML (正常)** | `---`<br>`status: Draft`<br>`---` | Phase 1 で成功。`{"status": "Draft"}` を取得。 |
+| **Markdown List (正常)** | `# Title`<br>`- **status**: Draft` | Phase 1 スキップ -> Phase 2 で成功。`{"status": "Draft"}` を取得。 |
+| **YAML 構文エラー** | `---`<br>`key: value: error`<br>`---` | Phase 1 失敗（例外捕捉） -> Phase 2 へフォールバック（結果的にメタデータなしか、誤検知されなければ空）。 |
+| **混在 (YAML優先)** | `---`<br>`a: 1`<br>`---`<br>`- **b**: 2` | Phase 1 が優先され `{"a": 1}` のみ取得。本文中のリストは本文として扱われる。 |
+| **探索範囲外** | (20行目)<br>`- **key**: val` | Phase 2 の15行制限により無視される。 |
 
-## 5. 考慮事項
-- **文字コード**: UTF-8 を前提とする。
-- **コメント**: YAML内のコメント `# comment` は維持されるが、ライブラリの挙動に依存するため、重要な情報はコメントではなくキーとして保持することを推奨する。
-- **順序**: `python-frontmatter` (および PyYAML) は通常、キーの順序を保持しない場合があるが、メタデータとしての意味には影響しない。
+## 6. 利用ライブラリ
+- `PyYAML`: YAML解析
+- `re` (標準ライブラリ): 正規表現によるテキスト解析
