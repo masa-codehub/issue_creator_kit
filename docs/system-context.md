@@ -3,7 +3,7 @@
 このドキュメントは、システムの全体像、境界、および主要な依存関係を定義する、プロジェクトの Single Source of Truth (SSOT) です。
 
 - **Status**: 承認済み
-- **Last Updated**: 2025-12-27
+- **Last Updated**: 2026-01-02
 
 ## 1. ビジネスコンテキストとアウトカム
 GitHubを用いたソフトウェア開発において、アーキテクチャ設計（ADR/Design Doc）から実装タスク（Issue）への落とし込みは、手動作業によるコストと「設計と実装の乖離」を生む主要な要因となっている。
@@ -22,7 +22,9 @@ GitHubを用いたソフトウェア開発において、アーキテクチャ�
 | **Inbox (インボックス)** | 各役割における「提案・策定中」のドキュメントが配置される場所。 | `_inbox/` |
 | **Queue (キュー)** | 自動 Issue 起票を待機しているタスクの配置場所。 | `reqs/tasks/_queue/` |
 | **Approved (承認済み)** | 合意形成され、SSOT として確定した設計ドキュメント。 | `reqs/design/_approved/` |
-| **Kit (キット)** | CLI、自動化スクリプト、ワークフロー定義の総称。 | |
+| **Usecase (ユースケース)** | アプリケーション固有のビジネスルール（承認フロー、Issue作成ロジック）。 | `src/issue_creator_kit/usecase/` |
+| **Infrastructure Adapter** | 外部システム（GitHub, Git, Filesystem）との入出力を担う実装。 | `src/issue_creator_kit/infrastructure/` |
+| **Kit (キット)** | CLI、Usecase、Adapter、ワークフロー定義の総称。 | |
 
 ## 3. システムの境界と責務 (System Boundary)
 
@@ -32,7 +34,20 @@ GitHubを用いたソフトウェア開発において、アーキテクチャ�
 - **タスク起票の自動化**: `tasks/_queue/` への配置をトリガーに、依存関係を解決して GitHub Issue を起票し、完了後に `archive/` へ移動する。
 - **トレーサビリティの維持**: 設計、計画、タスク間のファイルリンクと GitHub 上の親子関係を同期する。
 
-### 3.2 スコープ外 (Out-of-Scope)
+### 3.2 内部構造と責務 (Internal Structure - Clean Architecture Lite)
+本システムは Clean Architecture Lite に基づき、関心事を分離している。
+
+- **Interface Layer (CLI)**:
+    - ユーザー入力を受け付け、適切な Usecase を選択・実行する。
+    - 入出力の詳細（標準出力、引数解析）のみに関心を持つ。
+- **Usecase Layer (Business Rules)**:
+    - `ApprovalUseCase`, `WorkflowUseCase` 等、システムの中核となるロジックを実装する。
+    - 外部システム（GitHub等）の実装詳細を知らず、抽象化されたインターフェースに依存する。
+- **Infrastructure Layer (Adapters)**:
+    - `GitHubAdapter`, `GitAdapter`, `FileSystemAdapter` 等、Usecase が必要とする外部連携の実装を提供する。
+    - APIの変更や詳細なプロトコルを隠蔽する。
+
+### 3.3 スコープ外 (Out-of-Scope)
 - **コード生成**: 設計ドキュメントから直接ソースコードのボイラープレートを生成する機能は現時点では含まない。
 - **エディタ機能**: ドキュメントの執筆そのものは外部ツール（VS Code等）に依存する。
 
@@ -64,6 +79,7 @@ C4Context
     Rel(arch, github, "設計/Issue案をプッシュ", "Git/HTTPS")
     Rel(github, ick, "ワークフローを起動", "Webhook")
     Rel(ick, github, "Issue作成・ファイル移動", "REST API/Git")
+```
 
 ## 6. 戦略的トレードオフと 4 大リスク
 - **[標準化 vs 柔軟性]**: 本システムは特定のディレクトリ構造（`reqs/`）を前提とすることで、複雑な設定なしに高度な自動化を実現する。ユーザーには構造への適応を求める。
