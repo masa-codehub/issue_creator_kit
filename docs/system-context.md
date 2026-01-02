@@ -44,7 +44,7 @@ GitHubを用いたソフトウェア開発において、アーキテクチャ�
     - `ApprovalUseCase`, `WorkflowUseCase` 等、システムの中核となるロジックを実装する。
     - 外部システム（GitHub等）の実装詳細を知らず、抽象化されたインターフェースに依存する。
 - **Infrastructure Layer (Adapters)**:
-    - `GitHubAdapter`, `GitAdapter` 等、Usecase が必要とする外部連携の実装を提供する。
+    - `GitHubAdapter`, `GitAdapter`, `FileSystemAdapter` 等、Usecase が必要とする外部連携の実装を提供する。
     - APIの変更や詳細なプロトコルを隠蔽する。
 
 ### 3.3 スコープ外 (Out-of-Scope)
