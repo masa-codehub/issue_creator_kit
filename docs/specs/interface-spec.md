@@ -1,58 +1,113 @@
-# 詳細設計: 共通ユーティリティ関数インターフェース (ADR-002)
+# 詳細設計: インフラストラクチャ層インターフェース (ADR-002)
 
 ## 1. 目的
-ADR-002 の実装（Phase 2）に先立ち、共通で使用するユーティリティ関数のインターフェース（型、引数、戻り値）を定義する。
-本仕様は、メタデータ管理に **YAML Frontmatter** を使用することを前提とする。
+本ドキュメントは、`issue_creator_kit` におけるインフラストラクチャ層（ファイルシステム、外部API）およびドメインモデル（ドキュメント）のインターフェース定義である。
+実装は `src/issue_creator_kit/infrastructure/` および `src/issue_creator_kit/domain/` に配置される。
 
-## 2. 関数定義
+## 2. ドメインモデル
 
-### 2.1. `load_document(file_path: Path) -> Tuple[Dict[str, Any], str]`
-Markdownファイルを読み込み、メタデータと本文を分離して返す。
+### 2.1. `Document` (`src/issue_creator_kit/domain/document.py`)
+Markdownファイルの構造（メタデータと本文）を表現するドメインオブジェクト。
 
-- **引数**: 
+#### プロパティ
+- `content: str`: ドキュメントの本文（Markdown形式）
+- `metadata: dict[str, Any]`: ドキュメントのメタデータ（タイトル、ステータス等）
+
+#### メソッド
+
+##### `parse(cls, text: str) -> "Document"`
+テキスト（ファイル内容）を解析し、`Document` オブジェクトを生成する。
+- **引数**:
+    - `text`: ファイルの全文
+- **戻り値**: `Document` インスタンス
+- **仕様**:
+    - YAML Frontmatter (`---` 区切り) に対応する。
+    - Markdown List Metadata (`- **Key**: Value`) にも対応する（後方互換性のため）。
+
+##### `to_string(self, use_frontmatter: bool = True) -> str`
+`Document` オブジェクトを文字列（ファイル保存用フォーマット）に変換する。
+- **引数**:
+    - `use_frontmatter`: `True` の場合、YAML Frontmatter 形式を使用する。 `False` の場合、Markdown List Metadata 形式を使用する。
+- **戻り値**: 文字列化されたドキュメント
+
+## 3. インフラストラクチャ
+
+### 3.1. `FileSystemAdapter` (`src/issue_creator_kit/infrastructure/filesystem.py`)
+ローカルファイルシステムへのアクセスを抽象化するアダプター。
+
+#### メソッド
+
+##### `read_document(self, file_path: Path) -> Document`
+Markdownファイルを読み込み、`Document` オブジェクトとして返す。
+- **引数**:
     - `file_path`: 読み込むファイルのパス
-- **戻り値**: 
-    - `(metadata, content)` のタプル
-    - `metadata`: YAML Frontmatter から解析された辞書
-    - `content`: Frontmatter を除いた本文
-- **設計の根拠**: `python-frontmatter` をラップし、ファイルI/Oと解析を一括で行うことで呼び出し側のコードを簡素化する。
+- **戻り値**: `Document` インスタンス
+- **例外**:
+    - `FileNotFoundError`: 指定されたファイルが存在しない場合
 
-### 2.2. `save_document(file_path: Path, metadata: Dict[str, Any], content: str) -> None`
-メタデータと本文を指定して、Markdownファイルとして保存（上書き）する。
-
+##### `save_document(self, file_path: Path, document: Document, use_frontmatter: bool = True) -> None`
+`Document` オブジェクトを指定されたパスに保存する。
 - **引数**:
     - `file_path`: 保存先のパス
-    - `metadata`: 更新後のメタデータ辞書
-    - `content`: 本文（変更がない場合は元の本文を渡す）
+    - `document`: 保存するドキュメントオブジェクト
+    - `use_frontmatter`: Frontmatter形式を使用するかどうか（デフォルト: `True`）
 - **戻り値**: なし
-- **設計の根拠**: `frontmatter.dumps` を使用して正しい形式でファイルを再構築する。
 
-### 2.3. `update_metadata(file_path: Path, updates: Dict[str, Any]) -> None`
-指定されたファイルのメタデータのみを部分的に更新し、保存する。便利関数。
-
+##### `update_metadata(self, file_path: Path, updates: dict[str, Any]) -> None`
+指定されたファイルのメタデータのみを部分的に更新し、保存する。同時実行制御（排他ロック）を行う。
 - **引数**:
     - `file_path`: 対象ファイルのパス
     - `updates`: 更新・追加したいキーと値の辞書
 - **戻り値**: なし
-- **設計の根拠**: `load_document` -> 辞書更新 -> `save_document` の一連の流れをカプセル化する。
+- **例外**:
+    - `FileNotFoundError`: 指定されたファイルが存在しない場合
+- **仕様**:
+    - `fcntl` が利用可能な環境ではファイルロックを使用し、競合を防ぐ。
 
-### 2.4. `safe_move_file(src_path: Path, dst_dir: Path, overwrite: bool = False) -> Path`
+##### `safe_move_file(self, src_path: Path, dst_dir: Path, overwrite: bool = False) -> Path`
 ファイルを指定されたディレクトリへ安全に移動する。
-
 - **引数**:
     - `src_path`: 移動元ファイルのパス
     - `dst_dir`: 移動先ディレクトリのパス
     - `overwrite`: 既存ファイルを上書きするかどうか
-- **戻り値**:
-    - 移動後のファイルパス
+- **戻り値**: 移動後のファイルパス
 - **例外**:
     - `FileNotFoundError`: 移動元が存在しない場合
     - `FileExistsError`: 上書き禁止かつ移動先が既に存在する場合
 
-## 3. 利用ライブラリ
+##### `list_files(self, dir_path: Path, pattern: str = "*") -> list[Path]`
+指定されたディレクトリ内のファイルをリストアップする。
+- **引数**:
+    - `dir_path`: 対象ディレクトリのパス
+    - `pattern`: 検索するglobパターン（デフォルト: `*`）
+- **戻り値**: 見つかったファイルのパスリスト（`Path` オブジェクト）
+
+### 3.2. `GitHubAdapter` (`src/issue_creator_kit/infrastructure/github_adapter.py`)
+GitHub API へのアクセスを抽象化するアダプター。
+
+#### 初期化
+`__init__(self, token: str | None = None, repo: str | None = None)`
+- **引数**:
+    - `token`: GitHub Personal Access Token (省略時は環境変数 `GH_TOKEN` または `GITHUB_TOKEN` を使用)
+    - `repo`: リポジトリ名 (例: `owner/repo`, 省略時は環境変数 `GITHUB_REPOSITORY` を使用)
+
+#### メソッド
+
+##### `create_issue(self, title: str, body: str, labels: list[str] | None = None) -> int`
+GitHub Issue を新規作成する。
+- **引数**:
+    - `title`: Issue のタイトル
+    - `body`: Issue の本文
+    - `labels`: 付与するラベルのリスト（オプション）
+- **戻り値**: 作成された Issue の番号 (number)
+- **例外**:
+    - `ValueError`: リポジトリ情報が未設定の場合
+    - `RuntimeError`: API呼び出しが失敗した場合（ステータスコードが 201 以外）
+
+## 4. 利用ライブラリ
 - `typing`: 型ヒント
 - `pathlib`: パス操作
-- `frontmatter`: YAML Frontmatter 解析 (`python-frontmatter`)
-
-## 4. 今後の予定
-Phase 2 の実装において、これらの関数を `src/issue_creator_kit/utils.py` に実装する。
+- `shutil`: ファイル移動
+- `PyYAML`: YAML解析 (`yaml`)
+- `requests`: HTTPクライアント
+- `fcntl`: ファイルロック (Unix系のみ)
