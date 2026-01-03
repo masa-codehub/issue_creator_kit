@@ -3,13 +3,13 @@
 このドキュメントは、承認済みの ADR-003 を安全に実現するための、段階的な手順と WBS を定義します。
 
 - **Status**: 策定中
-- **Target Design**: [ADR-003](../../design/_approved/adr-003-task-and-roadmap-lifecycle.md)
+- **Target Design**: [ADR-003](../../design/_approved/adr-003-task-and-roadmap-lifecycle.md) (Updated v2: Self-Propelling Workflow)
 - **Last Updated**: 2026-01-03
 
 ## 1. 実装戦略の要約
 「一成果物一タスク」の原則に従い、全ての工程を原子的なステップに分解します。
-Phase 1 で確定させた設計と検証基準に基づき、Phase 2 ではテストコードを先行実装し、それをパスさせる形で機能を実現します。
-Phase 3 では、新機能に合わせたドキュメントの再整備と、不要になったプロトタイプコードの完全削除を行います。
+ADR-003 v2 で定義された「フェーズ連鎖（Auto-PR）」と「原子的な一括アーカイブ」の実現を中核に据え、Phase 1 では実装を一切行わず、詳細設計とテスト要件の定義に充てます。
+実装は Phase 2 以降とし、Phase 1 で確定させた「検証基準」をパスさせることを唯一のゴールとします。
 
 ## 2. 実装フェーズとWBS (The Journey)
 
