@@ -20,7 +20,7 @@ GitHubを用いたソフトウェア開発において、アーキテクチャ�
 | **Roadmap (計画)** | 設計を実現するための工程と進捗。承認後も更新され続ける。 | `reqs/roadmap/` |
 | **Task (タスク)** | 実装レベルの作業単位。Draft Issue ファイルから生成される。 | `reqs/tasks/` |
 | **Inbox (インボックス)** | 各役割における「提案・策定中」のドキュメントが配置される場所。 | `_inbox/` |
-| **Queue (キュー)** | 自動 Issue 起票を待機しているタスクの配置場所。 | `reqs/tasks/_queue/` |
+| **Queue (キュー)** | **【仮想概念】** 起票待ちの状態。`drafts/` から `archive/` への移動 PR が Open である状態を指す。 | - |
 | **Approved (承認済み)** | 合意形成され、SSOT として確定した設計ドキュメント。 | `reqs/design/_approved/` |
 | **Usecase (ユースケース)** | アプリケーション固有のビジネスルール（承認フロー、Issue作成ロジック）。 | `src/issue_creator_kit/usecase/` |
 | **Infrastructure Adapter** | 外部システム（GitHub, Git, Filesystem）との入出力を担う実装。 | `src/issue_creator_kit/infrastructure/` |
@@ -31,8 +31,9 @@ GitHubを用いたソフトウェア開発において、アーキテクチャ�
 ### 3.1 スコープ内 (In-Scope)
 - **ワークフローの展開**: 役割別に整理されたディレクトリ構造 (`reqs/{design,roadmap,tasks}`) と GitHub Actions 設定をデプロイする。
 - **ドキュメント承認管理**: `design/_inbox/` へのマージを検知し、`_approved/` への移動とトラッキング Issue 起票を自動化する。
-- **タスク起票の自動化**: `tasks/_queue/` への配置をトリガーに、依存関係を解決して GitHub Issue を起票し、完了後に `archive/` へ移動する。
-- **トレーサビリティの維持**: 設計、計画、タスク間のファイルリンクと GitHub 上の親子関係を同期する。
+- **仮想キューによる一括起票**: `archive/` へのファイル投入 PR のマージをトリガーに、依存関係を解決して GitHub Issue を一括起票する（物理キュー不要）。
+- **自己推進型ワークフロー (Auto-PR)**: フェーズ完了（最終 Issue のマージ）を検知し、次フェーズの移動 PR を自動作成する。
+- **トレーサビリティの自動同期**: 設計、計画（ロードマップ）、タスク間のファイルリンクと GitHub Issue 番号を動的に同期する。
 
 ### 3.2 内部構造と責務 (Internal Structure - Clean Architecture Lite)
 本システムは Clean Architecture Lite に基づき、関心事を分離している。
