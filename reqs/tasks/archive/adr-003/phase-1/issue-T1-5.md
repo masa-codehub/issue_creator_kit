@@ -23,21 +23,21 @@ issue: 96
 - **Design Evidence (設計の根拠)**: ADR-003 第 3 項「自己推進型ワークフロー」
 
 ## 2. 参照資料・入力ファイル (Input Context)
-- [ ] `reqs/tasks/template/issue-draft.md`
-- [ ] `reqs/design/_inbox/design-003-logic.md`
+- [x] `reqs/tasks/template/issue-draft.md`
+- [x] `reqs/design/_inbox/design-003-logic.md`
 
 ## 3. 実装手順と制約 (Implementation Steps & Constraints)
 
 ### 3.1. 負の制約 (Negative Constraints)
-- [ ] **変更禁止**: 既存の必須フィールド（`title`, `labels` 等）を削除しない。
+- [x] **変更禁止**: 既存の必須フィールド（`title`, `labels` 等）を削除しない。
 
 ### 3.2. 実装手順 (Changes)
-- [ ] **ファイル**: `reqs/tasks/template/issue-draft.md`
+- [x] **ファイル**: `reqs/tasks/template/issue-draft.md`
     - **処理内容**:
         - `next_phase_path`: 任意項目として追加。ディレクトリパス形式のバリデーションルールをコメント追記。
         - `roadmap`: 必須項目として強調。
         - `task_id`: 必須項目として強調。
-- [ ] **ファイル**: `docs/specs/metadata-logic-spec.md` (もしあれば更新、なければ新規作成)
+- [x] **ファイル**: `docs/specs/metadata-logic-spec.md`
     - メタデータの仕様を記述。
 
 ### 3.3. 構成変更・削除 (Configuration / Cleanup)
@@ -45,11 +45,11 @@ issue: 96
 
 ## 4. ブランチ戦略 (Branching Strategy)
 - **ベースブランチ (Base Branch)**: `feature/phase-1-foundation`
-- **作業ブランチ (Feature Branch)**: `feature/T1-5-schema-update`
+- **作業ブランチ (Feature Branch)**: `feature/task-T1-5-template-update`
 
 ## 5. 検証手順・完了条件 (Verification & DoD)
-- [ ] **観測される挙動**: テンプレートファイルが更新されていること。
-- [ ] **ファイル状態**: `reqs/tasks/template/issue-draft.md` に `next_phase_path` が含まれていること。
+- [x] **観測される挙動**: テンプレートファイルが更新されていること。
+- [x] **ファイル状態**: `reqs/tasks/template/issue-draft.md` に `next_phase_path` が含まれていること。
 
 ## 6. 成果物 (Deliverables)
 - テンプレート: `reqs/tasks/template/issue-draft.md`
