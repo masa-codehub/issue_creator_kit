@@ -125,3 +125,11 @@ Rel(api, db, "Reads/Writes", "Sync, JDBC")
 ### 3.2 成果物の定着
 
 `~/.gemini/GEMINI.md` の **「プルリクエストの管理 (PR Protocol)」** に完全に従い、PRを作成します。
+
+### 3.3 プロジェクト進行の完了 (Closing Protocol)
+`~/.gemini/GEMINI.md` の「3. プロジェクト進行（State Machine）」に従い、以下の手順を実行してタスクをクローズします。
+
+1.  **振り返り (Retrospective):** YWTまたはKPTを用いて成果と課題を振り返り、**次のアクション（仮説検証や改善案）**を宣言する。
+    *   `run_shell_command("echo '## Retrospective: ...'")`
+2.  **メモリクリア:** `save_memory` に保存したTodoリストを完了済みに更新（または削除）する。
+3.  **活動報告:** IssueやPRにコメントを残す際は、振り返りの内容を含める。
