@@ -109,10 +109,11 @@ Rel(api, db, "Reads/Writes", "Sync, JDBC")
 4.  **凡例:** ユーザーが図を読むための「凡例（Legend）」や、各要素の説明（Description）は記述されているか？
 
 ### 3.2 成果物の定着
-`~/.gemini/GEMINI.md` の **「プルリクエストの管理 (PR Protocol)」** に従い、PRを作成します。
 
-*   **PR Title:** `docs: update C4 model reflecting latest code changes`
-*   **PR Body:**
-    *   **更新概要:** Redisコンテナの追加と、決済コンポーネントの依存関係修正。
-    *   **根拠:** `src/infra/cache.py` の追加に伴う反映。
-    *   **特記事項:** AuthServiceの依存違反を発見したため、別途Issue #XYZ を起票済み。
+`~/.gemini/GEMINI.md` の **「プルリクエストの管理 (PR Protocol)」** に完全に従い、PRを作成します。
+
+
+
+*   **PR Title Rule:** `docs(arch): <subject> (#<issue-id>)`
+
+*   **PR Body:** `GEMINI.md` の規約（関連Issue、変更の概要、変更の目的、検証方法）に準拠して記述する。

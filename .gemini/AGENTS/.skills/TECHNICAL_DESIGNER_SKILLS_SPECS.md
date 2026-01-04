@@ -140,10 +140,11 @@ sequenceDiagram
 4.  **SSOT整合:** 用語は `docs/system-context.md` のユビキタス言語と一致しているか？
 
 ### 3.2 成果物の定着
-`~/.gemini/GEMINI.md` の **「プルリクエストの管理 (PR Protocol)」** に従い、PRを作成します。
 
-*   **PR Title:** `docs: add payment logic specification for issue #123`
-*   **PR Body:**
-    *   **概要:** 決済処理の詳細仕様策定
-    *   **主要な決定:** 整合性重視のためキャッシュ不使用とした点
-    *   **参照:** ADR-005, Issue #123
+`~/.gemini/GEMINI.md` の **「プルリクエストの管理 (PR Protocol)」** に完全に従い、PRを作成します。
+
+
+
+*   **PR Title Rule:** `docs(specs): <issue-title> (#<issue-id>)`
+
+*   **PR Body:** `GEMINI.md` の規約（関連Issue、変更の概要、変更の目的、検証方法）に準拠して記述する。

@@ -105,10 +105,11 @@ except ConnectionError:
 4.  **移行パス:** 既存の違反コードに対する扱い（直すのか、今回は許容するのか）が明確になっているか？
 
 ### 3.2 成果物の定着
-`~/.gemini/GEMINI.md` の **「プルリクエストの管理 (PR Protocol)」** に従い、PRを作成します。
 
-*   **PR Title:** `docs: update exception handling guidelines and ruff config`
-*   **PR Body:**
-    *   **変更内容:** 例外ハンドリングのルール明文化と、Ruffの `BLE` (Blind Except) ルール有効化。
-    *   **期待効果:** エラーの握りつぶし防止によるデバッグ効率向上。
-    *   **影響:** 既存コードの違反箇所は `noqa` で一時的に抑制（別Issueで対応予定）。
+`~/.gemini/GEMINI.md` の **「プルリクエストの管理 (PR Protocol)」** に完全に従い、PRを作成します。
+
+
+
+*   **PR Title Rule:** `docs(guide): <subject> (#<issue-id>)`
+
+*   **PR Body:** `GEMINI.md` の規約（関連Issue、変更の概要、変更の目的、検証方法）に準拠して記述する。
