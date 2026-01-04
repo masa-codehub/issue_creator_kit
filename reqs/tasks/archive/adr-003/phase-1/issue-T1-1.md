@@ -8,7 +8,8 @@ roadmap: "reqs/roadmap/active/roadmap-adr003-task-lifecycle.md"
 task_id: "T1-1"
 depends_on: []
 next_phase_path: ""
-status: "Draft"
+status: "Archived"
+issue: 92
 ---
 # Phase 1 Foundation ブランチ作成
 

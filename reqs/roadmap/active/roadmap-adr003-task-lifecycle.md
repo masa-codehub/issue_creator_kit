@@ -20,15 +20,15 @@ Phase 2 では、実装を「差分検知」「一括起票」「ロードマッ
 - **Gate (承認条件)**: 全ての設計がマージされ、実装者が迷わずテストコードを書ける状態。
 
 **WBS**
-| Task ID | Category | タスク内容 | 成果物 | 依存先 |
-| :---: | :---: | :--- | :--- | :---: |
-| T1-1 | Setup | Phase 1 Foundation ブランチ `feature/phase-1-foundation` の作成 | ブランチ | - |
-| T1-2 | Spike | `git diff` によるマージ差分（`archive/` への新規ファイル）特定ロジックの実機検証 | 調査メモ | T1-1 |
-| T1-3 | Pre | 仮想キューとフェーズ連鎖の論理フロー詳細設計（エラー時の停止位置含む） | `design-003-logic.md` | T1-2 |
-| T1-4 | Pre | インフラ層（PR作成・ブランチ操作）のインターフェース定義（シグネチャ確定） | `infra-interface.md` | T1-3 |
-| T1-5 | Pre | 制御用メタデータスキーマ確定（`next_phase_path`）とテンプレート最終更新 | `reqs/tasks/template/issue-draft.md` | T1-3 |
-| T1-6 | Pre | 全テストシナリオ（正常・異常・境界値）の定義（期待されるログ出力含む） | `test-criteria.md` | T1-4, T1-5 |
-| T1-7 | Review | Phase 1 成果物の最終監査と main マージ | Phase 1 PRマージ | T1-6 |
+| Task ID | Category | タスク内容 | 成果物 | 依存先 | リンク / Issue |
+| :---: | :---: | :--- | :--- | :---: | :--- |
+| T1-1 | Setup | Phase 1 Foundation ブランチ `feature/phase-1-foundation` の作成 | ブランチ | - | [issue-T1-1.md](../../tasks/archive/adr-003/phase-1/issue-T1-1.md) (#92) |
+| T1-2 | Spike | `git diff` によるマージ差分（`archive/` への新規ファイル）特定ロジックの実機検証 | 調査メモ | T1-1 | [issue-T1-2.md](../../tasks/archive/adr-003/phase-1/issue-T1-2.md) (#93) |
+| T1-3 | Pre | 仮想キューとフェーズ連鎖の論理フロー詳細設計（エラー時の停止位置含む） | `design-003-logic.md` | T1-2 | [issue-T1-3.md](../../tasks/archive/adr-003/phase-1/issue-T1-3.md) (#94) |
+| T1-4 | Pre | インフラ層（PR作成・ブランチ操作）のインターフェース定義（シグネチャ確定） | `infra-interface.md` | T1-3 | [issue-T1-4.md](../../tasks/archive/adr-003/phase-1/issue-T1-4.md) (#95) |
+| T1-5 | Pre | 制御用メタデータスキーマ確定（`next_phase_path`）とテンプレート最終更新 | `reqs/tasks/template/issue-draft.md` | T1-3 | [issue-T1-5.md](../../tasks/archive/adr-003/phase-1/issue-T1-5.md) (#96) |
+| T1-6 | Pre | 全テストシナリオ（正常・異常・境界値）の定義（期待されるログ出力含む） | `test-criteria.md` | T1-4, T1-5 | [issue-T1-6.md](../../tasks/archive/adr-003/phase-1/issue-T1-6.md) (#97) |
+| T1-7 | Review | Phase 1 成果物の最終監査と main マージ | Phase 1 PRマージ | T1-6 | [issue-T1-7.md](../../tasks/archive/adr-003/phase-1/issue-T1-7.md) (#98) |
 
 ### Phase 2: テスト駆動実装と検証
 - **Goal (狙い)**: 仮想キュー方式での起票と、フェーズの自動連鎖を完全に実現する。

@@ -8,7 +8,8 @@ roadmap: "reqs/roadmap/active/roadmap-adr003-task-lifecycle.md"
 task_id: "T1-2"
 depends_on: ["issue-T1-1.md"]
 next_phase_path: ""
-status: "Draft"
+status: "Archived"
+issue: 93
 ---
 # git diff によるマージ差分特定ロジックの実機検証
 

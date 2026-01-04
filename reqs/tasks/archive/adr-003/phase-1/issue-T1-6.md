@@ -8,7 +8,8 @@ roadmap: "reqs/roadmap/active/roadmap-adr003-task-lifecycle.md"
 task_id: "T1-6"
 depends_on: ["issue-T1-4.md", "issue-T1-5.md"]
 next_phase_path: ""
-status: "Draft"
+status: "Archived"
+issue: 97
 ---
 # 全テストシナリオの定義
 

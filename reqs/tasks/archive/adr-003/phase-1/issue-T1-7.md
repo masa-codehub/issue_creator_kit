@@ -8,7 +8,8 @@ roadmap: "reqs/roadmap/active/roadmap-adr003-task-lifecycle.md"
 task_id: "T1-7"
 depends_on: ["issue-T1-6.md"]
 next_phase_path: "reqs/tasks/drafts/adr-003/phase-2/"
-status: "Draft"
+status: "Archived"
+issue: 98
 ---
 # Phase 1 成果物の最終監査と main マージ
 

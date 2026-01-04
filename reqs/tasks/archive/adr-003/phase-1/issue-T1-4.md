@@ -8,7 +8,8 @@ roadmap: "reqs/roadmap/active/roadmap-adr003-task-lifecycle.md"
 task_id: "T1-4"
 depends_on: ["issue-T1-3.md"]
 next_phase_path: ""
-status: "Draft"
+status: "Archived"
+issue: 95
 ---
 # インフラ層のインターフェース定義
 
