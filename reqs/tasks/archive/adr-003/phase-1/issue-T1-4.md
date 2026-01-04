@@ -23,19 +23,19 @@ issue: 95
 - **Design Evidence (設計の根拠)**: `design-003-logic.md` (T1-3成果物)
 
 ## 2. 参照資料・入力ファイル (Input Context)
-- [ ] `reqs/design/_inbox/design-003-logic.md`
-- [ ] `src/issue_creator_kit/infrastructure/` (既存コード)
+- [x] `reqs/design/_inbox/design-003-logic.md`
+- [x] `src/issue_creator_kit/infrastructure/` (既存コード)
 
 ## 3. 実装手順と制約 (Implementation Steps & Constraints)
 
 ### 3.1. 負の制約 (Negative Constraints)
-- [ ] **変更禁止**: 既存の `GitHubAdapter` の動作を破壊しない。
+- [x] **変更禁止**: 既存の `GitHubAdapter` の動作を破壊しない。
 
 ### 3.2. 実装手順 (Changes)
-- [ ] **ファイル**: `docs/specs/infra-interface.md`
+- [x] **ファイル**: `docs/specs/infra-interface.md`
     - **処理内容**:
-        - `IGitAdapter`: `get_diff_files`, `checkout_new_branch`, `commit_and_push` 等の定義。
-        - `IGitHubAdapter`: `create_pull_request`, `search_issues` 等の定義。
+        - `IGitAdapter`: `get_added_files`, `checkout`, `move_file`, `commit`, `push` 等の定義。
+        - `IGitHubAdapter`: `create_pull_request`, `add_comment` 等の定義。
         - 各メソッドの入出力型（Type Hinting）と例外定義。
 
 ### 3.3. 構成変更・削除 (Configuration / Cleanup)
@@ -43,11 +43,11 @@ issue: 95
 
 ## 4. ブランチ戦略 (Branching Strategy)
 - **ベースブランチ (Base Branch)**: `feature/phase-1-foundation`
-- **作業ブランチ (Feature Branch)**: `feature/T1-4-infra-interface`
+- **作業ブランチ (Feature Branch)**: `feature/task-T1-4-infra-interface`
 
 ## 5. 検証手順・完了条件 (Verification & DoD)
-- [ ] **観測される挙動**: 仕様書が作成され、レビューを通過すること。
-- [ ] **ファイル状態**: `docs/specs/infra-interface.md` が存在すること。
+- [x] **観測される挙動**: 仕様書が作成され、レビューを通過すること。
+- [x] **ファイル状態**: `docs/specs/infra-interface.md` が存在すること。
 
 ## 6. 成果物 (Deliverables)
 - 仕様書: `docs/specs/infra-interface.md`
