@@ -4,6 +4,16 @@
 
 ---
 
+## 0. タスク選定 (Task Selection)
+
+作業に着手する前に、必ず「今、何をすべきか」をアクティブなロードマップから特定します。
+
+1.  **ソースの確認**: `reqs/roadmap/active/` 内にあるロードマップファイルを確認する。
+2.  **次タスクの特定**: 現在のフェーズを確認し、未着手の中で最も優先度が高い（または依存関係の上流にある）タスク ID（例: T1-1）を選択する。
+3.  **Draft ディレクトリの準備**: `reqs/tasks/drafts/<ADR-ID>/<Phase>/` ディレクトリが存在しない場合は作成する。
+
+---
+
 ## 1. 精密記述プロトコル (Precision Guardrails)
 
 エージェントが迷わず、かつ正確に目的を達成するために、以下の要素を具体的に記述します。
@@ -74,7 +84,12 @@
 
 ---
 
-## 4. 投入プロトコル (Promotion to Queue)
+## 4. 投入プロトコル (Promotion)
 
-1. `reqs/tasks/drafts/` への保存と PR 作成をアーキテクトの完了条件とする。
-2. **PR Body には必ず「3.3 論理的証明」の考察を含めること。**
+監査（Section 3）を完全にパスした Draft Issue を、仮想キュー（archive への移動 PR）を通じて起票します。
+
+1.  **アーカイブへの移動**: Draft ファイルを `reqs/tasks/drafts/...` から `reqs/tasks/archive/...` 内の適切なディレクトリへ移動する。
+    *   *コマンド例*: `run_shell_command{command: "mkdir -p reqs/tasks/archive/adr-xxx/phase-1 && mv reqs/tasks/drafts/adr-xxx/phase-1/issue-T1-1.md reqs/tasks/archive/adr-xxx/phase-1/"}`
+2.  **PR作成**: 移動した変更を含むプルリクエストを作成する。
+    *   **Title**: `feat: promote task <Task-ID> to archive`
+    *   **Review**: このPRがマージされた瞬間、GitHub Issue が自動起票される。
