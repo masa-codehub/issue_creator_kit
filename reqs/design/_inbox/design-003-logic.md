@@ -1,7 +1,7 @@
 # 概要 / Overview
 デザインドキュメント: 仮想キューとフェーズ連鎖の論理フロー詳細設計 (ADR-003 実装詳細)
 
-- **Author(s)**: TECHNICAL_DESIGNER
+- **Author(s)**: Developer Experience チーム
 - **Status**: 下書き
 - **Last Updated**: 2026-01-04
 
@@ -53,7 +53,7 @@ sequenceDiagram
         Note over ICK, Repo: 【フェーズ連鎖 (Auto-PR)】
         ICK->>ICK: next_phase_path の有無を確認
         ICK->>Repo: 次フェーズ用 Foundation ブランチ作成
-        ICK->>Repo: ファイル移動 (Draft -> Archive)
+        ICK->>Repo: on new branch: ファイル移動 (Draft -> Archive)
         ICK->>API: 起票用 PR を作成
     end
 
@@ -72,8 +72,14 @@ sequenceDiagram
 #### 2. 原子的一括起票 (Atomic Batch Creation)
 - **All-or-Nothing 戦略**:
     - 全ての対象ファイルについて、Issue 作成 API をコールする。
-    - **1件でも失敗した場合**: すでに作成された Issue を削除（または Close）しようとするのではなく、処理を中断してエラーを吐き、Git への書き戻しコミットを行わない。
-    - **成功時**: メモリ上の各ファイルオブジェクトに Issue 番号をセットし、次工程へ渡す。
+    - **1件でも失敗した場合**:
+        - すでに作成された Issue を削除（または Close）しようとするのではなく、処理を中断してエラーを吐き、Git への書き戻しコミット（Frontmatter の `issue` フィールド更新およびロードマップ更新）を一切行わない。
+        - このため、失敗したバッチ内のファイルは全て `issue` フィールドが空のままとなり、差分検知アルゴリズム（「`issue` フィールドが存在しない、あるいは空であるもの」を対象とする）により、再実行時に再度一括起票の対象となる。
+        - 途中まで作成された Issue が存在する場合でも、それらは Frontmatter から参照されていない「孤立 Issue」として一時的に残るが、再実行により同一タスクに対応する新規 Issue が作成されることはない（`issue` フィールドが空でないファイルは常にスキップされるため）。
+        - 孤立 Issue の扱いについては、運用ポリシーとして定期的な手動 Close（またはラベル付け）を行うか、別途クリーンアップジョブを検討する。
+    - **成功時**:
+        - メモリ上の各ファイルオブジェクトに Issue 番号をセットし、次の処理ステップへ渡す。
+        - これにより、再実行時には Frontmatter の `issue` 番号の有無で判定するため、既に Issue 番号が書き込まれたファイルは差分検知段階で自動的にスキップされ、二重起票は発生しない。
 
 #### 3. ロードマップ同期 (Roadmap Sync Engine)
 - **置換ロジック**:
@@ -81,7 +87,7 @@ sequenceDiagram
     - `| (Task ID) | ... | [ファイル名](../../tasks/drafts/(パス)) |` 形式の行を特定。
     - `../../tasks/drafts/` を `../../tasks/archive/` に置換。
     - リンクテキストの末尾、または備考欄に ` (#IssueNumber)` を追記する。
-- **安全策**: 置換対象のリンクが見つからない場合、そのファイルについてはスキップし警告ログを出すが、他のファイルの同期は継続する。
+- **安全策**: 置換対象のリンクが見つからない場合は、ロードマップとタスクファイルの不整合が発生している可能性が高いため、単なる警告ではなくエラーとして扱い処理を中断する。原因が解消されるまで自動同期処理を完了済みとみなさない。
 
 #### 4. フェーズ連鎖と Auto-PR (Phase Chaining)
 - **トリガー条件**:
@@ -89,12 +95,14 @@ sequenceDiagram
 - **処理フロー**:
     1.  `next_phase_path` (例: `reqs/tasks/drafts/phase-2/`) の存在を確認。
     2.  `git checkout -b feature/phase-N-foundation` を実行。
-    3.  指定パス内の全ファイルを `reqs/tasks/archive/` 側の対応ディレクトリへ物理移動。
+    3.  `next_phase_path` のパスに含まれる `drafts` を `archive` に置換して移動先パス（例: `reqs/tasks/archive/phase-2/`）を決定し、物理移動を実行。
     4.  `git add . && git commit -m "feat: promote phase-N tasks for virtual queue"`
     5.  `git push origin feature/phase-N-foundation`
     6.  GitHub API で PR を作成。`base: main`, `head: feature/phase-N-foundation`。
 - **無限ループ防止**:
-    - `next_phase_path` が指す先が、既に `archive/` 配下に存在するディレクトリである場合は、二重処理とみなして無視する。
+    - `next_phase_path` から算出される**移動先**ディレクトリ（例: `reqs/tasks/archive/phase-2/`）が既に存在する場合は、二重処理とみなして無視する。
+    - フェーズ連鎖処理中は、「訪問済み `next_phase_path` セット（例: `visited_phase_paths`）」を保持し、各ステップで次に処理しようとしている `next_phase_path` がこのセットに既に含まれている場合は「循環参照」と判断して、後続のフェーズ連鎖（Auto-PR 作成）を即座に中止し、警告ログを出力する。
+    - さらに安全装置として、フェーズ連鎖の最大深度（例: `MAX_PHASE_CHAIN_DEPTH = 10`）を定義し、連鎖回数がこの上限を超える場合も異常系とみなして処理を停止する（新規 PR は作成しない）。
     - PR 作成時に、同一の `head` ブランチ名が既に存在する場合も、安全のため処理をスキップする。
 
 #### 5. 安全装置 (Safety Mechanisms)
@@ -102,6 +110,11 @@ sequenceDiagram
     - ネットワークエラーによる API 失敗。
     - `git push` 時のコンフリクト（別の Actions や人間による変更）。
 - **冪等性**: `issue` 番号が既に Frontmatter にあるファイルは無視するため、Actions が再試行されても二重起票は発生しない。
+
+## パフォーマンスとレートリミット / Performance & Rate Limiting
+- GitHub Issue 作成 API のセカンダリレート制限（最大 80 件/60 秒）を考慮し、Issue 起票は 1 バッチあたり最大 50 件とする。
+- バッチ間に 60 秒のインターバル（例: `sleep 60`）を設けることで、100 件以上の一括起票時にもレートリミットエラーを回避する。
+- レートリミットエラー（HTTP 403 かつ `retry-after` ヘッダあり）を受け取った場合は、`retry-after` の秒数に安全マージン 5 秒を加えた時間だけ待機してから、未処理分の起票をリトライする。
 
 ## 検討した代替案 / Alternatives Considered
 - **案: Issue 作成直後に逐次コミット**: コミットログが汚れ、ロードマップ更新との整合性が取りにくいため却下。「一括処理・一括コミット」を採用。
@@ -112,7 +125,7 @@ sequenceDiagram
 - 秘密情報の漏洩はないが、自動 PR 作成により意図しない通知が飛ぶ可能性があるため、ロードマップでの事前定義を SSOT とする。
 
 ## 未解決の問題 / Open Questions & Unresolved Issues
-- 大量（100件以上）の Issue を一括起票する場合の API レートリミット対策（必要に応じてスリープを入れるべきか）。
+- 特になし。GitHub Issue 作成 API のレートリミット対策は設計に取り込んだ。
 
 ## 検証基準 / Verification Criteria
 - [ ] 模擬リポジトリにおいて、`drafts/` から `archive/` へのファイル移動を含む PR をマージした際、Actions が発火し、Issue が起票されること。
