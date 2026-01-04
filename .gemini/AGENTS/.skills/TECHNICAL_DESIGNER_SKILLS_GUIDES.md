@@ -120,9 +120,3 @@ except ConnectionError:
 ### 3.2 成果物の定着
 
 `~/.gemini/GEMINI.md` の **「プルリクエストの管理 (PR Protocol)」** に完全に従い、PRを作成します。
-
-
-
-*   **PR Title Rule:** `docs(guide): <subject> (#<issue-id>)`
-
-*   **PR Body:** `GEMINI.md` の規約（関連Issue、変更の概要、変更の目的、検証方法）に準拠して記述する。
