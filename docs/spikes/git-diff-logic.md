@@ -15,11 +15,16 @@ ADR-003 で定義された「仮想キュー（Virtual Queue）」の実行ト�
    - 結果: `R100` (Rename) として検出される。
    - 課題: リネーム検出が有効な場合、`--diff-filter=A` では検出できない。
 
-2. `git diff-tree -r --no-commit-id --name-status --diff-filter=A HEAD^1 HEAD -- reqs/tasks/archive/`
+2. `git diff HEAD^1 HEAD --name-status --no-renames --diff-filter=A -- reqs/tasks/archive/`
+   - 結果: `A` (Added) として正しく検出される。
+   - 考察: porcelain コマンドである `git diff` でも目的は達成可能。
+
+3. `git diff-tree -r --no-commit-id --name-status --diff-filter=A HEAD^1 HEAD -- reqs/tasks/archive/`
    - 結果: 何も検出されない（リネームとして扱われているため）。
 
-3. `git diff-tree -r --no-commit-id --name-status --diff-filter=A --no-renames HEAD^1 HEAD -- reqs/tasks/archive/`
+4. `git diff-tree -r --no-commit-id --name-status --diff-filter=A --no-renames HEAD^1 HEAD -- reqs/tasks/archive/`
    - 結果: `A` (Added) として正しく検出される。
+   - 考察: plumbing コマンドである `git diff-tree` はスクリプトでの利用に適しており、より安定した動作が期待できるため、こちらを採用する。
 
 ## 3. 結論
 以下のコマンドを使用することで、`drafts/` から `archive/` への移動を含め、新規に追加されたファイルを確実に特定できる。
