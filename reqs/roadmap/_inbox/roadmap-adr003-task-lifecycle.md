@@ -1,64 +1,64 @@
-# 実装・リファクタリング計画: タスクのライフサイクル管理 (ADR-003)
+# 実装・リファクタリング計画: 仮想キューと自己推進型ワークフロー (ADR-003)
 
-このドキュメントは、承認済みの ADR-003 を安全に実現するための、段階的な手順と WBS を定義します。
+このドキュメントは、承認済みの ADR-003 v3 を安全に実現するための、段階的な手順と WBS を定義します。
 
 - **Status**: 策定中
-- **Target Design**: [ADR-003](../../design/_approved/adr-003-task-and-roadmap-lifecycle.md) (Updated v2: Self-Propelling Workflow)
+- **Target Design**: [ADR-003](../../design/_approved/adr-003-task-and-roadmap-lifecycle.md) (Final: Virtual Queue & Phase Chaining)
 - **Last Updated**: 2026-01-03
 
 ## 1. 実装戦略の要約
-「一成果物一タスク」の原則に従い、全ての工程を原子的なステップに分解します。
-ADR-003 v2 で定義された「フェーズ連鎖（Auto-PR）」と「原子的な一括アーカイブ」の実現を中核に据え、Phase 1 では実装を一切行わず、詳細設計とテスト要件の定義に充てます。
-実装は Phase 2 以降とし、Phase 1 で確定させた「検証基準」をパスさせることを唯一のゴールとします。
+物理フォルダとしての `_queue/` を廃止し、GitHub Actions が `archive/` へのマージ差分を検知して起票を行う「仮想キュー」へ移行します。
+「一成果物一タスク」の原則を徹底し、Phase 1 では詳細設計（Logic, Schema, Interface）とテスト要件を確定させます。
+Phase 2 では、実装を「差分検知」「一括起票」「ロードマップ同期」「Auto-PR」の 4 つの独立したロジックに分解して TDD で進めます。
 
 ## 2. 実装フェーズとWBS (The Journey)
 
 ### Phase 1: 詳細設計とテスト要件の定義
-(詳細済み - 前回の出力を継承)
+- **Goal**: 「マージ差分からの起票」と「最終タスクからの Auto-PR」の論理的整合性を 100% 確定させる。
+- **Deliverables**: 詳細設計書、テスト仕様書、更新された Issue テンプレート。
+- **Gate**: 全ての設計がマージされ、実装者が迷わずテストを書ける状態。
+
 **WBS**
-| Task ID | Category | タスク内容 | 成果物 | 依存先 | Issue案リンク |
-| :---: | :---: | :--- | :--- | :---: | :--- |
-| T1-1 | Setup | Phase 1 基点ブランチ `feature/phase-1-foundation` の作成 | ブランチ | - | [issue-T1-1.md](../../tasks/drafts/adr-003/phase-1/issue-T1-1.md) |
-| T1-2 | Spike | GitHub API によるブランチ作成・PR作成の実現可能性調査 | 調査メモ | T1-1 | [issue-T1-2.md](../../tasks/drafts/adr-003/phase-1/issue-T1-2.md) |
-| T1-3 | Pre | 原子的なアーカイブとフェーズ連鎖の論理フロー設計 | `reqs/design/_inbox/design-003-logic.md` | T1-2 | [issue-T1-3.md](../../tasks/drafts/adr-003/phase-1/issue-T1-3.md) |
-| T1-4 | Pre | 制御用メタデータスキーマ定義とテンプレート更新 | `reqs/tasks/template/issue-draft.md` | T1-3 | [issue-T1-4.md](../../tasks/drafts/adr-003/phase-1/issue-T1-4.md) |
-| T1-5 | Pre | インフラ層（Git/GitHub Adapter）のインターフェース定義 | `docs/specs/adr-003-infra-interface.md` | T1-3 | [issue-T1-5.md](../../tasks/drafts/adr-003/phase-1/issue-T1-5.md) |
-| T1-6 | Pre | 全テストシナリオ（正常・異常・境界値）の定義 | `docs/specs/adr-003-test-criteria.md` | T1-4, T1-5 | [issue-T1-6.md](../../tasks/drafts/adr-003/phase-1/issue-T1-6.md) |
-| T1-7 | Review | 設計・テスト要件の最終承認と Main へのマージ | PRマージ | T1-6 | [issue-T1-7.md](../../tasks/drafts/adr-003/phase-1/issue-T1-7.md) |
+| Task ID | Category | タスク内容 | 成果物 | 依存先 |
+| :---: | :---: | :--- | :--- | :---: |
+| T1-1 | Setup | Phase 1 Foundation ブランチの作成 | ブランチ | - |
+| T1-2 | Spike | `git diff` によるマージ差分ファイル特定ロジックの実機検証 | 調査メモ | T1-1 |
+| T1-3 | Pre | 仮想キューとフェーズ連鎖の論理フロー詳細設計 | `design-003-logic.md` | T1-2 |
+| T1-4 | Pre | インフラ層（PR作成・ブランチ操作）のインターフェース定義 | `infra-interface.md` | T1-3 |
+| T1-5 | Pre | 制御用メタデータスキーマ確定とテンプレート最終更新 | `issue-draft.md` | T1-3 |
+| T1-6 | Pre | 全テストシナリオ（正常・異常・境界値）の定義 | `test-criteria.md` | T1-4, T1-5 |
+| T1-7 | Review | Phase 1 成果物の最終監査と Main マージ | PRマージ | T1-6 |
 
 ### Phase 2: テスト駆動実装と検証
-- **Goal (狙い)**: Phase 1 で定義された検証基準を 100% 満たす実装を完了する。
-- **Deliverables (成果物)**: テストコード、リファクタリングされた UseCase、新規 Auto-PR ロジック。
-- **Gate (承認条件)**: 定義された全てのテスト（特に異常系）がパスし、マニュアル検証で動作が証明されること。
+- **Goal**: 仮想キュー方式での起票と、フェーズの自動連鎖を完全に実現する。
+- **Deliverables**: `WorkflowUseCase` 拡張、`GitHubAdapter` 拡張、統合テスト。
+- **Gate**: 最終タスクのマージにより、次フェーズの PR が自動作成されるサイクルの実証。
 
 **WBS**
-| Task ID | Category | タスク内容 | 成果物 | 依存先 | Issue案リンク |
-| :---: | :---: | :--- | :--- | :---: | :--- |
-| T2-1 | Setup | Phase 2 基点ブランチ `feature/phase-2-foundation` の作成 | ブランチ | T1-7 | [issue-T2-1.md](../../tasks/drafts/adr-003/phase-2/issue-T2-1.md) |
-| T2-2 | Impl | 原子的なアーカイブ（Atomic Archiving）の単体テスト実装 | `tests/unit/usecase/test_atomic_archiving.py` | T2-1 | [issue-T2-2.md](../../tasks/drafts/adr-003/phase-2/issue-T2-2.md) |
-| T2-3 | Impl | 原子的なアーカイブ（一括移動・ロールバック）のロジック実装 | `src/issue_creator_kit/usecase/creation.py` | T2-2 | [issue-T2-3.md](../../tasks/drafts/adr-003/phase-2/issue-T2-3.md) |
-| T2-4 | Impl | フェーズ連鎖（Auto-PR）の単体テスト実装 | `tests/unit/usecase/test_phase_chaining.py` | T2-3 | [issue-T2-4.md](../../tasks/drafts/adr-003/phase-2/issue-T2-4.md) |
-| T2-5 | Impl | フェーズ連鎖（次フェーズ検知・PR作成）のロジック実装 | `src/issue_creator_kit/usecase/workflow.py` | T2-4 | [issue-T2-5.md](../../tasks/drafts/adr-003/phase-2/issue-T2-5.md) |
-| T2-6 | Verify | 統合検証（実際に `_queue` に複数フォルダを配置しての動作確認） | 検証ログ | T2-5 | [issue-T2-6.md](../../tasks/drafts/adr-003/phase-2/issue-T2-6.md) |
-| T2-7 | Review | Phase 2 完了承認と Main へのマージ | PRマージ | T2-6 | [issue-T2-7.md](../../tasks/drafts/adr-003/phase-2/issue-T2-7.md) |
+| Task ID | Category | タスク内容 | 成果物 | 依存先 |
+| :---: | :---: | :--- | :--- | :---: |
+| T2-1 | Setup | Phase 2 Foundation ブランチの作成 | ブランチ | T1-7 |
+| T2-2 | Impl | マージ差分検知と一括起票（仮想キュー）の TDD 実装 | `creation.py` | T2-1 |
+| T2-3 | Impl | ロードマップ WBS リンク自動置換ロジックの TDD 実装 | `roadmap_sync.py` | T2-2 |
+| T2-4 | Impl | 次フェーズ PR 自動作成（Auto-PR）の TDD 実装 | `workflow.py` | T2-3 |
+| T2-5 | Impl | GitHub Actions ワークフロー定義の差し替え | `ci.yml` | T2-4 |
+| T2-6 | Verify | 統合検証（フェーズ 1→2 の自動リレー確認） | 検証ログ | T2-5 |
+| T2-7 | Review | Phase 2 成果物の最終監査と Main マージ | PRマージ | T2-6 |
 
 ### Phase 3: リファクタリングと SSOT 同期
-- **Goal (狙い)**: 実装後のシステムを整理し、最新の運用ガイドラインを確立する。
-- **Deliverables (成果物)**: 最新化されたシステムコンテキスト、開発ガイド、クリーンなコードベース。
-- **Gate (承認条件)**: 旧プロトタイプコードが完全に削除され、ドキュメントと実装に矛盾がないこと。
+- **Goal**: 旧 `_queue` 方式の残骸を清掃し、システム全体の整合性を取る。
+- **Deliverables**: 最新化された `system-context.md`、クリーンなコード。
 
 **WBS**
-| Task ID | Category | タスク内容 | 成果物 | 依存先 | Issue案リンク |
-| :---: | :---: | :--- | :--- | :---: | :--- |
-| T3-1 | Setup | Phase 3 基点ブランチ `feature/phase-3-foundation` の作成 | ブランチ | T2-7 | [issue-T3-1.md](../../tasks/drafts/adr-003/phase-3/issue-T3-1.md) |
-| T3-2 | Clean | デバッグ用コードの削除とコードスタイルの最終調整 | クリーンコード | T3-1 | [issue-T3-2.md](../../tasks/drafts/adr-003/phase-3/issue-T3-2.md) |
-| T3-3 | Docs | システムコンテキスト（境界・用語・フロー図）の最新化 | `docs/system-context.md` | T3-2 | [issue-T3-3.md](../../tasks/drafts/adr-003/phase-3/issue-T3-3.md) |
-| T3-4 | Docs | 開発者向けセットアップ・運用ガイドの更新 | `docs/guides/` | T3-3 | [issue-T3-4.md](../../tasks/drafts/adr-003/phase-3/issue-T3-4.md) |
-| T3-5 | Review | ロードマップの完了宣言とアーカイブ | ロードマップ移動 | T3-4 | [issue-T3-5.md](../../tasks/drafts/adr-003/phase-3/issue-T3-5.md) |
+| Task ID | Category | タスク内容 | 成果物 | 依存先 |
+| :---: | :---: | :--- | :--- | :---: |
+| T3-1 | Clean | 物理 `_queue` フォルダ関連コードの完全削除 | コード削除 | T2-7 |
+| T3-2 | Docs | システムコンテキストと運用ガイドの最新化 | `docs/` 更新 | T3-1 |
+| T3-3 | Review | ロードマップ完了宣言とアーカイブ | 移動 | T3-2 |
 
 ## 3. リスク管理とロールバック
-- **リスク**: 一括移動フェーズで Git の競合が発生し、アーカイブに失敗する。
-- **対策**: 移動は常に最新の `main` をベースにした作業ブランチで行い、ECK（エージェント）が自動でコンフリクト解消を試みる。
+- **リスク**: Auto-PR で無限ループ（例: P1 が完了して P1 を再度呼ぶ）が発生する可能性。
+- **対策**: T1-3 の設計で「既処理フェーズの記録」を定義し、循環参照を物理的に防止する。
 
 ## 4. 移行完了の定義
-- タスクがフェーズを跨いで自動的に PR 化され、プロジェクトが自律的に進行する状態。
+- 開発者がマージボタンを押すだけで、次のフェーズの準備が整う「自己推進状態」の確立。
