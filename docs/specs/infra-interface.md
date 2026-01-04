@@ -21,12 +21,12 @@ Git リポジトリに対する物理的な操作を担当する。
 
 | メソッド名 | 引数 | 戻り値 | 説明 |
 | :--- | :--- | :--- | :--- |
-| `get_added_files` | `base: str, compare: str, path: str` | `list[str]` | `git diff-tree` を使用し、指定パス配下で追加（Added）されたファイルリストを取得する。 |
-| `checkout` | `branch: str, create: bool, base: str` | `None` | 指定したブランチに切り替える。`create=True` の場合は `base` を起点に新規作成する。 |
+| `get_added_files` | `base_ref: str, head_ref: str, path: str` | `list[str]` | `git diff-tree` を使用し、指定パス配下で追加（Added）されたファイルリストを取得する。 |
+| `checkout` | `branch: str, create: bool, base: str | None` | `None` | 指定したブランチに切り替える。`create=True` の場合は `base` を起点に新規作成する。`base` はブランチ作成時にのみ使用される。 |
 | `add` | `paths: list[str]` | `None` | 指定したファイルをステージングエリアに追加する。 |
 | `commit` | `message: str` | `None` | ステージングされた変更をコミットする。 |
 | `push` | `remote: str, branch: str, set_upstream: bool` | `None` | 指定したリモート・ブランチへプッシュする。 |
-| `move_file` | `src: str, dst: str` | `None` | `git mv` を使用してファイルを移動する。 |
+| `move_file` | `src: str, dst: str` | `None` | `git mv` を使用してファイルまたはディレクトリを移動する。 |
 
 ### 2. IGitHubAdapter
 GitHub REST API を介した操作を担当する。
@@ -34,7 +34,7 @@ GitHub REST API を介した操作を担当する。
 | メソッド名 | 引数 | 戻り値 | 説明 |
 | :--- | :--- | :--- | :--- |
 | `create_issue` | `title: str, body: str, labels: list[str]` | `int` | 指定したリポジトリに Issue を作成し、Issue 番号を返す。 |
-| `create_pull_request` | `title: str, body: str, head: str, base: str` | `str` | プルリクエストを作成し、PR の URL または ID を返す。 |
+| `create_pull_request` | `title: str, body: str, head: str, base: str` | `str` | プルリクエストを作成し、PR の URL を返す。 |
 | `add_comment` | `issue_number: int, body: str` | `None` | 指定した Issue または PR にコメントを投稿する（エラー通知等に利用）。 |
 
 ### 3. IFileSystemAdapter
@@ -44,7 +44,7 @@ GitHub REST API を介した操作を担当する。
 | :--- | :--- | :--- | :--- |
 | `read_document` | `path: str` | `Document` | 指定された Markdown ファイルを読み込み、YAML Frontmatter と Content を持つドメインオブジェクトを返す。 |
 | `update_metadata` | `path: str, metadata: dict` | `None` | 指定されたファイルの Frontmatter を指定された辞書の内容で更新（マージ）する。 |
-| `safe_move_file` | `src: str, dst: str, overwrite: bool` | `None` | ファイルを指定ディレクトリへ移動する。ディレクトリが存在しない場合は作成する。 |
+| `safe_move_file` | `src: str, dst_dir: str, overwrite: bool` | `None` | ファイルを指定ディレクトリへ移動する。ディレクトリが存在しない場合は作成する。 |
 | `read_file` | `path: str` | `str` | ファイルを文字列として読み込む（ロードマップ更新等に利用）。 |
 | `write_file` | `path: str, content: str` | `None` | 文字列をファイルに書き込む。 |
 
