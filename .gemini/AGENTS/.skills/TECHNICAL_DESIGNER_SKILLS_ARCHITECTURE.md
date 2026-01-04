@@ -11,63 +11,108 @@
 計画策定時に、以下の情報を「能動的偵察 (Active Reconnaissance)」によって収集し、Todoリストの具体化に利用してください。
 
 ### 1.1 能動的偵察 (Active Reconnaissance)
-*   **コード構造の把握:** `list_directory("src/")` や `glob("**/*.py")` で最新のパッケージ構成を確認する。
-*   **実行環境の調査:** `read_file("docker-compose.yml")`, `Dockerfile` 等で実行プロセス（コンテナ）構成を特定する。
-*   **外部依存の確認:** `pyproject.toml` 等でライブラリ依存関係を確認する。
-*   **既存ドキュメントの確認:** `docs/system-context.md`, `docs/architecture/c4-model.md` を読み込み、現状の記述を確認する。
+以下のコマンドを用いて、ドキュメントと実態の乖離を検出します。
+
+*   **構造スキャン:**
+    *   `list_directory("src/")` でトップレベルパッケージを確認。
+    *   `glob("src/**/*.py")` で全モジュールをリストアップし、ファイルの増減を把握する。
+*   **実行環境分析:**
+    *   `read_file("docker-compose.yml")` を読み、定義されているサービス（コンテナ）のリストを作成する。
+    *   `read_file("pyproject.toml")` を読み、外部ライブラリ（特にAWS SDKやDBドライバなど、インフラに関わるもの）の変更を確認する。
+*   **既存図の確認:**
+    *   `read_file("docs/architecture/c4-model.md")` (または `system-context.md`) を読み込み、現在の図解定義を確認する。
 
 ### 1.2 作業ブランチの計画
 *   **Action:** `~/.gemini/GEMINI.md` の **「1. Gitによるバージョン管理」** に従い、作業用ブランチを作成するタスクをTodoの先頭に追加する。
+    *   *Naming:* `docs/arch-update-{YYYYMMDD}`
 
 ### 1.3 リスク評価 (Specific Context)
-`~/.gemini/GEMINI.md` の **「3. プロジェクト進行 > 3. リスク評価」** を参照し、特に以下の観点を追加で考慮する。
-*   **正確性:** 図が現実のコードと乖離していないか？（嘘の図は無いより悪い）
-*   **抽象度:** 詳細すぎず、概略すぎない適切な粒度（C4モデルのLevel 2/3）か？
+Todo作成時に、以下の観点でリスクを評価する。
+
+*   **誤解の拡散:** 「事実と異なる図を描くこと」は最大の害悪である。不確かな部分は「要確認」と明記する方針とする。
+*   **複雑性:** 全てを描こうとして図がスパゲッティ化していないか？ C4モデルの「Level 2 (Container)」と「Level 3 (Component)」を適切に分離する計画を立てる。
 
 ---
 
 ## 2. Execution Phase Actions (for State 2)
 
-Todoを実行する際、以下の思考プロセスと記述ガードレールを遵守してください。
+Todoを実行する際、以下のステップで可視化を進めます。
 
 ### 2.1 ギャップ分析 (Hypothesis - Step 1: Gap Analysis)
-現状のドキュメント（To-Beと思っていたもの）と、コードの実態（As-Is）を比較します。
+「ドキュメント（To-Be）」と「コード実態（As-Is）」の差異を明確にします。
 
-*   **コンテナレベル:** 新規追加されたサービスや削除されたサービスはないか？
-*   **コンポーネントレベル:** パッケージ構成の変更により、コンポーネントの責務や境界が変わっていないか？
-*   **関係性:** 新たな依存関係や、禁じられた依存（Architecture Violation）が発生していないか？
+**Output Template (Markdown - Gap Analysis):**
+```markdown
+## アーキテクチャ・ギャップ分析
+| 対象 | ドキュメント記述 | コード実態 | アクション |
+| :--- | :--- | :--- | :--- |
+| `Redis` | 記載なし | `docker-compose.yml` に `redis:alpine` が追加され、`src/infra/cache.py` から参照されている。 | Container図に追加する。 |
+| `AuthService` | `UserService` に依存 | コード上は `AuthService` が `UserRepository` を直接呼んでいる（違反）。 | 図は現状通り（違反状態）を描き、Issueでリファクタリングを提案する。 |
+```
 
-### 2.2 構造定義と図解 (Hypothesis - Step 2: Drafting)
-ギャップを埋めるための修正案を作成します。
+### 2.2 構造定義 (Hypothesis - Step 2: Drafting)
+C4モデルの各レベルに合わせて要素を定義します。
 
-*   **コンポーネント定義:** 論理的なグルーピングを行い、責務を明確にする。
-*   **関係性定義:** 依存の方向（Uses, Persists, etc.）を定義する。
-*   **Mermaid記述:** `docs/template/c4-model-template.md` (存在する場合) に従い、Mermaid記法で図を作成する。
+#### Level 2: Container Diagram (System Context)
+実行単位（プロセス/コンテナ）を定義します。
 
-### 2.3 自律的解決ループ (Autonomy Loop)
-不明点（例: この依存関係は意図的かバグか？）がある場合、安易にユーザーに質問せず、以下のプロセスで解決します。
+**Output Template (Definition List):**
+*   **API Server:** Python/FastAPI. ユーザーからのHTTPリクエストを処理。
+*   **Worker:** Python/Celery. 非同期タスク（メール送信）を処理。
+*   **Database:** PostgreSQL. 永続化データストア。
 
-1.  **自己解決:** コードの履歴（git log）や関連するPR/Issueを調査し、変更の意図を特定する。
-2.  **現状優先:** 意図が不明でも、まずは「現状のコード構造」を正として図に反映させる（可視化が目的なので）。ただし、明らかにアーキテクチャ違反と思われる箇所はNoteで注釈を入れる。
-3.  **報告:** 重大な違反を発見した場合は、別途Issue起票などの提案を行う。
+#### Level 3: Component Diagram
+主要な論理コンポーネント（Controller, Service, Repository）を定義します。
+
+**Output Template (Definition List):**
+*   **PaymentController:** `src/interface/api/payment.py`. HTTPエンドポイント。
+*   **PaymentService:** `src/usecase/payment_service.py`. ビジネスロジック。
+*   **PaymentRepository:** `src/infra/db/payment_repo.py`. DBアクセス。
+
+### 2.3 図解作成 (Mermaid Visualization)
+定義した構造をMermaid記法で記述します。
+
+**Output Template (Mermaid):**
+```mermaid
+C4Context
+title System Context Diagram
+
+Person(user, "User", "A user of the banking system")
+System_Boundary(system, "Banking System") {
+    Container(api, "API Application", "Python, FastAPI", "Delivers functionality via JSON/HTTPS API")
+    ContainerDb(db, "Database", "PostgreSQL", "Stores user registration info, hashed credentials, etc.")
+}
+
+Rel(user, api, "Uses", "HTTPS")
+Rel(api, db, "Reads/Writes", "Sync, JDBC")
+```
+
+### 2.4 自律的解決ループ (Autonomy Loop)
+コードから設計意図が読み取れない場合のフロー。
+
+1.  **Code Archaeology:** `git blame` でそのコードを書いたコミットを探し、コミットメッセージや紐づくPRを読む。
+2.  **Conservative Update:** 意図が不明な場合、無理に「あるべき姿」に補正せず、「コードにある通り」の依存関係を図示する。（現状可視化が最優先）
+3.  **Annotation:** 図の中に `Note: この依存関係は循環参照の疑いあり` といった注釈を入れる。
 
 ---
 
 ## 3. Closing Phase Criteria (for State 3)
 
-タスク完了時に、以下の手順で最終監査を行い、品質を保証してください。
+タスク完了時に、以下の完全性チェックを実行してください。
 
 ### 3.1 最終監査 (Final Audit)
-以下の手順で成果物を精査し、自信を持って「Yes」と回答できるか確認します。
+更新したドキュメント (`docs/architecture/xxx.md`) に対してチェックを行います。
 
-1.  **成果物の再読:** `read_file` を用いて、更新したドキュメントを読み込む。
-2.  **チェックリストの消込:**
-    *   **[抽象度]** クラス図になっていないか？（C4 Componentレベルを維持）
-    *   **[凡例]** 矢印の意味や向きが正しいか？
-    *   **[現状一致]** コードの実態を正確に反映しているか？
-    *   **[説明責任]** 図だけでなく、補足テキストで設計意図が説明されているか？
-    *   **[整合性]** `docs/system-context.md` や関連ADRと矛盾していないか？
+1.  **現物一致:** 図にあるコンポーネントは、ファイルシステム上に実在するか？ 逆に、重要なファイルが図から漏れていないか？
+2.  **方向の正当性:** 矢印の向き（依存方向）は正しいか？（通常、`Importする側 -> Importされる側` または `呼ぶ側 -> 呼ばれる側`）
+3.  **抽象度:** クラス図（Level 4）レベルの詳細すぎる情報が混ざっていないか？（主要なインターフェースとクラスのみに絞る）
+4.  **凡例:** ユーザーが図を読むための「凡例（Legend）」や、各要素の説明（Description）は記述されているか？
 
 ### 3.2 成果物の定着
-`~/.gemini/GEMINI.md` の **「プルリクエストの管理 (PR Protocol)」** に従い、提出してください。
-*   **PR Body:** 変更点（どのコンポーネントを追加/削除したか）と、その根拠となるコードの場所を明記する。
+`~/.gemini/GEMINI.md` の **「プルリクエストの管理 (PR Protocol)」** に従い、PRを作成します。
+
+*   **PR Title:** `docs: update C4 model reflecting latest code changes`
+*   **PR Body:**
+    *   **更新概要:** Redisコンテナの追加と、決済コンポーネントの依存関係修正。
+    *   **根拠:** `src/infra/cache.py` の追加に伴う反映。
+    *   **特記事項:** AuthServiceの依存違反を発見したため、別途Issue #XYZ を起票済み。

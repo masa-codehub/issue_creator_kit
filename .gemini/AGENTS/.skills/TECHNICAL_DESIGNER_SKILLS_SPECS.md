@@ -11,76 +11,139 @@
 計画策定時に、以下の情報を「能動的偵察 (Active Reconnaissance)」によって収集し、Todoリストの具体化に利用してください。
 
 ### 1.1 能動的偵察 (Active Reconnaissance)
-*   **Issue分析:** `issue_read` で要件と依存関係を確認する。特に「完了定義（Definition of Done）」を明確にする。
-*   **SSOTの精読:** `read_file` で関連するADR (`reqs/design/_approved/`) や Design Doc を読み込み、ユビキタス言語、制約、検証基準を完全に把握する。
+以下のコマンドと視点を用いて、仕様策定に必要な「未確定要素」を洗い出します。
+
+*   **Issue分析:**
+    *   `issue_read` を実行し、Acceptance Criteria（受け入れ基準）を特定する。
+    *   *Check:* 「何ができたら完了か」が不明瞭な場合、仮説を立ててTodoに「完了定義の合意」を追加する。
+*   **SSOTの精読とギャップ特定:**
+    *   `read_file("reqs/design/_approved/adr-XXX.md")` を実行。
+    *   *Focus:* アーキテクチャで「決定されたこと（制約）」と「決定されていないこと（実装詳細）」の境界線を明確にする。
+    *   *Output Example in Memory:* `[Analysis] ADR-005ではDB製品はPostgreSQLと決まっているが、テーブル設計は未定。`
 *   **既存パターンの調査:**
-    *   `glob("docs/specs/**/*.md")` で既存仕様書を特定し、構造を模倣する。
-    *   `search_code` で `src/` 内の既存実装パターン（Baseクラス、共通エラーハンドリング等）を調査し、再利用可能な要素を特定する。
+    *   `glob("docs/specs/**/*.md")` で既存仕様書を探し、フォーマットを統一する。
+    *   `search_code(pattern="class Base.*Controller")` 等で、継承すべき基底クラスや利用すべき共通ライブラリ（Logger, ExceptionHandler）を特定する。
 
 ### 1.2 作業ブランチの計画
 *   **Action:** `~/.gemini/GEMINI.md` の **「1. Gitによるバージョン管理」** に従い、作業用ブランチを作成するタスクをTodoの先頭に追加する。
+    *   *Naming:* `feature/spec-issue-{Issue番号}`
 
 ### 1.3 リスク評価 (Specific Context)
-`~/.gemini/GEMINI.md` の **「3. プロジェクト進行 > 3. リスク評価」** を参照し、特に以下の観点を追加で考慮する。
-*   **実装可能性:** 提案する仕様は、現在の技術スタックとスケジュールで実現可能か？
-*   **影響範囲:** 既存のAPIやDBスキーマへの変更が、他の機能に予期せぬ副作用を与えないか？
+Todo作成時に、以下の観点でリスクを評価し、対策タスクを追加する。
+
+*   **実装可能性:** 「このライブラリで本当にその要件を満たせるか？」 -> *Task:* `[ ] プロトタイプコードによるライブラリ動作検証`
+*   **データ整合性:** 「DBスキーマ変更で既存データが壊れないか？」 -> *Task:* `[ ] マイグレーション手順とロールバック計画の策定`
+*   **影響範囲:** 「API変更でフロントエンドが壊れないか？」 -> *Task:* `[ ] 影響を受けるクライアントコードの特定`
 
 ---
 
 ## 2. Execution Phase Actions (for State 2)
 
-Todoを実行する際、以下の思考プロセスと記述ガードレールを遵守してください。
+Todoを実行する際、以下のステップで具体化を進めます。各ステップで「思考の過程」をログに残してください。
 
 ### 2.1 設計案の具体化 (Hypothesis - Step 1: Drafting)
-インプット情報を元に、まず具体的な実装設計案を立案します。
+インプット情報を元に、以下の項目について具体的な実装設計案を立案します。
 
-*   **コンポーネント設計:**
-    *   必要なクラス、モジュール、関数の責務と依存関係を定義する。
-    *   *Check:* 既存のレイヤー構造（Controller, Service, Repository等）に従っているか？
-*   **データモデル設計:**
-    *   ER図、テーブル定義、JSONスキーマを設計する。
-    *   *Check:* 将来の拡張性を考慮したデータ型になっているか？
-*   **インタラクション設計:**
-    *   Mermaid記法を用いてシーケンス図を作成し、データフローとトランザクション境界を可視化する。
-    *   *Check:* 正常系だけでなく、例外系（エラーフロー）も網羅されているか？
+#### A. コンポーネント詳細設計
+クラスやモジュールの責務とシグネチャを定義します。
+
+**Output Template (Markdown):**
+```markdown
+### コンポーネント設計案
+- **Class:** `PaymentService` (src/usecase/payment_service.py)
+    - **責務:** 決済処理のオーケストレーション。外部API呼び出しとDBトランザクション管理。
+    - **依存:** `IPaymentGateway`, `PaymentRepository`
+    - **Methods:**
+        - `process_payment(order_id: UUID, amount: Decimal) -> PaymentResult`
+            - *Pre-condition:* Orderステータスが 'PENDING' であること。
+            - *Post-condition:* 決済成功時、Orderステータスを 'PAID' に更新。
+            - *Exception:* `InsufficientFundsError` は `402 Payment Required` にマッピング。
+```
+
+#### B. データモデル設計
+永続化層の設計を行います。
+
+**Output Template (Markdown):**
+```markdown
+### データモデル設計案
+- **Table:** `payments`
+    - **Columns:**
+        - `id`: UUID (PK)
+        - `amount`: Decimal(10, 2) (Not Null)
+        - `status`: Varchar(20) (Enum: PENDING, SUCCESS, FAILED)
+        - `created_at`: Timestamp (Default: Now)
+    - **Indexes:** `idx_payments_order_id` (検索用)
+    - **Migration:** 安全性のため `AddField` のみ実施。破壊的変更なし。
+```
+
+#### C. インタラクション設計 (Sequence Diagram)
+処理の流れとトランザクション境界を可視化します。
+
+**Output Template (Mermaid):**
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant S as PaymentService
+    participant DB as Database
+    participant G as Gateway
+
+    C->>S: process_payment()
+    S->>DB: Begin Transaction
+    S->>G: charge()
+    alt Success
+        G-->>S: OK
+        S->>DB: Update Status 'PAID'
+        S->>DB: Commit
+        S-->>C: 200 OK
+    else Failed
+        G-->>S: Error
+        S->>DB: Rollback
+        S-->>C: 402 Payment Required
+    end
+```
 
 ### 2.2 整合性とインパクトの分析 (Integrity - Step 2: Validation)
-`~/.gemini/GEMINI.md` の **「2. SSOT精査と整合性検証プロトコル」** を実行し、設計案の妥当性を証明します。
+作成した設計案を検証し、結果を記録します。
 
-1.  **Fresh Read:** 関連ADRや `docs/system-context.md` を再読。
-2.  **整合性チェック:** 設計案がアーキテクチャ原則（Clean Architecture等）やユビキタス言語と矛盾していないか検証する。
-3.  **トレードオフ分析:** 「理想的な設計」と「現実的な実装コスト」のバランスを評価し、採用理由を明確にする。
+*   **アーキテクチャ検証:** `docs/system-context.md` の制約（例：レイヤー依存ルール）を守っているか？
+    *   *Check:* Service層からController層をimportしていないか？
+*   **トレードオフ分析:**
+    *   *Thinking Process:* 「パフォーマンス優先でキャッシュを使うか、整合性優先で都度DB参照するか？」
+    *   *Decision:* 「今回は決済に関わるため、整合性を最優先しキャッシュは使用しない（ADR-002準拠）」
 
 ### 2.3 自律的解決ループ (Autonomy Loop)
-不明点や曖昧さがある場合、安易にユーザーに質問せず、以下のプロセスで解決します。
+不明点がある場合の行動フローです。
 
-1.  **自己解決:** コードベースや過去のIssueを徹底的に調査し、答えを見つける。
-2.  **仮説構築:** 調査でも確定できない場合、「最も合理的と思われる仮説」を立て、それを仕様として記述する。
-3.  **意思決定の仰ぎ:** 重大なトレードオフやSSOTとの矛盾がある場合のみ、論点を整理してユーザーに判断を求める。
-    *   *Note:* 質問は「どうすればいいですか？」ではなく「A案とB案があり、Xの理由でA案を推奨しますが、承認いただけますか？」という形式にする。
+1.  **Search First:** `grep` や `git log` で類似の過去事例を探す。
+2.  **Hypothesize:** 「おそらくこうすべき」という仮説を立てる。
+3.  **Validate:** 仮説に基づいたプロトタイプコード（`temp_script.py`など）を書いて動作確認する。
+4.  **Decide or Ask:**
+    *   確信が持てれば決定事項として仕様書に書く。
+    *   ADRと矛盾するレベルの変更が必要なら、理由と案を添えてIssueコメントで質問する。
 
 ### 2.4 ドキュメント作成 (Documentation)
-*   `docs/template/spec-template.md` (存在する場合) や既存の仕様書をベースに、詳細仕様書を作成または更新する。
-*   **Rule:** 「多分」「おそらく」といった曖昧な表現を排除し、断定的な表現（MUST, SHOULD）を使用する。
+検証済みの内容を正式なドキュメント (`docs/specs/xxx.md`) に落とし込みます。
+既存の `docs/template/spec-template.md` がある場合は必ずそれを使用してください。
 
 ---
 
 ## 3. Closing Phase Criteria (for State 3)
 
-タスク完了時に、以下の手順で最終監査を行い、品質を保証してください。
+タスク完了時に、以下の完全性チェックを実行してください。
 
 ### 3.1 最終監査 (Final Audit)
-以下の手順で成果物を精査し、自信を持って「Yes」と回答できるか確認します。
+成果物 (`docs/specs/xxx.md`) に対して、以下の質問に全て「YES」で答えられるか確認します。
 
-1.  **成果物の再読:** `read_file` を用いて、完成した仕様書を読み込む。
-2.  **チェックリストの消込:**
-    *   **[明確性]** 曖昧な表現がなく、開発者が実装迷子にならないか？
-    *   **[具体性]** 型定義、メソッドシグネチャ、エンドポイントパスが具体的か？
-    *   **[網羅性]** エラーハンドリングやエッジケースが記述されているか？
-    *   **[一貫性]** 用語がユビキタス言語と統一されているか？
-    *   **[視覚化]** 複雑なロジックが図解（Mermaid）されているか？
-    *   **[SSOT]** 上位のADR/Design Docとの整合性が保たれているか？
+1.  **実装可能性:** このドキュメントをBACKENDCODERに渡した際、質問なしで実装を開始できるか？（型、パス、エラーコードは具体的か？）
+2.  **トレーサビリティ:** どのADRに基づいているかリンクがあるか？
+3.  **異常系網羅:** ネットワークエラー、バリデーションエラー時の挙動は定義されているか？
+4.  **SSOT整合:** 用語は `docs/system-context.md` のユビキタス言語と一致しているか？
 
 ### 3.2 成果物の定着
-`~/.gemini/GEMINI.md` の **「プルリクエストの管理 (PR Protocol)」** に従い、提出してください。
-*   **PR Body:** 仕様のポイントと、考慮したトレードオフ、参照したADRへのリンクを明記する。
+`~/.gemini/GEMINI.md` の **「プルリクエストの管理 (PR Protocol)」** に従い、PRを作成します。
+
+*   **PR Title:** `docs: add payment logic specification for issue #123`
+*   **PR Body:**
+    *   **概要:** 決済処理の詳細仕様策定
+    *   **主要な決定:** 整合性重視のためキャッシュ不使用とした点
+    *   **参照:** ADR-005, Issue #123
