@@ -1,152 +1,73 @@
-# アーキテクチャ可視化 (Architecture Visualization)
+# スキル: アーキテクチャ可視化 (Architecture Visualization)
 
-システムの現状（Current State）を正確に把握し、全体像を見失わないようにするためのプロセスです。コードベースの変更に合わせて定期的に更新し、開発者のメンタルモデルと実際のコードを一致させます。
+**システムの現状（Current State）を正確に把握し、全体像を見失わないようにするためのプロセスです。** コードベースの変更に合わせて定期的に更新し、開発者のメンタルモデルと実際のコードを一致させます。
 
-### Step 0: インプットと現状の把握 (Observe)
+このドキュメントは、TECHNICAL_DESIGNER が `~/.gemini/GEMINI.md` の「プロジェクト進行フレームワーク（State Machine）」を実行する際に参照するデータソースです。
 
-1.  **担当Issueと依存関係の確認:**
-    1.  `issue_read(method="get", issue_number=XXX)` を実行し、アーキテクチャ更新の目的と範囲を把握する。
-    2.  `issue_read(method="get_sub_issues", issue_number=XXX)` を使い、依存タスク（子Issue）が全て **CLOSED** になっていることを確認する。完了していない場合は作業を開始せず報告する。
+---
 
-2.  **作業ブランチの準備:**
-    1.  **ベースブランチの特定:** 担当Issueの記述（本文やコメント）を確認し、作業の基点となる「ベースブランチ」の指定がないか確認する（明示がなければ `main` をベースとする）。
-    2.  **ベースの最新化:** `run_shell_command("git checkout <base_branch> && git pull")` を実行し、ベースブランチをリモートの最新状態に同期する。
-    3.  **作業ブランチの作成:** `create_branch` (または `git checkout -b`) を使用し、Issue番号を含んだ作業用ブランチ（例: `feature/arch-update-issue-XXX`）をベースブランチから作成する。
+## 1. Planning Phase Inputs (for State 1)
 
-3.  **先行タスク成果物の実在検証 (Verification of Deliverables):**
-    1.  **成果物の特定:** `issue_read(method="get_comments", issue_number=XXX)` を実行し、子Issueの完了報告コメントから「Pull Request番号」や「作成されたファイルパス」の情報を特定する。
-    2.  **変更内容の把握:** PR番号が特定できた場合は `pull_request_read(method="get_diff", pullNumber=YYY)` を、ファイルパスのみの場合は `read_file` を実行し、アーキテクチャ図に反映すべき「新しい構造的事実」を抽出する。
-    3.  **実在確認:** `list_directory` や `read_file` を使い、特定した主要な変更ファイルがファイルシステム上に実際に存在することを自分の目で確認する。
+計画策定時に、以下の情報を「能動的偵察 (Active Reconnaissance)」によって収集し、Todoリストの具体化に利用してください。
 
-3.  **コードベースの構造と実行単位の調査:**
-    1.  `list_directory(dir_path="src/")` を実行し、最新のパッケージ構成を確認する。
-    2.  **インフラ構成の確認:** `read_file(file_path="docker-compose.yml")`, `Dockerfile`, `Procfile` 等を読み込み、システムがどのような「実行プロセス（コンテナ）」で構成されているかを特定する。
-    3.  `read_file(file_path="pyproject.toml")` (または `package.json` 等) を読み込み、外部依存ライブラリの追加・変更を確認する。
-    4.  `glob(pattern="src/**/*.py")` (プロジェクトの言語に合わせて拡張子を調整) を活用し、主要なエントリポイント、モジュール、クラスの配置を特定する。
+### 1.1 能動的偵察 (Active Reconnaissance)
+*   **コード構造の把握:** `list_directory("src/")` や `glob("**/*.py")` で最新のパッケージ構成を確認する。
+*   **実行環境の調査:** `read_file("docker-compose.yml")`, `Dockerfile` 等で実行プロセス（コンテナ）構成を特定する。
+*   **外部依存の確認:** `pyproject.toml` 等でライブラリ依存関係を確認する。
+*   **既存ドキュメントの確認:** `docs/system-context.md`, `docs/architecture/c4-model.md` を読み込み、現状の記述を確認する。
 
-4.  **既存アーキテクチャドキュメントの確認:**
-    1.  `read_file(file_path="docs/system-context.md")` および `docs/architecture/c4-model.md` を読み込む。
-    2.  `read_file(file_path="docs/template/c4-model-template.md")` を読み込み、記述フォーマットを確認する。
-    3.  **ギャップ分析:** Step 0-2 (先行成果物) および Step 0-3 (コード実態) と、現在のドキュメントを比較し、As-Is / To-Be の形式で乖離を特定する。
+### 1.2 作業ブランチの計画
+*   **Action:** `~/.gemini/GEMINI.md` の **「1. Gitによるバージョン管理」** に従い、作業用ブランチを作成するタスクをTodoの先頭に追加する。
 
-    **分析結果アウトプット例（作業ログ）**
-    ```markdown
-    ## ギャップ分析レポート
+### 1.3 リスク評価 (Specific Context)
+`~/.gemini/GEMINI.md` の **「3. プロジェクト進行 > 3. リスク評価」** を参照し、特に以下の観点を追加で考慮する。
+*   **正確性:** 図が現実のコードと乖離していないか？（嘘の図は無いより悪い）
+*   **抽象度:** 詳細すぎず、概略すぎない適切な粒度（C4モデルのLevel 2/3）か？
 
-    | 対象コンポーネント | As-Is (コードの実態) | To-Be (ドキュメント記述) | 対応方針 |
-    | :--- | :--- | :--- | :--- |
-    | `PaymentGateway` | `src/infrastructure/external/` に新規実装済み。 | 外部システムとしてContext図に追加。 | `docs/system-context.md` の更新案を作成 |
-    | `UserService` | `NotificationService` に依存。 | 依存関係の矢印が不足している。 | `docs/architecture/c4-model.md` の更新案を作成 |
-    ```
+---
 
-### Step 1: 構造化と図解ドラフト作成 (Orient)
+## 2. Execution Phase Actions (for State 2)
 
-Step 0 の**ギャップ分析結果（As-Is/To-Be）に基づき**、ADR等の一次情報源と照らし合わせながら詳細定義を行い、ドラフトを作成します。
+Todoを実行する際、以下の思考プロセスと記述ガードレールを遵守してください。
 
-1.  **コンテナレベルの分析・定義 (Level 2):**
-    1.  **フォーマットの確認:** `read_file(file_path="docs/template/c4-model-template.md")` を読み込む。
-    2.  **更新対象の特定:** ギャップ分析レポートに基づき、新規追加・変更があった「実行プロセス（docker-composeのservice等）」に焦点を当てる。
-    3.  **選定分析:** 各プロセスについて、アーキテクチャ図に「コンテナ」として載せるべきか判断する。
-        - **Check:** `search_file_content` 等を用いて関連するADRを検索し、そのコンテナ構成が `reqs/design/_approved/` 内の方針（マイクロサービス化等）と整合しているか確認する。
+### 2.1 ギャップ分析 (Hypothesis - Step 1: Gap Analysis)
+現状のドキュメント（To-Beと思っていたもの）と、コードの実態（As-Is）を比較します。
 
-    **選定分析アウトプット例**
-    ```markdown
-    | プロセス名 | 採用/不採用 | 判断理由 |
-    | :--- | :--- | :--- |
-    | `api` | **採用** | システムのメイン機能を担うWeb/APIサーバーであるため。 |
-    | `worker` | **採用** | メイル送信や集計など、アーキテクチャ上重要な非同期処理を担うため。 |
-    | `redis` | **採用** | キューおよびキャッシュとして、コンテナ間の連携に不可欠なミドルウェアであるため。 |
-    | `log-router` | **不採用** | インフラ補助的なサイドカーであり、ビジネスロジックには直接関与しないため省略。 |
-    ```
+*   **コンテナレベル:** 新規追加されたサービスや削除されたサービスはないか？
+*   **コンポーネントレベル:** パッケージ構成の変更により、コンポーネントの責務や境界が変わっていないか？
+*   **関係性:** 新たな依存関係や、禁じられた依存（Architecture Violation）が発生していないか？
 
-    4.  採用したコンテナの **技術スタック** と **主要な責務** を定義する。
+### 2.2 構造定義と図解 (Hypothesis - Step 2: Drafting)
+ギャップを埋めるための修正案を作成します。
 
-2.  **コンポーネントレベルの分析・定義 (Level 3):**
-    1.  **更新対象の特定:** ギャップ分析で特定されたコンテナ、またはモジュール構成に変更があったコンテナを選択する。
-    2.  **コンポーネント分析:** パッケージ構造や主要クラスを調査し、アーキテクチャ的に意味のある「論理グループ」を特定・グルーピングする。
-        - **Action:** 必要に応じて `read_file` で主要クラスのソースコード（import文やクラス定義）を読み込み、実際の依存関係や責務を確認する。
-        - **Check:** 特定したコンポーネント粒度は、プロジェクトの設計原則（Clean Architecture等）における「層」や「責務」と一致しているか？
+*   **コンポーネント定義:** 論理的なグルーピングを行い、責務を明確にする。
+*   **関係性定義:** 依存の方向（Uses, Persists, etc.）を定義する。
+*   **Mermaid記述:** `docs/template/c4-model-template.md` (存在する場合) に従い、Mermaid記法で図を作成する。
 
-    **コンポーネント分析アウトプット例**
-    ```markdown
-    | パッケージ/クラス | 分析 | コンポーネント定義 |
-    | :--- | :--- | :--- |
-    | `src/interface/controllers/payment_*.py` | 複数のControllerクラスが存在するが、責務は「決済APIの提供」で共通。 | **PaymentController** (Group) |
-    | `src/usecase/payment_service.py` | ビジネスロジックの中核。単独で重要。 | **PaymentService** (Single Class) |
-    | `src/domain/payment/validator.py` | Serviceから呼ばれる補助クラス。単独で図示すると細かすぎる。 | -> PaymentServiceに内包させる（図示しない） |
-    | `src/infra/db/payment_repo.py` | DBアクセスの抽象化。アーキテクチャ的に重要。 | **PaymentRepository** |
-    ```
+### 2.3 自律的解決ループ (Autonomy Loop)
+不明点（例: この依存関係は意図的かバグか？）がある場合、安易にユーザーに質問せず、以下のプロセスで解決します。
 
-    3.  特定したコンポーネントの **種類** と **責務** を定義する。
+1.  **自己解決:** コードの履歴（git log）や関連するPR/Issueを調査し、変更の意図を特定する。
+2.  **現状優先:** 意図が不明でも、まずは「現状のコード構造」を正として図に反映させる（可視化が目的なので）。ただし、明らかにアーキテクチャ違反と思われる箇所はNoteで注釈を入れる。
+3.  **報告:** 重大な違反を発見した場合は、別途Issue起票などの提案を行う。
 
-    **コンポーネント定義アウトプット例**
-    ```markdown
-    | コンポーネント名 | 種類 (Component Type) | 責務 (Responsibility) |
-    | :--- | :--- | :--- |
-    | **PaymentController** | FastAPI Router | HTTPリクエストのバリデーション、レスポンスのシリアライズ、Serviceの呼び出し。 |
-    | **PaymentService** | Service Class | 決済ビジネスロジックの実行、外部決済ゲートウェイとの連携、トランザクション管理。 |
-    | **PaymentRepository** | SQLAlchemy DAO | 決済データの永続化、DBクエリの実行、ドメインエンティティへのマッピング。 |
-    | **AuthMiddleware** | Middleware | 全てのリクエストに対するJWT認証の実行、ユーザーコンテキストの注入。 |
-    ```
+---
 
-3.  **関係性の定義 (Relationship):**
-    1.  特定した要素間の **「依存の向き」** と **「通信手段/呼び出し方法」** を定義する。
-    2.  **依存方向の検証:** 定義した依存関係が、上位レベルから下位レベルへの依存（またはDIPによる逆転）となっており、**循環参照や不正な依存（Infrastructure -> Domain等）がないか**を確認する。
+## 3. Closing Phase Criteria (for State 3)
 
-    **アウトプット例**
-    ```markdown
-    - `PaymentController` -> `PaymentService` (Function Call) [OK: Interface -> Usecase]
-    - `PaymentRepository` -> `Database` (SQL/JDBC) [OK: Infra -> External]
-    - `PaymentRepository` -> `PaymentService` (Function Call) [NG: Infra -> Usecase. Should use Interface/DIP]
-    ```
+タスク完了時に、以下の手順で最終監査を行い、品質を保証してください。
 
-4.  **Mermaidドラフトの作成:**
-    1.  定義した内容を統合し、テンプレートに沿って Mermaid 記法のドラフトを作成する。
-    2.  L1 (System Context) の更新が必要な場合は、`docs/system-context.md` の修正案も併せて作成する。
+### 3.1 最終監査 (Final Audit)
+以下の手順で成果物を精査し、自信を持って「Yes」と回答できるか確認します。
 
-    **Mermaidドラフト例**
-    ```mermaid
-    C4Component
-    title Component Diagram - Payment Service
-    
-    Container_Boundary(api, "API Application") {
-        Component(ctrl, "PaymentController", "FastAPI", "Handles payment requests")
-        Component(svc, "PaymentService", "Python", "Business logic for payments")
-        Component(repo, "PaymentRepository", "SQLAlchemy", "Persists payment data")
-        
-        Rel(ctrl, svc, "Uses")
-        Rel(svc, repo, "Uses")
-    }
-    ```
+1.  **成果物の再読:** `read_file` を用いて、更新したドキュメントを読み込む。
+2.  **チェックリストの消込:**
+    *   **[抽象度]** クラス図になっていないか？（C4 Componentレベルを維持）
+    *   **[凡例]** 矢印の意味や向きが正しいか？
+    *   **[現状一致]** コードの実態を正確に反映しているか？
+    *   **[説明責任]** 図だけでなく、補足テキストで設計意図が説明されているか？
+    *   **[整合性]** `docs/system-context.md` や関連ADRと矛盾していないか？
 
-### Step 2: 自己レビューとドキュメントの最終化 (Act)
-
-作成したドラフトを客観的な視点で検証し、公式ドキュメントとして反映・公開します。
-
-1.  **ドラフトと基準情報の読み込み:**
-    1.  `read_file(file_path="...")` を使用して、Step 1 で作成した図解のドラフト内容を読み込む。
-    2.  **基準情報の再確認:** 検証の基準として、以下の情報を読み込み（または再確認）する。
-        - 担当Issue: `issue_read(method="get", issue_number=XXX)`
-        - システムコンテキスト: `read_file(file_path="docs/system-context.md")`
-        - 関連するADR: `read_file(file_path="reqs/design/_approved/adr-XXX.md")`
-    3.  作成したドラフトが、Step 0 で特定したギャップ（As-Is/To-Be）を過不足なく解消しているか再確認する。
-
-2.  **自己レビュー (Self-Review):**
-    1.  以下の **「アーキテクチャ図品質チェックリスト」** に基づいて検証を行う。
-
-    **アーキテクチャ図品質チェックリスト**
-    - [ ] **抽象度の統一:** C1にクラス名が混ざっていないか？ C3に詳細なインフラ設定が混ざっていないか？
-    - [ ] **凡例と方向:** 矢印の意味は明確か？ 向きは正しいか（通常は依存元 -> 依存先）？
-    - [ ] **現状一致:** 図の内容は「現在のコード（現実）」を正確に反映しているか？
-    - [ ] **説明責任:** 図だけでは伝わらない設計意図が、テキストで補足されているか？
-    - [ ] **整合性 (Consistency):** 担当Issueの要件、`docs/system-context.md`、関連ADRと矛盾していないか？
-    - [ ] **適正範囲 (Scope):** 必要な要素の漏れ（不足）や、要求されていない過剰な構造（Over-Engineering）がないか？
-
-3.  **ドキュメントの更新と Git 反映:**
-    1.  `write_file` または `replace` を使用して、対象ファイル（`docs/system-context.md` または `docs/architecture/c4-model.md`）を正式に更新する。
-    2.  **成果物の記録:** `run_shell_command` を使い、`git add`, `git commit -m "docs: update architecture diagram for [Issue名]"`, `git push` を実行する。
-    3.  **PRの作成:** `create_pull_request` で、設計変更を明示したプルリクエストを作成する（既にPRが存在する場合は不要）。
-
-4.  **完了報告とハンドオフ:**
-    1.  担当Issueにコメントし、更新したドキュメントのパスとPRのURLを報告する。
-    2.  **PMへの通知:** `PRODUCT_MANAGER` に対し、最新のアーキテクチャに基づいた実装計画の策定を依頼する。
+### 3.2 成果物の定着
+`~/.gemini/GEMINI.md` の **「プルリクエストの管理 (PR Protocol)」** に従い、提出してください。
+*   **PR Body:** 変更点（どのコンポーネントを追加/削除したか）と、その根拠となるコードの場所を明記する。
