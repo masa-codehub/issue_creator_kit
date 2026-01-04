@@ -12,10 +12,13 @@ ADR-002（ドキュメント承認フローの自動化）において、Markdow
 ```markdown
 ---
 title: "タイトル"
-labels: ["task", "P1"]
+labels:
+  - task
+  - P1
 roadmap: "reqs/roadmap/active/roadmap-xxx.md"
 task_id: "T1-1"
-depends_on: ["issue-T1-0.md"]
+depends_on:
+  - issue-T1-0.md
 next_phase_path: "reqs/tasks/drafts/phase-2/"
 status: "Draft"
 ---
@@ -27,14 +30,14 @@ status: "Draft"
 
 ADR-003 の仮想キューおよびフェーズ連鎖を制御するために、以下のフィールドを厳密に定義する。
 
-| フィールド名 | 必須 | 型 | 説明 | バリデーションルール |
+| フィールド名 | 必須 (◯:必須, △:推奨, ×:任意) | 型 | 説明 | バリデーションルール |
 | :--- | :---: | :--- | :--- | :--- |
 | `title` | ◯ | `str` | タスクのタイトル。Issue 起票時のタイトルに使用される。 | 1文字以上。 |
 | `labels` | △ | `list[str]` | Issue に付与するラベルのリスト。 | リスト形式。文字列以外は無視。 |
 | `roadmap` | ◯ | `str` | 関連するロードマップファイルへの相対パス。 | 有効な相対パス形式。 |
-| `task_id` | ◯ | `str` | ロードマップ WBS テーブル内の ID と一致する一意な識別子。 | アルファベット+数字+ハイフンの形式（例: `T1-1`）。 |
+| `task_id` | ◯ | `str` | ロードマップ WBS テーブル内の ID と一致する一意な識別子。 | 正規表現 `^T\d+-\d+$` にマッチする形式（例: `T1-1`）。 |
 | `depends_on` | × | `list[str]` | 依存するタスクファイル名（拡張子込み）のリスト。 | リスト形式。存在しないファイルは警告ログ。 |
-| `next_phase_path` | × | `str` | フェーズ最終タスク完了後に移動させる Draft ディレクトリのパス。 | `reqs/tasks/drafts/` で始まり `/` で終わるパス。 |
+| `next_phase_path` | × | `str` | フェーズ最終タスク完了後に移動させる Draft ディレクトリのパス。フェーズ内の最終タスクでのみ設定する。 | `reqs/tasks/drafts/` で始まり `/` で終わるパス。フェーズ最終タスク以外では未指定または空文字。 |
 | `status` | ◯ | `str` | タスクの状態。 | `Draft`, `Archived` のいずれか。 |
 | `issue` | × | `int` | 起票された Issue の番号。ICK が自動的に書き込む。 | 1以上の整数。 |
 

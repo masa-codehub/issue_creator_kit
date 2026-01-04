@@ -1,14 +1,14 @@
 ---
 title: "タスクタイトル"
-labels:
+labels: # △ 推奨: タスク種別・優先度・担当ロールなど必要なラベルを設定すること（詳細は metadata-logic-spec.md 参照）
   - "task"
   - "P1" # Priority: P0 (Critical), P1 (High), P2 (Medium), P3 (Low)
   - "BACKENDCODER" # Role: BACKENDCODER, SYSTEM_ARCHITECT, TECHNICAL_DESIGNER, etc.
-roadmap: "reqs/roadmap/active/roadmap-xxx.md" # 必須: 関連するロードマップへの相対パス（同期エンジンが使用）
-task_id: "TX-Y" # 必須: ロードマップ WBS と一致するタスクID（同期エンジンが使用）
-depends_on: [] # オプション: 依存するタスクファイル名のリスト（例: ["issue-T1-1.md"]）。Topological Sort に使用。
-next_phase_path: "" # フェーズ最終タスクのみ記述。次フェーズの Draft パス（例: "reqs/tasks/drafts/adr-xxx/phase-2/"）
-status: "Draft" # 初期値は "Draft"
+roadmap: "reqs/roadmap/active/roadmap-xxx.md" # ◯ 必須: 関連するロードマップへの相対パス（同期エンジンが使用）
+task_id: "T1-1" # ◯ 必須: ロードマップ WBS と一致するタスクID（同期エンジンが使用。例: T1-1）
+depends_on: [] # × 任意: 依存するタスクファイル名のリスト（例: ["issue-T1-1.md"]）。Topological Sort に使用。
+next_phase_path: "" # × 任意: フェーズ最終タスクのみ記述。次フェーズの Draft パス（例: "reqs/tasks/drafts/phase-2/"）
+status: "Draft" # ◯ 必須: 初期値は "Draft"。有効な値: "Draft" または "Archived"
 # issue: # 起票後に ICK が自動追記。手動入力は不要。
 ---
 # {{title}}
