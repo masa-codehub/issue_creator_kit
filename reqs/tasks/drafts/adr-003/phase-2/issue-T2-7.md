@@ -17,9 +17,9 @@ status: "Draft"
 - **Task ID**: T2-7
 
 ## 1. 目的と背景 (Goal & Context)
-- **As-is (現状)**: Phase 2 の実装と検証が完了。
-- **To-be (あるべき姿)**: 成果物を `main` にマージし、Phase 3 を開始する。これが成功すれば、理論上 Auto-PR により Phase 3 の準備が自動で整うはずである。
-- **Design Evidence (設計の根拠)**: ADR-003
+- **As-is (現状)**: Phase 2 の実装（仮想キュー、Auto-PR ロジック等）が `feature/phase-2-foundation` で完了している。
+- **To-be (あるべき姿)**: `feature/phase-2-foundation` が `main` にマージされる。本システム自体が「仮想キュー」を処理できる状態になり、Auto-PR によって Phase 3 が自動的に提案される。
+- **Design Evidence (設計の根拠)**: ADR-003 第 3 項「自己推進型ワークフロー」
 
 ## 2. 参照資料・入力ファイル (Input Context)
 - [ ] `reqs/tasks/drafts/adr-003/phase-3/` (次フェーズの存在確認)
@@ -27,21 +27,23 @@ status: "Draft"
 ## 3. 実装手順と制約 (Implementation Steps & Constraints)
 
 ### 3.1. 負の制約 (Negative Constraints)
-- [ ] なし
+- [ ] **前提条件**: T2-6 (統合検証) が成功していること。
 
 ### 3.2. 実装手順 (Changes)
-- [ ] **監査**: コード品質、テストカバレッジの最終チェック。
-- [ ] **Git操作**: `feature/phase-2-foundation` を `main` へマージ。
+- [ ] **最終レビュー**:
+    - 実装コード、テスト、GitHub Actions 定義の最終監査。
+- [ ] **Git操作**:
+    - `feature/phase-2-foundation` から `main` へのプルリクエストを作成し、マージする。
 
 ### 3.3. 構成変更・削除 (Configuration / Cleanup)
 - なし
 
 ## 4. ブランチ戦略 (Branching Strategy)
-- **ベースブランチ (Base Branch)**: `feature/phase-2-foundation`
-- **作業ブランチ (Feature Branch)**: `feature/T2-7-phase2-review`
+- **ベースブランチ (Base Branch)**: `main`
+- **作業ブランチ (Feature Branch)**: `feature/phase-2-foundation`
 
 ## 5. 検証手順・完了条件 (Verification & DoD)
-- [ ] **観測される挙動**: `main` マージ後、しばらくして Phase 3 用の PR が自動作成されること（今回の実装成果）。
+- [ ] **観測される挙動**: `main` マージ後、ICK（または GitHub Actions）によって Phase 3 の起票 PR が自動作成されること。
 
 ## 6. 成果物 (Deliverables)
-- マージコミット
+- マージされた `main` ブランチの状態
