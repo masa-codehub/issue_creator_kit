@@ -33,6 +33,10 @@ status: "Draft"
 ### 3.2. 実装手順 (Changes)
 - [ ] **ファイル**: `src/issue_creator_kit/usecase/workflow.py`
     - **処理内容**: `PhasePromoter` クラスの実装。
+        - 1. `next_phase_path` の抽出: 起票されたタスクの Frontmatter から次フェーズ情報を取得。
+        - 2. ブランチ作成: `main` から `feature/phase-X-foundation` を作成。
+        - 3. ファイル移動: `drafts/...` から `archive/...` へ（ただし、これはAuto-PRの場合はDraftのまま移動せず、PRのDiffとして表現するのか、Draftフォルダごと移動するのか？ ADRでは「次フェーズのDraftフォルダをDraftとして保持しつつ、作業場所を確保する」あるいは「Draftの内容をArchiveへ移動するPRを作る」とある。ここでは **「次フェーズのDraftフォルダ内のファイルを編集可能にするための準備」** ではなく、ADRの記述「次フェーズ用 Foundation Branch を作成」「移動コミット」「PR作成」を実装する）。
+        - 4. PR作成: `GitHubAdapter.create_pull_request` を呼び出す。
 - [ ] **ファイル**: `tests/unit/usecase/test_workflow.py`
 
 ### 3.3. 構成変更・削除 (Configuration / Cleanup)
@@ -44,6 +48,7 @@ status: "Draft"
 
 ## 5. 検証手順・完了条件 (Verification & DoD)
 - [ ] **自動テスト**: パスすること。
+- [ ] **コード**: `workflow.py` に `PhasePromoter` クラスが存在すること。
 
 ## 6. 成果物 (Deliverables)
 - `workflow.py`

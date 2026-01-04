@@ -31,7 +31,11 @@ status: "Draft"
 
 ### 3.2. 実装手順 (Changes)
 - [ ] **ファイル**: `src/issue_creator_kit/usecase/roadmap_sync.py` (新規)
-    - **処理内容**: ロードマップファイルをパースし、対象行を特定して書き換えるロジック。
+    - **処理内容**: `RoadmapUpdater` クラスの実装。
+        - 入力: 起票された Issue 情報（ファイルパス、Issue番号）。
+        - 処理: 指定されたロードマップファイルを読み込み、行単位で正規表現マッチングを行う。
+        - 置換: `drafts/` を `archive/` に置換し、Issue リンクを追記。
+        - 保存: ファイルを上書き保存。
 - [ ] **ファイル**: `tests/unit/usecase/test_roadmap_sync.py`
 
 ### 3.3. 構成変更・削除 (Configuration / Cleanup)
@@ -43,6 +47,7 @@ status: "Draft"
 
 ## 5. 検証手順・完了条件 (Verification & DoD)
 - [ ] **自動テスト**: パスすること。
+- [ ] **コード**: `roadmap_sync.py` に `RoadmapUpdater` クラスが存在すること。
 
 ## 6. 成果物 (Deliverables)
 - `roadmap_sync.py`

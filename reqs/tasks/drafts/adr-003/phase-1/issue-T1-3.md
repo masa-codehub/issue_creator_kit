@@ -32,11 +32,11 @@ status: "Draft"
 
 ### 3.2. 実装手順 (Changes)
 - [ ] **ファイル**: `reqs/design/_inbox/design-003-logic.md`
-    - **処理内容**:
-        - 起票フロー（Difference Detection -> Issue Creation -> Roadmap Sync）の詳細フローチャート/シーケンス定義。
-        - フェーズ連鎖フロー（Next Phase Detection -> Branch Creation -> File Move -> PR Creation）の詳細定義。
-        - エラー発生時の停止ポイントと通知方法の定義。
-        - 無限ループ防止策の定義。
+    - **処理内容**: 以下のセクションを含む設計書を作成する。
+        - **1. Difference Detection Logic**: `git diff` の解析方法と対象ファイルのフィルタリングルール。
+        - **2. Roadmap Sync Logic**: タスクパスの置換アルゴリズムと競合解決策（Fail-fast）。
+        - **3. Auto-PR Logic**: `next_phase_path` の抽出、ブランチ作成、ファイル移動、PR作成の一連のフロー。
+        - **4. Safety Mechanisms**: 無限ループ防止（循環参照チェック）、部分失敗時のロールバック方針。
 
 ### 3.3. 構成変更・削除 (Configuration / Cleanup)
 - なし
@@ -47,7 +47,7 @@ status: "Draft"
 
 ## 5. 検証手順・完了条件 (Verification & DoD)
 - [ ] **観測される挙動**: Design Doc がプルリクエストとして提出され、承認されること。
-- [ ] **ファイル状態**: `reqs/design/_inbox/design-003-logic.md` が存在し、内容が具体的であること。
+- [ ] **ファイル状態**: `reqs/design/_inbox/design-003-logic.md` が存在し、上記4点のロジックが具体的に記述されていること。
 
 ## 6. 成果物 (Deliverables)
 - 詳細設計書: `reqs/design/_inbox/design-003-logic.md`

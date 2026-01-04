@@ -32,9 +32,12 @@ status: "Draft"
 
 ### 3.2. 実装手順 (Changes)
 - [ ] **ファイル**: `src/issue_creator_kit/usecase/creation.py`
-    - **処理内容**: `DifferenceDetector` クラス等を実装し、`main` へのマージイベントから対象ファイルを特定するロジックを追加。
+    - **処理内容**:
+        - `DifferenceDetector` クラスの実装: `GitAdapter` を使用してマージコミット間の差分ファイルパスを取得。
+        - `IssueFactory` クラスの実装 (または既存拡張): ファイル内容をパースし、Issue オブジェクトを生成。
+        - メインロジック: 検知されたファイル群に対して `create_issue` をループ実行。
 - [ ] **ファイル**: `tests/unit/usecase/test_creation.py`
-    - **処理内容**: TDD によるテスト実装。
+    - **処理内容**: TDD によるテスト実装。ダミーの `GitAdapter` モックを使用。
 
 ### 3.3. 構成変更・削除 (Configuration / Cleanup)
 - なし
@@ -45,6 +48,7 @@ status: "Draft"
 
 ## 5. 検証手順・完了条件 (Verification & DoD)
 - [ ] **自動テスト**: 単体テストがパスすること。
+- [ ] **コード**: `creation.py` に `DifferenceDetector` クラスが存在すること。
 
 ## 6. 成果物 (Deliverables)
 - `creation.py`
