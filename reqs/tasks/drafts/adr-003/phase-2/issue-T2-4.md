@@ -17,38 +17,39 @@ status: "Draft"
 - **Task ID**: T2-4
 
 ## 1. 目的と背景 (Goal & Context)
-- **As-is (現状)**: フェーズ完了後、次のフェーズの準備は手動で行う必要がある。
-- **To-be (あるべき姿)**: `next_phase_path` を検知し、自動的に次フェーズ用のブランチ作成、ファイル移動、PR 作成が行われる。
-- **Design Evidence (設計の根拠)**: `design-003-logic.md`
+- **As-is (現状)**: フェーズが完了しても、次フェーズの準備（移動 PR 作成）は手動で行う必要がある。
+- **To-be (あるべき姿)**: `next_phase_path` メタデータを検知し、自動的に「次フェーズ起票用 PR」が作成される。
+- **Design Evidence (設計の根拠)**: `design-003-logic.md` 第 4 項
 
 ## 2. 参照資料・入力ファイル (Input Context)
 - [ ] `reqs/design/_inbox/design-003-logic.md`
 - [ ] `docs/specs/infra-interface.md`
+- [ ] `docs/specs/test-criteria.md`
 
 ## 3. 実装手順と制約 (Implementation Steps & Constraints)
 
 ### 3.1. 負の制約 (Negative Constraints)
-- [ ] **変更禁止**: 無限ループを引き起こすような再帰呼び出し。
+- [ ] **無限ループ防止**: 同一の `head` ブランチ名が既に存在する場合や、循環参照（P1->P2->P1）を検知した場合は PR 作成を停止すること。
+- [ ] **変更禁止**: `main` ブランチへの直接プッシュ。必ず新ブランチを作成すること。
 
 ### 3.2. 実装手順 (Changes)
-- [ ] **ファイル**: `src/issue_creator_kit/usecase/workflow.py`
-    - **処理内容**: `PhasePromoter` クラスの実装。
-        - 1. `next_phase_path` の抽出: 起票されたタスクの Frontmatter から次フェーズ情報を取得。
-        - 2. ブランチ作成: `main` から `feature/phase-X-foundation` を作成。
-        - 3. ファイル移動: `drafts/...` から `archive/...` へ（ただし、これはAuto-PRの場合はDraftのまま移動せず、PRのDiffとして表現するのか、Draftフォルダごと移動するのか？ ADRでは「次フェーズのDraftフォルダをDraftとして保持しつつ、作業場所を確保する」あるいは「Draftの内容をArchiveへ移動するPRを作る」とある。ここでは **「次フェーズのDraftフォルダ内のファイルを編集可能にするための準備」** ではなく、ADRの記述「次フェーズ用 Foundation Branch を作成」「移動コミット」「PR作成」を実装する）。
-        - 4. PR作成: `GitHubAdapter.create_pull_request` を呼び出す。
-- [ ] **ファイル**: `tests/unit/usecase/test_workflow.py`
+- [ ] **UseCase実装**: `src/issue_creator_kit/usecase/workflow.py`
+    - **PhasePromoter**: `design-003-logic.md` 第 4.2 項のフロー（ブランチ作成、ファイル移動、コミット、PR作成）を実装。
+    - **SafetyMechanisms**: 無限ループ防止用のセット（`visited_phase_paths`）および最大深度チェックを実装。
+- [ ] **テスト実装**: `tests/unit/usecase/test_workflow.py`
+    - **Scenario**: `docs/specs/test-criteria.md` の `AP-001`〜`AP-004` をカバーするテストを記述。
 
 ### 3.3. 構成変更・削除 (Configuration / Cleanup)
 - なし
 
 ## 4. ブランチ戦略 (Branching Strategy)
 - **ベースブランチ (Base Branch)**: `feature/phase-2-foundation`
-- **作業ブランチ (Feature Branch)**: `feature/T2-4-auto-pr-impl`
+- **作業ブランチ (Feature Branch)**: `feature/task-T2-4-auto-pr`
 
 ## 5. 検証手順・完了条件 (Verification & DoD)
-- [ ] **自動テスト**: パスすること。
-- [ ] **コード**: `workflow.py` に `PhasePromoter` クラスが存在すること。
+- [ ] **自動テスト**: `pytest tests/unit/usecase/test_workflow.py` がパスすること（TC: AP-001〜AP-004）。
+- [ ] **観測される挙動**: 循環参照を模した入力に対し、警告ログを出力して PR 作成をスキップすること。
 
 ## 6. 成果物 (Deliverables)
-- `workflow.py`
+- `src/issue_creator_kit/usecase/workflow.py`
+- `tests/unit/usecase/test_workflow.py`

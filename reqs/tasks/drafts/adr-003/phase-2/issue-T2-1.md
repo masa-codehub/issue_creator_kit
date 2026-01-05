@@ -18,7 +18,7 @@ status: "Draft"
 
 ## 1. 目的と背景 (Goal & Context)
 - **As-is (現状)**: Phase 1 が完了し、Phase 2 の開発を開始するための基点が必要。
-- **To-be (あるべき姿)**: `feature/phase-2-foundation` が作成されている。
+- **To-be (あるべき姿)**: Phase 2 の全タスクのベースとなる `feature/phase-2-foundation` が作成・公開されている。
 - **Design Evidence (設計の根拠)**: ADR-003 第 2 項「再帰的フェーズブランチ戦略」
 
 ## 2. 参照資料・入力ファイル (Input Context)
@@ -28,10 +28,13 @@ status: "Draft"
 
 ### 3.1. 負の制約 (Negative Constraints)
 - [ ] **変更禁止**: `main` への直接コミット禁止。
+- [ ] **スコープ外**: 実装コードの変更。
 
 ### 3.2. 実装手順 (Changes)
 - [ ] **Git操作**:
-    - `main` から `feature/phase-2-foundation` を作成しプッシュする。
+    - `main` ブランチを最新状態にする。
+    - `main` から `feature/phase-2-foundation` を作成する。
+    - リモート（origin）にプッシュし、後続タスクがこのブランチをベースにできるよう準備する。
 
 ### 3.3. 構成変更・削除 (Configuration / Cleanup)
 - なし
@@ -41,8 +44,8 @@ status: "Draft"
 - **作業ブランチ (Feature Branch)**: `feature/phase-2-foundation`
 
 ## 5. 検証手順・完了条件 (Verification & DoD)
-- [ ] **観測される挙動**: リモートにブランチが存在する。
-- [ ] **ファイル状態**: `main` と同期されている。
+- [ ] **観測される挙動**: リモートに `feature/phase-2-foundation` ブランチが存在する。
+- [ ] **ファイル状態**: ブランチが `main` の最新状態と同期されている。
 
 ## 6. 成果物 (Deliverables)
 - ブランチ: `feature/phase-2-foundation`
