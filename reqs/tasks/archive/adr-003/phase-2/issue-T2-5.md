@@ -9,7 +9,7 @@ task_id: "T2-5"
 depends_on: ["issue-T2-4.md"]
 next_phase_path: ""
 status: "Archived"
-issue: 124
+issue: 128
 ---
 # Issue起票オートメーション・ワークフローの新規作成
 
