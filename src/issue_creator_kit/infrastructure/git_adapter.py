@@ -49,6 +49,13 @@ class GitAdapter:
         self.run_command(["mv", src, dst])
 
     def get_added_files(self, base_ref: str, head_ref: str, path: str) -> list[str]:
+        """
+        Get a list of newly added files in the specified path.
+
+        Note: This uses --diff-filter=A and --no-renames, meaning files moved via
+        'git mv' will be detected as Added only if Git does not identify them
+        as renames (based on similarity threshold).
+        """
         cmd = [
             "diff-tree",
             "-r",

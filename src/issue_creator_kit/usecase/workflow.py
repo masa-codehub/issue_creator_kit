@@ -7,6 +7,11 @@ from issue_creator_kit.usecase.approval import ApprovalUseCase
 
 
 class WorkflowUseCase:
+    """
+    UseCase for managing the end-to-end task workflow, including document approvals
+    and automatic phase promotion (Auto-PR).
+    """
+
     MAX_PHASE_CHAIN_DEPTH = 10
 
     def __init__(
@@ -55,6 +60,10 @@ class WorkflowUseCase:
         2. Creates a new foundation branch.
         3. Moves files from drafts to archive.
         4. Commits, Pushes, and creates a PR.
+
+        Error Handling Strategy:
+        - Catch specific branch-exists errors to skip silently (idempotent).
+        - Propagate other fatal git/network errors to avoid inconsistent state.
         """
         if not next_phase_path:
             return
@@ -76,26 +85,52 @@ class WorkflowUseCase:
         self.visited_phase_paths.add(next_phase_path)
         self.phase_chain_depth += 1
 
-        # Derive phase name (e.g. "phase-2" from ".../phase-2/")
+        # Derive and validate phase name
         p = Path(next_phase_path)
-        # Handle trailing slash by using p.name if not empty, else p.parent.name
-        phase_name = p.name if p.name else p.parent.name
+        candidate = p.name
+        if not candidate:
+            parent = p.parent
+            if parent and parent != p:
+                candidate = parent.name
+
+        phase_name = candidate.strip() if candidate else ""
+        if not phase_name:
+            print(
+                f"Warning: Could not derive valid phase name from {next_phase_path}. Skipping."
+            )
+            return
+
         new_branch = f"feature/{phase_name}-foundation"
 
-        # Derive destination: swap 'drafts' with 'archive'
-        dest_path = next_phase_path.replace("drafts", "archive")
+        # Derive destination: replace only the 'drafts' segment with 'archive'
+        if "drafts" in p.parts:
+            replaced_parts = [
+                "archive" if part == "drafts" else part for part in p.parts
+            ]
+            dest_path = str(Path(*replaced_parts))
+        else:
+            # Fallback if 'drafts' segment is missing
+            dest_path = next_phase_path.replace("drafts", "archive")
 
-        # Basic check if destination already exists (logical or physical)
         if Path(dest_path).exists():
             print(
-                f"Warning: Destination {dest_path} already exists. Skipping promotion to avoid duplicate processing."
+                f"Warning: Destination {dest_path} already exists. Skipping promotion."
             )
             return
 
         try:
             print(f"Promoting to next phase: {phase_name}")
             # 1. Create foundation branch
-            self.git_adapter.checkout(new_branch, create=True, base="main")
+            try:
+                self.git_adapter.checkout(new_branch, create=True, base="main")
+            except RuntimeError as e:
+                # Handle cases where branch already exists specifically
+                if "already exists" in str(e):
+                    print(
+                        f"Warning: Branch {new_branch} already exists. Skipping promotion."
+                    )
+                    return
+                raise
 
             # 2. Move files
             self.git_adapter.move_file(next_phase_path, dest_path)
@@ -116,9 +151,7 @@ class WorkflowUseCase:
                 print(f"Successfully created PR: {pr_url}")
 
         except Exception as e:
-            print(f"Error during phase promotion: {e}")
-            # Design: Fail-fast, maintain consistency
-            # We don't re-raise here to allow other potential promotions in the same run if needed,
-            # but we've logged it. Actually, design says "異常発生時には「何もしない」"
-            # If one promotion fails, we might want to stop everything.
-            # For now, let's just log and skip this one.
+            # For git mv, commit, push, or PR creation, failures are logged and propagated
+            # to ensure the process stops and maintains repo consistency.
+            print(f"Critical: Error during phase promotion for {phase_name}: {e}")
+            raise
