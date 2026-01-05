@@ -75,11 +75,11 @@ sequenceDiagram
     - **1件でも失敗した場合**:
         - すでに作成された Issue を削除（または Close）しようとするのではなく、処理を中断してエラーを吐き、Git への書き戻しコミット（Frontmatter の `issue` フィールド更新およびロードマップ更新）を一切行わない。
         - このため、失敗したバッチ内のファイルは全て `issue` フィールドが空のままとなり、差分検知アルゴリズム（「`issue` フィールドが存在しない、あるいは空であるもの」を対象とする）により、再実行時に再度一括起票の対象となる。
-        - 途中まで作成された Issue が存在する場合でも、それらは Frontmatter から参照されていない「孤立 Issue」として一時的に残るが、再実行により同一タスクに対応する新規 Issue が作成されることはない（`issue` フィールドが空でないファイルは常にスキップされるため）。
+        - 途中まで作成された Issue が存在する場合でも、それらは Frontmatter から参照されていない「孤立 Issue」として一時的に残る。再実行時には、失敗したバッチ内の全ファイルが再度一括起票の対象となるため、これら孤立 Issue に対応する新規 Issue が追加で作成され（二重起票が発生する）。この二重起票は、Git 上の原子性と一貫性を優先するために許容する fail-fast 戦略上のトレードオフとみなす。
         - 孤立 Issue の扱いについては、運用ポリシーとして定期的な手動 Close（またはラベル付け）を行うか、別途クリーンアップジョブを検討する。
     - **成功時**:
         - メモリ上の各ファイルオブジェクトに Issue 番号をセットし、次の処理ステップへ渡す。
-        - これにより、再実行時には Frontmatter の `issue` 番号の有無で判定するため、既に Issue 番号が書き込まれたファイルは差分検知段階で自動的にスキップされ、二重起票は発生しない。
+        - 全ての Issue 作成が完了した後にのみ、一括してファイルへの書き戻しとコミットを実行する。
 
 #### 3. ロードマップ同期 (Roadmap Sync Engine)
 - **置換ロジック**:
@@ -95,7 +95,7 @@ sequenceDiagram
 - **処理フロー**:
     1.  `next_phase_path` (例: `reqs/tasks/drafts/phase-2/`) の存在を確認。
     2.  `git checkout -b feature/phase-N-foundation` を実行。
-    3.  `next_phase_path` のパスに含まれる `drafts` を `archive` に置換して移動先パス（例: `reqs/tasks/archive/phase-2/`）を決定し、物理移動を実行。
+    3.  `next_phase_path` で指定されたディレクトリ（例: `reqs/tasks/drafts/phase-2/`) 内の全ファイルを、`drafts` を `archive` に置換したパス（例: `reqs/tasks/archive/phase-2/`）へ `git mv` を使って移動する。
     4.  `git add . && git commit -m "feat: promote phase-N tasks for virtual queue"`
     5.  `git push origin feature/phase-N-foundation`
     6.  GitHub API で PR を作成。`base: main`, `head: feature/phase-N-foundation`。

@@ -25,7 +25,7 @@ Markdown ファイルの内容を表現するドメインオブジェクト。
 - `title: str`: タスクのタイトル。
 - `content: str`: Markdown の本文。
 - `metadata: dict`: YAML Frontmatter の内容（`labels`, `depends_on`, `issue`, `next_phase_path` 等を含む）。
-- `body`: （便宜上の属性）`content` から Frontmatter を除いた部分、あるいは Issue の本文として送信する文字列。
+- `body`: （便宜上の属性）`content` から Frontmatter を除いた、Issue 本文として使用される文字列。
 
 ### 1. IGitAdapter
 Git リポジトリに対する物理的な操作を担当する。
@@ -79,9 +79,11 @@ sequenceDiagram
         FS-->>UC: doc
         UC->>GH: create_issue(doc.title, doc.body, doc.metadata.labels)
         GH-->>UC: issue_number
-        UC->>FS: update_metadata(file, {"issue": issue_number})
-        UC->>Git: add([file])
+        UC->>UC: メモリ上のバッファに (file, issue_number) を保存
     end
+    Note over UC, FS: 全 Issue 作成成功後、一括書き戻し
+    UC->>FS: update_metadata(all_processed_files)
+    UC->>Git: add(all_processed_files)
     UC->>Git: commit("docs: update issue numbers")
 
     Note over UC, FS: ロードマップ同期
@@ -95,6 +97,7 @@ sequenceDiagram
     Note over UC, FS: フェーズ連鎖 (Auto-PR)
     UC->>Git: checkout(new_branch, create=True, base="main")
     UC->>Git: move_file(draft_dir, archive_dir)
+    Note right of Git: Move contents of draft_dir to archive_dir
     UC->>Git: commit("feat: promote tasks")
     UC->>Git: push("origin", new_branch, set_upstream=True)
     UC->>GH: create_pull_request(title, body, head=new_branch, base="main")
