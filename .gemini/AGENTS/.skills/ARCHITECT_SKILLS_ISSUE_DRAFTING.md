@@ -83,13 +83,3 @@
 5.  **完了宣言**: 全ての問いに対して「具体的な証拠を伴う合格回答」が得られた時のみ、監査を完了する。
 
 ---
-
-## 4. 投入プロトコル (Promotion)
-
-監査（Section 3）を完全にパスした Draft Issue を、仮想キュー（archive への移動 PR）を通じて起票します。
-
-1.  **アーカイブへの移動**: Draft ファイルを `reqs/tasks/drafts/...` から `reqs/tasks/archive/...` 内の適切なディレクトリへ移動する。
-    *   *コマンド例*: `run_shell_command{command: "mkdir -p reqs/tasks/archive/adr-xxx/phase-1 && mv reqs/tasks/drafts/adr-xxx/phase-1/issue-T1-1.md reqs/tasks/archive/adr-xxx/phase-1/"}`
-2.  **PR作成**: 移動した変更を含むプルリクエストを作成する。
-    *   **Title**: `feat: promote task <Task-ID> to archive`
-    *   **Review**: このPRがマージされた瞬間、GitHub Issue が自動起票される。
