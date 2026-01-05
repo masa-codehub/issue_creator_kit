@@ -107,7 +107,7 @@ sequenceDiagram
 
 #### 5. 安全装置 (Safety Mechanisms)
 - **Fail-fast**: 以下のいずれかで失敗した場合は、即座に終了し、Git リポジトリを汚さない（Push しない）。
-    - ネットワークエラーによる API 失敗。
+    - ネットワークエラーによる API 失敗.
     - `git push` 時のコンフリクト（別の Actions や人間による変更）。
 - **冪等性**: `issue` 番号が既に Frontmatter にあるファイルは無視するため、Actions が再試行されても二重起票は発生しない。
 
@@ -121,7 +121,7 @@ sequenceDiagram
 - **案: `archive/` 移動を Actions 内で行う**: 人間が PR で「どのタスクを完了とするか」を明示的に操作する（レビューする）プロセスを重視するため、現在の「マージ後に起票」案を採用。
 
 ## セキュリティとプライバシー / Security & Privacy
-- `GITHUB_TOKEN` の権限として、`contents: write` (コミット用) および `issues: write` (起票用) が必要。
+- `GITHUB_TOKEN` の権限として、`contents: write` (コミット用) および `issues: write` (起票用) が必要.
 - 秘密情報の漏洩はないが、自動 PR 作成により意図しない通知が飛ぶ可能性があるため、ロードマップでの事前定義を SSOT とする。
 
 ## 未解決の問題 / Open Questions & Unresolved Issues
