@@ -45,11 +45,30 @@ jobs:
 
       - name: Process Diff and Create Issues
         run: |
+          # 初回プッシュやブランチ作成時の空 SHA をチェック
+          BEFORE_SHA="${{ github.event.before }}"
+          if [ "$BEFORE_SHA" == "0000000000000000000000000000000000000000" ]; then
+            echo "First push or branch creation detected. Comparing with HEAD^1."
+            BEFORE_SHA="HEAD^1"
+          fi
+
+          echo "Comparing $BEFORE_SHA with ${{ github.event.after }}"
+
           # マージ差分を検知し、新規タスクの Issue 起票とロードマップ同期を実行。
           # PATH 環境変数に依存しないよう、python3 -m でモジュールを直接実行します。
           python3 -m issue_creator_kit process-diff \
-            --before ${{ github.event.before }} \
+            --before "$BEFORE_SHA" \
             --after ${{ github.event.after }} \
             --roadmap reqs/roadmap/active/roadmap-adr003-task-lifecycle.md \
             --repo ${{ github.repository }} \
             --token ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push changes
+        run: |
+          # issue_creator_kit により生成されたコミットをリモート main ブランチへ反映する
+          if ! git diff --quiet origin/main HEAD; then
+            echo "Changes detected. Pushing to main..."
+            git push origin HEAD:main
+          else
+            echo "No changes to push."
+          fi

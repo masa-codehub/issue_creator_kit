@@ -156,7 +156,7 @@ def main():
     diff_parser.add_argument(
         "--archive-dir",
         default="reqs/tasks/archive/",
-        help="Directory to monitor for new tasks",
+        help="Directory to check for added task files",
     )
     diff_parser.add_argument(
         "--roadmap",
@@ -164,37 +164,11 @@ def main():
     )
     diff_parser.add_argument(
         "--repo",
-        help="GitHub repository (owner/repo).",
+        help="GitHub repository (owner/repo). Defaults to GITHUB_REPOSITORY if not set.",
     )
     diff_parser.add_argument(
         "--token",
-        help="GitHub token.",
-    )
-
-    # run command (legacy alias for backward compatibility or general use)
-    run_parser = subparsers.add_parser("run", help="Run the issue creation automation")
-    run_parser.add_argument(
-        "--before", default="HEAD^1", help="Base ref/SHA for comparison"
-    )
-    run_parser.add_argument(
-        "--after", default="HEAD", help="Head ref/SHA for comparison"
-    )
-    run_parser.add_argument(
-        "--archive-dir",
-        default="reqs/tasks/archive/",
-        help="Directory to monitor for new tasks",
-    )
-    run_parser.add_argument(
-        "--roadmap",
-        help="Path to the roadmap file to synchronize",
-    )
-    run_parser.add_argument(
-        "--repo",
-        help="GitHub repository (owner/repo).",
-    )
-    run_parser.add_argument(
-        "--token",
-        help="GitHub token.",
+        help="GitHub token. Defaults to GITHUB_TOKEN if not set.",
     )
 
     # run-workflow command
@@ -276,7 +250,7 @@ def main():
 
     if args.command == "init":
         init_project(args)
-    elif args.command in ["run", "process-diff"]:
+    elif args.command == "process-diff":
         run_automation(args)
     elif args.command == "run-workflow":
         run_workflow(args)
