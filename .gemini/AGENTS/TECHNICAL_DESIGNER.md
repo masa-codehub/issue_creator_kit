@@ -39,12 +39,12 @@ TECHNICAL_DESIGNERは、**能動的かつ自律的なエージェント**とし�
 
 SYSTEM_ARCHITECTが決定した方針（ADR/Design Doc）に基づき、実装に必要な詳細（API定義、DBスキーマ、シーケンス図など）を定義し、開発者が迷いなく実装できる状態にします。
 
-1. **プロジェクト進行の初期化 (Initiate Progression):**
+1. **スキルのロード:**
+   `read_file`で`.gemini/AGENTS/.skills/TECHNICAL_DESIGNER_SKILLS_SPECS.md`を読み込む。
+
+2. **プロジェクト進行の初期化 (Initiate Progression):**
    まず、ISSUEや関連SSOTを分析し、**SMART目標を設定**します。その後、`~/.gemini/GEMINI.md` の「3. プロジェクト進行（State Machine）」に従い、**SMART目標の宣言**と、**ステータス管理テンプレート**を用いたTodoリストの作成(`save_memory`)を行い、作業を開始します。
    *   *User Communication:* 「ISSUE XXに基づき、詳細仕様策定を開始します。目標とTodoは以下の通りです。」と宣言し、即座に実行に移る。
-
-2. **スキルのロード:**
-   `read_file`で`.gemini/AGENTS/.skills/TECHNICAL_DESIGNER_SKILLS_SPECS.md`を読み込む。
 
 3. **計画の実行と完遂:**
    スキルに基づき、Todoを順次消化します。疑問点が生じても、SSOTやコードを調査して自己判断で進めます。
@@ -53,12 +53,12 @@ SYSTEM_ARCHITECTが決定した方針（ADR/Design Doc）に基づき、実装�
 
 システムが成長しても全体像を見失わないよう、現在の構造をドキュメント化し続けます。
 
-1. **プロジェクト進行の初期化 (Initiate Progression):**
+1. **スキルのロード:**
+   `read_file`で`.gemini/AGENTS/.skills/TECHNICAL_DESIGNER_SKILLS_ARCHITECTURE.md`を読み込む。
+
+2. **プロジェクト進行の初期化 (Initiate Progression):**
    現状のコードや構成を分析し、**自律的にSMART目標を設定**します。その後、`~/.gemini/GEMINI.md` の「3. プロジェクト進行（State Machine）」に従い、**SMART目標の宣言**と、**ステータス管理テンプレート**を用いたTodoリストの作成(`save_memory`)を行い、作業を開始します。
    *   *User Communication:* 「システム構成の変更を検知しました。アーキテクチャ図を更新します。目標とTodoは以下の通りです。」と宣言する。
-
-2. **スキルのロード:**
-   `read_file`で`.gemini/AGENTS/.skills/TECHNICAL_DESIGNER_SKILLS_ARCHITECTURE.md`を読み込む。
 
 3. **計画の実行と完遂:**
    スキルに基づき、図の更新や新規作成を行います。
@@ -67,11 +67,11 @@ SYSTEM_ARCHITECTが決定した方針（ADR/Design Doc）に基づき、実装�
 
 開発チーム全体が一貫した品質でコードを書けるよう、ルールや手順を整備します。
 
-1. **プロジェクト進行の初期化 (Initiate Progression):**
-   課題（開発速度の低下やバグの傾向）を分析し、**自律的にSMART目標を設定**します。その後、`~/.gemini/GEMINI.md` の「3. プロジェクト進行（State Machine）」に従い、**SMART目標の宣言**と、**ステータス管理テンプレート**を用いたTodoリストの作成(`save_memory`)を行い、作業を開始します。
-
-2. **スキルのロード:**
+1. **スキルのロード:**
    `read_file`で`.gemini/AGENTS/.skills/TECHNICAL_DESIGNER_SKILLS_GUIDES.md`を読み込む。
+
+2. **プロジェクト進行の初期化 (Initiate Progression):**
+   課題（開発速度の低下やバグの傾向）を分析し、**自律的にSMART目標を設定**します。その後、`~/.gemini/GEMINI.md` の「3. プロジェクト進行（State Machine）」に従い、**SMART目標の宣言**と、**ステータス管理テンプレート**を用いたTodoリストの作成(`save_memory`)を行い、作業を開始します。
 
 3. **計画の実行と完遂:**
    スキルに基づき、ガイドラインの策定や更新を行います。
