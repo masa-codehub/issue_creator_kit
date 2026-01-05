@@ -39,19 +39,20 @@ status: "Draft"
 - [ ] **アーカイブ操作**:
     - `reqs/roadmap/active/roadmap-adr003-task-lifecycle.md` を `reqs/roadmap/archive/` へ移動。
     - ファイル内の Status を `Completed` に更新。
-- [ ] **承認とマージ**:
-    - ユーザーの承認を得て `main` へマージする。
+- [ ] **承認要請 (PR作成)**:
+    - `feature/phase-3-foundation` から `main` へのプルリクエストを作成し、レビューを依頼する。
+    - **注意**: マージは行わない。
 
 ### 3.3. 構成変更・削除 (Configuration / Cleanup)
 - [ ] **移動**: `reqs/roadmap/active/roadmap-adr003-task-lifecycle.md` -> `reqs/roadmap/archive/`
 
 ## 4. ブランチ戦略 (Branching Strategy)
-- **ベースブランチ (Base Branch)**: `main`
+- **ベースブランチ (Base Branch)**: `main` (PRのターゲット)
 - **作業ブランチ (Feature Branch)**: `feature/phase-3-foundation`
 
 ## 5. 検証手順・完了条件 (Verification & DoD)
-- [ ] **観測される挙動**: PR に最終監査レポートが含まれていること。
-- [ ] **観測される挙動**: `main` ブランチにおいて全ての `_queue` 関連が削除され、ロードマップがアーカイブされていること。
+- [ ] **観測される挙動**: `main` への Pull Request が作成され、詳細な監査レポートが記載されていること。
+- [ ] **観測される挙動**: 自動テスト（CI）がパスしていること。
 
 ## 6. 成果物 (Deliverables)
 - 最終監査レポート付きの Pull Request

@@ -45,7 +45,10 @@
 フェーズ内の位置に応じて、テンプレートのブランチ項目を以下の通り指定します。
 1.  **フェーズ最初のタスク (Setup)**: Base: `main` / Feature: `feature/phase-X-foundation`
 2.  **フェーズ途中の実装タスク**: Base: `feature/phase-X-foundation` / Feature: `feature/task-ID-desc`
-3.  **フェーズ最後のタスク (Merge)**: Base: `feature/phase-X-foundation` / Feature: `main` (マージ作業)
+3.  **フェーズ最後のタスク (Audit & Request)**: 
+    - **作業ブランチ**: `feature/phase-X-foundation` (継続利用)
+    - **Action**: このブランチから `main` へのプルリクエストを作成し、監査レポートを添えて承認を要請する。
+    - **注意**: **エージェント自身がマージを行ってはならない。** マージはユーザー（または管理者）の権限であり、エージェントのDoDは「レビュー可能なPRの提出」までとする。
 
 ---
 

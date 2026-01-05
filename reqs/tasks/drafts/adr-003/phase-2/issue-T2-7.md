@@ -39,19 +39,20 @@ status: "Draft"
     - **コンテキスト整合性**: システムコンテキストの定義（境界・用語）を守っているか。
 - [ ] **レポート作成**:
     - 監査結果をまとめ、Pull Request の Body に記載する。
-- [ ] **承認とマージ**:
-    - ユーザーの承認を得て `main` へマージする（Auto-PR トリガー）。
+- [ ] **承認要請 (PR作成)**:
+    - `feature/phase-2-foundation` から `main` へのプルリクエストを作成し、レビューを依頼する。
+    - **注意**: マージは行わない。
 
 ### 3.3. 構成変更・削除 (Configuration / Cleanup)
 - なし
 
 ## 4. ブランチ戦略 (Branching Strategy)
-- **ベースブランチ (Base Branch)**: `main`
+- **ベースブランチ (Base Branch)**: `main` (PRのターゲット)
 - **作業ブランチ (Feature Branch)**: `feature/phase-2-foundation`
 
 ## 5. 検証手順・完了条件 (Verification & DoD)
-- [ ] **観測される挙動**: PR に詳細な監査レポートが含まれていること。
-- [ ] **観測される挙動**: マージ後、ICK によって Phase 3 の起票 PR が自動作成されること。
+- [ ] **観測される挙動**: `main` への Pull Request が作成され、詳細な監査レポートが記載されていること。
+- [ ] **観測される挙動**: 自動テスト（CI）がパスしていること。
 
 ## 6. 成果物 (Deliverables)
 - 監査レポート付きの Pull Request
