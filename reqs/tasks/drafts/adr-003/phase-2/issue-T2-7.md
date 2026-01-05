@@ -1,5 +1,5 @@
 ---
-title: "Phase 2 成果物の最終監査と main マージ"
+title: "Phase 2 完了監査と次フェーズへのプロモーション"
 labels:
   - "task"
   - "P1"
@@ -10,7 +10,7 @@ depends_on: ["issue-T2-6.md"]
 next_phase_path: "reqs/tasks/drafts/adr-003/phase-3/"
 status: "Draft"
 ---
-# Phase 2 成果物の最終監査と main マージ
+# Phase 2 完了監査と次フェーズへのプロモーション
 
 ## 親Issue / ロードマップ (Context)
 - **Roadmap**: reqs/roadmap/active/roadmap-adr003-task-lifecycle.md
@@ -18,22 +18,29 @@ status: "Draft"
 
 ## 1. 目的と背景 (Goal & Context)
 - **As-is (現状)**: Phase 2 の実装（仮想キュー、Auto-PR ロジック等）が `feature/phase-2-foundation` で完了している。
-- **To-be (あるべき姿)**: `feature/phase-2-foundation` が `main` にマージされる。本システム自体が「仮想キュー」を処理できる状態になり、Auto-PR によって Phase 3 が自動的に提案される。
-- **Design Evidence (設計の根拠)**: ADR-003 第 3 項「自己推進型ワークフロー」
+- **To-be (あるべき姿)**: 成果物の品質と整合性が監査され、問題がないことが確認された上で `main` にマージされる。これにより、Auto-PR がトリガーされ Phase 3 へ自動的に移行する。
+- **Design Evidence (設計の根拠)**: ADR-003, SYSTEM_ARCHITECT Audit Protocol
 
 ## 2. 参照資料・入力ファイル (Input Context)
 - [ ] `reqs/tasks/drafts/adr-003/phase-3/` (次フェーズの存在確認)
+- [ ] `docs/system-context.md`
+- [ ] `reqs/design/_approved/adr-003-task-and-roadmap-lifecycle.md`
 
 ## 3. 実装手順と制約 (Implementation Steps & Constraints)
 
 ### 3.1. 負の制約 (Negative Constraints)
-- [ ] **前提条件**: T2-6 (統合検証) が成功していること。
+- [ ] **監査基準**: 監査レポートに重大な指摘事項（SSOT乖離、無駄なコード等）がある状態でのマージは禁止。
 
 ### 3.2. 実装手順 (Changes)
-- [ ] **最終レビュー**:
-    - 実装コード、テスト、GitHub Actions 定義の最終監査。
-- [ ] **Git操作**:
-    - `feature/phase-2-foundation` から `main` へのプルリクエストを作成し、マージする。
+- [ ] **フェーズ完了監査 (Audit)**:
+    - **実装状況**: ロードマップのタスクが全て完了し、テストがパスしているか。
+    - **SSOT整合性**: 実装コード (`src/`) が設計書 (`reqs/design/`) と一致しているか。
+    - **無駄の排除**: 不要なファイル、デバッグログ、コメントアウトが削除されているか。
+    - **コンテキスト整合性**: システムコンテキストの定義（境界・用語）を守っているか。
+- [ ] **レポート作成**:
+    - 監査結果をまとめ、Pull Request の Body に記載する。
+- [ ] **承認とマージ**:
+    - ユーザーの承認を得て `main` へマージする（Auto-PR トリガー）。
 
 ### 3.3. 構成変更・削除 (Configuration / Cleanup)
 - なし
@@ -43,7 +50,9 @@ status: "Draft"
 - **作業ブランチ (Feature Branch)**: `feature/phase-2-foundation`
 
 ## 5. 検証手順・完了条件 (Verification & DoD)
-- [ ] **観測される挙動**: `main` マージ後、ICK（または GitHub Actions）によって Phase 3 の起票 PR が自動作成されること。
+- [ ] **観測される挙動**: PR に詳細な監査レポートが含まれていること。
+- [ ] **観測される挙動**: マージ後、ICK によって Phase 3 の起票 PR が自動作成されること。
 
 ## 6. 成果物 (Deliverables)
+- 監査レポート付きの Pull Request
 - マージされた `main` ブランチの状態

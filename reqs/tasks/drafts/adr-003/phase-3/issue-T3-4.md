@@ -1,5 +1,5 @@
 ---
-title: "ロードマップ完了宣言とアーカイブ"
+title: "プロジェクト完了監査とアーカイブ"
 labels:
   - "task"
   - "P1"
@@ -10,7 +10,7 @@ depends_on: ["issue-T3-3.md"]
 next_phase_path: ""
 status: "Draft"
 ---
-# ロードマップ完了宣言とアーカイブ
+# プロジェクト完了監査とアーカイブ
 
 ## 親Issue / ロードマップ (Context)
 - **Roadmap**: reqs/roadmap/active/roadmap-adr003-task-lifecycle.md
@@ -18,8 +18,8 @@ status: "Draft"
 
 ## 1. 目的と背景 (Goal & Context)
 - **As-is (現状)**: Phase 3 (Cleanup/Docs) の成果が `feature/phase-3-foundation` に集約されている。
-- **To-be (あるべき姿)**: 全ての成果が `main` に統合され、ロードマップがアーカイブされる。ADR-003 の実装プロジェクトが完了した状態。
-- **Design Evidence (設計の根拠)**: ADR-003
+- **To-be (あるべき姿)**: プロジェクト全体の成果物が監査され、ADR-003 の目的（仮想キュー・自己推進）が完全に達成されていることが確認された上で、ロードマップがアーカイブされる。
+- **Design Evidence (設計の根拠)**: ADR-003, SYSTEM_ARCHITECT Audit Protocol
 
 ## 2. 参照資料・入力ファイル (Input Context)
 - [ ] `reqs/roadmap/active/roadmap-adr003-task-lifecycle.md`
@@ -27,14 +27,20 @@ status: "Draft"
 ## 3. 実装手順と制約 (Implementation Steps & Constraints)
 
 ### 3.1. 負の制約 (Negative Constraints)
-- [ ] なし
+- [ ] **監査基準**: 旧システム（物理キュー等）の遺物が完全に除去されていない場合、完了としてはいけない。
 
 ### 3.2. 実装手順 (Changes)
-- [ ] **ファイル操作**:
+- [ ] **プロジェクト完了監査 (Final Audit)**:
+    - **クリーンアップ確認**: `reqs/tasks/_queue` などの廃止フォルダが完全に消滅しているか。
+    - **ドキュメント整合性**: システムコンテキスト、開発ガイド、ADR の記述に矛盾がないか。
+    - **機能検証**: 新しい起票フロー（仮想キュー）が正常に機能することを最終確認する。
+- [ ] **レポート作成**:
+    - 最終監査レポートを Pull Request の Body に記載する。
+- [ ] **アーカイブ操作**:
     - `reqs/roadmap/active/roadmap-adr003-task-lifecycle.md` を `reqs/roadmap/archive/` へ移動。
     - ファイル内の Status を `Completed` に更新。
-- [ ] **Git操作**:
-    - `feature/phase-3-foundation` から `main` へのプルリクエストを作成し、マージする。
+- [ ] **承認とマージ**:
+    - ユーザーの承認を得て `main` へマージする。
 
 ### 3.3. 構成変更・削除 (Configuration / Cleanup)
 - [ ] **移動**: `reqs/roadmap/active/roadmap-adr003-task-lifecycle.md` -> `reqs/roadmap/archive/`
@@ -44,8 +50,10 @@ status: "Draft"
 - **作業ブランチ (Feature Branch)**: `feature/phase-3-foundation`
 
 ## 5. 検証手順・完了条件 (Verification & DoD)
+- [ ] **観測される挙動**: PR に最終監査レポートが含まれていること。
 - [ ] **観測される挙動**: `main` ブランチにおいて全ての `_queue` 関連が削除され、ロードマップがアーカイブされていること。
 
 ## 6. 成果物 (Deliverables)
+- 最終監査レポート付きの Pull Request
 - アーカイブされたロードマップ
 - クリーンアップされた `main` ブランチ
