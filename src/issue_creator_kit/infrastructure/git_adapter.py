@@ -42,3 +42,21 @@ class GitAdapter:
         else:
             cmd.extend([remote, branch])
         self.run_command(cmd)
+
+    def get_added_files(self, base_ref: str, head_ref: str, path: str) -> list[str]:
+        cmd = [
+            "diff-tree",
+            "-r",
+            "--no-commit-id",
+            "--name-only",
+            "--diff-filter=A",
+            "--no-renames",
+            base_ref,
+            head_ref,
+            "--",
+            path,
+        ]
+        output = self.run_command(cmd)
+        if not output:
+            return []
+        return output.splitlines()
