@@ -41,12 +41,12 @@
 
 システムの全体像（システムの境界、外部システム、ユーザー、主要なデータフロー）を定義し、常に最新の状態に保つための最優先プロセスです。
 
-1. **プロジェクト進行の初期化 (Initiate Progression):**
+1. **スキルのロード:**
+   `read_file`で`.gemini/AGENTS/.skills/ARCHITECT_SKILLS_CONTEXT.md`を読み込む。
+
+2. **プロジェクト進行の初期化 (Initiate Progression):**
    まず、共通プロトコルの **「コンテキスト分析とトリアージ」** を実行し、ユーザーとの合意形成を行う。
    合意が得られた後、`~/.gemini/GEMINI.md` の「3. プロジェクト進行」セクション（State Machine）に従って、SMART目標の設定、Todo作成、セルフレビューを行う。
-
-2. **スキルのロード:**
-   `read_file`で`.gemini/AGENTS/.skills/ARCHITECT_SKILLS_CONTEXT.md`を読み込む。
 
 3. **計画の策定と実行:**
    読み込んだスキルに基づき、Todoを消化してシステムコンテキストを更新・作成する。
@@ -55,12 +55,12 @@
 
 技術選定、パターン採用、および技術的負債の解消など、長期的影響が大きい決定を行うための標準プロセスです。
 
-1. **プロジェクト進行の初期化 (Initiate Progression):**
+1. **スキルのロード:**
+   `read_file`で`.gemini/AGENTS/.skills/ARCHITECT_SKILLS_ADR.md`を読み込む。
+
+2. **プロジェクト進行 of 初期化 (Initiate Progression):**
    まず、共通プロトコルの **「コンテキスト分析とトリアージ」** を実行し、ユーザーとの合意形成を行う。
    合意が得られた後、`~/.gemini/GEMINI.md` の「3. プロジェクト進行」セクション（State Machine）に従って計画を立てる。
-
-2. **スキルのロード:**
-   `read_file`で`.gemini/AGENTS/.skills/ARCHITECT_SKILLS_ADR.md`を読み込む。
 
 3. **計画の策定と実行:**
    ADRテンプレートに従い、検証可能な仮説として意思決定を文書化する。
@@ -69,12 +69,12 @@
 
 ビジネス要求や既存機能の大規模なリファクタリングを、具体的なシステム構造やデータフローに落とし込み、実装の SSOT となる Design Doc を作成します。
 
-1. **プロジェクト進行の初期化 (Initiate Progression):**
+1. **スキルのロード:**
+   `read_file`で`.gemini/AGENTS/.skills/ARCHITECT_SKILLS_DESIGN_DOC.md`を読み込む。
+
+2. **プロジェクト進行の初期化 (Initiate Progression):**
    まず、共通プロトコルの **「コンテキスト分析とトリアージ」** を実行し、ユーザーとの合意形成を行う。
    合意が得られた後、`~/.gemini/GEMINI.md` の「3. プロジェクト進行」セクション（State Machine）に従って計画を立てる。
-
-2. **スキルのロード:**
-   `read_file`で`.gemini/AGENTS/.skills/ARCHITECT_SKILLS_DESIGN_DOC.md`を読み込む。
 
 3. **計画の策定と実行:**
    Design Docテンプレートに従い、実装のSSOTを構築する。
@@ -83,12 +83,12 @@
 
 承認済みの ADR または Design Doc を、稼働中のシステムを壊さずに実現するための「段階的な実装・修正手順」を設計します。
 
-1. **プロジェクト進行の初期化 (Initiate Progression):**
+1. **スキルのロード:**
+   `read_file`で`.gemini/AGENTS/.skills/ARCHITECT_SKILLS_ROADMAP.md`を読み込む。
+
+2. **プロジェクト進行の初期化 (Initiate Progression):**
    まず、共通プロトコルの **「コンテキスト分析とトリアージ」** を実行し、ユーザーとの合意形成を行う。
    合意が得られた後、`~/.gemini/GEMINI.md` の「3. プロジェクト進行」セクション（State Machine）に従って計画を立てる。
-
-2. **スキルのロード:**
-   `read_file`で`.gemini/AGENTS/.skills/ARCHITECT_SKILLS_ROADMAP.md`を読み込む。
 
 3. **計画の策定と実行:**
    ロードマップテンプレートに従い、安全な着地ステップ（WBS/Issue案）を策定する。
@@ -97,12 +97,12 @@
 
 アクティブなロードマップに基づいて具体的な実装タスクを定義し、開発者が着手可能な状態（Issue）にします。
 
-1. **プロジェクト進行の初期化 (Initiate Progression):**
+1. **スキルのロード:**
+   `read_file`で`.gemini/AGENTS/.skills/ARCHITECT_SKILLS_ISSUE_DRAFTING.md`を読み込む。
+
+2. **プロジェクト進行の初期化 (Initiate Progression):**
    まず、共通プロトコルの **「コンテキスト分析とトリアージ」** を実行し、ユーザーとの合意形成を行う。
    合意が得られた後、`~/.gemini/GEMINI.md` の「3. プロジェクト進行」セクション（State Machine）に従って計画を立てる。
-
-2. **スキルのロード:**
-   `read_file`で`.gemini/AGENTS/.skills/ARCHITECT_SKILLS_ISSUE_DRAFTING.md`を読み込む。
 
 3. **計画の策定と実行:**
    読み込んだスキルに基づき、ロードマップからタスクを選定し、Issueドラフトの作成と監査を行った上で、キューへの投入（起票トリガー）を実行する。
