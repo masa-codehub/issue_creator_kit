@@ -68,6 +68,15 @@ class GitHubAdapter:
 
         if response.status_code == 201:
             return response.json()["html_url"]
+        if response.status_code == 422:
+            # GitHub returns 422 Unprocessable Entity (Validation Failed)
+            # when a pull request with the same head and base already exists,
+            # among other validation errors.
+            raise RuntimeError(
+                "Failed to create PR due to validation error (HTTP 422). "
+                "A pull request with the same head and base may already exist. "
+                f"Raw response body: {response.text}"
+            )
         raise RuntimeError(
             f"Failed to create PR. Status: {response.status_code}, Body: {response.text}"
         )

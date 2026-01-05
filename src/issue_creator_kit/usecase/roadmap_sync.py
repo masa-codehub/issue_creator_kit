@@ -19,13 +19,14 @@ class RoadmapSyncUseCase:
         and appending the issue number.
 
         Args:
-            roadmap_path (str): Path to the roadmap Markdown file.
-            results (list[tuple[Path, int]]): A list of tuples, each containing
-                the Path to the archived task file and its created issue number.
+            roadmap_path (str): Path to the roadmap Markdown file. The file is
+                expected to contain Markdown tables with links to task files.
+            results (list[tuple[Path, int]]): A list of tuples where each tuple
+                contains (archived_task_file_path, created_issue_number).
 
         Raises:
-            ValueError: If a link for a processed task is not found in the roadmap,
-                or if the URL format in the roadmap is unexpected.
+            ValueError: If a link for a task is not found in the roadmap,
+                or if the URL format does not contain the expected 'drafts/' segment.
             FileNotFoundError: If the roadmap file does not exist.
         """
         if not results:
@@ -38,13 +39,13 @@ class RoadmapSyncUseCase:
         content = self.fs.read_file(str(path))
         new_content = content
 
-        # Check for duplicate filenames in results to avoid redundant processing
+        # Avoid redundant sync if results contain duplicate filenames
         seen_filenames = set()
         unique_results = []
         for file_path, issue_number in results:
             if file_path.name in seen_filenames:
                 print(
-                    f"Warning: Duplicate task filename detected: {file_path.name}. Skipping redundant sync."
+                    f"Warning: Duplicate task filename {file_path.name} in results. Skipping."
                 )
                 continue
             seen_filenames.add(file_path.name)
@@ -53,7 +54,8 @@ class RoadmapSyncUseCase:
         for file_path, issue_number in unique_results:
             filename = file_path.name
 
-            # Look for link: [filename.md](url)
+            # Look for link: [filename.md](url).
+            # Using a more robust pattern to handle potential nested parentheses in URL.
             link_pattern = rf"\[{re.escape(filename)}\]\(([^)]+)\)"
 
             # Check if link exists
@@ -67,14 +69,19 @@ class RoadmapSyncUseCase:
             ) -> str:
                 url = match.group(1)
 
-                # Robust validation: ensure it's a draft link
-                if "drafts/" not in url:
-                    # If it's already archived, we might want to just update the number
-                    # but usually this means something is wrong or already processed.
-                    if "archive/" in url:
-                        # Update number if not present or different?
-                        # For now, let's just append if missing.
-                        if f"(#{n})" in url or f"(#{n})" in match.group(0):
+                # Validate and replace 'drafts' with 'archive' using path segments
+                parts = url.split("/")
+                found = False
+                for i, part in enumerate(parts):
+                    if part == "drafts":
+                        parts[i] = "archive"
+                        found = True
+                        break
+
+                if not found:
+                    # If already archived, just ensure issue number is present
+                    if "archive" in parts:
+                        if f"(#{n})" in match.group(0):
                             return match.group(0)
                         return f"[{f}]({url}) (#{n})"
 
@@ -82,13 +89,7 @@ class RoadmapSyncUseCase:
                         f"Expected 'drafts/' in URL for {f} in roadmap {roadmap_path}, but got: {url}"
                     )
 
-                # Replace 'drafts' with 'archive' in the URL using regex for safety
-                # Guaranteed to replace only when preceded by '/' or start of string
-                new_url = re.sub(r"(?<=/)tasks/drafts/", "tasks/archive/", url)
-                if new_url == url:
-                    # Fallback if 'tasks/' prefix is missing
-                    new_url = url.replace("drafts/", "archive/", 1)
-
+                new_url = "/".join(parts)
                 return f"[{f}]({new_url}) (#{n})"
 
             new_content = re.sub(link_pattern, replace_link, new_content)

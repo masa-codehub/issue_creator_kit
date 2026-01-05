@@ -1,4 +1,5 @@
 # ruff: noqa: T201
+import re
 from graphlib import CycleError, TopologicalSorter
 from pathlib import Path
 
@@ -115,9 +116,11 @@ class IssueCreationUseCase:
                 if not doc.metadata.get("issue"):
                     target_docs[path] = doc
             except (FileNotFoundError, PermissionError) as e:
+                # Fatal: Cannot proceed if we can't access files we know exist in git
                 print(f"Error: Failed to access {file_str}: {e}")
                 raise
             except Exception as e:
+                # Non-fatal: Skip malformed files but log warning
                 print(f"Warning: Failed to parse {file_str}: {e}")
 
         if not target_docs:
@@ -157,9 +160,12 @@ class IssueCreationUseCase:
 
                 title = doc.metadata.get("title") or path.stem
                 body = doc.content
-                # Replace placeholders for dependencies
+                # Replace placeholders for dependencies using regex with word boundaries
+                # to avoid accidental partial matches.
                 for dep_filename, issue_num in issue_map.items():
-                    body = body.replace(dep_filename, f"#{issue_num}")
+                    # Replace 'task-ID.md' with '#IssueNo'
+                    pattern = rf"\b{re.escape(dep_filename)}\b"
+                    body = re.sub(pattern, f"#{issue_num}", body)
 
                 labels = doc.metadata.get("labels", [])
                 if isinstance(labels, str):
