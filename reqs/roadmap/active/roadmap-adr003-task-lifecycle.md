@@ -43,7 +43,7 @@ Phase 2 では、実装を「差分検知」「一括起票」「ロードマッ
 | T2-2 | Impl | マージ差分検知と一括起票（仮想キュー）の TDD 実装 | `creation.py` | T2-1 |
 | T2-3 | Impl | ロードマップ WBS リンク自動置換ロジックの TDD 実装 | `roadmap_sync.py` | T2-2 |
 | T2-4 | Impl | 次フェーズ PR 自動作成（Auto-PR）とブランチ自動作成ロジックの TDD 実装 | `workflow.py` | T2-3 |
-| T2-5 | Impl | GitHub Actions ワークフロー定義の差し替え（`push` イベントトリガー化） | `ci.yml` | T2-4 |
+| T2-5 | Impl | Issue起票オートメーション・ワークフローの新規作成 | `.github/workflows/issue-automator.yml` | T2-4 | [issue-T2-5.md](../../tasks/archive/adr-003/phase-2/issue-T2-5.md) (#124) |
 | T2-6 | Verify | 統合検証（フェーズ 1→2 の自動リレー確認） | 検証ログ | T2-5 |
 | T2-7 | Review | Phase 2 成果物の最終監査と main マージ | PRマージ | T2-6 |
 
