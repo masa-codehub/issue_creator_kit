@@ -1,0 +1,55 @@
+name: Auto Create Issues
+
+# ADR-003: マージされたタスク（archive）の Issue 起票とロードマップ同期を自動化します。
+# 仮想キュー（Virtual Queue）方式に基づき、マージ差分を検知して自動実行されます。
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'reqs/tasks/archive/**'
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  issue-automator:
+    runs-on: self-hosted
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      # [環境依存のセットアップ]
+      # 実行環境に Python 3.13 がない場合は、以下のステップを追加してください。
+      # - name: Set up Python
+      #   uses: actions/setup-python@v5
+      #   with:
+      #     python-version: '3.13'
+
+      - name: Install Issue Creator Kit
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install git+https://github.com/masa-codehub/issue_creator_kit.git
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Process Diff and Create Issues
+        run: |
+          # マージ差分を検知し、新規タスクの Issue 起票とロードマップ同期を実行。
+          # PATH 環境変数に依存しないよう、python3 -m でモジュールを直接実行します。
+          python3 -m issue_creator_kit process-diff \
+            --before ${{ github.event.before }} \
+            --after ${{ github.event.after }} \
+            --roadmap reqs/roadmap/active/roadmap-adr003-task-lifecycle.md \
+            --repo ${{ github.repository }} \
+            --token ${{ secrets.GITHUB_TOKEN }}
