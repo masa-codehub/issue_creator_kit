@@ -109,8 +109,10 @@ class WorkflowUseCase:
             ]
             dest_path = str(Path(*replaced_parts))
         else:
-            # Fallback if 'drafts' segment is missing
-            dest_path = next_phase_path.replace("drafts", "archive")
+            print(
+                f"Warning: 'drafts' segment not found in path {next_phase_path}. Skipping promotion."
+            )
+            return
 
         if Path(dest_path).exists():
             print(
@@ -133,7 +135,7 @@ class WorkflowUseCase:
                 raise
 
             # 2. Move files
-            self.git_adapter.move_file(next_phase_path, dest_path)
+            self.git_adapter.move_file(next_phase_path, dest_path.rstrip("/"))
 
             # 3. Commit and Push
             self.git_adapter.commit(

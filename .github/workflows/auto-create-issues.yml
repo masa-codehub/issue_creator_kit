@@ -58,7 +58,7 @@ jobs:
           # PATH 環境変数に依存しないよう、python3 -m でモジュールを直接実行します。
           python3 -m issue_creator_kit process-diff \
             --before "$BEFORE_SHA" \
-            --after ${{ github.event.after }} \
+            --after "${{ github.event.after }}" \
             --roadmap reqs/roadmap/active/roadmap-adr003-task-lifecycle.md \
             --repo ${{ github.repository }} \
             --token ${{ secrets.GITHUB_TOKEN }}

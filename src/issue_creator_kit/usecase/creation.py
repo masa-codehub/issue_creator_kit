@@ -230,10 +230,12 @@ class IssueCreationUseCase:
         # 7. Git Commit
         if processed_paths:
             try:
+                current_branch = self.git.get_current_branch()
                 self.git.add(processed_paths)
                 self.git.commit("docs: update issue numbers and sync roadmap")
+                self.git.push(remote="origin", branch=current_branch)
             except Exception as e:
-                print(f"Error during git commit: {e}")
+                print(f"Error during git commit/push: {e}")
                 raise
 
         # 8. Auto-PR (Phase Promotion)
@@ -247,7 +249,13 @@ class IssueCreationUseCase:
                     self.workflow.promote_next_phase(np_path)
 
                     # Switch back to original branch to ensure subsequent logic works
-                    self.git.checkout(original_branch)
+                    try:
+                        self.git.checkout(original_branch)
+                    except Exception as e:
+                        print(
+                            f"Warning: Failed to checkout original branch '{original_branch}': {e}. "
+                            "Continuing, but state may be unexpected."
+                        )
 
                 except Exception as e:
                     print(f"Error calling promote_next_phase for {np_path}: {e}")
