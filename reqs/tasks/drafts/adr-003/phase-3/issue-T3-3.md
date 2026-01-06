@@ -32,9 +32,9 @@ status: "Draft"
 
 ### 3.2. 実装手順 (Changes)
 - [ ] **ファイル**: `docs/system-context.md`
-    - **処理内容**: システムの仕組み説明を更新。
-- [ ] **ファイル**: `docs/guides/`
-    - **処理内容**: 開発者が Issue を起票する手順（Draft作成 → PR作成 → マージ）を解説。
+    - **処理内容**: システムの仕組み説明を更新（Virtual Queue の詳細化、Physical Queue 廃止の明記）。
+- [ ] **ファイル**: `docs/guides/development-setup.md`
+    - **処理内容**: 開発者が Issue を起票する手順（Draft作成 → `archive/` への移動 PR 作成 → マージによる自動起票）を具体的に解説。
 
 ### 3.3. 構成変更・削除 (Configuration / Cleanup)
 - なし

@@ -2,12 +2,12 @@
 
 このドキュメントは、承認済みの ADR-003 v3（仮想キュー、自己推進、再帰的ブランチ戦略）を安全に実現するための、段階的な手順と WBS を定義します。
 
-- **Status**: 策定中
+- **Status**: Active
 - **Target Design**: [ADR-003](../../design/_approved/adr-003-task-and-roadmap-lifecycle.md)
-- **Last Updated**: 2026-01-03
+- **Last Updated**: 2026-01-06
 
 ## 1. 実装戦略の要約
-物理フォルダとしての `_queue/` を廃止し、GitHub Actions が `archive/` へのマージ差分を検知して起票を行う「仮想キュー」へ移行します。
+物理フォルダとしての `_queue/` を廃止し、GitHub Actions が `archive/` へマージ差分を検知して起票を行う「仮想キュー」へ移行します。
 「一成果物一タスク」の原則を徹底し、Phase 1 では詳細設計（Logic, Schema, Interface）とテスト要件を確定させます。
 Phase 2 では、実装を「差分検知」「一括起票」「ロードマップ同期」「Auto-PR」の 4 つの独立したロジックに分解して TDD で進めます。
 
@@ -37,15 +37,15 @@ Phase 2 では、実装を「差分検知」「一括起票」「ロードマッ
 - **Gate (承認条件)**: 最終タスクのマージにより、次フェーズの PR が自動作成されるサイクルの実証。
 
 **WBS**
-| Task ID | Category | タスク内容 | 成果物 | 依存先 |
-| :---: | :---: | :--- | :--- | :---: |
-| T2-1 | Setup | Phase 2 Foundation ブランチ `feature/phase-2-foundation` の作成 | ブランチ | T1-7 |
-| T2-2 | Impl | マージ差分検知と一括起票（仮想キュー）の TDD 実装 | `creation.py` | T2-1 |
-| T2-3 | Impl | ロードマップ WBS リンク自動置換ロジックの TDD 実装 | `roadmap_sync.py` | T2-2 |
-| T2-4 | Impl | 次フェーズ PR 自動作成（Auto-PR）とブランチ自動作成ロジックの TDD 実装 | `workflow.py` | T2-3 |
-| T2-5 | Impl | GitHub Actions ワークフロー定義の差し替え（`push` イベントトリガー化） | `ci.yml` | T2-4 |
-| T2-6 | Verify | 統合検証（フェーズ 1→2 の自動リレー確認） | 検証ログ | T2-5 |
-| T2-7 | Review | Phase 2 成果物の最終監査と main マージ | PRマージ | T2-6 |
+| Task ID | Category | タスク内容 | 成果物 | 依存先 | リンク / Issue |
+| :---: | :---: | :--- | :--- | :---: | :--- |
+| T2-1 | Setup | Phase 2 Foundation ブランチ `feature/phase-2-foundation` の作成 | ブランチ | T1-7 | [issue-T2-1.md](../../tasks/archive/adr-003/phase-2/issue-T2-1.md) |
+| T2-2 | Impl | マージ差分検知と一括起票（仮想キュー）の TDD 実装 | `creation.py` | T2-1 | [issue-T2-2.md](../../tasks/archive/adr-003/phase-2/issue-T2-2.md) |
+| T2-3 | Impl | ロードマップ WBS リンク自動置換ロジックの TDD 実装 | `roadmap_sync.py` | T2-2 | [issue-T2-3.md](../../tasks/archive/adr-003/phase-2/issue-T2-3.md) |
+| T2-4 | Impl | 次フェーズ PR 自動作成（Auto-PR）とブランチ自動作成ロジックの TDD 実装 | `workflow.py` | T2-3 | [issue-T2-4.md](../../tasks/archive/adr-003/phase-2/issue-T2-4.md) |
+| T2-5 | Impl | Issue起票オートメーション・ワークフローの新規作成 | `.github/workflows/issue-automator.yml` | T2-4 | [issue-T2-5.md](../../tasks/archive/adr-003/phase-2/issue-T2-5.md) |
+| T2-6 | Verify | 統合検証（フェーズ 1→2 の自動リレー確認） | 検証ログ | T2-5 | [issue-T2-6.md](../../tasks/archive/adr-003/phase-2/issue-T2-6.md) |
+| T2-7 | Review | Phase 2 成果物の最終監査と main マージ | PRマージ | T2-6 | [issue-T2-7.md](../../tasks/archive/adr-003/phase-2/issue-T2-7.md) |
 
 ### Phase 3: リファクタリングと SSOT 同期
 - **Goal (狙い)**: 旧 `_queue` 方式の残骸を清掃し、システム全体の整合性を取る。
@@ -54,12 +54,12 @@ Phase 2 では、実装を「差分検知」「一括起票」「ロードマッ
 - **Gate (承認条件)**: 旧コードが完全に削除され、ドキュメントと実装に矛盾がないこと。
 
 **WBS**
-| Task ID | Category | タスク内容 | 成果物 | 依存先 |
-| :---: | :---: | :--- | :--- | :---: |
-| T3-1 | Setup | Phase 3 Foundation ブランチ `feature/phase-3-foundation` の作成 | ブランチ | T2-7 |
-| T3-2 | Clean | 物理 `_queue` フォルダ関連コードの完全削除 | コード削除 | T3-1 |
-| T3-3 | Docs | システムコンテキストと運用ガイド（新しい起票手順）の最新化 | `docs/` 更新 | T3-2 |
-| T3-4 | Review | ロードマップ完了宣言とアーカイブ | 移動 | T3-3 |
+| Task ID | Category | タスク内容 | 成果物 | 依存先 | リンク / Issue |
+| :---: | :---: | :--- | :--- | :---: | :--- |
+| T3-1 | Setup | Phase 3 Foundation ブランチ `feature/phase-3-foundation` の作成 | ブランチ | T2-7 | [issue-T3-1.md](../../tasks/drafts/adr-003/phase-3/issue-T3-1.md) |
+| T3-2 | Clean | 物理 `_queue` フォルダ関連コードの完全削除 | コード削除 | T3-1 | [issue-T3-2.md](../../tasks/drafts/adr-003/phase-3/issue-T3-2.md) |
+| T3-3 | Docs | システムコンテキストと運用ガイド（新しい起票手順）の最新化 | `docs/` 更新 | T3-2 | [issue-T3-3.md](../../tasks/drafts/adr-003/phase-3/issue-T3-3.md) |
+| T3-4 | Review | ロードマップ完了宣言とアーカイブ | 移動 | T3-3 | [issue-T3-4.md](../../tasks/drafts/adr-003/phase-3/issue-T3-4.md) |
 
 ## 3. リスク管理とロールバック
 - **リスク**: Auto-PR で無限ループ（例: P1 が完了して P1 を再度呼ぶ）が発生する可能性。
