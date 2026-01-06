@@ -52,8 +52,11 @@ def run_automation(args):
     gh = GitHubAdapter(repo=args.repo, token=args.token)
     git = GitAdapter()
     roadmap_sync = RoadmapSyncUseCase(fs)
+
+    # Initialize ApprovalUseCase for WorkflowUseCase
+    approval_usecase = ApprovalUseCase(fs, gh)
     workflow = WorkflowUseCase(
-        approval_usecase=None, git_adapter=git, github_adapter=gh
+        approval_usecase=approval_usecase, git_adapter=git, github_adapter=gh
     )
     usecase = IssueCreationUseCase(
         fs, gh, git_adapter=git, roadmap_sync=roadmap_sync, workflow_usecase=workflow

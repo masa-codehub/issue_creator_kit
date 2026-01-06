@@ -1,5 +1,4 @@
 # ruff: noqa: T201
-import contextlib
 import re
 from graphlib import CycleError, TopologicalSorter
 from pathlib import Path
@@ -239,16 +238,29 @@ class IssueCreationUseCase:
 
         # 8. Auto-PR (Phase Promotion)
         if self.workflow and next_phases:
+            # Capture current branch to restore later
+            original_branch = self.git.get_current_branch()
+
             for np_path in next_phases:
                 try:
                     print(f"Triggering Auto-PR for next phase: {np_path}")
                     self.workflow.promote_next_phase(np_path)
 
-                    # Switch back to main to ensure subsequent logic works
-                    self.git.checkout("main")
+                    # Switch back to original branch to ensure subsequent logic works
+                    self.git.checkout(original_branch)
 
                 except Exception as e:
                     print(f"Error calling promote_next_phase for {np_path}: {e}")
                     # Try to recover state
-                    with contextlib.suppress(Exception):
-                        self.git.checkout("main")
+                    try:
+                        self.git.checkout(original_branch)
+                    except Exception as recovery_error:
+                        print(
+                            "CRITICAL: Failed to recover to original branch "
+                            f"'{original_branch}' after error. "
+                            f"Repository may be inconsistent. Error: {recovery_error}"
+                        )
+                        # Re-raise the original error or the recovery error?
+                        # Re-raising the original error is usually better for the caller,
+                        # but we must ensure they know the state is bad.
+                        raise e from recovery_error
