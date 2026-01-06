@@ -74,9 +74,3 @@ class FileSystemAdapter:
         if not dir_path.exists():
             return []
         return list(dir_path.glob(pattern))
-
-    def read_file(self, path: Path | str) -> str:
-        return Path(path).read_text(encoding="utf-8")
-
-    def write_file(self, path: Path | str, content: str) -> None:
-        Path(path).write_text(content, encoding="utf-8")
