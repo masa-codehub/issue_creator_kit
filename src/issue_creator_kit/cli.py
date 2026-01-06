@@ -10,6 +10,7 @@ from issue_creator_kit.infrastructure.git_adapter import GitAdapter
 from issue_creator_kit.infrastructure.github_adapter import GitHubAdapter
 from issue_creator_kit.usecase.approval import ApprovalUseCase
 from issue_creator_kit.usecase.creation import IssueCreationUseCase
+from issue_creator_kit.usecase.roadmap_sync import RoadmapSyncUseCase
 from issue_creator_kit.usecase.workflow import WorkflowUseCase
 
 PACKAGE_ROOT = Path(__file__).parent
@@ -44,18 +45,22 @@ def init_project(args):
 
 
 def run_automation(args):
-    """Run the issue creation automation."""
-    print("Running issue automation...")
+    """Run the issue creation automation (Virtual Queue)."""
+    print("Running issue automation (Virtual Queue)...")
 
     fs = FileSystemAdapter()
-    gh = GitHubAdapter()
-    usecase = IssueCreationUseCase(fs, gh)
-
-    queue_dir = Path("reqs/tasks/_queue")
-    archive_dir = Path("reqs/tasks/archive")
+    gh = GitHubAdapter(repo=args.repo, token=args.token)
+    git = GitAdapter()
+    roadmap_sync = RoadmapSyncUseCase(fs)
+    usecase = IssueCreationUseCase(fs, gh, git_adapter=git, roadmap_sync=roadmap_sync)
 
     try:
-        usecase.create_issues_from_queue(queue_dir, archive_dir)
+        usecase.create_issues_from_virtual_queue(
+            base_ref=args.before,
+            head_ref=args.after,
+            archive_path=args.archive_dir,
+            roadmap_path=args.roadmap,
+        )
     except Exception as e:
         print(f"Automation failed: {e}", file=sys.stderr)
         sys.exit(1)
@@ -138,8 +143,33 @@ def main():
         "--force", "-f", action="store_true", help="Overwrite existing files"
     )
 
-    # run command (issue creation)
-    subparsers.add_parser("run", help="Run the issue creation automation")
+    # process-diff command (virtual queue)
+    diff_parser = subparsers.add_parser(
+        "process-diff", help="Run the issue creation automation from git diff"
+    )
+    diff_parser.add_argument(
+        "--before", required=True, help="Base ref/SHA for comparison"
+    )
+    diff_parser.add_argument(
+        "--after", required=True, help="Head ref/SHA for comparison"
+    )
+    diff_parser.add_argument(
+        "--archive-dir",
+        default="reqs/tasks/archive/",
+        help="Directory to check for added task files",
+    )
+    diff_parser.add_argument(
+        "--roadmap",
+        help="Path to the roadmap file to synchronize",
+    )
+    diff_parser.add_argument(
+        "--repo",
+        help="GitHub repository (owner/repo). Defaults to GITHUB_REPOSITORY if not set.",
+    )
+    diff_parser.add_argument(
+        "--token",
+        help="GitHub token. Defaults to GITHUB_TOKEN if not set.",
+    )
 
     # run-workflow command
     workflow_parser = subparsers.add_parser(
@@ -220,7 +250,7 @@ def main():
 
     if args.command == "init":
         init_project(args)
-    elif args.command == "run":
+    elif args.command == "process-diff":
         run_automation(args)
     elif args.command == "run-workflow":
         run_workflow(args)
