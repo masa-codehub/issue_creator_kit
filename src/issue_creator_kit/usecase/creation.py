@@ -1,4 +1,5 @@
 # ruff: noqa: T201
+import contextlib
 import re
 from graphlib import CycleError, TopologicalSorter
 from pathlib import Path
@@ -8,6 +9,7 @@ from issue_creator_kit.infrastructure.filesystem import FileSystemAdapter
 from issue_creator_kit.infrastructure.git_adapter import GitAdapter
 from issue_creator_kit.infrastructure.github_adapter import GitHubAdapter
 from issue_creator_kit.usecase.roadmap_sync import RoadmapSyncUseCase
+from issue_creator_kit.usecase.workflow import WorkflowUseCase
 
 
 class IssueCreationUseCase:
@@ -21,11 +23,13 @@ class IssueCreationUseCase:
         github_adapter: GitHubAdapter,
         git_adapter: GitAdapter | None = None,
         roadmap_sync: RoadmapSyncUseCase | None = None,
+        workflow_usecase: WorkflowUseCase | None = None,
     ):
         self.fs = fs_adapter
         self.github = github_adapter
         self.git = git_adapter
         self.roadmap_sync = roadmap_sync
+        self.workflow = workflow_usecase
 
     def _parse_dependencies(self, doc: Document) -> set[str]:
         """Parse dependencies from document metadata and return a set of filenames."""
@@ -188,14 +192,45 @@ class IssueCreationUseCase:
             self.fs.update_metadata(path, {"issue": f"#{issue_number}"})
             processed_paths.append(str(path))
 
-        # 6. Roadmap Sync
-        if roadmap_path and self.roadmap_sync:
-            try:
-                self.roadmap_sync.sync(roadmap_path, results)
-                processed_paths.append(roadmap_path)
-            except Exception as e:
-                print(f"Warning: Failed to sync roadmap at {roadmap_path}: {e}")
-                # We continue even if roadmap sync fails, but we don't add it to commit if sync didn't happen
+        # 6. Roadmap Sync (Dynamic)
+        roadmap_groups: dict[str, list[tuple[Path, int]]] = {}
+        if roadmap_path:
+            roadmap_groups[roadmap_path] = []
+
+        next_phases = set()
+
+        for path, issue_number in results:
+            target_doc = doc_map.get(path.name)
+            if not target_doc:
+                continue
+
+            # Roadmap Grouping
+            r_path = target_doc.metadata.get("roadmap_path")
+            if r_path:
+                if r_path not in roadmap_groups:
+                    roadmap_groups[r_path] = []
+                roadmap_groups[r_path].append((path, issue_number))
+            elif roadmap_path:
+                # Fallback to default roadmap if not specified in doc
+                # Avoid duplication if logic already added it?
+                # Using set to avoid duplicates in list? sync() handles duplicates but better here.
+                # However, tuples are (path, int), so unique per task.
+                roadmap_groups[roadmap_path].append((path, issue_number))
+
+            # Next Phase Detection
+            np = target_doc.metadata.get("next_phase_path")
+            if np:
+                next_phases.add(np)
+
+        if self.roadmap_sync:
+            for r_path, r_results in roadmap_groups.items():
+                if not r_results:
+                    continue
+                try:
+                    self.roadmap_sync.sync(r_path, r_results)
+                    processed_paths.append(r_path)
+                except Exception as e:
+                    print(f"Warning: Failed to sync roadmap at {r_path}: {e}")
 
         # 7. Git Commit
         if processed_paths:
@@ -205,3 +240,21 @@ class IssueCreationUseCase:
             except Exception as e:
                 print(f"Error during git commit: {e}")
                 raise
+
+                # 8. Auto-PR (Phase Promotion)
+                if self.workflow and next_phases:
+                    for np_path in next_phases:
+                        try:
+                            print(f"Triggering Auto-PR for next phase: {np_path}")
+                            self.workflow.promote_next_phase(np_path)
+
+                            # Switch back to main to ensure subsequent logic (like pushing changes) works
+                            self.git.checkout("main")
+
+                        except Exception as e:
+                            print(
+                                f"Error calling promote_next_phase for {np_path}: {e}"
+                            )
+                            # Try to recover state
+                            with contextlib.suppress(Exception):
+                                self.git.checkout("main")
