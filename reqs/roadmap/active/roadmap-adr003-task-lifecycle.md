@@ -57,8 +57,7 @@ Phase 2 では、実装を「差分検知」「一括起票」「ロードマッ
 | Task ID | Category | タスク内容 | 成果物 | 依存先 | リンク / Issue |
 | :---: | :---: | :--- | :--- | :---: | :--- |
 | T3-1 | Setup | Phase 3 Foundation ブランチ `feature/phase-3-foundation` の作成 | ブランチ | T2-7 | [issue-T3-1.md](../../tasks/drafts/adr-003/phase-3/issue-T3-1.md) |
-| T3-2 | Clean | 物理 `_queue` フォルダ関連コードの完全削除 | コード削除 | T3-1 | [issue-T3-2.md](../../tasks/drafts/adr-003/phase-3/issue-T3-2.md) |
-| T3-3 | Docs | システムコンテキストと運用ガイド（新しい起票手順）の最新化 | `docs/` 更新 | T3-2 | [issue-T3-3.md](../../tasks/drafts/adr-003/phase-3/issue-T3-3.md) |
+| T3-3 | Docs | システムコンテキストと運用ガイド（新しい起票手順）の最新化 | `docs/` 更新 | T3-1 | [issue-T3-3.md](../../tasks/drafts/adr-003/phase-3/issue-T3-3.md) |
 | T3-4 | Review | ロードマップ完了宣言とアーカイブ | 移動 | T3-3 | [issue-T3-4.md](../../tasks/drafts/adr-003/phase-3/issue-T3-4.md) |
 
 ## 3. リスク管理とロールバック
