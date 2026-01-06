@@ -48,6 +48,9 @@ class GitAdapter:
     def move_file(self, src: str, dst: str):
         self.run_command(["mv", src, dst])
 
+    def get_current_branch(self) -> str:
+        return self.run_command(["rev-parse", "--abbrev-ref", "HEAD"])
+
     def get_added_files(self, base_ref: str, head_ref: str, path: str) -> list[str]:
         """
         Get a list of newly added files in the specified path.
