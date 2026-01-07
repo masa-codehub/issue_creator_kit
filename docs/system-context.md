@@ -59,8 +59,8 @@ GitHubを用いたソフトウェア開発において、アーキテクチャ�
 | アクター名 | 役割 / 目的 |
 | :--- | :--- |
 | **Architect (Human)** | 高レベルな設計（ADR/Design Doc）を作成・承認し、ビジネス価値を定義する。 |
-| **AI Agent** | 承認された設計を解析し、依存関係（`Depends-On`）を含む Draft Issue へ分解・作成する。 |
-| **Developer (Human/Agent)** | 自動起票されたIssueと紐づいた設計ドキュメントを参照して実装を行う。 |
+| **AI Agent** | 承認された設計に基づくタスクの細分化、起票 PR (Draft -> Archive) の作成、および Issue の実装を行う。 |
+| **Developer (Human)** | 自動起票された Issue の実装、および PR レビューを行う。 |
 
 ### 4.2 外部システム
 | システム名 | 連携内容 / プロトコル |
