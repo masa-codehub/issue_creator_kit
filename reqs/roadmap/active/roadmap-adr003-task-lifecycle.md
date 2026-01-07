@@ -4,7 +4,7 @@
 
 - **Status**: Active
 - **Target Design**: [ADR-003](../../design/_approved/adr-003-task-and-roadmap-lifecycle.md)
-- **Last Updated**: 2026-01-06
+- **Last Updated**: 2026-01-07
 
 ## 1. 実装戦略の要約
 物理フォルダとしての `_queue/` を廃止し、GitHub Actions が `archive/` へマージ差分を検知して起票を行う「仮想キュー」へ移行します。
