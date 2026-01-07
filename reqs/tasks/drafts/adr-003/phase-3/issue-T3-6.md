@@ -22,7 +22,7 @@ status: "Draft"
 - **Design Evidence (設計の根拠)**: ADR-003
 
 ## 2. 参照資料・入力ファイル (Input Context)
-- [ ] `reqs/design/_approved/design-003-v2-auto-pr.md`
+- [ ] `docs/specs/auto-pr-logic.md`
 
 ## 3. 実装手順と制約 (Implementation Steps & Constraints)
 

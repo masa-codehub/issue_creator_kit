@@ -30,7 +30,7 @@ status: "Draft"
 - [ ] **制約**: `process-diff` コマンドにロジックを混在させないこと（責務分離）。
 
 ### 3.2. 実装手順 (Changes)
-- [ ] **設計**: `reqs/design/_inbox/design-003-v2-auto-pr.md` を作成。
+- [ ] **設計**: `docs/specs/auto-pr-logic.md` を作成。
     - トリガー: `pull_request` (closed & merged == true)
     - ロジック: マージされたPRから関連Issueを特定 -> Issueのメタデータ(next_phase_path)を取得 -> Auto-PR作成。
 - [ ] **承認**: レビューとマージ。
@@ -46,4 +46,4 @@ status: "Draft"
 - [ ] **観測される挙動**: 設計ドキュメントが承認（マージ）されること。
 
 ## 6. 成果物 (Deliverables)
-- `reqs/design/_approved/design-003-v2-auto-pr.md`
+- `docs/specs/auto-pr-logic.md`

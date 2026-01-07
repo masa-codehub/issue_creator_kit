@@ -19,10 +19,10 @@ status: "Draft"
 ## 1. 目的と背景 (Goal & Context)
 - **As-is (現状)**: `auto-create-issues.yml` (pushトリガー) しかない。
 - **To-be (あるべき姿)**: `auto-phase-promotion.yml` (pull_request closedトリガー) が存在し、完了時に Auto-PR ロジックを呼び出す。
-- **Design Evidence (設計の根拠)**: design-003-v2-auto-pr.md
+- **Design Evidence (設計の根拠)**: docs/specs/auto-pr-logic.md
 
 ## 2. 参照資料・入力ファイル (Input Context)
-- [ ] `reqs/design/_approved/design-003-v2-auto-pr.md`
+- [ ] `docs/specs/auto-pr-logic.md`
 
 ## 3. 実装手順と制約 (Implementation Steps & Constraints)
 

@@ -18,11 +18,11 @@ status: "Draft"
 
 ## 1. 目的と背景 (Goal & Context)
 - **As-is (現状)**: Auto-PR のロジックが存在しない（バグ修正で削除済み）。
-- **To-be (あるべき姿)**: `design-003-v2-auto-pr.md` に基づき、タスク完了時に Auto-PR を作成する機能が実装されている。
-- **Design Evidence (設計の根拠)**: design-003-v2-auto-pr.md
+- **To-be (あるべき姿)**: `docs/specs/auto-pr-logic.md` に基づき、タスク完了時に Auto-PR を作成する機能が実装されている。
+- **Design Evidence (設計の根拠)**: docs/specs/auto-pr-logic.md
 
 ## 2. 参照資料・入力ファイル (Input Context)
-- [ ] `reqs/design/_approved/design-003-v2-auto-pr.md`
+- [ ] `docs/specs/auto-pr-logic.md`
 
 ## 3. 実装手順と制約 (Implementation Steps & Constraints)
 
