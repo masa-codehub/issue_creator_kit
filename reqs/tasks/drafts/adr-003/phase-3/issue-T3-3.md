@@ -1,30 +1,28 @@
 ---
-title: "システムコンテキストと運用ガイドの最新化"
+title: "Auto-PR ロジックの実装"
 labels:
   - "task"
   - "P1"
-  - "TECHNICAL_DESIGNER"
+  - "BACKENDCODER"
 roadmap: "reqs/roadmap/active/roadmap-adr003-task-lifecycle.md"
 task_id: "T3-3"
-depends_on: ["issue-T3-1.md"]
+depends_on: ["issue-T3-2.md"]
 next_phase_path: ""
 status: "Draft"
 ---
-# システムコンテキストと運用ガイドの最新化
+# Auto-PR ロジックの実装
 
 ## 親Issue / ロードマップ (Context)
 - **Roadmap**: reqs/roadmap/active/roadmap-adr003-task-lifecycle.md
 - **Task ID**: T3-3
 
 ## 1. 目的と背景 (Goal & Context)
-- **As-is (現状)**: ドキュメント（システムコンテキストやADR-001）が古い物理キュー方式を説明していたり、ステータスが不正確である。
-- **To-be (あるべき姿)**: 新しい「仮想キュー」「Auto-PR」方式を反映し、ADR-001 も実装済みのロジック仕様として正しく定義されている。
-- **Design Evidence (設計の根拠)**: ADR-003
+- **As-is (現状)**: Auto-PR のロジックが存在しない（バグ修正で削除済み）。
+- **To-be (あるべき姿)**: `design-003-v2-auto-pr.md` に基づき、タスク完了時に Auto-PR を作成する機能が実装されている。
+- **Design Evidence (設計の根拠)**: design-003-v2-auto-pr.md
 
 ## 2. 参照資料・入力ファイル (Input Context)
-- [ ] `docs/system-context.md`
-- [ ] `docs/guides/development-setup.md`
-- [ ] `reqs/design/_approved/adr-001-issue-creation-logic.md`
+- [ ] `reqs/design/_approved/design-003-v2-auto-pr.md`
 
 ## 3. 実装手順と制約 (Implementation Steps & Constraints)
 
@@ -32,22 +30,19 @@ status: "Draft"
 - [ ] なし
 
 ### 3.2. 実装手順 (Changes)
-- [ ] **ファイル**: `docs/system-context.md`
-    - **処理内容**: システムの仕組み説明を更新（Virtual Queue の詳細化、Physical Queue 廃止の明記）。
-- [ ] **ファイル**: `docs/guides/development-setup.md`
-    - **処理内容**: 開発者が Issue を起票する手順（Draft作成 → `archive/` への移動 PR 作成 → マージによる自動起票）を具体的に解説。
-- [ ] **ファイル**: `reqs/design/_approved/adr-001-issue-creation-logic.md`
-    - **処理内容**: ステータスを「承認済み/実装済み」に更新。「物理キュー」の記述を「仮想キュー（ADR-003参照）」に修正し、依存解決ロジックの SSOT として整備する。
+- [ ] **CLI拡張**: `process-pr-merge` (仮) のような新コマンド、または既存コマンドへのフラグ追加。
+- [ ] **UseCase実装**: `WorkflowUseCase` に「完了Issueからの次フェーズ特定・PR作成」ロジックを追加。
+- [ ] **テスト**: 単体テストの追加。
 
 ### 3.3. 構成変更・削除 (Configuration / Cleanup)
 - なし
 
 ## 4. ブランチ戦略 (Branching Strategy)
 - **ベースブランチ (Base Branch)**: `feature/phase-3-foundation`
-- **作業ブランチ (Feature Branch)**: `feature/T3-3-docs-update`
+- **作業ブランチ (Feature Branch)**: `feature/task-T3-3-impl`
 
 ## 5. 検証手順・完了条件 (Verification & DoD)
-- [ ] **観測される挙動**: ドキュメントレビュー通過。
+- [ ] **自動テスト**: 新規ロジックのユニットテストがパスすること。
 
 ## 6. 成果物 (Deliverables)
-- 更新されたドキュメント群
+- 実装コード

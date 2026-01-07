@@ -1,24 +1,24 @@
 ---
-title: "Phase 3 Foundation ブランチ作成・確認"
+title: "Phase 4 Foundation ブランチ作成"
 labels:
   - "task"
   - "P1"
   - "SYSTEM_ARCHITECT"
 roadmap: "reqs/roadmap/active/roadmap-adr003-task-lifecycle.md"
-task_id: "T3-1"
-depends_on: ["issue-T2-7.md"]
+task_id: "T4-1"
+depends_on: ["issue-T3-6.md"]
 next_phase_path: ""
 status: "Draft"
 ---
-# Phase 3 Foundation ブランチ作成・確認
+# Phase 4 Foundation ブランチ作成
 
 ## 親Issue / ロードマップ (Context)
 - **Roadmap**: reqs/roadmap/active/roadmap-adr003-task-lifecycle.md
-- **Task ID**: T3-1
+- **Task ID**: T4-1
 
 ## 1. 目的と背景 (Goal & Context)
-- **As-is (現状)**: Phase 3 は「自動化ロジックの修正」フェーズとして再定義された。Auto-PR (#147) により `feature/phase-3-foundation` は既に作成されている可能性がある。
-- **To-be (あるべき姿)**: `feature/phase-3-foundation` が存在し、最新の `main` と同期されている。
+- **As-is (現状)**: Phase 3 (Logic Repair) が完了している。
+- **To-be (あるべき姿)**: `feature/phase-4-foundation` が存在する。
 - **Design Evidence (設計の根拠)**: ADR-003
 
 ## 2. 参照資料・入力ファイル (Input Context)
@@ -27,23 +27,20 @@ status: "Draft"
 ## 3. 実装手順と制約 (Implementation Steps & Constraints)
 
 ### 3.1. 負の制約 (Negative Constraints)
-- [ ] なし
+- [ ] **確認**: もし Auto-PR で既に作られていたら、それをチェックアウトして利用する。
 
 ### 3.2. 実装手順 (Changes)
-- [ ] **Git操作**:
-    - ブランチ `feature/phase-3-foundation` の存在確認。
-    - 存在する場合は checkout し、`main` をマージして最新化。
-    - 存在しない場合は作成。
+- [ ] **Git操作**: ブランチの確認または作成。
 
 ### 3.3. 構成変更・削除 (Configuration / Cleanup)
 - なし
 
 ## 4. ブランチ戦略 (Branching Strategy)
 - **ベースブランチ (Base Branch)**: `main`
-- **作業ブランチ (Feature Branch)**: `feature/phase-3-foundation`
+- **作業ブランチ (Feature Branch)**: `feature/phase-4-foundation`
 
 ## 5. 検証手順・完了条件 (Verification & DoD)
-- [ ] **観測される挙動**: ブランチが利用可能であること。
+- [ ] **観測される挙動**: ブランチが存在する。
 
 ## 6. 成果物 (Deliverables)
 - ブランチ
