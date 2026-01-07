@@ -9,6 +9,7 @@ task_id: "T3-1"
 depends_on: ["issue-T2-7.md"]
 next_phase_path: ""
 status: "Draft"
+issue: "#154"
 ---
 # Phase 3 Foundation ブランチ作成・確認
 

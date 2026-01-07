@@ -9,6 +9,7 @@ task_id: "T3-3"
 depends_on: ["issue-T3-2.md"]
 next_phase_path: ""
 status: "Draft"
+issue: "#156"
 ---
 # Auto-PR ロジックの実装
 

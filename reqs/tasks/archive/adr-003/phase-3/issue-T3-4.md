@@ -9,6 +9,7 @@ task_id: "T3-4"
 depends_on: ["issue-T3-3.md"]
 next_phase_path: ""
 status: "Draft"
+issue: "#157"
 ---
 # GitHub Actions ワークフローの構築
 

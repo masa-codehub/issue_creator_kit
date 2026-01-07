@@ -9,6 +9,7 @@ task_id: "T3-2"
 depends_on: ["issue-T3-1.md"]
 next_phase_path: ""
 status: "Draft"
+issue: "#155"
 ---
 # Auto-PR ロジックの詳細設計 (Re-Design)
 

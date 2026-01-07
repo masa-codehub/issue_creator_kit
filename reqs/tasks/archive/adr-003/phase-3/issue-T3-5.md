@@ -9,6 +9,7 @@ task_id: "T3-5"
 depends_on: ["issue-T3-4.md"]
 next_phase_path: ""
 status: "Draft"
+issue: "#158"
 ---
 # 統合検証（完了トリガーによるAuto-PR）
 
