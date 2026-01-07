@@ -19,7 +19,7 @@ status: "Draft"
 
 ## 1. 目的と背景 (Goal & Context)
 - **As-is (現状)**: ロジックとワークフローが実装されたが、実機（GitHub）での連鎖挙動が未確認。
-- **To-be (あるべき姿)**: PR マージという「人間またはエージェントの操作」が、正しく次フェーズの PR 作成を誘発することが実証されている。
+- **To-be (あるべき姿)**: ダミーPRのマージを通じて、Auto-PR が正しく作成されることが実証されている。
 - **Design Evidence (設計の根拠)**: ADR-003 第 3.3 項 (ステップ 5-6)
 
 ## 2. 参照資料・入力ファイル (Input Context)
@@ -29,20 +29,22 @@ status: "Draft"
 ## 3. 実装手順と制約 (Implementation Steps & Constraints)
 
 ### 3.1. 負の制約 (Negative Constraints)
-- [ ] **汚染禁止**: 検証に使用するダミーの Issue や PR は、完了後に必ずクリーンアップすること。
+- [ ] **自己マージ禁止**: 本タスク (T3-5) の PR をマージすることで検証完了としてはならない。必ず**別のダミー PR** を用いて検証すること。
+- [ ] **汚染禁止**: 検証に使用するダミーの Issue や PR は、検証終了後に必ずクリーンアップすること。
 
 ### 3.2. 実装手順 (Changes)
 - [ ] **模擬タスク投入**:
-    - `drafts/test-phase/` に `next_phase_path` を持つ md ファイルを配置し、`archive/` へ移動する PR をマージ（起票）。
+    - `reqs/tasks/drafts/test-phase/issue-test.md` (next_phase_path 設定済み) を作成。
+    - これを `reqs/tasks/archive/test-phase/` へ移動する PR を作成・マージし、Issue を起票させる。
 - [ ] **完了シミュレーション**:
-    - 起票された Issue に対する「実装完了 PR」を作成（`Closes #TestIssue` を記載）。
-    - PR を `main` へマージ。
+    - 起票された Issue に対する「実装完了ダミー PR」を作成（`Closes #TestIssue` を記載）。
+    - ダミー PR を `main` へマージ。
 - [ ] **連鎖確認**:
     - 数分待機し、Actions が正常終了することを確認。
-    - 次フェーズ（指定した `next_phase_path`）の Draft が Archive に移動する新しい PR が自動作成されていることを確認。
+    - 次フェーズ（`test-phase-next` 等）の Draft が Archive に移動する新しい PR が自動作成されていることを確認。
 
 ### 3.3. 構成変更・削除 (Configuration / Cleanup)
-- [ ] **クリーンアップ**: 検証用のブランチ、Issue、ファイルを全て削除。
+- [ ] **クリーンアップ**: 検証で作成されたブランチ、Issue、PR、ファイルを全て削除。
 
 ## 4. ブランチ戦略 (Branching Strategy)
 - **Pattern**: Feature (Integration Test)
