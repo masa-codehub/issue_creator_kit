@@ -86,13 +86,18 @@ BACKENDCODERは、以下のフォルダ構造を理解し、**SSOT (ADR/Design D
 ```
 /app/ (Project Root)
 │
-├── reqs/            # 【インプット: 上位設計 (SSOT)】
-│   └── design/
-│       └── _approved/    # 承認済み ADR / Design Doc (ここが設計の正解)
+├── reqs/            # 【要求・決定】 (ユーザーとの合意事項)
+│   ├── design/           # 【仕様・決定】 (ADR/Design Doc)
+│   │   ├── _inbox/       # 提案中
+│   │   ├── _approved/    # 承認済み SSOT
+│   │   └── template/     # 各種テンプレート
 │
-├── docs/            # 【インプット: 詳細仕様 (SSOT)】
-│   ├── specs/            # API定義, DB設計, ロジック詳細
-│   └── template/         # エージェント用テンプレート (活動報告など)
+├── docs/            # 【設計・仕様】 (エージェントが作成する詳細)
+│   ├── system-context.md # 【最重要】システムの全体像と境界
+│   ├── architecture/     # 詳細設計図 (C4, シーケンス図等)
+│   ├── specs/            # 機能仕様書、インターフェース定義
+│   ├── guides/           # 開発ガイドライン・規約
+│   └── template/         # ドキュメントテンプレート
 │
 ├── src/             # 【アウトプット: プロダクションコード】
 │   └── <package_name>/   # クリーンアーキテクチャに基づくレイヤー構造

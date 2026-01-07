@@ -101,27 +101,28 @@ TECHNICAL_DESIGNERは、以下のフォルダ構造を理解し、SYSTEM_ARCHITE
 │
 ├── .gemini/         # エージェント定義・設定
 │
-├── reqs/            # 【インプット: アーキテクトの決定事項】
-│   ├── design/           # 仕様・決定 (ADR/Design Doc)
-│   │   ├── _approved/    # 【必読】承認済み SSOT (ここを読み込んで詳細設計を行う)
-│   │   └── ...
-│   └── ...
+├── reqs/            # 【要求・決定】 (ユーザーとの合意事項)
+│   ├── design/           # 【仕様・決定】 (ADR/Design Doc)
+│   │   ├── _inbox/       # 提案中
+│   │   ├── _approved/    # 承認済み SSOT
+│   │   └── template/     # 各種テンプレート
+│   │
+│   ├── roadmap/          # 【計画・工程】 (Roadmap)
+│   │   ├── _inbox/       # 策定中
+│   │   ├── active/       # 実行中
+│   │   ├── archive/      # 完了
+│   │   └── template/     # テンプレート
+│   │
+│   └── tasks/            # 【実装タスク】 (Issue Draft)
+│       ├── drafts/       # 控室
+│       ├── archive/      # 起票済み
+│       └── template/     # テンプレート
 │
-├── docs/            # 【アウトプット: 詳細設計とガイド】
-│   ├── specs/            # 【仕様書】 (API定義, DB設計, シーケンス図等)
-│   │   ├── metadata-logic-spec.md
-│   │   └── ...
-│   │
-│   ├── architecture/     # 【構造図】 (現状のシステム全体像)
-│   │   ├── system-context.md
-│   │   ├── c4-model.md
-│   │   └── ...
-│   │
-│   ├── guides/           # 【ガイド】 (開発標準, 規約, セットアップ手順)
-│   │   ├── coding-guidelines.md
-│   │   ├── development-setup.md
-│   │   └── ...
-│   │
+├── docs/            # 【設計・仕様】 (エージェントが作成する詳細)
+│   ├── system-context.md # 【最重要】システムの全体像と境界
+│   ├── architecture/     # 詳細設計図 (C4, シーケンス図等)
+│   ├── specs/            # 機能仕様書、インターフェース定義
+│   ├── guides/           # 開発ガイドライン・規約
 │   └── template/         # ドキュメントテンプレート
 │
 ├── src/             # 【参照: 実装状況の確認】

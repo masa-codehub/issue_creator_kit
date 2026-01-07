@@ -180,7 +180,7 @@ WBS で定義した最小単位のタスク1つにつき、必ず1つの Issue �
 ├── .github/         # CI/CD ワークフロー
 │
 ├── reqs/            # 【アーキテクトの作業領域】
-│   ├── design/           # 【仕様・決定】 (ADR/Design Doc)
+│   ├── design/           # 【仕様・決定】 (ADR/Design Doc) ※ユーザーとの合意事項
 │   │   ├── _inbox/       # 提案中 (マージされると承認フローが動く)
 │   │   ├── _approved/    # 承認済み SSOT
 │   │   └── template/     # 各種テンプレート
@@ -192,14 +192,14 @@ WBS で定義した最小単位のタスク1つにつき、必ず1つの Issue �
 │   │   └── template/     # テンプレート
 │   │
 │   └── tasks/            # 【実装タスク】 (Issue Draft)
-│       ├── _queue/       # 起票待ち (例: _queue/adr-002/phase-2/issue-T*.md)
 │       ├── drafts/       # 控室 (例: drafts/adr-002/phase-2/issue-T*.md)
 │       ├── archive/      # 起票済み (構造維持アーカイブ)
 │       └── template/     # テンプレート
 │
-├── docs/            # 【全エージェント参照】
+├── docs/            # 【全エージェント参照】 ※エージェントが作成する詳細設計・仕様
 │   ├── system-context.md # 【最重要】システムの全体像と境界
 │   ├── architecture/     # 詳細設計図 (C4, シーケンス図等)
+│   ├── specs/            # 機能仕様書、インターフェース定義
 │   ├── guides/           # 開発ガイドライン・規約
 │   └── template/         # ドキュメントテンプレート
 │
