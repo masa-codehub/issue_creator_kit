@@ -9,6 +9,7 @@ task_id: "T3-6"
 depends_on: ["issue-T3-5.md"]
 next_phase_path: "reqs/tasks/drafts/adr-003/phase-4/"
 status: "Draft"
+issue: "#159"
 ---
 # Phase 3 完了監査と次フェーズへのプロモーション
 
