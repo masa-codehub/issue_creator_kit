@@ -42,16 +42,17 @@ GitHub を用いた高度なソフトウェア開発において、設計から�
 3.  **Phase End**: フェーズ最後のタスク（Review）の完了をもって、**Foundation Branch** を `main` へマージする。これが次フェーズへの連鎖合図となる。
 
 ### 3. 自己推進型ワークフロー（フェーズ連鎖）
-「仕事（実装フェーズ）が終わったら次を呼ぶ」サイクルを自動化する。
+本システムは以下の 8 ステップに従い、フェーズの進行と自動起票を連鎖させる。
 
-- **トリガー規約**:
-    - 各フェーズの最終タスク（例: `Review & Merge`）の Frontmatter に `next_phase_path: "reqs/tasks/drafts/adr-xxx/phase-2/"` を記述する。
-- **Actions による自動連鎖 (Auto-PR)**:
-    1.  **検知**: 最終タスク（Review）を含むブランチが `main` にマージされたことを検知。
-    2.  **次フェーズ準備**: ICK が `next_phase_path` を読み取り、`main` から **次フェーズ用 Foundation Branch** (例: `feature/phase-2-foundation`) を作成。
-    3.  **移動コミット**: `drafts/adr-xxx/phase-2/` 内の全ファイルを `reqs/tasks/archive/adr-xxx/phase-2/` へ物理的に移動し、コミット・プッシュする。
-    4.  **PR 作成**: **「次フェーズ起票 PR」** (Title: `feat: promote phase-2 tasks to archive`) を `main` へ向けて自動作成する。
-- **異常時の挙動**: PR 作成に失敗した場合は、不整合を防ぐため「移動を行わず、ログを出力して停止」する。
+1. **drafts/** から **archive/** への `*.md` の移動（プルリクエスト #1 を手動作成）
+2. **プルリクエスト #1** を `main` にマージ
+3. **Issue を自動起票**（移動した `*.md` のみ）
+4. Issue を全て実装し、フェーズのブランチへマージ
+5. **最終 Issue を完了**（フェーズのブランチを `main` にマージ）
+6. **次のフェーズの *.md を drafts/ から archive/ へ移動**（プルリクエスト #N を自動起票）
+   - ※最終 Issue の判定は、タスク定義の `next_phase_path` メタデータの有無等で行う。
+7. **プルリクエスト #N** を `main` にマージ
+8. **Issue を自動起票**。以下、その ADR/Design-Doc の Issue が全て処理されるまで続く。
 
 ### 4. 自己更新型ロードマップ (Roadmap Sync)
 タスク起票時にロードマップとの整合性を自動で維持する。
