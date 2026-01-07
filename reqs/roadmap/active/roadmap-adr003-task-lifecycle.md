@@ -4,7 +4,7 @@
 
 - **Status**: Active
 - **Target Design**: [ADR-003](../../design/_approved/adr-003-task-and-roadmap-lifecycle.md)
-- **Last Updated**: 2026-01-06
+- **Last Updated**: 2026-01-07
 
 ## 1. 実装戦略の要約
 物理フォルダとしての `_queue/` を廃止し、GitHub Actions が `archive/` へマージ差分を検知して起票を行う「仮想キュー」へ移行します。
@@ -47,18 +47,34 @@ Phase 2 では、実装を「差分検知」「一括起票」「ロードマッ
 | T2-6 | Verify | 統合検証（フェーズ 1→2 の自動リレー確認） | 検証ログ | T2-5 | [issue-T2-6.md](../../tasks/archive/adr-003/phase-2/issue-T2-6.md) |
 | T2-7 | Review | Phase 2 成果物の最終監査と main マージ | PRマージ | T2-6 | [issue-T2-7.md](../../tasks/archive/adr-003/phase-2/issue-T2-7.md) |
 
-### Phase 3: リファクタリングと SSOT 同期
+### Phase 3: 自動化ロジックの修正と完成 (Logic Repair)
+- **Goal (狙い)**: 「Issue 起票時」ではなく「最終 Issue 完了時」に Auto-PR を作成する正しいロジックを設計・実装し、自己推進サイクルを確立する。
+- **Input (前提)**: Phase 2 の完了と、SSOT (ADR-003) の修正。
+- **Deliverables (成果物)**: 正しい `Auto-PR` ロジック (`WorkflowUseCase`), 新規ワークフロー (`auto-phase-promotion.yml`).
+- **Gate (承認条件)**: 完了トリガーによる Auto-PR 作成が実証されること。
+
+**WBS**
+| Task ID | Category | タスク内容 | 成果物 | 依存先 | リンク / Issue |
+| :---: | :---: | :--- | :--- | :---: | :--- |
+| T3-1 | Setup | Phase 3 Foundation ブランチ作成・確認 | ブランチ | T2-7 | [issue-T3-1.md](../../tasks/drafts/adr-003/phase-3/issue-T3-1.md) |
+| T3-2 | Design | Auto-PR ロジックの詳細設計 (Re-Design) | `docs/specs/auto-pr-logic.md` | T3-1 | [issue-T3-2.md](../../tasks/drafts/adr-003/phase-3/issue-T3-2.md) |
+| T3-3 | Impl | Auto-PR ロジックの実装 | コード | T3-2 | [issue-T3-3.md](../../tasks/drafts/adr-003/phase-3/issue-T3-3.md) |
+| T3-4 | Config | GitHub Actions ワークフローの構築 | YAML | T3-3 | [issue-T3-4.md](../../tasks/drafts/adr-003/phase-3/issue-T3-4.md) |
+| T3-5 | Verify | 統合検証（完了トリガーによるAuto-PR） | 検証ログ | T3-4 | [issue-T3-5.md](../../tasks/drafts/adr-003/phase-3/issue-T3-5.md) |
+| T3-6 | Review | Phase 3 完了監査と次フェーズへのプロモーション | PRマージ | T3-5 | [issue-T3-6.md](../../tasks/drafts/adr-003/phase-3/issue-T3-6.md) |
+
+### Phase 4: リファクタリングと SSOT 同期 (Cleanup)
 - **Goal (狙い)**: 旧 `_queue` 方式の残骸を清掃し、システム全体の整合性を取る。
-- **Input (前提)**: Phase 2 の完了。
+- **Input (前提)**: Phase 3 の完了。
 - **Deliverables (成果物)**: 最新化された `system-context.md`、クリーンなコード。
 - **Gate (承認条件)**: 旧コードが完全に削除され、ドキュメントと実装に矛盾がないこと。
 
 **WBS**
 | Task ID | Category | タスク内容 | 成果物 | 依存先 | リンク / Issue |
 | :---: | :---: | :--- | :--- | :---: | :--- |
-| T3-1 | Setup | Phase 3 Foundation ブランチ `feature/phase-3-foundation` の作成 | ブランチ | T2-7 | [issue-T3-1.md](../../tasks/drafts/adr-003/phase-3/issue-T3-1.md) |
-| T3-3 | Docs | システムコンテキストと運用ガイド（新しい起票手順）の最新化 | `docs/` 更新 | T3-1 | [issue-T3-3.md](../../tasks/drafts/adr-003/phase-3/issue-T3-3.md) |
-| T3-4 | Review | ロードマップ完了宣言とアーカイブ | 移動 | T3-3 | [issue-T3-4.md](../../tasks/drafts/adr-003/phase-3/issue-T3-4.md) |
+| T4-1 | Setup | Phase 4 Foundation ブランチ作成 | ブランチ | T3-6 | [issue-T4-1.md](../../tasks/drafts/adr-003/phase-4/issue-T4-1.md) |
+| T4-2 | Docs | システムコンテキストと運用ガイドの最新化 | `docs/` 更新 | T4-1 | [issue-T4-2.md](../../tasks/drafts/adr-003/phase-4/issue-T4-2.md) |
+| T4-3 | Review | ロードマップ完了宣言とアーカイブ | 移動 | T4-2 | [issue-T4-3.md](../../tasks/drafts/adr-003/phase-4/issue-T4-3.md) |
 
 ## 3. リスク管理とロールバック
 - **リスク**: Auto-PR で無限ループ（例: P1 が完了して P1 を再度呼ぶ）が発生する可能性。

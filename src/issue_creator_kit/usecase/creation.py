@@ -196,8 +196,6 @@ class IssueCreationUseCase:
         if roadmap_path:
             roadmap_groups[roadmap_path] = []
 
-        next_phases = set()
-
         for path, issue_number in results:
             target_doc = doc_map.get(path.name)
             if not target_doc:
@@ -211,11 +209,6 @@ class IssueCreationUseCase:
                 roadmap_groups[r_path].append((path, issue_number))
             elif roadmap_path:
                 roadmap_groups[roadmap_path].append((path, issue_number))
-
-            # Next Phase Detection
-            np = target_doc.metadata.get("next_phase_path")
-            if np:
-                next_phases.add(np)
 
         if self.roadmap_sync:
             for r_path, r_results in roadmap_groups.items():
@@ -237,38 +230,3 @@ class IssueCreationUseCase:
             except Exception as e:
                 print(f"Error during git commit/push: {e}")
                 raise
-
-        # 8. Auto-PR (Phase Promotion)
-        if self.workflow and next_phases:
-            # Capture current branch to restore later
-            original_branch = self.git.get_current_branch()
-
-            for np_path in next_phases:
-                try:
-                    print(f"Triggering Auto-PR for next phase: {np_path}")
-                    self.workflow.promote_next_phase(np_path)
-
-                    # Switch back to original branch to ensure subsequent logic works
-                    try:
-                        self.git.checkout(original_branch)
-                    except Exception as e:
-                        print(
-                            f"Warning: Failed to checkout original branch '{original_branch}': {e}. "
-                            "Continuing, but state may be unexpected."
-                        )
-
-                except Exception as e:
-                    print(f"Error calling promote_next_phase for {np_path}: {e}")
-                    # Try to recover state
-                    try:
-                        self.git.checkout(original_branch)
-                    except Exception as recovery_error:
-                        print(
-                            "CRITICAL: Failed to recover to original branch "
-                            f"'{original_branch}' after error. "
-                            f"Repository may be inconsistent. Error: {recovery_error}"
-                        )
-                        # Re-raise the original error or the recovery error?
-                        # Re-raising the original error is usually better for the caller,
-                        # but we must ensure they know the state is bad.
-                        raise e from recovery_error

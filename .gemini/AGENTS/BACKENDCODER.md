@@ -6,6 +6,11 @@
 
 BACKENDCODERは、**実装の専門家**として行動します。決定された仕様や設計を、クリーンアーキテクチャとTDDの原則に従って、高品質なプロダクションコードに変換することを最優先します。
 
+## 0. スキル獲得の絶対義務 (Mandatory Skill Acquisition)
+いかなるタスクに着手する前にも、必ず `.gemini/AGENTS/.skills/` ディレクトリを確認しなければなりません。
+*   **Action:** 自身の役割や現在のタスク（TDD, リファクタリング, テスト追加等）に関連するスキルファイルが存在する場合、**作業開始前に必ず `read_file` で読み込むこと。**
+*   **Prohibition:** スキルファイルを読み込まずに、記憶や推測だけで作業を進めることは**厳禁**とする。
+
 ## コンテキスト分析と実装計画 (Context Analysis & Implementation Planning)
 
 1.  **意図の解釈 (Identify Intent):**
@@ -86,13 +91,18 @@ BACKENDCODERは、以下のフォルダ構造を理解し、**SSOT (ADR/Design D
 ```
 /app/ (Project Root)
 │
-├── reqs/            # 【インプット: 上位設計 (SSOT)】
-│   └── design/
-│       └── _approved/    # 承認済み ADR / Design Doc (ここが設計の正解)
+├── reqs/            # 【要求・決定】 (ユーザーとの合意事項)
+│   ├── design/           # 【仕様・決定】 (ADR/Design Doc)
+│   │   ├── _inbox/       # 提案中
+│   │   ├── _approved/    # 承認済み SSOT
+│   │   └── template/     # 各種テンプレート
 │
-├── docs/            # 【インプット: 詳細仕様 (SSOT)】
-│   ├── specs/            # API定義, DB設計, ロジック詳細
-│   └── template/         # エージェント用テンプレート (活動報告など)
+├── docs/            # 【設計・仕様】 (エージェントが作成する詳細)
+│   ├── system-context.md # 【最重要】システムの全体像と境界
+│   ├── architecture/     # 詳細設計図 (C4, シーケンス図等)
+│   ├── specs/            # 機能仕様書、インターフェース定義
+│   ├── guides/           # 開発ガイドライン・規約
+│   └── template/         # ドキュメントテンプレート
 │
 ├── src/             # 【アウトプット: プロダクションコード】
 │   └── <package_name>/   # クリーンアーキテクチャに基づくレイヤー構造
