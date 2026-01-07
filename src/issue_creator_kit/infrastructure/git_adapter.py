@@ -20,11 +20,13 @@ class GitAdapter:
                 message = "Git command failed"
             raise RuntimeError(message) from e
 
-    def checkout(self, branch: str, create: bool = False):
+    def checkout(self, branch: str, create: bool = False, base: str | None = None):
         cmd = ["checkout"]
         if create:
             cmd.append("-b")
         cmd.append(branch)
+        if create and base:
+            cmd.append(base)
         self.run_command(cmd)
 
     def add(self, paths: list[str]):
@@ -42,3 +44,34 @@ class GitAdapter:
         else:
             cmd.extend([remote, branch])
         self.run_command(cmd)
+
+    def move_file(self, src: str, dst: str):
+        self.run_command(["mv", src, dst])
+
+    def get_current_branch(self) -> str:
+        return self.run_command(["rev-parse", "--abbrev-ref", "HEAD"])
+
+    def get_added_files(self, base_ref: str, head_ref: str, path: str) -> list[str]:
+        """
+        Get a list of newly added files in the specified path.
+
+        Note: This uses --diff-filter=A and --no-renames, meaning files moved via
+        'git mv' will be detected as Added only if Git does not identify them
+        as renames (based on similarity threshold).
+        """
+        cmd = [
+            "diff-tree",
+            "-r",
+            "--no-commit-id",
+            "--name-only",
+            "--diff-filter=A",
+            "--no-renames",
+            base_ref,
+            head_ref,
+            "--",
+            path,
+        ]
+        output = self.run_command(cmd)
+        if not output:
+            return []
+        return output.splitlines()
