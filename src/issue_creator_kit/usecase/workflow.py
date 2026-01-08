@@ -128,7 +128,9 @@ class WorkflowUseCase:
             print(f"Promoting to next phase: {phase_name}")
             # 1. Create foundation branch
             try:
-                self.git_adapter.checkout(new_branch, create=True, base="main")
+                self.git_adapter.checkout(
+                    new_branch, create=True, base="feature/task-T3-5-verify"
+                )
             except RuntimeError as e:
                 # Handle cases where branch already exists specifically
                 if "already exists" in str(e):
@@ -152,7 +154,7 @@ class WorkflowUseCase:
                 title = f"feat: promote {phase_name} tasks"
                 body = f"Automatic promotion of tasks for {phase_name} from drafts to archive."
                 pr_url, pr_number = self.github_adapter.create_pull_request(
-                    title, body, head=new_branch, base="main"
+                    title, body, head=new_branch, base="feature/task-T3-5-verify"
                 )
                 print(f"Successfully created PR #{pr_number}: {pr_url}")
 

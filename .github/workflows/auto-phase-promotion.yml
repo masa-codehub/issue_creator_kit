@@ -8,6 +8,7 @@ on:
     types: [closed]
     branches:
       - main
+      - feature/task-T3-5-verify
 
 permissions:
   contents: write
