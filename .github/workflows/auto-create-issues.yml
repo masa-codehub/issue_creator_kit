@@ -62,5 +62,6 @@ jobs:
             --after "${{ github.event.after }}" \
             --roadmap reqs/roadmap/active/roadmap-adr003-task-lifecycle.md \
             --use-pr \
+            --base-branch "${{ github.ref_name }}" \
             --repo ${{ github.repository }} \
             --token ${{ secrets.GITHUB_TOKEN }}
