@@ -1,6 +1,6 @@
 # 実装・リファクタリング計画: 仮想キューと自己推進型ワークフロー (ADR-003)
 
-このドキュメントは、承認済みの ADR-003 v3（仮想キュー、自己推進、再帰的ブランチ戦略）を安全に実現するための、段階的な手順と WBS を定義します。
+このドキュメントは、承認済みの ADR-003 v3（仮想キュー, 自己推進, 再帰的ブランチ戦略）を安全に実現するための、段階的な手順と WBS を定義します。
 
 - **Status**: Active
 - **Target Design**: [ADR-003](../../design/_approved/adr-003-task-and-roadmap-lifecycle.md)
@@ -57,9 +57,9 @@ Phase 2 では、実装を「差分検知」「一括起票」「ロードマッ
 | Task ID | Category | タスク内容 | 成果物 | 依存先 | リンク / Issue |
 | :---: | :---: | :--- | :--- | :---: | :--- |
 | T3-1 | Setup | Phase 3 Foundation ブランチ作成・確認 | ブランチ | T2-7 | [issue-T3-1.md](../../tasks/archive/adr-003/phase-3/issue-T3-1.md) (#154) |
-| T3-2 | Design | Auto-PR ロジックの詳細設計 (Re-Design) | `docs/specs/auto-pr-logic.md` | T3-1 | [issue-T3-2.md](../../tasks/archive/adr-003/phase-3/issue-T3-2.md) (#155, PR #161) |
-| T3-3 | Impl | Auto-PR ロジックの実装 | コード | T3-2 | [issue-T3-3.md](../../tasks/archive/adr-003/phase-3/issue-T3-3.md) (#156, PR #162) |
-| T3-4 | Config | GitHub Actions ワークフローの構築 | YAML | T3-3 | [issue-T3-4.md](../../tasks/archive/adr-003/phase-3/issue-T3-4.md) (#157, PR #163) |
+| T3-2 | Design | Auto-PR ロジックの詳細設計 (Re-Design) | `docs/specs/auto-pr-logic.md` | T3-1 | [issue-T3-2.md](../../tasks/archive/adr-003/phase-3/issue-T3-2.md) (#155) |
+| T3-3 | Impl | Auto-PR ロジックの実装 | コード | T3-2 | [issue-T3-3.md](../../tasks/archive/adr-003/phase-3/issue-T3-3.md) (#156) |
+| T3-4 | Config | GitHub Actions ワークフローの構築 | YAML | T3-3 | [issue-T3-4.md](../../tasks/archive/adr-003/phase-3/issue-T3-4.md) (#157) |
 | T3-5 | Verify | 統合検証（完了トリガーによるAuto-PR） | 検証ログ | T3-4 | [issue-T3-5.md](../../tasks/archive/adr-003/phase-3/issue-T3-5.md) (#158) |
 | T3-6 | Review | Phase 3 完了監査と次フェーズへのプロモーション | PRマージ | T3-5 | [issue-T3-6.md](../../tasks/archive/adr-003/phase-3/issue-T3-6.md) (#159) |
 
