@@ -57,7 +57,7 @@ Phase 2 では、実装を「差分検知」「一括起票」「ロードマッ
 | Task ID | Category | タスク内容 | 成果物 | 依存先 | リンク / Issue |
 | :---: | :---: | :--- | :--- | :---: | :--- |
 | T3-1 | Setup | Phase 3 Foundation ブランチ作成・確認 | ブランチ | T2-7 | [issue-T3-1.md](../../tasks/archive/adr-003/phase-3/issue-T3-1.md) (#154) |
-| T3-2 | Design | Auto-PR ロジックの詳細設計 (Re-Design) | `docs/specs/auto-pr-logic.md` | T3-1 | [issue-T3-2.md](../../tasks/archive/adr-003/phase-3/issue-T3-2.md) (#155) |
+| T3-2 | Design | Auto-PR ロジックの詳細設計 (Re-Design) | `docs/specs/auto-pr-logic.md` | T3-1 | [issue-T3-2.md](../../tasks/archive/adr-003/phase-3/issue-T3-2.md) (#155, PR #161) |
 | T3-3 | Impl | Auto-PR ロジックの実装 | コード | T3-2 | [issue-T3-3.md](../../tasks/archive/adr-003/phase-3/issue-T3-3.md) (#156) |
 | T3-4 | Config | GitHub Actions ワークフローの構築 | YAML | T3-3 | [issue-T3-4.md](../../tasks/archive/adr-003/phase-3/issue-T3-4.md) (#157) |
 | T3-5 | Verify | 統合検証（完了トリガーによるAuto-PR） | 検証ログ | T3-4 | [issue-T3-5.md](../../tasks/archive/adr-003/phase-3/issue-T3-5.md) (#158) |
