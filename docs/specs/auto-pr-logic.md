@@ -92,13 +92,15 @@ sequenceDiagram
 ### WorkflowUseCase の拡張
 以下のメソッドを追加または改修する。
 
-#### `promote_from_pr(pr_body: str) -> Optional[str]`
-- **引数**: マージされたプルリクエストの本文。
-- **戻り値**: 特定された次フェーズのパス（なければ None）。
+#### `promote_from_merged_pr(pr_body: str, archive_dir: str = "reqs/tasks/archive") -> None`
+- **引数**: 
+    - `pr_body`: マージされたプルリクエストの本文。
+    - `archive_dir`: タスクファイルが格納されているアーカイブディレクトリのパス。
+- **戻り値**: なし
 - **ロジック**:
-    1. 正規表現 `(?i)(?:close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved)\s+#(\d+)` で Issue 番号を抽出。
-    2. `archive/` 下を巡回し、メタデータの `issue` が一致するファイルを探す。
-    3. そのファイルの `next_phase_path` を返す。
+    1. 正規表現 `(?i)(?:close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved)\s*#(\d+)` で Issue 番号を抽出。
+    2. `archive_dir` 下を巡回し、メタデータの `issue` が一致するファイルを探す（O(N+M) のルックアップマップを推奨）。
+    3. そのファイルの `next_phase_path` を特定し、存在する場合は内部で次フェーズへのプロモーション処理を実行する。
 
 #### `create_promotion_pr(next_phase_path: str)`
 - **既存の `promote_next_phase` をベースに詳細化**:
@@ -109,8 +111,10 @@ sequenceDiagram
 ### IssueCreationUseCase の改修
 #### `create_issues_from_virtual_queue`
 - **変更点**: コミット・プッシュ部分を、直接 Push だけでなく「PR作成」を選択可能にする。
-- **新パラメータ**: `use_pr: bool = False`
-- **ロジック**: `use_pr` が True の場合、`chore/metadata-sync-...` ブランチを作成して PR を投げる。
+- **新パラメータ**: 
+    - `use_pr: bool = False`
+    - `base_branch: str = "main"`
+- **ロジック**: `use_pr` が True の場合、`chore/metadata-sync-...` ブランチを作成して PR を投げる。その際 `metadata` ラベルを付与する。
 
 ## 補足・制約事項
 - **原子性の確保**: メタデータ同期 PR がマージされるまで、Issue 番号とファイルの状態は不整合となるが、Git を SSOT とする原則に基づき、PR のマージをもって正とする。

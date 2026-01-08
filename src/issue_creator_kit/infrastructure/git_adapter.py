@@ -29,6 +29,9 @@ class GitAdapter:
             cmd.append(base)
         self.run_command(cmd)
 
+    def fetch(self, remote: str = "origin"):
+        self.run_command(["fetch", remote])
+
     def add(self, paths: list[str]):
         self.run_command(["add"] + paths)
 
