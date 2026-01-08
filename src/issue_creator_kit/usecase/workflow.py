@@ -1,6 +1,8 @@
 # ruff: noqa: T201
+import re
 from pathlib import Path
 
+from issue_creator_kit.infrastructure.filesystem import FileSystemAdapter
 from issue_creator_kit.infrastructure.git_adapter import GitAdapter
 from issue_creator_kit.infrastructure.github_adapter import GitHubAdapter
 from issue_creator_kit.usecase.approval import ApprovalUseCase
@@ -19,10 +21,12 @@ class WorkflowUseCase:
         approval_usecase: ApprovalUseCase | None,
         git_adapter: GitAdapter,
         github_adapter: GitHubAdapter | None = None,
+        filesystem_adapter: FileSystemAdapter | None = None,
     ):
         self.approval_usecase = approval_usecase
         self.git_adapter = git_adapter
         self.github_adapter = github_adapter
+        self.fs = filesystem_adapter or FileSystemAdapter()
         self.visited_phase_paths: set[str] = set()
         self.phase_chain_depth = 0
 
@@ -157,3 +161,43 @@ class WorkflowUseCase:
             # to ensure the process stops and maintains repo consistency.
             print(f"Critical: Error during phase promotion for {phase_name}: {e}")
             raise
+
+    def promote_from_merged_pr(self, pr_body: str) -> None:
+        """
+        Analyzes a merged PR body to find linked issues and promote to the next phase
+         if the task file contains a next_phase_path.
+        """
+        if not pr_body:
+            return
+
+        # 1. Extract issue numbers using regex
+        # Matches keywords like Closes, Fixes, Resolves followed by #number
+        pattern = r"(?i)(?:close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved)\s+#(\d+)"
+        issue_numbers = re.findall(pattern, pr_body)
+
+        if not issue_numbers:
+            return
+
+        print(f"Detected linked issues in PR body: {issue_numbers}")
+
+        # 2. Scan archive/ to find matching task files
+        archive_dir = Path("reqs/tasks/archive")
+        all_task_files = self.fs.list_files(archive_dir, "**/*.md")
+
+        for issue_no in issue_numbers:
+            target_issue = f"#{issue_no}"
+            for task_file in all_task_files:
+                try:
+                    doc = self.fs.read_document(task_file)
+                    file_issue = doc.metadata.get("issue")
+                    if file_issue == target_issue:
+                        next_phase = doc.metadata.get("next_phase_path")
+                        if next_phase:
+                            print(
+                                f"Detected merged PR for Issue {target_issue}. Next phase found: {next_phase}"
+                            )
+                            self.promote_next_phase(next_phase)
+                            return  # Currently assuming only one promotion per PR
+                except Exception as e:
+                    print(f"Warning: Failed to process {task_file}: {e}")
+                    continue

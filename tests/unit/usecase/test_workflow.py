@@ -2,6 +2,8 @@ import unittest
 from pathlib import Path
 from unittest.mock import MagicMock
 
+from issue_creator_kit.domain.document import Document
+from issue_creator_kit.infrastructure.filesystem import FileSystemAdapter
 from issue_creator_kit.infrastructure.git_adapter import GitAdapter
 from issue_creator_kit.infrastructure.github_adapter import GitHubAdapter
 from issue_creator_kit.usecase.approval import ApprovalUseCase
@@ -13,10 +15,12 @@ class TestWorkflowUseCase(unittest.TestCase):
         self.mock_approval_usecase = MagicMock(spec=ApprovalUseCase)
         self.mock_git_adapter = MagicMock(spec=GitAdapter)
         self.mock_github_adapter = MagicMock(spec=GitHubAdapter)
+        self.mock_fs_adapter = MagicMock(spec=FileSystemAdapter)
         self.workflow = WorkflowUseCase(
             self.mock_approval_usecase,
             self.mock_git_adapter,
             github_adapter=self.mock_github_adapter,
+            filesystem_adapter=self.mock_fs_adapter,
         )
         self.inbox_dir = Path("reqs/design/_inbox")
         self.approved_dir = Path("reqs/design/_approved")
@@ -143,3 +147,62 @@ class TestWorkflowUseCase(unittest.TestCase):
 
         # Verify no action taken
         self.mock_git_adapter.checkout.assert_not_called()
+
+    def test_promote_from_merged_pr_success(self):
+        # Setup
+        pr_body = "This PR closes #123 and fixes #456"
+        archive_files = [
+            Path("reqs/tasks/archive/phase-1/issue-1.md"),
+            Path("reqs/tasks/archive/phase-1/issue-2.md"),
+        ]
+        self.mock_fs_adapter.list_files.return_value = archive_files
+
+        # Mock document for issue #123
+        doc_123 = MagicMock(spec=Document)
+        doc_123.metadata = {
+            "issue": "#123",
+            "next_phase_path": "reqs/tasks/drafts/phase-2/",
+        }
+
+        # Mock document for issue #456
+        doc_456 = MagicMock(spec=Document)
+        doc_456.metadata = {"issue": "#456"}  # No next_phase_path
+
+        def mock_read_document(path):
+            if "issue-1.md" in str(path):
+                return doc_123
+            return doc_456
+
+        self.mock_fs_adapter.read_document.side_effect = mock_read_document
+
+        # Mock promote_next_phase to avoid side effects in this test
+        self.workflow.promote_next_phase = MagicMock()
+
+        # Execute
+        self.workflow.promote_from_merged_pr(pr_body)
+
+        # Verify
+        self.workflow.promote_next_phase.assert_called_once_with(
+            "reqs/tasks/drafts/phase-2/"
+        )
+
+    def test_promote_from_merged_pr_no_issue_found(self):
+        # Setup
+        pr_body = "No issue mentioned here"
+
+        # Execute
+        self.workflow.promote_from_merged_pr(pr_body)
+
+        # Verify
+        self.mock_fs_adapter.list_files.assert_not_called()
+
+    def test_promote_from_merged_pr_issue_not_in_archive(self):
+        # Setup
+        pr_body = "closes #999"
+        self.mock_fs_adapter.list_files.return_value = []
+
+        # Execute
+        self.workflow.promote_from_merged_pr(pr_body)
+
+        # Verify
+        self.mock_fs_adapter.list_files.assert_called_once()

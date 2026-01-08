@@ -213,3 +213,34 @@ def test_create_issues_from_virtual_queue_with_dependencies(
     # Verify body replacement in Task 2
     assert "#101" in calls[1].args[1]
     assert "task1.md" not in calls[1].args[1]
+
+
+def test_create_issues_from_virtual_queue_with_metadata_pr(
+    usecase, mock_fs, mock_github, mock_git
+):
+    # Setup
+    mock_git.get_added_files.return_value = ["reqs/tasks/archive/task1.md"]
+    mock_fs.read_document.return_value = Document(
+        content="Body", metadata={"title": "Task 1"}
+    )
+    mock_github.create_issue.return_value = 101
+
+    # Execute with use_pr=True
+    usecase.create_issues_from_virtual_queue(
+        base_ref="before",
+        head_ref="after",
+        archive_path="reqs/tasks/archive/",
+        use_pr=True,
+    )
+
+    # Verify branch creation and PR
+    mock_git.checkout.assert_called()
+    # Find the branch name used
+    checkout_args = mock_git.checkout.call_args[0][0]
+    assert "chore/metadata-sync-" in checkout_args
+
+    mock_git.push.assert_called_with(remote="origin", branch=checkout_args)
+    mock_github.create_pull_request.assert_called_once()
+    pr_args = mock_github.create_pull_request.call_args[1]
+    assert pr_args["head"] == checkout_args
+    assert pr_args["base"] == "main"
