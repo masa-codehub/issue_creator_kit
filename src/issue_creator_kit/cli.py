@@ -91,7 +91,7 @@ def run_merge_workflow(args):
     )
 
     try:
-        workflow.promote_from_merged_pr(args.pr_body)
+        workflow.promote_from_merged_pr(args.pr_body, archive_dir=args.archive_dir)
     except Exception as e:
         print(f"Merge workflow failed: {e}", file=sys.stderr)
         sys.exit(1)
@@ -218,6 +218,11 @@ def main():
     )
     merge_parser.add_argument(
         "--pr-body", required=True, help="Body of the merged Pull Request"
+    )
+    merge_parser.add_argument(
+        "--archive-dir",
+        default="reqs/tasks/archive",
+        help="Directory to check for completed task files",
     )
     merge_parser.add_argument(
         "--repo",
