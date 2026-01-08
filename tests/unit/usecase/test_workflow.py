@@ -95,7 +95,7 @@ class TestWorkflowUseCase(unittest.TestCase):
 
         # Verify Git operations
         self.mock_git_adapter.checkout.assert_called_with(
-            "feature/phase-2-foundation", create=True, base="feature/task-T3-5-verify"
+            "feature/phase-2-foundation", create=True, base="main"
         )
         self.mock_git_adapter.move_file.assert_called_with(
             next_phase_path, expected_dest.rstrip("/")
@@ -111,7 +111,7 @@ class TestWorkflowUseCase(unittest.TestCase):
         title = kwargs.get("title", args[0]) if args else kwargs.get("title")
         self.assertIn("phase-2", title)
         self.assertEqual(kwargs.get("head"), "feature/phase-2-foundation")
-        self.assertEqual(kwargs.get("base"), "feature/task-T3-5-verify")
+        self.assertEqual(kwargs.get("base"), "main")
 
     def test_promote_next_phase_skips_if_branch_exists(self):
         # Setup
