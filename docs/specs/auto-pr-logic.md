@@ -1,18 +1,19 @@
-# Auto-PR および メタデータ同期ロジック 詳細仕様書
+# 自己推進型ワークフロー (Self-Propelling Workflow) 詳細仕様書
 
 ## 概要
-ADR-003 で定義された「8ステップ・ライフサイクル」を完全に実現するための、自動化ロジックの詳細仕様を定義する。
+ADR-003 で定義されたタスクライフサイクルを完全に実現するための、自動化ロジックの詳細仕様を定義する。
 本仕様の導入により、タスクの完了（PRマージ）をトリガーとした次フェーズへの自動遷移（Auto-PR）と、保護ブランチ環境下での安全なメタデータ（Issue番号）同期を実現する。
 
 ## 関連ドキュメント
 - ADR: [adr-003-task-and-roadmap-lifecycle.md](../reqs/design/_approved/adr-003-task-and-roadmap-lifecycle.md)
 - Design Doc: [design-003-logic.md](../reqs/design/_approved/design-003-logic.md)
+- System Context: [system-context.md](../docs/system-context.md)
 
-## 自己更新型ワークフロー (Self-Updating Workflow) の定義
-本システムは ADR-003 に基づき、以下の「自己更新型」サイクルで進行する。
+## 自己推進型ワークフロー (Self-Propelling Workflow) の定義
+本システムは ADR-003 および System Context に基づき、以下のサイクルで進行する。
 
 ### 1. タスクの発生（起票フェーズ）
-- **[Human]** `drafts/` から `archive/` へのファイル移動 PR を作成・マージ。
+- **[Human/Agent]** `drafts/` から `archive/` へのファイル移動 PR を作成・マージ。
 - **[ICK/process-diff]** マージを検知し、GitHub Issue を一括起票。
 
 ### 2. タスクの遂行（実装フェーズ）
@@ -23,7 +24,7 @@ ADR-003 で定義された「8ステップ・ライフサイクル」を完全�
 - **[ICK/process-merge]** マージされた PR の内容から完了したタスクを特定し、次フェーズへの Auto-PR を作成。
 
 ### 4. 循環（サイクル）
-- **[ICK/RoadmapSync]** 起票・完了に合わせてロードマップの WBS リンクを `Draft` から `Archive`、そして Issue 番号付きへと自己更新する。
+- **[ICK/RoadmapSync]** 起票・完了に合わせてロードマップの WBS リンクを `Draft` から `Archive`、そして Issue 番号付きへと動的に同期（自己更新）する。
 
 ## メタデータ同期戦略
 ### 課題
