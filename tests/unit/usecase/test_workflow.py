@@ -236,6 +236,47 @@ class TestWorkflowUseCase(unittest.TestCase):
         self.workflow.promote_next_phase.assert_any_call("phase-2")
         self.workflow.promote_next_phase.assert_any_call("phase-3")
 
+    def test_promote_from_merged_pr_handles_parse_error_and_continues(self):
+        # Setup
+        pr_body = "closes #1, closes #2"
+        archive_files = [
+            Path("reqs/tasks/archive/issue-1.md"),
+            Path("reqs/tasks/archive/issue-2.md"),
+        ]
+        self.mock_fs_adapter.list_files.return_value = archive_files
+
+        # Fail first file with generic error, succeed second
+        doc2 = MagicMock(spec=Document)
+        doc2.metadata = {"issue": "#2", "next_phase_path": "phase-next"}
+
+        def mock_read_document(path):
+            if "issue-1.md" in str(path):
+                raise ValueError("Malformed YAML")
+            return doc2
+
+        self.mock_fs_adapter.read_document.side_effect = mock_read_document
+        self.workflow.promote_next_phase = MagicMock()
+
+        # Execute
+        self.workflow.promote_from_merged_pr(pr_body)
+
+        # Verify: Continues after ValueError and promotes #2
+        self.workflow.promote_next_phase.assert_called_once_with("phase-next")
+
+    def test_promote_from_merged_pr_raises_on_fatal_error(self):
+        # Setup
+        pr_body = "closes #1"
+        archive_files = [Path("reqs/tasks/archive/issue-1.md")]
+        self.mock_fs_adapter.list_files.return_value = archive_files
+
+        self.mock_fs_adapter.read_document.side_effect = PermissionError(
+            "Access Denied"
+        )
+
+        # Execute & Verify
+        with self.assertRaises(PermissionError):
+            self.workflow.promote_from_merged_pr(pr_body)
+
     def test_promote_from_merged_pr_issue_not_in_archive(self):
         # Setup
         pr_body = "closes #999"
