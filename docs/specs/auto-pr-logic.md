@@ -8,24 +8,29 @@ ADR-003 で定義された「8ステップ・ライフサイクル」を完全�
 - ADR: [adr-003-task-and-roadmap-lifecycle.md](../reqs/design/_approved/adr-003-task-and-roadmap-lifecycle.md)
 - Design Doc: [design-003-logic.md](../reqs/design/_approved/design-003-logic.md)
 
-## 8ステップ・ライフサイクルの定義
-本システムは以下のサイクルで自律的に進行する。
+## 自己更新型ワークフロー (Self-Updating Workflow) の定義
+本システムは ADR-003 に基づき、以下の「自己更新型」サイクルで進行する。
 
-1. **[Human]** `drafts/` から `archive/` へのファイル移動 PR を作成。
-2. **[Human]** PR をマージ。
-3. **[ICK/process-diff]** マージされた `archive/` 内の新規ファイルを検知し、GitHub Issue を起票。
-4. **[ICK/sync-metadata]** 起票した Issue 番号をファイルに書き戻し、ロードマップを同期する。
-5. **[Human]** Issue に基づき開発を行い、完了後 `main` へのマージ PR を作成。
-6. **[Human]** PR をマージ。
-7. **[ICK/process-merge]** マージされた PR の内容から完了したタスクを特定し、`next_phase_path` があれば次フェーズの移動 PR を作成（Auto-PR）。
-8. **[Human/ICK]** 手順 2 へ戻る（再帰的連鎖）。
+### 1. タスクの発生（起票フェーズ）
+- **[Human]** `drafts/` から `archive/` へのファイル移動 PR を作成・マージ。
+- **[ICK/process-diff]** マージを検知し、GitHub Issue を一括起票。
 
-## メタデータ同期戦略 (Step 4)
+### 2. タスクの遂行（実装フェーズ）
+- **[Human/Agent]** Issue に基づき実装を行い、Foundation Branch へマージ。
+
+### 3. タスクの完了と連鎖（完了フェーズ）
+- **[Human]** フェーズ最後のタスク（監査/マージ）を `main` へマージ。
+- **[ICK/process-merge]** マージされた PR の内容から完了したタスクを特定し、次フェーズへの Auto-PR を作成。
+
+### 4. 循環（サイクル）
+- **[ICK/RoadmapSync]** 起票・完了に合わせてロードマップの WBS リンクを `Draft` から `Archive`、そして Issue 番号付きへと自己更新する。
+
+## メタデータ同期戦略
 ### 課題
 `main` ブランチが保護されている（Branch Protection Rule）場合、Actions からの直接 `git push` は失敗する。
 
 ### 解決策: Metadata Sync PR 方式
-`process-diff` 完了後のメタデータ更新およびロードマップ同期を以下の手順で行う。
+起票フェーズにおけるメタデータ更新およびロードマップ同期を以下の手順で行う。
 
 1. **ブランチ作成**: `main` から一時ブランチ `chore/metadata-sync-[timestamp]` を作成。
 2. **コミット・プッシュ**: 更新されたファイルとロードマップをコミットし、プッシュ。
@@ -36,7 +41,7 @@ ADR-003 で定義された「8ステップ・ライフサイクル」を完全�
     - リポジトリ設定で `Allow auto-merge` を有効化し、ICK が PR 作成直後に `enableAutoMerge` API を叩く。
     - または、特定のラベルが付いた PR を自動マージする GitHub Actions を利用する。
 
-## Auto-PR ロジック (Step 7)
+## Auto-PR ロジック
 ### トリガー
 - イベント: `pull_request` (closed)
 - 条件: `github.event.pull_request.merged == true`
