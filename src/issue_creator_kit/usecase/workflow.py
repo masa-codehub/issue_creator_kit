@@ -172,6 +172,10 @@ class WorkflowUseCase:
         if not pr_body:
             return
 
+        # Reset state for a fresh promotion chain
+        self.visited_phase_paths = set()
+        self.phase_chain_depth = 0
+
         # 1. Extract issue numbers using regex
         # Matches keywords like Closes, Fixes, Resolves followed by #number (whitespace optional)
         pattern = r"(?i)(?:close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved)\s*#(\d+)"
@@ -196,11 +200,14 @@ class WorkflowUseCase:
                     # Assumes issue format is '#123'
                     issue_number_str = str(issue).lstrip("#")
                     issue_to_phase_map[issue_number_str] = next_phase
+            except (FileNotFoundError, PermissionError) as e:
+                # Fatal: Cannot proceed if we can't access files we know exist
+                print(f"Critical Error: Failed to access task file {task_file}: {e}")
+                raise
             except Exception as e:
-                # Log warning but continue scanning other files
-                print(f"Warning: Failed to process task file {task_file}: {e}")
+                # Non-fatal: Skip malformed files but log warning
+                print(f"Warning: Failed to parse task file {task_file}: {e}")
                 continue
-
         # 3. Process all promotable tasks found in the PR's issues
         promoted_count = 0
         for issue_no in issue_numbers:
