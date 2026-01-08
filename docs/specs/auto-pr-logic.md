@@ -5,9 +5,9 @@ ADR-003 で定義されたタスクライフサイクルを完全に実現する
 本仕様の導入により、タスクの完了（PRマージ）をトリガーとした次フェーズへの自動遷移（Auto-PR）と、保護ブランチ環境下での安全なメタデータ（Issue番号）同期を実現する。
 
 ## 関連ドキュメント
-- ADR: [adr-003-task-and-roadmap-lifecycle.md](../reqs/design/_approved/adr-003-task-and-roadmap-lifecycle.md)
-- Design Doc: [design-003-logic.md](../reqs/design/_approved/design-003-logic.md)
-- System Context: [system-context.md](../docs/system-context.md)
+- ADR: [adr-003-task-and-roadmap-lifecycle.md](../../reqs/design/_approved/adr-003-task-and-roadmap-lifecycle.md)
+- Design Doc: design-003-logic.md（作成予定 / リンク未設定）
+- System Context: [system-context.md](../system-context.md)
 
 ## 自己推進型ワークフロー (Self-Propelling Workflow) の定義
 本システムは ADR-003 および System Context に基づき、以下のサイクルで進行する。
@@ -48,7 +48,7 @@ ADR-003 で定義されたタスクライフサイクルを完全に実現する
 - 条件: `github.event.pull_request.merged == true`
 
 ### タスク特定アルゴリズム
-1. **PR本文解析**: マージされた PR の Body から `Closes #(\d+)` または `Fixes #(\d+)` を正規表現で抽出する。
+1. **PR本文解析**: マージされた PR の Body から、GitHub がサポートするキーワード（`close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved`）に続く `#(\d+)` を正規表現で抽出する。
 2. **ファイル検索**: `reqs/tasks/archive/` 以下の全ての `.md` ファイルをスキャンし、Frontmatter の `issue` フィールドが抽出した番号と一致するものを特定する。
 3. **連鎖判定**: 特定したファイルの `next_phase_path` が空でない場合、そのパスを次フェーズのソースとして扱う。
 
@@ -115,4 +115,4 @@ sequenceDiagram
 ## 補足・制約事項
 - **原子性の確保**: メタデータ同期 PR がマージされるまで、Issue 番号とファイルの状態は不整合となるが、Git を SSOT とする原則に基づき、PR のマージをもって正とする。
 - **無限ループ防止**: `WorkflowUseCase` 内で既に実装済みの `MAX_PHASE_CHAIN_DEPTH` を引き続き適用する。
-- **エラー通知**: Issue 特定に失敗した場合や、PR 作成に失敗した場合は、GitHub Actions のログに詳細を出力し、必要に応じて管理者に通知（Issue コメント等）を行う。
+- **エラー通知**: Issue 特定に失敗した場合や、PR 作成に失敗した場合は、GitHub Actions のログに詳細を出力する。さらに、トリガーとなったコミットまたはPRにコメントを追加し、関係者に失敗を通知する。
