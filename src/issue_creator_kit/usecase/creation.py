@@ -80,6 +80,7 @@ class IssueCreationUseCase:
         archive_path: str = "reqs/tasks/archive/",
         roadmap_path: str | None = None,
         use_pr: bool = False,
+        base_branch: str = "main",
     ) -> None:
         """
         Detect added files in the archive path via git diff-tree, create GitHub issues,
@@ -99,6 +100,7 @@ class IssueCreationUseCase:
             archive_path (str): The directory path to monitor for new tasks.
             roadmap_path (str, optional): Path to the roadmap file to synchronize.
             use_pr (bool): If True, create a new branch and PR for metadata updates.
+            base_branch (str): The base branch for the metadata sync PR (default: main).
 
         Raises:
             RuntimeError: If GitAdapter is missing or if issue creation fails.
@@ -227,20 +229,33 @@ class IssueCreationUseCase:
         if processed_paths:
             try:
                 if use_pr:
-                    timestamp = int(time.time())
+                    timestamp = time.time_ns()
                     sync_branch = f"chore/metadata-sync-{timestamp}"
                     print(f"Creating metadata sync branch: {sync_branch}")
-                    self.git.checkout(sync_branch, create=True, base="main")
+                    # Ensure base branch is up to date
+                    self.git.fetch(remote="origin")
+                    self.git.checkout(
+                        sync_branch, create=True, base=f"origin/{base_branch}"
+                    )
+
                     self.git.add(processed_paths)
                     self.git.commit("docs: update issue numbers and sync roadmap")
                     self.git.push(remote="origin", branch=sync_branch)
 
                     title = "chore: sync metadata for new issues"
                     body = "Automatic metadata update (issue numbers and roadmap sync) for newly created issues."
-                    pr_url = self.github.create_pull_request(
-                        title, body, head=sync_branch, base="main"
+                    pr_url, pr_number = self.github.create_pull_request(
+                        title, body, head=sync_branch, base=base_branch
                     )
-                    print(f"Successfully created metadata sync PR: {pr_url}")
+                    # Add 'metadata' label to the PR
+                    try:
+                        self.github.add_labels(pr_number, ["metadata"])
+                    except Exception as e:
+                        print(f"Warning: Failed to add label to PR #{pr_number}: {e}")
+
+                    print(
+                        f"Successfully created metadata sync PR #{pr_number}: {pr_url}"
+                    )
                 else:
                     current_branch = self.git.get_current_branch()
                     self.git.add(processed_paths)

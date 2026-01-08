@@ -52,7 +52,7 @@ class GitHubAdapter:
 
     def create_pull_request(
         self, title: str, body: str, head: str, base: str = "main"
-    ) -> str:
+    ) -> tuple[str, int]:
         if not self.repo:
             raise ValueError("GitHub repository is not set.")
 
@@ -67,7 +67,8 @@ class GitHubAdapter:
         response = requests.post(api_url, headers=self._get_headers(), json=data)
 
         if response.status_code == 201:
-            return response.json()["html_url"]
+            res_data = response.json()
+            return res_data["html_url"], res_data["number"]
         if response.status_code == 422:
             # GitHub returns 422 Unprocessable Entity (Validation Failed)
             # when a pull request with the same head and base already exists,
@@ -81,4 +82,18 @@ class GitHubAdapter:
             f"Failed to create PR. Status: {response.status_code}, Body: {response.text}"
         )
 
-    # Future: Add more methods as needed (e.g. get_issue, comment, etc.)
+    def add_labels(self, issue_number: int, labels: list[str]) -> None:
+        if not self.repo:
+            raise ValueError("GitHub repository is not set.")
+
+        api_url = (
+            f"https://api.github.com/repos/{self.repo}/issues/{issue_number}/labels"
+        )
+        data = {"labels": labels}
+
+        response = requests.post(api_url, headers=self._get_headers(), json=data)
+
+        if response.status_code != 200:
+            raise RuntimeError(
+                f"Failed to add labels to #{issue_number}. Status: {response.status_code}, Body: {response.text}"
+            )

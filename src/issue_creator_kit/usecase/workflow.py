@@ -151,10 +151,10 @@ class WorkflowUseCase:
             if self.github_adapter:
                 title = f"feat: promote {phase_name} tasks"
                 body = f"Automatic promotion of tasks for {phase_name} from drafts to archive."
-                pr_url = self.github_adapter.create_pull_request(
+                pr_url, pr_number = self.github_adapter.create_pull_request(
                     title, body, head=new_branch, base="main"
                 )
-                print(f"Successfully created PR: {pr_url}")
+                print(f"Successfully created PR #{pr_number}: {pr_url}")
 
         except Exception as e:
             # For git mv, commit, push, or PR creation, failures are logged and propagated
@@ -162,7 +162,9 @@ class WorkflowUseCase:
             print(f"Critical: Error during phase promotion for {phase_name}: {e}")
             raise
 
-    def promote_from_merged_pr(self, pr_body: str) -> None:
+    def promote_from_merged_pr(
+        self, pr_body: str, archive_dir: str = "reqs/tasks/archive"
+    ) -> None:
         """
         Analyzes a merged PR body to find linked issues and promote to the next phase
          if the task file contains a next_phase_path.
@@ -171,8 +173,8 @@ class WorkflowUseCase:
             return
 
         # 1. Extract issue numbers using regex
-        # Matches keywords like Closes, Fixes, Resolves followed by #number
-        pattern = r"(?i)(?:close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved)\s+#(\d+)"
+        # Matches keywords like Closes, Fixes, Resolves followed by #number (whitespace optional)
+        pattern = r"(?i)(?:close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved)\s*#(\d+)"
         issue_numbers = re.findall(pattern, pr_body)
 
         if not issue_numbers:
@@ -180,24 +182,40 @@ class WorkflowUseCase:
 
         print(f"Detected linked issues in PR body: {issue_numbers}")
 
-        # 2. Scan archive/ to find matching task files
-        archive_dir = Path("reqs/tasks/archive")
-        all_task_files = self.fs.list_files(archive_dir, "**/*.md")
+        # 2. Scan archive/ to find matching task files and build a lookup map (O(N+M))
+        archive_path = Path(archive_dir)
+        all_task_files = self.fs.list_files(archive_path, "**/*.md")
 
+        issue_to_phase_map: dict[str, str] = {}
+        for task_file in all_task_files:
+            try:
+                doc = self.fs.read_document(task_file)
+                issue = doc.metadata.get("issue")
+                next_phase = doc.metadata.get("next_phase_path")
+                if issue and next_phase:
+                    # Assumes issue format is '#123'
+                    issue_number_str = str(issue).lstrip("#")
+                    issue_to_phase_map[issue_number_str] = next_phase
+            except Exception as e:
+                # Log warning but continue scanning other files
+                print(f"Warning: Failed to process task file {task_file}: {e}")
+                continue
+
+        # 3. Process all promotable tasks found in the PR's issues
+        promoted_count = 0
         for issue_no in issue_numbers:
-            target_issue = f"#{issue_no}"
-            for task_file in all_task_files:
+            if issue_no in issue_to_phase_map:
+                next_phase = issue_to_phase_map[issue_no]
+                print(
+                    f"Detected merged PR for Issue #{issue_no}. Next phase found: {next_phase}"
+                )
                 try:
-                    doc = self.fs.read_document(task_file)
-                    file_issue = doc.metadata.get("issue")
-                    if file_issue == target_issue:
-                        next_phase = doc.metadata.get("next_phase_path")
-                        if next_phase:
-                            print(
-                                f"Detected merged PR for Issue {target_issue}. Next phase found: {next_phase}"
-                            )
-                            self.promote_next_phase(next_phase)
-                            return  # Currently assuming only one promotion per PR
+                    self.promote_next_phase(next_phase)
+                    promoted_count += 1
                 except Exception as e:
-                    print(f"Warning: Failed to process {task_file}: {e}")
-                    continue
+                    print(f"Error promoting phase for Issue #{issue_no}: {e}")
+
+        if promoted_count == 0:
+            print("No next_phase_path found for the linked issues.")
+        else:
+            print(f"Successfully triggered {promoted_count} phase promotions.")

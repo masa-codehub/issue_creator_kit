@@ -69,6 +69,7 @@ def run_automation(args):
             archive_path=args.archive_dir,
             roadmap_path=args.roadmap,
             use_pr=args.use_pr,
+            base_branch=args.base_branch,
         )
     except Exception as e:
         print(f"Automation failed: {e}", file=sys.stderr)
@@ -198,6 +199,11 @@ def main():
         help="Create a PR for metadata updates instead of pushing directly to main",
     )
     diff_parser.add_argument(
+        "--base-branch",
+        default="main",
+        help="Base branch for the metadata sync PR (default: main)",
+    )
+    diff_parser.add_argument(
         "--repo",
         help="GitHub repository (owner/repo). Defaults to GITHUB_REPOSITORY if not set.",
     )
@@ -215,10 +221,12 @@ def main():
     )
     merge_parser.add_argument(
         "--repo",
+        required=True,
         help="GitHub repository (owner/repo).",
     )
     merge_parser.add_argument(
         "--token",
+        required=True,
         help="GitHub token.",
     )
 

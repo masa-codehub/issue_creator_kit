@@ -46,7 +46,8 @@ GitHub REST API を介した操作を担当する。
 | メソッド名 | 引数 | 戻り値 | 説明 |
 | :--- | :--- | :--- | :--- |
 | `create_issue` | `title: str, body: str, labels: list[str]` | `int` | 指定したリポジトリに Issue を作成し、Issue 番号を返す。 |
-| `create_pull_request` | `title: str, body: str, head: str, base: str` | `str` | プルリクエストを作成し、PR の URL を返す。 |
+| `create_pull_request` | `title: str, body: str, head: str, base: str` | `tuple[str, int]` | プルリクエストを作成し、PR の URL と番号を返す。 |
+| `add_labels` | `issue_number: int, labels: list[str]` | `None` | 指定した Issue または PR にラベルを付与する。 |
 | `add_comment` | `issue_number: int, body: str` | `None` | 指定した Issue または PR にコメントを投稿する（エラー通知等に利用）。 |
 
 ### 3. IFileSystemAdapter

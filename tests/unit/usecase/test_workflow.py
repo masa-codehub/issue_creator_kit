@@ -36,10 +36,6 @@ class TestWorkflowUseCase(unittest.TestCase):
         # Then
         self.assertFalse(result)
         # Verify GitAdapter methods were NOT called
-        # Note: checkout might be called depending on implementation logic (prepare branch first or after?)
-        # If we prepare branch first, checkout would be called.
-        # If we optimize to only prepare if needed, it wouldn't.
-        # Let's assume we prepare branch first to be safe for file ops?
         self.mock_git_adapter.checkout.assert_called_once_with(
             self.branch_name, create=True
         )
@@ -89,6 +85,10 @@ class TestWorkflowUseCase(unittest.TestCase):
         # Setup
         next_phase_path = "reqs/tasks/drafts/phase-2/"
         expected_dest = "reqs/tasks/archive/phase-2/"
+        self.mock_github_adapter.create_pull_request.return_value = (
+            "http://github.com/pr/1",
+            1,
+        )
 
         # Execute
         self.workflow.promote_next_phase(next_phase_path)
@@ -150,7 +150,7 @@ class TestWorkflowUseCase(unittest.TestCase):
 
     def test_promote_from_merged_pr_success(self):
         # Setup
-        pr_body = "This PR closes #123 and fixes #456"
+        pr_body = "This PR closes #123 and fixes#456"  # Testing optional whitespace
         archive_files = [
             Path("reqs/tasks/archive/phase-1/issue-1.md"),
             Path("reqs/tasks/archive/phase-1/issue-2.md"),
@@ -166,7 +166,10 @@ class TestWorkflowUseCase(unittest.TestCase):
 
         # Mock document for issue #456
         doc_456 = MagicMock(spec=Document)
-        doc_456.metadata = {"issue": "#456"}  # No next_phase_path
+        doc_456.metadata = {
+            "issue": "#456",
+            "next_phase_path": "reqs/tasks/drafts/phase-3/",
+        }
 
         def mock_read_document(path):
             if "issue-1.md" in str(path):
@@ -182,9 +185,9 @@ class TestWorkflowUseCase(unittest.TestCase):
         self.workflow.promote_from_merged_pr(pr_body)
 
         # Verify
-        self.workflow.promote_next_phase.assert_called_once_with(
-            "reqs/tasks/drafts/phase-2/"
-        )
+        self.assertEqual(self.workflow.promote_next_phase.call_count, 2)
+        self.workflow.promote_next_phase.assert_any_call("reqs/tasks/drafts/phase-2/")
+        self.workflow.promote_next_phase.assert_any_call("reqs/tasks/drafts/phase-3/")
 
     def test_promote_from_merged_pr_no_issue_found(self):
         # Setup
@@ -195,6 +198,43 @@ class TestWorkflowUseCase(unittest.TestCase):
 
         # Verify
         self.mock_fs_adapter.list_files.assert_not_called()
+
+    def test_promote_from_merged_pr_multiple_issues(self):
+        # Setup
+        pr_body = "closes #1, fixes #2, resolve #3"
+        archive_files = [
+            Path("reqs/tasks/archive/issue-1.md"),
+            Path("reqs/tasks/archive/issue-2.md"),
+            Path("reqs/tasks/archive/issue-3.md"),
+        ]
+        self.mock_fs_adapter.list_files.return_value = archive_files
+
+        doc1 = MagicMock(spec=Document)
+        doc1.metadata = {"issue": "#1", "next_phase_path": "phase-2"}
+        doc2 = MagicMock(spec=Document)
+        doc2.metadata = {"issue": "#2", "next_phase_path": "phase-3"}
+        doc3 = MagicMock(spec=Document)
+        doc3.metadata = {"issue": "#3"}  # No next phase
+
+        def mock_read_document(path):
+            if "issue-1.md" in str(path):
+                return doc1
+            if "issue-2.md" in str(path):
+                return doc2
+            return doc3
+
+        self.mock_fs_adapter.read_document.side_effect = mock_read_document
+        self.workflow.promote_next_phase = MagicMock()
+
+        # Execute
+        self.workflow.promote_from_merged_pr(pr_body)
+
+        # Verify
+        # list_files should be called only once (O(N+M) efficiency)
+        self.mock_fs_adapter.list_files.assert_called_once()
+        self.assertEqual(self.workflow.promote_next_phase.call_count, 2)
+        self.workflow.promote_next_phase.assert_any_call("phase-2")
+        self.workflow.promote_next_phase.assert_any_call("phase-3")
 
     def test_promote_from_merged_pr_issue_not_in_archive(self):
         # Setup
