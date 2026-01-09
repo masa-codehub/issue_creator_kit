@@ -68,9 +68,50 @@ def run_automation(args):
             head_ref=args.after,
             archive_path=args.archive_dir,
             roadmap_path=args.roadmap,
+            use_pr=args.use_pr,
+            base_branch=args.base_branch,
         )
     except Exception as e:
         print(f"Automation failed: {e}", file=sys.stderr)
+        sys.exit(1)
+
+
+def run_merge_workflow(args):
+    """Run the merge-triggered workflow (Auto-PR)."""
+    print("Running merge-triggered workflow (Auto-PR)...")
+
+    fs = FileSystemAdapter()
+    gh = GitHubAdapter(repo=args.repo, token=args.token)
+    git = GitAdapter()
+    workflow = WorkflowUseCase(
+        approval_usecase=None,
+        git_adapter=git,
+        github_adapter=gh,
+        filesystem_adapter=fs,
+    )
+
+    pr_body = args.pr_body
+    if args.event_path:
+        import json
+
+        try:
+            with open(args.event_path, encoding="utf-8") as f:
+                event = json.load(f)
+            pr_body = event.get("pull_request", {}).get("body", "")
+        except Exception as e:
+            print(f"Error reading event path {args.event_path}: {e}", file=sys.stderr)
+            sys.exit(1)
+
+    if pr_body is None:
+        print(
+            "Warning: No PR body found (neither --pr-body nor --event-path provided valid body)."
+        )
+        pr_body = ""
+
+    try:
+        workflow.promote_from_merged_pr(pr_body, archive_dir=args.archive_dir)
+    except Exception as e:
+        print(f"Merge workflow failed: {e}", file=sys.stderr)
         sys.exit(1)
 
 
@@ -171,10 +212,43 @@ def main():
         help="Path to the roadmap file to synchronize",
     )
     diff_parser.add_argument(
+        "--use-pr",
+        action="store_true",
+        help="Create a PR for metadata updates instead of pushing directly to main",
+    )
+    diff_parser.add_argument(
+        "--base-branch",
+        default="main",
+        help="Base branch for the metadata sync PR (default: main)",
+    )
+    diff_parser.add_argument(
         "--repo",
         help="GitHub repository (owner/repo). Defaults to GITHUB_REPOSITORY if not set.",
     )
     diff_parser.add_argument(
+        "--token",
+        help="GitHub token. Defaults to GITHUB_TOKEN if not set.",
+    )
+
+    # process-merge command
+    merge_parser = subparsers.add_parser(
+        "process-merge", help="Run the Auto-PR logic triggered by a merged PR"
+    )
+    merge_parser.add_argument("--pr-body", help="Body of the merged Pull Request")
+    merge_parser.add_argument(
+        "--event-path",
+        help="Path to the GitHub event JSON file (e.g., $GITHUB_EVENT_PATH). Safer than --pr-body.",
+    )
+    merge_parser.add_argument(
+        "--archive-dir",
+        default="reqs/tasks/archive/",
+        help="Directory to check for completed task files",
+    )
+    merge_parser.add_argument(
+        "--repo",
+        help="GitHub repository (owner/repo). Defaults to GITHUB_REPOSITORY if not set.",
+    )
+    merge_parser.add_argument(
         "--token",
         help="GitHub token. Defaults to GITHUB_TOKEN if not set.",
     )
@@ -260,6 +334,8 @@ def main():
         init_project(args)
     elif args.command == "process-diff":
         run_automation(args)
+    elif args.command == "process-merge":
+        run_merge_workflow(args)
     elif args.command == "run-workflow":
         run_workflow(args)
     elif args.command == "approve":

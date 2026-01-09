@@ -1,0 +1,47 @@
+name: Auto Phase Promotion (Auto-PR)
+
+# ADR-003: フェーズ完了（PRマージ）をトリガーとして、次フェーズのタスクを自動展開します。
+# PR 本文の "Closes #XXX" から完了したタスクを特定し、連鎖を開始します。
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  auto-promotion:
+    # main へのマージ時のみ実行
+    if: github.event.pull_request.merged == true
+    runs-on: self-hosted
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # 全ての履歴を取得（ブランチ作成に必要）
+
+      - name: Install Issue Creator Kit
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install .
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Process Merge and Promote Phase
+        run: |
+          # マージされた PR の本文から連鎖対象を特定し、Auto-PR を作成します。
+          # PR本文には改行や特殊文字が含まれる可能性があるため、イベントJSONファイルのパスを渡して安全に読み込みます。
+          python3 -m issue_creator_kit process-merge \
+            --event-path "$GITHUB_EVENT_PATH" \
+            --repo ${{ github.repository }} \
+            --token ${{ secrets.GITHUB_TOKEN }}
+

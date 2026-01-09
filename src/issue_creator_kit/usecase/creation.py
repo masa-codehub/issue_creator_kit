@@ -1,5 +1,6 @@
 # ruff: noqa: T201
 import re
+import time
 from graphlib import CycleError, TopologicalSorter
 from pathlib import Path
 
@@ -78,6 +79,8 @@ class IssueCreationUseCase:
         head_ref: str,
         archive_path: str = "reqs/tasks/archive/",
         roadmap_path: str | None = None,
+        use_pr: bool = False,
+        base_branch: str = "main",
     ) -> None:
         """
         Detect added files in the archive path via git diff-tree, create GitHub issues,
@@ -89,13 +92,15 @@ class IssueCreationUseCase:
         3. Create GitHub Issues in order, replacing task-ID placeholders with #IssueNo.
         4. If all issues are created successfully, update file metadata.
         5. Synchronize the roadmap WBS links if roadmap_path is provided.
-        6. Commit and push the changes to Git.
+        6. Commit and push the changes to Git (either directly or via PR).
 
         Args:
             base_ref (str): The base commit/branch for comparison.
             head_ref (str): The head commit/branch for comparison.
             archive_path (str): The directory path to monitor for new tasks.
             roadmap_path (str, optional): Path to the roadmap file to synchronize.
+            use_pr (bool): If True, create a new branch and PR for metadata updates.
+            base_branch (str): The base branch for the metadata sync PR (default: main).
 
         Raises:
             RuntimeError: If GitAdapter is missing or if issue creation fails.
@@ -223,10 +228,68 @@ class IssueCreationUseCase:
         # 7. Git Commit
         if processed_paths:
             try:
-                current_branch = self.git.get_current_branch()
-                self.git.add(processed_paths)
-                self.git.commit("docs: update issue numbers and sync roadmap")
-                self.git.push(remote="origin", branch=current_branch)
+                if use_pr:
+                    sync_branch = None
+                    # Retry logic to ensure unique branch name
+                    for attempt in range(3):
+                        timestamp = time.time_ns()
+                        candidate = f"chore/metadata-sync-{timestamp}"
+                        if attempt > 0:
+                            candidate = f"{candidate}-{attempt}"
+                        print(f"Creating metadata sync branch: {candidate}")
+                        try:
+                            # Ensure base branch is up to date
+                            try:
+                                self.git.fetch(remote="origin")
+                            except RuntimeError as e:
+                                print(
+                                    f"Warning: git fetch failed: {e}. Attempting to proceed without fresh fetch."
+                                )
+
+                            self.git.checkout(
+                                candidate, create=True, base=f"origin/{base_branch}"
+                            )
+                            sync_branch = candidate
+                            break
+                        except Exception as e:
+                            message = str(e)
+                            # Retry only if branch already exists
+                            if "already exists" in message or "exists" in message:
+                                print(
+                                    f"Warning: Branch '{candidate}' already exists. "
+                                    "Retrying with a different name..."
+                                )
+                                continue
+                            raise
+
+                    if sync_branch is None:
+                        raise RuntimeError(
+                            "Failed to create a unique metadata sync branch after multiple attempts."
+                        )
+
+                    self.git.add(processed_paths)
+                    self.git.commit("docs: update issue numbers and sync roadmap")
+                    self.git.push(remote="origin", branch=sync_branch)
+
+                    title = "chore: sync metadata for new issues"
+                    body = "Automatic metadata update (issue numbers and roadmap sync) for newly created issues."
+                    pr_url, pr_number = self.github.create_pull_request(
+                        title, body, head=sync_branch, base=base_branch
+                    )
+                    # Add 'metadata' label to the PR
+                    try:
+                        self.github.add_labels(pr_number, ["metadata"])
+                    except Exception as e:
+                        print(f"Warning: Failed to add label to PR #{pr_number}: {e}")
+
+                    print(
+                        f"Successfully created metadata sync PR #{pr_number}: {pr_url}"
+                    )
+                else:
+                    current_branch = self.git.get_current_branch()
+                    self.git.add(processed_paths)
+                    self.git.commit("docs: update issue numbers and sync roadmap")
+                    self.git.push(remote="origin", branch=current_branch)
             except Exception as e:
                 print(f"Error during git commit/push: {e}")
                 raise

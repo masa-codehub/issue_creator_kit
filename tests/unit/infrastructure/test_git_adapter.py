@@ -31,3 +31,29 @@ class TestGitAdapter(unittest.TestCase):
         # Prefix "Git command failed: " is 20 chars.
         # Total around 220.
         self.assertTrue(len(msg) < 250)
+
+    @patch("subprocess.run")
+    def test_fetch_success(self, mock_run):
+        # When
+        self.adapter.fetch(remote="origin", prune=True)
+
+        # Then
+        mock_run.assert_called_with(
+            ["git", "fetch", "origin", "--prune"],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+
+    @patch("subprocess.run")
+    def test_fetch_failure(self, mock_run):
+        # Given
+        mock_run.side_effect = subprocess.CalledProcessError(
+            returncode=1, cmd="git fetch", stderr="Network error"
+        )
+
+        # When/Then
+        with self.assertRaises(RuntimeError) as cm:
+            self.adapter.fetch()
+
+        self.assertIn("Network error", str(cm.exception))
