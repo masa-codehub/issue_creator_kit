@@ -210,6 +210,7 @@ class WorkflowUseCase:
                 continue
         # 3. Process all promotable tasks found in the PR's issues
         promoted_count = 0
+        errors = []
         for issue_no in issue_numbers:
             if issue_no in issue_to_phase_map:
                 next_phase = issue_to_phase_map[issue_no]
@@ -220,7 +221,14 @@ class WorkflowUseCase:
                     self.promote_next_phase(next_phase)
                     promoted_count += 1
                 except Exception as e:
-                    print(f"Error promoting phase for Issue #{issue_no}: {e}")
+                    error_msg = f"Error promoting phase for Issue #{issue_no}: {e}"
+                    print(error_msg)
+                    errors.append(error_msg)
+
+        if errors:
+            raise RuntimeError(
+                f"One or more phase promotions failed: {'; '.join(errors)}"
+            )
 
         if promoted_count == 0:
             print("No next_phase_path found for the linked issues.")

@@ -229,14 +229,43 @@ class IssueCreationUseCase:
         if processed_paths:
             try:
                 if use_pr:
-                    timestamp = time.time_ns()
-                    sync_branch = f"chore/metadata-sync-{timestamp}"
-                    print(f"Creating metadata sync branch: {sync_branch}")
-                    # Ensure base branch is up to date
-                    self.git.fetch(remote="origin")
-                    self.git.checkout(
-                        sync_branch, create=True, base=f"origin/{base_branch}"
-                    )
+                    sync_branch = None
+                    # Retry logic to ensure unique branch name
+                    for attempt in range(3):
+                        timestamp = time.time_ns()
+                        candidate = f"chore/metadata-sync-{timestamp}"
+                        if attempt > 0:
+                            candidate = f"{candidate}-{attempt}"
+                        print(f"Creating metadata sync branch: {candidate}")
+                        try:
+                            # Ensure base branch is up to date
+                            try:
+                                self.git.fetch(remote="origin")
+                            except RuntimeError as e:
+                                print(
+                                    f"Warning: git fetch failed: {e}. Attempting to proceed without fresh fetch."
+                                )
+
+                            self.git.checkout(
+                                candidate, create=True, base=f"origin/{base_branch}"
+                            )
+                            sync_branch = candidate
+                            break
+                        except Exception as e:
+                            message = str(e)
+                            # Retry only if branch already exists
+                            if "already exists" in message or "exists" in message:
+                                print(
+                                    f"Warning: Branch '{candidate}' already exists. "
+                                    "Retrying with a different name..."
+                                )
+                                continue
+                            raise
+
+                    if sync_branch is None:
+                        raise RuntimeError(
+                            "Failed to create a unique metadata sync branch after multiple attempts."
+                        )
 
                     self.git.add(processed_paths)
                     self.git.commit("docs: update issue numbers and sync roadmap")

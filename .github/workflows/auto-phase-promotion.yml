@@ -39,11 +39,9 @@ jobs:
       - name: Process Merge and Promote Phase
         run: |
           # マージされた PR の本文から連鎖対象を特定し、Auto-PR を作成します。
-          # PR本文には改行や特殊文字が含まれる可能性があるため、環境変数経由で安全に渡します。
-          export PR_BODY="${{ github.event.pull_request.body }}"
-          
+          # PR本文には改行や特殊文字が含まれる可能性があるため、イベントJSONファイルのパスを渡して安全に読み込みます。
           python3 -m issue_creator_kit process-merge \
-            --pr-body "$PR_BODY" \
+            --event-path "$GITHUB_EVENT_PATH" \
             --repo ${{ github.repository }} \
             --token ${{ secrets.GITHUB_TOKEN }}
 

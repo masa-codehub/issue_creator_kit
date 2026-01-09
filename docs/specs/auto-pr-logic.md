@@ -6,7 +6,7 @@ ADR-003 で定義されたタスクライフサイクルを完全に実現する
 
 ## 関連ドキュメント
 - ADR: [adr-003-task-and-roadmap-lifecycle.md](../../reqs/design/_approved/adr-003-task-and-roadmap-lifecycle.md)
-- Design Doc: design-003-logic.md（作成予定 / リンク未設定）
+- Design Doc: ADR-003 に統合済み
 - System Context: [system-context.md](../system-context.md)
 
 ## 自己推進型ワークフロー (Self-Propelling Workflow) の定義

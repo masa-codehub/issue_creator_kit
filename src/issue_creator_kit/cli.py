@@ -90,8 +90,26 @@ def run_merge_workflow(args):
         filesystem_adapter=fs,
     )
 
+    pr_body = args.pr_body
+    if args.event_path:
+        import json
+
+        try:
+            with open(args.event_path, encoding="utf-8") as f:
+                event = json.load(f)
+            pr_body = event.get("pull_request", {}).get("body", "")
+        except Exception as e:
+            print(f"Error reading event path {args.event_path}: {e}", file=sys.stderr)
+            sys.exit(1)
+
+    if pr_body is None:
+        print(
+            "Warning: No PR body found (neither --pr-body nor --event-path provided valid body)."
+        )
+        pr_body = ""
+
     try:
-        workflow.promote_from_merged_pr(args.pr_body, archive_dir=args.archive_dir)
+        workflow.promote_from_merged_pr(pr_body, archive_dir=args.archive_dir)
     except Exception as e:
         print(f"Merge workflow failed: {e}", file=sys.stderr)
         sys.exit(1)
@@ -216,23 +234,23 @@ def main():
     merge_parser = subparsers.add_parser(
         "process-merge", help="Run the Auto-PR logic triggered by a merged PR"
     )
+    merge_parser.add_argument("--pr-body", help="Body of the merged Pull Request")
     merge_parser.add_argument(
-        "--pr-body", required=True, help="Body of the merged Pull Request"
+        "--event-path",
+        help="Path to the GitHub event JSON file (e.g., $GITHUB_EVENT_PATH). Safer than --pr-body.",
     )
     merge_parser.add_argument(
         "--archive-dir",
-        default="reqs/tasks/archive",
+        default="reqs/tasks/archive/",
         help="Directory to check for completed task files",
     )
     merge_parser.add_argument(
         "--repo",
-        required=True,
-        help="GitHub repository (owner/repo).",
+        help="GitHub repository (owner/repo). Defaults to GITHUB_REPOSITORY if not set.",
     )
     merge_parser.add_argument(
         "--token",
-        required=True,
-        help="GitHub token.",
+        help="GitHub token. Defaults to GITHUB_TOKEN if not set.",
     )
 
     # run-workflow command
