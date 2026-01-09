@@ -1,14 +1,16 @@
 ---
-title: "システムコンテキストと運用ガイドの最新化"
+depends_on:
+- issue-T4-1.md
+issue: '#174'
 labels:
-  - "task"
-  - "P1"
-  - "TECHNICAL_DESIGNER"
-roadmap: "reqs/roadmap/active/roadmap-adr003-task-lifecycle.md"
-task_id: "T4-2"
-depends_on: ["issue-T4-1.md"]
-next_phase_path: ""
-status: "Draft"
+- task
+- P1
+- TECHNICAL_DESIGNER
+next_phase_path: ''
+roadmap: reqs/roadmap/active/roadmap-adr003-task-lifecycle.md
+status: Draft
+task_id: T4-2
+title: システムコンテキストと運用ガイドの最新化
 ---
 # システムコンテキストと運用ガイドの最新化
 
