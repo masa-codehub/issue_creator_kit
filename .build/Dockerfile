@@ -40,7 +40,7 @@ RUN curl -sSL https://deb.nodesource.com/setup_24.x | bash - && \
     rm -rf /var/lib/apt/lists/*
 
 # gemini-cliをグローバルにインストール
-RUN npm update && npm install -g @google/gemini-cli@latest
+RUN npm update && npm install -g @google/gemini-cli@preview
 
 # 必要なPythonパッケージのインストール
 COPY ./pyproject.toml .

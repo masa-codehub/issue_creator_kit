@@ -7,7 +7,7 @@ gh auth setup-git
 bash ./.build/setup_gemini_auth.sh
 
 # Gemini CLIのインストールと更新
-npm update && npm install -g @google/gemini-cli@latest
+npm update && npm install -g @google/gemini-cli@preview
 
 # 外部モジュールのインストール
 pip install -e .[dev]
