@@ -72,9 +72,9 @@ Phase 2 では、実装を「差分検知」「一括起票」「ロードマッ
 **WBS**
 | Task ID | Category | タスク内容 | 成果物 | 依存先 | リンク / Issue |
 | :---: | :---: | :--- | :--- | :---: | :--- |
-| T4-1 | Setup | Phase 4 Foundation ブランチ作成 | ブランチ | T3-6 | [issue-T4-1.md](../../tasks/drafts/adr-003/phase-4/issue-T4-1.md) |
-| T4-2 | Docs | システムコンテキストと運用ガイドの最新化 | `docs/` 更新 | T4-1 | [issue-T4-2.md](../../tasks/drafts/adr-003/phase-4/issue-T4-2.md) |
-| T4-3 | Review | ロードマップ完了宣言とアーカイブ | 移動 | T4-2 | [issue-T4-3.md](../../tasks/drafts/adr-003/phase-4/issue-T4-3.md) |
+| T4-1 | Setup | Phase 4 Foundation ブランチ作成 | ブランチ | T3-6 | [issue-T4-1.md](../../tasks/archive/adr-003/phase-4/issue-T4-1.md) (#173) |
+| T4-2 | Docs | システムコンテキストと運用ガイドの最新化 | `docs/` 更新 | T4-1 | [issue-T4-2.md](../../tasks/archive/adr-003/phase-4/issue-T4-2.md) (#174) |
+| T4-3 | Review | ロードマップ完了宣言とアーカイブ | 移動 | T4-2 | [issue-T4-3.md](../../tasks/archive/adr-003/phase-4/issue-T4-3.md) (#175) |
 
 ## 3. リスク管理とロールバック
 - **リスク**: Auto-PR で無限ループ（例: P1 が完了して P1 を再度呼ぶ）が発生する可能性。

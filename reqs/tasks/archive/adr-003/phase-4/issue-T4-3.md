@@ -1,14 +1,16 @@
 ---
-title: "プロジェクト完了監査とアーカイブ"
+depends_on:
+- issue-T4-2.md
+issue: '#175'
 labels:
-  - "task"
-  - "P1"
-  - "SYSTEM_ARCHITECT"
-roadmap: "reqs/roadmap/active/roadmap-adr003-task-lifecycle.md"
-task_id: "T4-3"
-depends_on: ["issue-T4-2.md"]
-next_phase_path: ""
-status: "Draft"
+- task
+- P1
+- SYSTEM_ARCHITECT
+next_phase_path: ''
+roadmap: reqs/roadmap/active/roadmap-adr003-task-lifecycle.md
+status: Draft
+task_id: T4-3
+title: プロジェクト完了監査とアーカイブ
 ---
 # プロジェクト完了監査とアーカイブ
 

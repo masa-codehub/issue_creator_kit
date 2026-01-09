@@ -1,14 +1,16 @@
 ---
-title: "Phase 4 Foundation ブランチ作成"
+depends_on:
+- issue-T3-6.md
+issue: '#173'
 labels:
-  - "task"
-  - "P1"
-  - "SYSTEM_ARCHITECT"
-roadmap: "reqs/roadmap/active/roadmap-adr003-task-lifecycle.md"
-task_id: "T4-1"
-depends_on: ["issue-T3-6.md"]
-next_phase_path: ""
-status: "Draft"
+- task
+- P1
+- SYSTEM_ARCHITECT
+next_phase_path: ''
+roadmap: reqs/roadmap/active/roadmap-adr003-task-lifecycle.md
+status: Draft
+task_id: T4-1
+title: Phase 4 Foundation ブランチ作成
 ---
 # Phase 4 Foundation ブランチ作成
 
