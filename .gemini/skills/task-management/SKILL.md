@@ -25,12 +25,10 @@ description: Framework for systematic task execution using a state machine (Plan
 ## State 3: Closing (完了・振り返り)
 - **いつ:** 全てのTodoが `[x]` または `[-]` になった時。
 - **Action:**
-    1. **振り返り (Retrospective):** 成果と課題を振り返り、次のアクションを決定する。
-        - **YWT (技術・タスクの深掘り):** 技術的失敗や未知の挙動に対し、事実(Y)、知見(W)、仮説検証案(T)を記述。
-        - **KPT (プロセス改善):** プロセス課題に対し、継続点(K)、問題点(P)、改善案(T)を記述。
+    1. **振り返り (Retrospective):** `retrospective` スキルを使用して、成果と課題を振り返り、次のアクションを決定する。
     
     2. **完了処理 (Cleanup):**
         - 作業が完了した `.gemini/todo.md` を整理または削除し、コンテキストをクリアする。
 
     3. **次のサイクルへ:**
-        - 必要に応じてState 1へ戻る。YWTのTが出された場合は、それを次の最初のTodoにする。
+        - 必要に応じてState 1へ戻る。
