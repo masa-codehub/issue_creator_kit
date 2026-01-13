@@ -18,43 +18,50 @@ ADR作成の一連のプロセス（偵察 -> モデリング -> 仮説立案 ->
 
 ### 0. 共通プロトコルの実行 (Initiate Protocol)
 - **Action:**
-  - 作業を開始する前に、以下の問いかけを行い、ユーザーとの認識を合わせる。
-    - 「なぜ今、その変更が必要なのか？」（意図の解釈）
-    - 「現状のSSOTとどう整合させるか？」（コンテキストマッピング）
-    - 「このADR作成プロセスで進めて良いか？」（提案と合意）
+  - `objective-analysis` スキルを活用し、以下の問いかけを通じてユーザーとの認識を完全に一致させる。
+    - **Identify Intent:** 「なぜ今、その変更が必要なのか？」（`objective-analysis` の仮説立案を使用）
+    - **Context Mapping:** 「現状のSSOTとどう整合させるか？」
+    - **Proposal & Consensus:** 「このADR作成プロセスで進めて良いか？」
+  - `activate_skill objective-analysis`
 
-### 1. 作業ブランチの作成・切り替え (Phase 0: Branch Setup)
+### 1. 計画とTodo作成 (Planning with Todo)
+- **Action:**
+  - `todo-management` スキルを使用し、本スキルの実行手順（偵察、モデリング、仮説、起草...）を `.gemini/todo.md` に登録する。
+  - 各ステップの完了ごとにTodoを更新し、進捗を可視化する。
+  - `activate_skill todo-management`
+
+### 2. 作業ブランチの作成・切り替え (Phase 0: Branch Setup)
 - **Action:**
   - 合意が得られたら、`github-checkout-feature-branch` スキルを使用し、ADR作成用のフィーチャーブランチを作成・切り替える。
   - `activate_skill github-checkout-feature-branch`
 
-### 2. 能動的偵察 (Phase 1: Reconnaissance)
+### 3. 能動的偵察 (Phase 1: Reconnaissance)
 - **Action:**
   - `active-reconnaissance` スキルを呼び出し、ファクト、コンテキスト、およびギャップを調査し、ラフドラフトを作成する。
   - `activate_skill active-reconnaissance`
 
-### 3. ドメインモデリング (Phase 2: Modeling)
+### 4. ドメインモデリング (Phase 2: Modeling)
 - **Action:**
   - 偵察結果を元に `domain-modeling` スキルを呼び出し、用語と境界を定義する。
   - `activate_skill domain-modeling`
 
-### 4. 仮説立案 (Phase 3: Hypothesis)
+### 5. 仮説立案 (Phase 3: Hypothesis)
 - **Action:**
   - `architecture-hypothesis` スキルを呼び出し、技術的解決策と代替案を策定し、ADRドラフトを更新する。
   - `activate_skill architecture-hypothesis`
 
-### 5. 起草と合意形成 (Phase 4: Drafting)
+### 6. 起草と合意形成 (Phase 4: Drafting)
 - **Action:**
   - `adr-drafting` スキルを呼び出し、ユーザーとの対話を通じてADRを完成させ、承認を得る。
   - `activate_skill adr-drafting`
 
-### 6. コミットとPR作成 (Phase 5: Commit & PR)
+### 7. コミットとPR作成 (Phase 5: Commit & PR)
 - **Action:**
   - 合意形成が完了したADRファイルをコミットし、プルリクエストを作成する。
   - `activate_skill github-commit`
   - `activate_skill github-pull-request`
 
-### 7. 振り返り (Phase 6: Retrospective)
+### 8. 振り返り (Phase 6: Retrospective)
 - **Action:**
   - `retrospective` スキルを呼び出し、今回の意思決定プロセスの質（論理的飛躍がなかったか、合意形成はスムーズだったか）を振り返る。
   - `activate_skill retrospective`

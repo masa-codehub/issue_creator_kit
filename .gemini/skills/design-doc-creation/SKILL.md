@@ -18,45 +18,54 @@ Design Doc作成の一連のプロセス（偵察 -> モデリング -> 詳細�
 
 ### 0. 共通プロトコルの実行 (Initiate Protocol)
 - **Action:**
-  - ユーザーの意図（Why）と、今回Design Docを作成する範囲（Scope）について合意する。
+  - `objective-analysis` スキルを活用し、詳細設計の目的とスコープについて合意形成を行う。
+    - **Identify Intent:** 「この機能追加により、どのようなビジネス価値（アウトカム）を達成したいか？」
+    - **Context Mapping:** 「対象となるコンポーネントや影響範囲（Scope）はどこまでか？」
+    - **Proposal & Consensus:** 「この詳細設計プロセスで進めて良いか？」
+  - `activate_skill objective-analysis`
 
-### 1. 作業ブランチの作成・切り替え (Phase 0: Branch Setup)
+### 1. 計画とTodo作成 (Planning with Todo)
+- **Action:**
+  - `todo-management` スキルを使用し、本スキルの実行手順を `.gemini/todo.md` に登録する。
+  - `activate_skill todo-management`
+
+### 2. 作業ブランチの作成・切り替え (Phase 0: Branch Setup)
 - **Action:**
   - `github-checkout-feature-branch` スキルを使用し、Design Doc作成用のフィーチャーブランチを作成・切り替える。
   - `activate_skill github-checkout-feature-branch`
 
-### 2. 能動的偵察 (Phase 1: Reconnaissance)
+### 3. 能動的偵察 (Phase 1: Reconnaissance)
 - **Action:**
   - `active-reconnaissance` スキルを呼び出し、現状把握とギャップ分析を行う。
   - **Note:** Design Doc用のテンプレートを使用するよう指示すること。
   - `activate_skill active-reconnaissance`
 
-### 3. ドメインモデリング (Phase 2: Modeling)
+### 4. ドメインモデリング (Phase 2: Modeling)
 - **Action:**
   - `domain-modeling` スキルを呼び出し、ユビキタス言語と集約を定義する。
   - `activate_skill domain-modeling`
 
-### 4. 詳細設計 (Phase 3: Technical Specs)
+### 5. 詳細設計 (Phase 3: Technical Specs)
 - **Action:**
   - `technical-design` スキルを呼び出し、ER図、API、シーケンス図を設計する。
   - `activate_skill technical-design`
 
-### 5. 信頼性設計 (Phase 4: Reliability)
+### 6. 信頼性設計 (Phase 4: Reliability)
 - **Action:**
   - `reliability-design` スキルを呼び出し、非機能要件（エラー処理、リトライ等）を定義する。
   - `activate_skill reliability-design`
 
-### 6. 起草と合意形成 (Phase 5: Drafting)
+### 7. 起草と合意形成 (Phase 5: Drafting)
 - **Action:**
   - `design-doc-drafting` スキルを呼び出し、ドキュメントを完成させて合意を得る。
   - `activate_skill design-doc-drafting`
 
-### 7. コミットとPR作成 (Phase 6: Commit & PR)
+### 8. コミットとPR作成 (Phase 6: Commit & PR)
 - **Action:**
   - `activate_skill github-commit`
   - `activate_skill github-pull-request`
 
-### 8. 振り返り (Phase 7: Retrospective)
+### 9. 振り返り (Phase 7: Retrospective)
 - **Action:**
   - `retrospective` スキルを呼び出し、詳細設計プロセスの質を振り返る。
   - **振り返りの観点:**

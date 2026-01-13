@@ -18,40 +18,49 @@ description: Orchestrator skill for creating and maintaining the System Context 
 
 ### 0. 共通プロトコルの実行 (Initiate Protocol)
 - **Action:**
-  - メンテナンスの目的と範囲（Scope）について合意する。
+  - `objective-analysis` スキルを活用し、メンテナンスの目的と範囲について合意形成を行う。
+    - **Identify Intent:** 「なぜ今、システムコンテキストの更新が必要なのか？」
+    - **Context Mapping:** 「最新のADRや実装の変更をどう反映させるべきか？」
+    - **Proposal & Consensus:** 「このコンテキスト更新プロセスで進めて良いか？」
+  - `activate_skill objective-analysis`
 
-### 1. 作業ブランチの作成・切り替え (Phase 0: Branch Setup)
+### 1. 計画とTodo作成 (Planning with Todo)
+- **Action:**
+  - `todo-management` スキルを使用し、本スキルの実行手順を `.gemini/todo.md` に登録する。
+  - `activate_skill todo-management`
+
+### 2. 作業ブランチの作成・切り替え (Phase 0: Branch Setup)
 - **Action:**
   - `github-checkout-feature-branch` スキルを使用し、ドキュメント更新用のブランチ（`docs/update-context` 等）を作成・切り替える。
   - `activate_skill github-checkout-feature-branch`
 
-### 2. 能動的偵察 (Phase 1: Reconnaissance)
+### 3. 能動的偵察 (Phase 1: Reconnaissance)
 - **Action:**
   - `active-reconnaissance` スキルを呼び出し、現状の依存関係やADRとのギャップを洗い出す。
   - **Target:** `docs/system-context.md` (Design Docではなく)
   - `activate_skill active-reconnaissance`
 
-### 3. ドメインモデリング (Phase 2: Modeling)
+### 4. ドメインモデリング (Phase 2: Modeling)
 - **Action:**
   - `domain-modeling` スキルを呼び出し、最新のユビキタス言語を整理する。
   - `activate_skill domain-modeling`
 
-### 4. コンテキスト図作成 (Phase 3: Diagramming)
+### 5. コンテキスト図作成 (Phase 3: Diagramming)
 - **Action:**
   - `context-diagram` スキルを呼び出し、C4 System Context図を作成・更新する。
   - `activate_skill context-diagram`
 
-### 5. 起草と合意形成 (Phase 4: Drafting)
+### 6. 起草と合意形成 (Phase 4: Drafting)
 - **Action:**
   - `context-drafting` スキルを呼び出し、`docs/system-context.md` を完成させて合意を得る。
   - `activate_skill context-drafting`
 
-### 6. コミットとPR作成 (Phase 5: Commit & PR)
+### 7. コミットとPR作成 (Phase 5: Commit & PR)
 - **Action:**
   - `activate_skill github-commit`
   - `activate_skill github-pull-request`
 
-### 7. 振り返り (Phase 6: Retrospective)
+### 8. 振り返り (Phase 6: Retrospective)
 - **Action:**
   - `retrospective` スキルを呼び出し、ドキュメントの鮮度維持プロセス自体を振り返る。
   - `activate_skill retrospective`
