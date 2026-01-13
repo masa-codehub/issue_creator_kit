@@ -1,8 +1,8 @@
 services:
   agent:
     build:
-      context: ./${AGENT_NAME}/.build
-      dockerfile: Dockerfile
+      context: ./${AGENT_NAME}
+      dockerfile: .build/Dockerfile
     image: ${AGENT_NAME}_image
     volumes:
       - ./${AGENT_NAME}:${CONTAINER_VOLUME:-/app}
@@ -20,7 +20,7 @@ services:
       - GITHUB_REPOSITORY=${GITHUB_REPOSITORY:-my_account/my_repository}
       - BROKER_HOST=${BROKER_HOST:-broker}
       - BROKER_PORT=${BROKER_PORT:-8001}
-      - GITHUB_TOKEN=${GITHUB_TOKEN:-my_github_token}
+      - GITHUB_MCP_PAT=${GITHUB_MCP_PAT:-my_github_token}
       - GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT:-your_gcp_project}
       - GOOGLE_CLOUD_LOCATION=${GOOGLE_CLOUD_LOCATION:-us-central1}
     # command: ["bash", "run.sh"]
