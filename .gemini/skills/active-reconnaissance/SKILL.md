@@ -58,18 +58,23 @@ description: Skill for identifying the gap between a user's request and the proj
   - [ ] **ビジネス生存性 (Viability):** 法務・コスト・セキュリティ上の致命的問題はないか？
 
 ## アウトプット形式 (Output Template)
-偵察結果を元に、ラフなADRドラフトを **ファイルとして作成** すること。
+偵察結果を元に、ラフドラフトを **ファイルとして作成** すること。
+目的に応じてテンプレートと出力ファイル名を切り替える。
 
-1.  **テンプレート読み込み:** `reqs/design/template/adr.md` の内容を取得する。
-2.  **ドラフト作成:** `reqs/design/_inbox/adr-XXX-<title>.md` を作成し、以下のセクションを埋める（他は空欄またはプレースホルダーで良い）。
-    - **Title:** 仮のタイトル。
-    - **Status:** `Proposed`
-    - **Context:** ユーザーの意図、関連する既存ADR、現状の実装状況、**および初期リスク評価の結果**。
-    - **Problem:** 特定されたギャップ（論理的矛盾や技術的課題）。
+1.  **テンプレート選択:**
+    - **ADRの場合:** `reqs/design/template/adr.md`
+    - **Design Docの場合:** `reqs/design/template/design-doc.md`
+2.  **ドラフト作成:** テンプレートの内容を読み込み、調査結果を埋めて `reqs/design/_inbox/` に保存する。
+    - **ADR:** `adr-XXX-<title>.md`
+    - **Design Doc:** `design-XXX-<title>.md`
+3.  **記述内容:**
+    - **Context/Background:** ユーザーの意図、関連する既存決定、現状の実装状況、初期リスク評価の結果。
+    - **Problem/Issues:** 特定されたギャップ（論理的矛盾や技術的課題）。
 
 ```markdown
 ## 偵察完了報告
-- **Rough Draft Created:** `reqs/design/_inbox/adr-XXX-<title>.md`
+- **Rough Draft Created:** `reqs/design/_inbox/<file_name>.md`
+- **Type:** ADR / Design Doc
 - **Findings:**
   - ユーザーの要望は既存の [ADR-005] と矛盾するため、Problemセクションにその旨を記載しました。
   - 実装コードの現状（`src/auth/`）を Context に追記しました。
@@ -77,5 +82,5 @@ description: Skill for identifying the gap between a user's request and the proj
 ```
 
 ## 完了条件 (Definition of Done)
-- 現状認識と課題（ギャップ）が明確に記述された、ラフなADRドラフトファイルが `_inbox` に作成されていること。
+- 目的に応じたドラフトファイル（ADRまたはDesign Doc）が作成され、現状認識とギャップが記述されていること。
 
