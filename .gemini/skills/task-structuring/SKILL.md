@@ -1,65 +1,63 @@
 ---
 name: task-structuring
-description: Decomposes approved ADRs/Design Docs into atomic tasks using a DAG-based approach. Generates a structured roadmap to maximize parallelism and ensure logical consistency.
+description: Decomposes approved ADRs/Design Docs into a dependency graph of Artifacts and Tasks using backward chaining. Generates a robust roadmap where every task is logically connected to existing assets.
 ---
 
-# Task Structuring (DAG-based Roadmap Construction)
+# Task Structuring (Graph-based Roadmap Construction)
 
-このスキルは、承認された ADR や Design Doc を起点とし、完了までの道のりを「論理的な依存関係（Input/Output）」に基づいて分解・構造化します。
-従来の線形な計画ではなく、**DAG（有向非巡回グラフ）** を構築することで、手戻りのない最短経路と最大並列化を実現します。
+このスキルは、承認された ADR/Design Doc を起点として、最終ゴールから逆算的（バックキャスト）にタスクを分解し、完全な依存関係グラフ（DAG）を構築します。
+「何となくタスクを並べる」のではなく、**「成果物のインプット/アウトプットの連鎖」** として計画を定義します。
 
 ## 役割定義 (Role Definition)
-あなたは **Project Planner** です。直感ではなく「データの依存関係」に基づいてタスクを逆算し、AIエージェントが迷わず実行できる精緻なロードマップを構築します。
+あなたは **Graph Planner** です。ゴールから出発点（既存資産）までの経路を論理的に繋ぎ、未解決の依存関係（Missing Link）を一つ残らず解消します。
 
 ## 前提 (Prerequisites)
 - `active-reconnaissance` が利用可能であること。
 - `reqs/design/_approved/` に承認済みの ADR または Design Doc が存在すること。
+- `docs/system-context.md` および既存コードベースが参照可能であること。
+
+## 概念モデル (Conceptual Model)
+
+1.  **成果物 (Artifact):**
+    - タスクの入出力単位。ファイル名ではなく **論理ID** で管理する（例: `ART-USER-SCHEMA`）。
+    - **構成:**
+        - **Code Artifact:** 実装コード + テストコード（ペアで1つの成果物）
+        - **Doc Artifact:** 要件定義（テスト相当） + UML/詳細設計（実装相当）
+2.  **タスク (Task):**
+    - 複数の成果物をインプットとし、**単一の論理成果物** を生成する作業単位。
+3.  **グラフ (DAG):**
+    - ノード: タスク, エッジ: 成果物の依存関係。
+    - **完了条件:** 全てのタスクのインプットが「既存のドキュメント/コード」または「他タスクの成果物」に結びついていること。
 
 ## 手順 (Procedure)
 
-### 1. ゴール定義と逆算 (Backward Chaining)
+### 1. ゴール定義と成果物ID化 (Goal Definition)
 - **Action:**
-  - 承認済みドキュメントを読み込み、最終成果物（Goal）を定義する。
-  - **Backward Chaining:**
-    1. 最終成果物 $G$ を出力するタスク $T_G$ を定義する。
-    2. $T_G$ の実行に必要なインプット $I_{T_G}$（コード、設定、データ等）をリストアップする。
-    3. $I_{T_G}$ のうち、現状（Reality）に存在しないものを「未解決インプット（Missing Inputs）」として特定する。
-    4. 未解決インプットを出力する前駆タスクを定義する。
-    5. すべてのインプットが「既存資産」または「他タスクの出力」になるまで、再帰的に繰り返す。
+  - 承認済みドキュメント（ADR/Design Doc）を読み込み、最終的に達成すべき状態を **成果物ID** として定義する。
+  - 例: `ART-GOAL-PAYMENT-FEATURE`
 
-### 2. タスク定義と詳細化 (Task Definition)
+### 2. グラフ構築: バックワード・チェイニング (Graph Construction)
 - **Action:**
-  - 洗い出された各タスクに対し、以下の属性を定義し、タスクファイル (`reqs/tasks/drafts/`) として出力する。
-  - **属性:**
-    - **ID:** 一意な識別子（例: T-001）
-    - **Title:** タスク名
-    - **Inputs:** 作業開始に必要なファイルや情報（具体的パス）
-    - **Output:** 作業完了時に生成される成果物（具体的パス）
-    - **Dependencies:** 前提となるタスクID
-    - **Instruction:** 作業詳細（Design Docの該当セクションへの参照を含む）
+  - ゴールから遡って、依存関係が解決するまで再帰的にタスクを定義する。
+  - **Loop Process:**
+    1. **未解決の成果物** をピックアップする。
+    2. それを生成するための **タスク** を定義する。
+    3. そのタスクを実行するために必要な **インプット成果物** を洗い出す。
+    4. インプットが「既存資産（System Context, Code, Approved Docs）」にあるか確認する。
+        - **Yes:** 依存解決（既存ノードへ接続）。
+        - **No:** 新たな「未解決の成果物」としてリストに追加し、1に戻る。
 
-### 3. 論理矛盾の検出 (Cycle Detection & Validation)
+### 3. タスク詳細化とグラフ補正 (Detailing & Refinement)
 - **Action:**
-  - 定義したタスク間の依存関係を検証する。
-  - **Checklist:**
-    - [ ] **循環参照:** A -> B -> A のようなループがないか？（DFSで検出）
-    - [ ] **孤立タスク:** 最終ゴールに繋がらない無駄なタスクがないか？
-    - [ ] **インプット不足:** 必要な情報がどこからも供給されないタスクがないか？
+  - 構築されたグラフ（骨子）に対し、各タスクの具体的な中身を記述する（`todo-management` 的な分解）。
+  - **Refinement Loop:**
+    - タスクの手順を詳細化する過程で、「実はこの情報（インプット）も必要だ」「この成果物は分割すべきだ」といった発見があれば、即座に **Step 2 (Graph Construction)** に戻ってグラフを更新する。
+    - これを、全てのタスク詳細とグラフ構造が矛盾なく整合するまで繰り返す。
 
-### 4. ロードマップ生成 (Leveling & Scheduling)
+### 4. ロードマップ出力 (Output Generation)
 - **Action:**
-  - タスクを依存関係に基づいて階層化（Topological Sort / Leveling）し、実行順序を決定する。
-  - **Level 0:** 即座に着手可能なタスク（依存なし）。
-  - **Level 1:** Level 0 の完了後に着手可能なタスク。
-  - ...
-  - `reqs/roadmap/` に YAML または Markdown 形式でロードマップを出力する。
-
-### 5. レビューと承認 (Review & Approve)
-- **Action:**
-  - 構築されたロードマップを「4大リスク」の観点で評価する。
-    - [ ] **実現可能性:** 依存関係は技術的に正しいか？
-    - [ ] **並列性:** 無駄な直列化が行われていないか？
-  - ユーザーに提示し、承認を得る。
+  - 完成したグラフをトポロジカルソートし、実行可能な順序でロードマップファイル (`reqs/roadmap/`) を生成する。
+  - 同時に、各タスクの詳細定義をドラフトファイル (`reqs/tasks/drafts/`) として出力する。
 
 ## アウトプット形式 (Roadmap Output)
 
@@ -68,32 +66,37 @@ description: Decomposes approved ADRs/Design Docs into atomic tasks using a DAG-
 ```markdown
 # Roadmap: [Project Name]
 
-## Graph Structure (DAG)
+## Artifact Graph (DAG)
 ```mermaid
 graph TD
-    T001[Schema Design] --> T002[Migration Script]
-    T001 --> T003[Model Implementation]
-    T002 --> T004[DB Setup]
-    T003 --> T005[API Implementation]
-    T004 --> T005
+    %% Existing Assets
+    CTX[System Context]
+    ADR[ADR-001]
+    CODE[Existing User Code]
+
+    %% Tasks & Artifacts
+    T1(Task: Design Schema) -->|ART-SCHEMA| T2(Task: DB Migration)
+    T2 -->|ART-DB-TABLE| T3(Task: Implement Repository)
+    
+    %% Dependencies
+    ADR --> T1
+    CTX --> T1
+    CODE --> T3
 ```
 
-## Task List (Ordered by Level)
+## Task Execution Order
 
-### Level 0 (Ready to Start)
-- [ ] **T001: Schema Design**
-  - Inputs: `docs/specs/schema.md`
-  - Output: `src/db/schema.sql`
-  - Draft: `reqs/tasks/drafts/T001.md`
+### Phase 1: Foundation
+- [ ] **T-001: [Task Name]**
+  - **Goal:** [生成される成果物ID]
+  - **Inputs:**
+    - `docs/system-context.md`
+    - `ART-XXX` (from T-000)
+  - **Draft:** `reqs/tasks/drafts/T-001.md`
 
-### Level 1
-- [ ] **T002: Migration Script**
-  - Inputs: `src/db/schema.sql` (from T001)
-  - Output: `migrations/001_init.sql`
 ...
 ```
 
 ## 完了条件 (Definition of Done)
-- すべてのタスクが Input/Output で論理的に結合されていること。
-- 循環参照がなく、ゴールまで到達可能であること。
-- ロードマップファイルと、個別のタスクドラフトが生成されていること。
+- ロードマップ上の全てのタスクの出発点が、最終的に「既存の文書・コード」に辿り着いていること（浮いたタスクがない）。
+- タスク詳細（Draft）記述により、インプット不足がないことが検証済みであること。
