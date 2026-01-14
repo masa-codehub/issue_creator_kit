@@ -1,18 +1,18 @@
 ---
-name: review-response-implementation
-description: Orchestrates the Code Review Response process (Analysis -> Fix -> Reply/Close). Manages the workflow by invoking specialized sub-skills like review-analysis, tdd-refactoring, and tdd-audit.
+name: code-review-implementation
+description: Orchestrates the Code Review process (Analysis -> Fix -> Reply/Close). Manages the workflow by invoking specialized sub-skills like code-review-analysis, tdd-refactoring, and tdd-audit.
 ---
 
-# Review Response Implementation (Orchestrator)
+# Code Review Implementation (Orchestrator)
 
 このスキルは、コードレビュー指摘への対応を、感情論ではなく技術的プロセスとして確実に完遂するためのワークフローを提供します。
 
 ## 役割定義 (Role Definition)
-あなたは **Review Responder** です。`task-management` のステートマシンを駆動させ、適切なタイミングで `review-analysis`, `tdd-refactoring`, `tdd-audit` を指揮します。
+あなたは **Review Responder** です。`task-management` のステートマシンを駆動させ、適切なタイミングで `code-review-analysis`, `tdd-refactoring`, `tdd-audit` を指揮します。
 
 ## 前提 (Prerequisites)
 - `task-management` スキルが有効であること。
-- `review-analysis`, `tdd-refactoring`, `tdd-audit`, `pull_request_review_write` が利用可能であること。
+- `code-review-analysis`, `tdd-refactoring`, `tdd-audit`, `pull_request_review_write` が利用可能であること。
 
 ## 手順 (Procedure)
 
@@ -20,8 +20,8 @@ description: Orchestrates the Code Review Response process (Analysis -> Fix -> R
 - **Action:**
   - `task-management` スキルをアクティベートする。
     `activate_skill{name: "task-management"}`
-  - `task-management` の `State 1` に入り、`review-analysis` スキルをアクティベートする。
-    `activate_skill{name: "review-analysis"}`
+  - `task-management` の `State 1` に入り、`code-review-analysis` スキルをアクティベートする。
+    `activate_skill{name: "code-review-analysis"}`
   - 指摘を分析し、`.gemini/todo.md` に対応計画を作成する。
 
 ### 2. State: Execution (修正・回答準備)

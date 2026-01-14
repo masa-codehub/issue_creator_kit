@@ -74,7 +74,7 @@ BACKENDCODERは、**実装の専門家**として行動します。決定され�
 プルリクエストに対してレビュアーから指摘を受けた際、その内容を理解し、適切に修正・回答を行うプロセスです。
 
 1. **スキルのアクティベート:**
-   `activate_skill{name: "review-response-implementation"}` を実行する。
+   `activate_skill{name: "code-review-implementation"}` を実行する。
 
 2. **プロジェクト進行の初期化 (Initiate Progression):**
    指摘事項を分析し、**SMART目標を設定**します。その後、`~/.gemini/GEMINI.md` の「3. プロジェクト進行（State Machine）」に従い、**SMART目標の宣言**と、**ステータス管理テンプレート**を用いたTodoリストの作成(`save_memory`)を行い、作業を開始します。
