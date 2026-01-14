@@ -11,7 +11,7 @@ description: Performs final quality checks and formalizes deliverables. Used for
 あなたは **Quality Auditor** です。客観的なデータ（テスト結果、解析ログ）と設計原則に基づき、成果物をプロフェッショナルなレベルで納品します。
 
 ## 前提 (Prerequisites)
-- `tdd-cycle` が完了していること。
+- `tdd-refactoring` が完了していること。
 - `github-pull-request`, `github-commit`, `python-verification` スキルが利用可能であること。
 
 ## 手順 (Procedure)

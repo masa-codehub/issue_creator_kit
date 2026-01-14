@@ -35,18 +35,18 @@ description: Analyzes requirements and SSOT to formulate a concrete TDD plan. Us
 - **Action:**
   - 収集した情報に基づき、以下のテンプレートを用いて具体的なシナリオを作成する。
   - **Checklist:**
-    - [ ] **Red:** 失敗することが確実な、最小のテストケースは何か？（期待される失敗理由を明記）
-    - [ ] **Green:** テストを通すために最低限必要な実装は何か？
-    - [ ] **Refactor:** 重複、マジックナンバー、命名、既存コードとの調和をどう整えるか？
+    - [ ] **Red:** 失敗すべき振る舞いの **根拠 (Basis: ADR/Spec)** は明確か？
+    - [ ] **Green:** 実装すべきロジックの **最小限の定義** は何か？
+    - [ ] **Refactor:** 準拠すべき **規約 (Styleguide/ADR)** はどれか？
 
 ### 4. Todo分解 (via todo-management)
 - **Action:**
-  - `todo-management` スキルをアクティベートし、策定した「TDD Plan」を `.gemini/todo.md` のタスクリストに変換する。
+  - `todo-management` スキルをアクティベートし、策定した「TDD Plan」を `.gemini/todo.md` の形式に変換する。
     `activate_skill{name: "todo-management"}`
-  - 各サイクル（Red, Green, Refactor）を、それぞれ「Action（ツール実行）」と「Verify（テスト/解析実行）」のペアに分解する。
-  - **重要 (Reference):**
-    - **Redタスク:** Action には「どの仕様書/ADRに基づいてテストケースを作成するか」を明記する。
-    - **Refactorタスク:** Action には「何を基準にリファクタリングするか（Coding Guidelines等）」を明記する。
+  - **マッピングルール:**
+    - **Task Name:** [Red/Green/Refactor] + 簡潔な作業名
+    - **Action:** 具体的なツール操作（`write_file`, `replace` 等）と、**その根拠となるドキュメントの参照**。
+    - **Verify:** 成功を判定するコマンド（`pytest`, `ruff`, `mypy` 等）と、期待される結果。
   - `todo-review` を実行し、計画が原子レベルまで砕かれているか確認する。
     `activate_skill{name: "todo-review"}`
 
@@ -54,17 +54,31 @@ description: Analyzes requirements and SSOT to formulate a concrete TDD plan. Us
 
 ```markdown
 ## TDD Plan: [Issue Title/ID]
-- **Goal:** [SMARTに基づいた具体的な目標]
-- **Context:** [参照したADR/Spec/ファイル]
-- **Scenarios:**
-  - **Red:** [テストファイルパス] に [テスト名] を追加。期待される失敗: [理由]
-  - **Green:** [ソースファイルパス] に最小限の [ロジック/メソッド] を実装。
-  - **Refactor:** [改善対象の匂いや構造]
-- **Risks:** [4 Big Risks (Value, Feasibility, Usability, Viability) に基づく懸念事項]
+- **Goal:** [SMART目標]
+- **Context:** [参照ドキュメント一覧]
+
+### Scenarios
+1. **Red (Test Case)**
+   - **Basis:** [ADR-XXX / Spec Name]
+   - **Plan:** [ファイルパス] に [テスト名] を追加。
+   - **Expectation:** [期待される失敗理由] で失敗する。
+
+2. **Green (Implementation)**
+   - **Basis:** [ロジックの仕様/要件]
+   - **Plan:** [ファイルパス] に最小限の [ロジック] を実装。
+   - **Expectation:** テストがパスする。
+
+3. **Refactor (Quality)**
+   - **Basis:** [Coding Guidelines / Styleguide]
+      - **Plan:** `tdd-refactoring` を起動し、[改 善対象] を整理。
+   - **Expectation:** Linter/Type Check パス、かつテストがGreen維持。
+
+- **Risks:** [4 Big Risks]
+```
 
 ---
-※ 詳細な実行ステップは `.gemini/todo.md` に作成されました。
-```
+※ 詳細な実行ステップは上記マッピングルールに従い `.gemini/todo.md` に展開されました。
+
 
 ## 完了条件 (Definition of Done)
 - ユーザーに TDD Plan を提示し、合意を得ていること。

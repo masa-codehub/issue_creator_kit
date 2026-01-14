@@ -1,6 +1,6 @@
 ---
 name: tdd-implementation
-description: Orchestrates the entire TDD process (Planning -> Execution -> Closing). Manages the workflow by invoking specialized sub-skills like tdd-planning, tdd-cycle, and tdd-audit. Used for (1) implementing complex features requiring high reliability, (2) fixing critical bugs with regression testing, and (3) refactoring legacy code safely using test harnesses.
+description: Orchestrates the entire TDD process (Planning -> Execution -> Closing). Manages the workflow by invoking specialized sub-skills like tdd-planning, tdd-refactoring, and tdd-audit. Used for (1) implementing complex features requiring high reliability, (2) fixing critical bugs with regression testing, and (3) refactoring legacy code safely using test harnesses.
 ---
 
 # TDD Implementation (Orchestrator)
@@ -8,11 +8,11 @@ description: Orchestrates the entire TDD process (Planning -> Execution -> Closi
 このスキルは、複雑な実装タスクを TDD の原則に基づき、構造化されたプロセスで確実に完遂することを目的とします。
 
 ## 役割定義 (Role Definition)
-あなたは **TDD Lead** です。`task-management` のステートマシンを駆動させ、適切なタイミングで `tdd-planning`, `tdd-cycle`, `tdd-audit` を指揮します。
+あなたは **TDD Lead** です。`task-management` のステートマシンを駆動させ、適切なタイミングで `tdd-planning`, `tdd-refactoring`, `tdd-audit` を指揮します。
 
 ## 前提 (Prerequisites)
 - `task-management` スキルが有効であること。
-- `tdd-planning`, `tdd-cycle`, `tdd-audit` スキルが定義されていること。
+- `tdd-planning`, `tdd-refactoring`, `tdd-audit` スキルが定義されていること。
 
 ## 手順 (Procedure)
 
@@ -25,9 +25,11 @@ description: Orchestrates the entire TDD process (Planning -> Execution -> Closi
 
 ### 2. State: Execution (実行)
 - **Action:**
-  - `task-management` の `State 2` に入り、`tdd-cycle` スキルをアクティベートする。
-    `activate_skill{name: "tdd-cycle"}`
-  - 計画されたサイクル（Red-Green-Refactor）を全てのテストケースについて完了させる。
+  - `task-management` の `State 2` に入り、`.gemini/todo.md` のタスクを順次実行する。
+  - **Red / Green Tasks:** 通常のツール操作（`write_file`, `pytest` 等）で実行する。
+  - **Refactor Tasks:** `tdd-refactoring` スキルをアクティベートし、品質改善サイクルを回す。
+    `activate_skill{name: "tdd-refactoring"}`
+  - 全てのテストケースについて実装とリファクタリングを完了させる。
 
 ### 3. State: Closing (完了・振り返り)
 - **Action:**
