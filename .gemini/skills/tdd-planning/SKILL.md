@@ -49,8 +49,17 @@ description: Analyzes requirements and SSOT to formulate a concrete TDD plan. Us
     - **Task Name:** [Red/Green/Refactor] + 簡潔な作業名
     - **Action:** 具体的なツール操作（`write_file`, `replace` 等）と、**その根拠となるドキュメントの参照**。
     - **Verify:** 成功を判定するコマンド（`pytest`, `ruff`, `mypy` 等）と、期待される結果。
-  - `todo-review` を実行し、計画が原子レベルまで砕かれているか確認する。
+
+### 5. レビューと洗練 (Review & Refinement)
+- **Action:**
+  - 以下の「4大リスク」の観点でTDD Plan全体を自己評価し、懸念があれば計画を修正する。
+    - [ ] **価値 (Value):** 本当にこの実装でユーザー課題が解決されるか？
+    - [ ] **ユーザビリティ (Usability):** 実装されるインターフェース（API, CLI等）は使いやすいか？
+    - [ ] **実現可能性 (Feasibility):** 計画された時間と技術で完遂できるか？
+    - [ ] **ビジネス生存性 (Viability):** セキュリティ、保守性、コストに問題はないか？
+  - `todo-review` を実行し、計画が原子レベルまで砕かれているか、論理的な飛躍がないかを最終確認する。
     `activate_skill{name: "todo-review"}`
+  - 指摘事項が完全になくなるまで、計画をブラッシュアップする。
 
 ## アウトプット形式 (Output Template)
 
