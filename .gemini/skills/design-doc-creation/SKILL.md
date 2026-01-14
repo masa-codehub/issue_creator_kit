@@ -6,7 +6,7 @@ description: Orchestrator skill for creating Detailed Design Documents. Sequenti
 # Design Doc作成オーケストレーション (Design Doc Creation)
 
 Design Doc作成の一連のプロセス（偵察 -> モデリング -> 詳細設計 -> 信頼性設計 -> 起草・合意）を統括・実行するスキル。
-`SYSTEM_ARCHITECT.md` の共通プロトコルに準拠し、実装フェーズの手戻りを防ぐための詳細な青写真を作成する。
+`task-management` スキルのフレームワークを採用し、実装フェーズの手戻りを防ぐための詳細な青写真を作成する。
 
 ## 役割定義 (Role Definition)
 あなたは **Lead Architect (リードアーキテクト)** です。ビジネス要求を、開発者が迷いなく実装可能な「技術仕様」へと変換する全責任を持ちます。
@@ -16,63 +16,33 @@ Design Doc作成の一連のプロセス（偵察 -> モデリング -> 詳細�
 
 ## 手順 (Procedure)
 
-### 0. 共通プロトコルの実行 (Initiate Protocol)
+### 1. 計画フェーズ (State 1: Planning)
 - **Action:**
-  - `objective-analysis` スキルを活用し、詳細設計の目的とスコープについて合意形成を行う。
-    - **Identify Intent:** 「この機能追加により、どのようなビジネス価値（アウトカム）を達成したいか？」
-    - **Context Mapping:** 「対象となるコンポーネントや影響範囲（Scope）はどこまでか？」
-    - **Proposal & Consensus:** 「この詳細設計プロセスで進めて良いか？」
-    `activate_skill{name: "objective-analysis"}`
+  1. タスクマネジメントを開始する。
+     `activate_skill{name: "task-management"}`
+  2. 詳細設計の目的とスコープを特定する。
+     `activate_skill{name: "objective-analysis"}`
+     *   実装により達成すべきビジネス価値と、影響範囲（Bounded Context）を明確にする。既存のADRや要件定義書を参照し、設計の前提条件を洗い出す。
+  3. SMART目標を設定する。
+     `activate_skill{name: "objective-setting"}`
+     *   成果物となるDesign Docのファイル名、対象機能、およびレビュー基準（誰の合意が必要か）を定義する。
+  4. 実行計画を策定し、Todoとして登録する。
+     `activate_skill{name: "todo-management"}`
+     *   詳細設計の標準プロセス（偵察、モデリング、技術設計、信頼性設計、起草、PR）を網羅したTodoリストを作成する。
+     *   各タスクには、対応する専門スキル（`active-reconnaissance`、`domain-modeling`、`technical-design`、`reliability-design`、`design-doc-drafting`、`github-commit`、`github-pull-request`）を割り当て、依存関係を考慮した順序で構成すること。
 
-### 1. 計画とTodo作成 (Planning with Todo)
+### 2. 実行フェーズ (State 2: Execution)
 - **Action:**
-  - `todo-management` スキルを使用し、本スキルの実行手順を `.gemini/todo.md` に登録する。
-    `activate_skill{name: "todo-management"}`
+  - `task-management` の実行サイクルに従い、各専門スキル (`activate_skill{...}`) を呼び出してTodoを順次消化する。
+  - **重要:** 各設計ステップでの決定事項（データモデル、API仕様、非機能要件）が相互に矛盾しないよう、常に整合性を確認しながら進めること。特に `reliability-design` で定義したエラー処理やリトライ方針が、`technical-design` のシーケンス図やAPI定義に反映されていることを確認する。
 
-### 2. 作業ブランチの作成・切り替え (Phase 0: Branch Setup)
+### 3. 完了フェーズ (State 3: Closing)
 - **Action:**
-  - `github-checkout-feature-branch` スキルを使用し、Design Doc作成用のフィーチャーブランチを作成・切り替える。
-    `activate_skill{name: "github-checkout-feature-branch"}`
-
-### 3. 能動的偵察 (Phase 1: Reconnaissance)
-- **Action:**
-  - `active-reconnaissance` スキルを呼び出し、現状把握とギャップ分析を行う。
-  - **Note:** Design Doc用のテンプレートを使用するよう指示すること。
-    `activate_skill{name: "active-reconnaissance"}`
-
-### 4. ドメインモデリング (Phase 2: Modeling)
-- **Action:**
-  - `domain-modeling` スキルを呼び出し、ユビキタス言語と集約を定義する。
-    `activate_skill{name: "domain-modeling"}`
-
-### 5. 詳細設計 (Phase 3: Technical Specs)
-- **Action:**
-  - `technical-design` スキルを呼び出し、ER図、API、シーケンス図を設計する。
-    `activate_skill{name: "technical-design"}`
-
-### 6. 信頼性設計 (Phase 4: Reliability)
-- **Action:**
-  - `reliability-design` スキルを呼び出し、非機能要件（エラー処理、リトライ等）を定義する。
-    `activate_skill{name: "reliability-design"}`
-
-### 7. 起草と合意形成 (Phase 5: Drafting)
-- **Action:**
-  - `design-doc-drafting` スキルを呼び出し、ドキュメントを完成させて合意を得る。
-    `activate_skill{name: "design-doc-drafting"}`
-
-### 8. コミットとPR作成 (Phase 6: Commit & PR)
-- **Action:**
-  - `activate_skill{name: "github-commit"}`
-  - `activate_skill{name: "github-pull-request"}`
-
-### 9. 振り返り (Phase 7: Retrospective)
-- **Action:**
-  - `retrospective` スキルを呼び出し、詳細設計プロセスの質を振り返る。
-  - **振り返りの観点:**
-    - **網羅性:** 異常系やデータ整合性の懸念を、コーディング前に全て洗い出せたか？
-    - **伝達性:** 図面や仕様の記述は、初見の実装者が理解できるほど明確だったか？
-    - **フロントローディング:** 実装フェーズで手戻りになりそうな論点を、この段階で解消できたか？
+  - `task-management` の完了フローに従う。
+  - **Retrospective:**
     `activate_skill{name: "retrospective"}`
+    *   設計プロセスの質を振り返る。
+    *   「実装者が迷う曖昧さは残っていないか」「エッジケースの考慮漏れはないか」といった観点で自身の設計アウトプットを評価し、次回の設計品質向上につなげる。
 
 ## アウトプット形式 (Output Template)
 全工程完了時の報告。
