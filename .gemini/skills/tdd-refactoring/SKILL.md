@@ -20,6 +20,7 @@ description: Executes the Refactoring Loop to improve code quality without chang
 - **Input:**
   - **前サイクルの自己レビュー結果（改善提案）。**
   - `python-verification` (Linter/Type Checker) の出力。
+    `activate_skill{name: "python-verification"}`
   - プロジェクトの規約 (`docs/guides/coding-guidelines.md`, `styleguide.md`)。
   - TDD Plan で指摘された「あるべき構造」。
 - **Action:**
