@@ -22,32 +22,33 @@ ADR作成の一連のプロセス（偵察 -> モデリング -> 仮説立案 ->
     - **Identify Intent:** 「なぜ今、その変更が必要なのか？」（`objective-analysis` の仮説立案を使用）
     - **Context Mapping:** 「現状のSSOTとどう整合させるか？」
     - **Proposal & Consensus:** 「このADR作成プロセスで進めて良いか？」
-  - `activate_skill objective-analysis`
+    `activate_skill{name: "objective-analysis"}`
 
 ### 1. 計画とTodo作成 (Planning with Todo)
 - **Action:**
   - `todo-management` スキルを使用し、本スキルの実行手順（偵察、モデリング、仮説、起草...）を `.gemini/todo.md` に登録する。
   - 各ステップの完了ごとにTodoを更新し、進捗を可視化する。
-  - `activate_skill todo-management`
+    `activate_skill{name: "todo-management"}`
 
 ### 2. 作業ブランチの作成・切り替え (Phase 0: Branch Setup)
 - **Action:**
   - 合意が得られたら、`github-checkout-feature-branch` スキルを使用し、ADR作成用のフィーチャーブランチを作成・切り替える。
-  - `activate_skill github-checkout-feature-branch`
+    `activate_skill{name: "github-checkout-feature-branch"}`
 
 ### 3. 能動的偵察 (Phase 1: Reconnaissance)
 - **Action:**
   - `active-reconnaissance` スキルを呼び出し、ファクト、コンテキスト、およびギャップを調査し、ラフドラフトを作成する。
-  - `activate_skill active-reconnaissance`
+    `activate_skill{name: "active-reconnaissance"}`
 
 ### 4. ドメインモデリング (Phase 2: Modeling)
 - **Action:**
   - 偵察結果を元に `domain-modeling` スキルを呼び出し、用語と境界を定義する。
-  - `activate_skill domain-modeling`
+    `activate_skill{name: "domain-modeling"}`
 
 ### 5. 仮説立案 (Phase 3: Hypothesis)
 - **Action:**
   - `architecture-hypothesis` スキルを呼び出し、技術的解決策と代替案を策定し、ADRドラフトを更新する。
+    `activate_skill{name: "architecture-hypothesis"}`
   - `activate_skill architecture-hypothesis`
 
 ### 6. 起草と合意形成 (Phase 4: Drafting)

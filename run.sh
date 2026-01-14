@@ -9,7 +9,7 @@ bash ./.build/setup_gemini_auth.sh
 # Gemini CLIのインストールと更新
 npm update && npm install -g @google/gemini-cli@preview
 gemini extensions install https://github.com/github/github-mcp-server
-gemini extensions install https://github.com/gemini-cli-extensions/conductor
+# gemini extensions install https://github.com/gemini-cli-extensions/conductor
 
 # 外部モジュールのインストール
 pip install -e .[dev]
