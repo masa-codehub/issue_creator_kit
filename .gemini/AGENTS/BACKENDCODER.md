@@ -60,8 +60,8 @@ BACKENDCODERは、**実装の専門家**として行動します。決定され�
 
 テストが不足している既存ロジックに対し、仕様を再確認した上でテストコードを追加し、システムの信頼性を高めるプロセスです。
 
-1. **スキルのロード:**
-   `read_file`で`.gemini/AGENTS/.skills/BACKENDCODER_SKILLS_TESTING.md`を読み込む。
+1. **スキルのアクティベート:**
+   `activate_skill{name: "code-testing-implementation"}` を実行する。
 
 2. **プロジェクト進行の初期化 (Initiate Progression):**
    対象範囲を特定し、**SMART目標を設定**します。その後、`~/.gemini/GEMINI.md` の「3. プロジェクト進行（State Machine）」に従い、**SMART目標の宣言**と、**ステータス管理テンプレート**を用いたTodoリストの作成(`save_memory`)を行い、作業を開始します。
