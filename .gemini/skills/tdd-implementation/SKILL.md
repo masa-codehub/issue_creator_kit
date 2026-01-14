@@ -1,6 +1,6 @@
 ---
 name: tdd-implementation
-description: Orchestrates the entire TDD process (Planning -> Execution -> Closing). Manages the workflow by invoking specialized sub-skills like tdd-planning, tdd-refactoring, and tdd-audit. Used for (1) implementing complex features requiring high reliability, (2) fixing critical bugs with regression testing, and (3) refactoring legacy code safely using test harnesses.
+description: Orchestrates the entire TDD process (Planning -> Execution -> Closing). Manages the workflow by invoking specialized sub-skills like tdd-planning, tdd-refactoring, and tdd-audit. Used for (1) implementing complex features requiring high reliability, (2) fixing critical bugs with regression testing, and (3) building new modules with strict architectural alignment.
 ---
 
 # TDD Implementation (Orchestrator)
