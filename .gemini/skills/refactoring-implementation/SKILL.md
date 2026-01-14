@@ -1,6 +1,6 @@
 ---
 name: refactoring-implementation
-description: Orchestrates the entire Refactoring process (Planning -> Execution -> Closing). Manages the workflow by invoking specialized sub-skills like refactoring-planning, tdd-refactoring, and refactoring-audit.
+description: Orchestrates the entire Refactoring process (Planning -> Execution -> Closing). Manages the workflow by invoking specialized sub-skills like refactoring-planning, tdd-refactoring, and tdd-audit.
 ---
 
 # Refactoring Implementation (Orchestrator)
@@ -8,11 +8,11 @@ description: Orchestrates the entire Refactoring process (Planning -> Execution 
 このスキルは、大規模なリファクタリングタスクを、安全かつ確実に完遂するための構造化されたプロセスを提供します。
 
 ## 役割定義 (Role Definition)
-あなたは **Refactoring Lead** です。`task-management` のステートマシンを駆動させ、適切なタイミングで `refactoring-planning`, `tdd-refactoring`, `refactoring-audit` を指揮します。
+あなたは **Refactoring Lead** です。`task-management` のステートマシンを駆動させ、適切なタイミングで `refactoring-planning`, `tdd-refactoring`, `tdd-audit` を指揮します。
 
 ## 前提 (Prerequisites)
 - `task-management` スキルが有効であること。
-- `refactoring-planning`, `tdd-refactoring`, `refactoring-audit` スキルが定義されていること。
+- `refactoring-planning`, `tdd-refactoring`, `tdd-audit` スキルが定義されていること。
 
 ## 手順 (Procedure)
 
@@ -34,8 +34,8 @@ description: Orchestrates the entire Refactoring process (Planning -> Execution 
 
 ### 3. State: Closing (完了・振り返り)
 - **Action:**
-  - `task-management` の `State 3` に入り、`refactoring-audit` スキルをアクティベートする。
-    `activate_skill{name: "refactoring-audit"}`
+  - `task-management` の `State 3` に入り、`tdd-audit` スキルをアクティベートする。
+    `activate_skill{name: "tdd-audit"}`
   - 品質監査、PR作成、振り返り、報告を行い、タスクをクローズする。
 
 ## 完了条件 (Definition of Done)
