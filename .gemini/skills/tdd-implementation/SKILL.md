@@ -18,6 +18,8 @@ description: Orchestrates the entire TDD process (Planning -> Execution -> Closi
 
 ### 1. State: Planning (計画)
 - **Action:**
+  - `task-management` スキルをアクティベートする。
+    `activate_skill{name: "task-management"}`
   - `task-management` の `State 1` に入り、`tdd-planning` スキルをアクティベートする。
     `activate_skill{name: "tdd-planning"}`
   - SMART目標を宣言し、`.gemini/todo.md` に実行計画を作成する。
