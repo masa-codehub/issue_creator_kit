@@ -21,7 +21,7 @@ description: Analyzes requirements and SSOT to formulate a concrete TDD plan. Us
   - `todo-management` スキルをアクティベートする。
     `activate_skill{name: "todo-management"}`
   - `issue_read` を実行し、表面的な要件だけでなく「ユーザー価値（Why）」を特定する。
-  - `active-reconnaissance` スキルを活用し、関連する承認済み ADR (`reqs/design/_approved/`) と仕様書 (`docs/specs/`) を読み込む。
+  - `active-reconnaissance` スキルを活用し、関連するSSOT（ADR、仕様書、ガイドライン等）を読み込む。
     `activate_skill{name: "active-reconnaissance"}`
   - `read_file` で実装対象周辺の既存コードと既存テストを確認する。
 
