@@ -1,6 +1,6 @@
 ---
 name: code-review-implementation
-description: Orchestrates the Code Review process (Analysis -> Fix -> Reply/Close). Manages the workflow by invoking specialized sub-skills like code-review-analysis, tdd-refactoring, and tdd-audit.
+description: Orchestrates the Code Review process (Analysis -> Fix -> Reply/Close). Manages the workflow by invoking specialized sub-skills like code-review-analysis, tdd-refactoring, and tdd-audit. Used for (1) addressing change requests from reviewers (fixes), (2) providing technical explanations or justifications for design choices (replies), and (3) improving code quality based on feedback before merging.
 ---
 
 # Code Review Implementation (Orchestrator)

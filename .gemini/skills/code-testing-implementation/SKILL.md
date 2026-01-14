@@ -1,6 +1,6 @@
 ---
 name: code-testing-implementation
-description: Orchestrates the Testing Strategy & Implementation process (Planning -> Execution -> Closing). Manages the workflow by invoking specialized sub-skills like code-testing-planning, tdd-refactoring, and tdd-audit.
+description: Orchestrates the Testing Strategy & Implementation process (Planning -> Execution -> Closing). Manages the workflow by invoking specialized sub-skills like code-testing-planning, tdd-refactoring, and tdd-audit. Used for (1) adding missing coverage for legacy code, (2) reproducing reported bugs with regression tests (xfail), and (3) verifying edge cases or error handling for existing logic.
 ---
 
 # Code Testing Implementation (Orchestrator)

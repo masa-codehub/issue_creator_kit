@@ -1,6 +1,6 @@
 ---
 name: code-refactoring-implementation
-description: Orchestrates the entire Code Refactoring process (Planning -> Execution -> Closing). Manages the workflow by invoking specialized sub-skills like code-refactoring-planning, tdd-refactoring, and tdd-audit.
+description: Orchestrates the entire Code Refactoring process (Planning -> Execution -> Closing). Manages the workflow by invoking specialized sub-skills like code-refactoring-planning, tdd-refactoring, and tdd-audit. Used for (1) repaying technical debt (e.g., extracting logic from fat controllers), (2) improving architectural compliance (e.g., enforcing dependency rules), and (3) preparing legacy code for new features (e.g., decoupling).
 ---
 
 # Code Refactoring Implementation (Orchestrator)
