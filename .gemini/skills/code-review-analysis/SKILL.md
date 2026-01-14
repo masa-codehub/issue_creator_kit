@@ -1,9 +1,9 @@
 ---
-name: review-analysis
+name: code-review-analysis
 description: Analyzes PR review comments, verifies them against SSOT, and formulates a Fix/Reply plan. Used to categorize comments (Accept, Discuss, Explain) and define atomic actions.
 ---
 
-# Review Analysis
+# Code Review Analysis
 
 このスキルは、コードレビューで受けた指摘を体系的に分析し、感情的にならず技術的根拠に基づいた対応方針（修正または説明）を決定することを目的とします。
 
