@@ -43,8 +43,7 @@ description: Analyzes requirements and SSOT to formulate a concrete TDD plan. Us
 
 ### 4. Todo分解 (via todo-management)
 - **Action:**
-  - `todo-management` スキルをアクティベートし、策定した「TDD Plan」を `.gemini/todo.md` の形式に変換する。
-    `activate_skill{name: "todo-management"}`
+  - `todo-management` の「タスク分解フレームワーク」に従い、策定した「TDD Plan」を `.gemini/todo.md` の形式に変換する。
   - **マッピングルール:**
     - **Task Name:** [Red/Green/Refactor] + 簡潔な作業名
     - **Action:** 具体的なツール操作（`write_file`, `replace` 等）と、**その根拠となるドキュメントの参照**。
@@ -59,7 +58,10 @@ description: Analyzes requirements and SSOT to formulate a concrete TDD plan. Us
     - [ ] **ビジネス生存性 (Viability):** セキュリティ、保守性、コストに問題はないか？
   - `todo-review` を実行し、計画が原子レベルまで砕かれているか、論理的な飛躍がないかを最終確認する。
     `activate_skill{name: "todo-review"}`
-  - 指摘事項が完全になくなるまで、計画をブラッシュアップする。
+  - **修正フロー:**
+    - **要件・設計レベルの不備:** Step 3 (TDD Plan の策定) に戻る。
+    - **タスク粒度・記述の不備:** Step 4 (Todo分解) に戻る。
+  - 指摘事項が完全になくなり、承認条件（Approve）を満たすまでループする。
 
 ## アウトプット形式 (Output Template)
 
