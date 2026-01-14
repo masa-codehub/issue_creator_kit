@@ -7,6 +7,7 @@ description: Create and manage pull requests when a feature is complete, a bug i
 
 1. **変更のコミット (Commit):**
    PR作成前に、未コミットの変更がある場合は `github-commit` スキルを呼び出して変更をコミットする。
+   `activate_skill{name: "github-commit"}`
 
 2. **既存PRの確認:**
    重複を防ぐため、`list_pull_requests` で関連する既存PRがないか確認する。

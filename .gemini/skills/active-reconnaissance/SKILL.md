@@ -16,11 +16,10 @@ description: Skill for identifying the gap between a user's request and the proj
 
 ## 手順 (Procedure)
 
-### 1. 依頼の解釈と仮説立案 (Intent Analysis)
+### 1. 意図の抽出 (Intent Extraction)
 - **Action:**
   - `objective-analysis` スキルを活用し、ユーザーの依頼から「何を変えたいのか（理想の状態）」を抽出する。
-  - その変更が影響しそうな領域（コード、ドキュメント）についての初期仮説を立てる。
-
+    `activate_skill{name: "objective-analysis"}`
 - **Checklist:**
   - [ ] **[Alignment]** ユーザーが解決したい本質的な課題は何かを定義したか？
 

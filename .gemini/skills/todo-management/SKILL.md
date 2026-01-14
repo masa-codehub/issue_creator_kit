@@ -42,6 +42,7 @@ description: Skill for breaking down goals into atomic, verifiable steps and man
 
 4. **レビューと洗練 (Review & Refine):**
    作成したTodoリストに対して `todo-review` スキルを実行し、計画の品質をチェックする。
+   `activate_skill{name: "todo-review"}`
    **`todo-review` による指摘事項が完全になくなるまで**、手順2（Todoの修正）からのプロセスを繰り返す。
 
 5. **完了:**

@@ -9,6 +9,7 @@ description: Skill for recording changes to the local repository. Used upon comp
 このスキルでは、**すべての変更**をステージングし、規約に沿ったメッセージでコミットする手順を規定する。
 
 > **Note:** 作業開始前またはコミット前に、必ず `github-checkout-feature-branch` を使用して適切な作業ブランチにいることを確認済みであること。
+> （必要に応じて `activate_skill{name: "github-checkout-feature-branch"}` を実行する）
 
 ## 手順
 
