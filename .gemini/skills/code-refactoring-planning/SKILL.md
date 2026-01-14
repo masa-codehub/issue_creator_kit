@@ -1,9 +1,9 @@
 ---
-name: refactoring-planning
+name: code-refactoring-planning
 description: Analyzes code smells and architectural violations to formulate a concrete Refactoring Plan. Used for (1) identifying technical debt, (2) defining As-Is vs To-Be states, and (3) planning safe, atomic refactoring steps.
 ---
 
-# Refactoring Planning
+# Code Refactoring Planning
 
 このスキルは、既存コードのリファクタリングを行う前に「何を」「なぜ」「どのように」改善するかを明確にし、破壊的な変更やデグレードを防ぐための計画策定を目的とします。
 
