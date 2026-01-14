@@ -1,9 +1,9 @@
 ---
-name: refactoring-implementation
-description: Orchestrates the entire Refactoring process (Planning -> Execution -> Closing). Manages the workflow by invoking specialized sub-skills like refactoring-planning, tdd-refactoring, and tdd-audit.
+name: code-refactoring
+description: Orchestrates the entire Code Refactoring process (Planning -> Execution -> Closing). Manages the workflow by invoking specialized sub-skills like refactoring-planning, tdd-refactoring, and tdd-audit.
 ---
 
-# Refactoring Implementation (Orchestrator)
+# Code Refactoring (Orchestrator)
 
 このスキルは、大規模なリファクタリングタスクを、安全かつ確実に完遂するための構造化されたプロセスを提供します。
 
