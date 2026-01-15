@@ -58,8 +58,7 @@ description: Executes the Refactoring Loop to improve code quality without chang
       - *Proposal:* ...
     - [ ] **User Value:** この複雑さはユーザーのメリットにつながっているか？
 
-  - 提案の中から、**最も効果が高く、リスクが低い1つ**を選択し、次ステップ（Iterate）へのインプットとする。
-  - **判定:** 全てのチェックリストをクリアし、改善提案が出なくなったらサイクル完了と判断する。
+  - 提案の中から、**最も効果が高く、リスクが低い1つ**を選択し、宣言する。次ステップ（Iterate）へのインプットとする。
 
 ### 5. 反復 (Iterate)
 - **Input:**
