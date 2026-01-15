@@ -21,6 +21,7 @@ description: Performs final quality checks and formalizes deliverables. Used for
   - **SSOT整合性:** `ssot-verification` を実行し、更新されたアーキテクチャ図が上位の設計方針（ADR等）と矛盾していないか確認する。
     `activate_skill{name: "ssot-verification"}`
   - **リンク切れチェック:** ドキュメント内のリンクが有効であることを確認する（手動またはツール使用）。
+  - **判定:** もし修正が必要な不整合が見つかった場合、**直ちに `architecture-visualization` の実行フェーズ（Drafting/Refactoring）に戻り、修正を行うこと。** ここで修正作業を行ってはならない。
 
 ### 2. 成果物の定着
 - **Action:**

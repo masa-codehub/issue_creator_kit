@@ -22,12 +22,13 @@ description: Refines architecture diagrams for readability, consistency, and cla
 *   **Domain Grouping:** ビジネス的な関連性が高い要素を `Boundary` で囲む。
 *   **Layer Grouping:** Clean Architecture のレイヤー（Infra, Interface, UseCase, Domain）ごとに配置を整理する。
 
-### 3. 明確化と標準化 (Clarification & Standardization)
+### 4. 整合性と標準化 (Integrity & Standardization)
+*   **SSOT Check:** `activate_skill{name: "ssot-verification"}` を実行し、図がADRや上位設計と矛盾していないか確認する。
 *   **Annotation:** 循環参照や非推奨な依存関係には警告色の `Note` を配置する。
 *   **Legend:** 特殊な記法には凡例を追加する。
 *   **Mermaid Polish:** 配置方向（TB/LR）を調整し、視線の流れを自然にする。
 
-### 4. 自己レビューと改善提案 (Self-Review & Proposal)
+### 5. 自己レビューと改善提案 (Self-Review & Proposal)
 以下のチェックリストに基づき、図面とドキュメントの品質を自律的に向上させる。
 
 *   **Checklist & Proposal:**
