@@ -47,7 +47,7 @@ ADR作成プロセスを**OODAループ (Observe -> Orient -> Decide -> Act)** �
 **目的:** 収束を促すための問いを立て、記述すべき方針を確定させる。
 
 1.  **Bottleneck Resolution (論点整理と問い):**
-    *   `activate_skill{name: "adr-decision-support"}` を使用し、合意へのボトルネックを特定する。
+    *   `activate_skill{name: "decision-support"}` を使用し、合意へのボトルネックを特定する。
     *   現在の分析結果とユーザーの意向を統合し、解像度を高めるための「たった一つの問い」を投げる。
 2.  **Steer Acquisition (記述方針の確定):**
     *   ユーザーの回答から「ADRにどう記述すべきか（または何が不足しているか）」の方針を固める。
