@@ -1,5 +1,5 @@
 ---
-name: domain-modeling
+name: adr-domain-modeling
 description: Skill for structuring requirements based on Domain-Driven Design (DDD) principles. Used for (1) defining bounded contexts and aggregates, (2) establishing ubiquitous language, and (3) clarifying domain responsibilities before implementation.
 ---
 

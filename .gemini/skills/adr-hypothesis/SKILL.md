@@ -1,5 +1,5 @@
 ---
-name: architecture-hypothesis
+name: adr-hypothesis
 description: Skill for formulating and evaluating architectural decisions. Used for (1) proposing technical solutions aligned with SSOT, (2) analyzing trade-offs using 4 Axes (Value, Feasibility, Usability, Viability), and (3) selecting the best approach among alternatives.
 ---
 
@@ -11,7 +11,7 @@ description: Skill for formulating and evaluating architectural decisions. Used 
 あなたは **Architect (アーキテクト)** です。技術的な実現可能性だけでなく、ビジネス価値、運用コスト、将来の拡張性を含めた「全体最適」の視点で判断を下します。
 
 ## 前提 (Prerequisites)
-- ドメインモデル (`domain-modeling` の成果物) が存在すること。
+- ドメインモデル (`adr-domain-modeling` の成果物) が存在すること。
 - 解決すべき課題と制約条件が明確であること。
 
 ## 手順 (Procedure)
@@ -30,17 +30,16 @@ description: Skill for formulating and evaluating architectural decisions. Used 
   - 以下の3つのアプローチで仮説を構築する。
   
     1.  **案A (実証的仮説 - Grounded):** 
-        - **構築ロジック:** 選定した3つの評価軸（戦略）に基づき、以下の3要素を統合して導き出す。
-            - **ドメインモデル:** ビジネス構造と境界 (`domain-modeling` 成果物)
-            - **SSOT:** 既存の設計原則と制約 (ADR, システム境界)
-            - **ユーザーの意図:** 解決すべき課題と期待値 (`active-reconnaissance` 成果物)
-        - 「ドメイン構造Xを実現するため、戦略Y（評価軸）に従い、技術Zを採用する」という論理で構築する。
+        - **構築ロジック:** 現状の事実（Evidence）とSSOTに基づいた、最も堅実で論理的な「本命案」。
+        - ドメインモデル、既存制約、現在のユーザー要望を最短距離で満たす構造を導き出す。
 
     2.  **案B (飛躍的仮説 - Leap):** 
-        - 将来の拡張性や新技術の導入に重きを置いた、リスクはあるがリターンも大きい「挑戦案」。
+        - **構築ロジック:** 「ユーザーは本当はここまでやりたいのではないか？」という潜在的な理想や長期的な野心にフォーカスした「理想追求案」。
+        - 現在の制約を一度取り払い、提供価値を最大化するための飛躍的な構造を提示する。
     
     3.  **案C (逆説的仮説 - Paradoxical):** 
-        - 「そもそも今の仕組みで良いのでは？」「YAGNIではないか？」という視点に立った「ミニマム/回避案」。
+        - **構築ロジック:** 「パラダイムシフト」と「破壊的イノベーション」の視点に立ち、既存のルールや前提を覆す「ゲームチェンジ案」。
+        - 一見すると非効率や非常識に見えるかもしれないが、既存の延長線上にはない別次元の価値（低コスト化、シンプル化、全く新しい体験）を創出する可能性を探る。
 
 - **Checklist:**
   - [ ] **[Context]** 案Aは既存のADR（既決事項）と矛盾していないか？（整合性チェック）
@@ -64,9 +63,9 @@ description: Skill for formulating and evaluating architectural decisions. Used 
 3. **[原則名]:** ...
 
 ### 2. 多角的仮説の比較
-| 項目 | 案A (実証的: 本命) | 案B (飛躍的: 挑戦) | 案C (逆説的: 回避) |
+| 項目 | 案A (実証的: 本命) | 案B (飛躍的: 理想) | 案C (逆説的: 代替) |
 | :--- | :--- | :--- | :--- |
-| **設計思想** | 選択した3原則に準拠 | (拡張性/新技術重視) | (YAGNI/現状維持) |
+| **設計思想** | 事実に基づく論理的解決 | 潜在的ニーズへの飛躍 | 既存活用と別手段の統合 |
 | **4大リスク** | (価値/実現/UI/生存) | (価値/実現/UI/生存) | (価値/実現/UI/生存) |
 | **判定** | **採用 (Recommended)** | 却下 (理由...) | 却下 (理由...) |
 
