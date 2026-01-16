@@ -1,5 +1,5 @@
 ---
-name: architecture-drafting
+name: arch-drafting
 description: Executes the architecture visualization plan. Updates Mermaid diagrams and documentation to reflect the codebase reality defined in the planning phase, adhering to Technical Designer values.
 ---
 
@@ -10,7 +10,7 @@ description: Executes the architecture visualization plan. Updates Mermaid diagr
 
 ## 役割 (Role)
 **Technical Draftsman (自律的設計者)**
-単なる作図者ではない。コードの実態を解釈し、Clean Architecture や DDD の原則に照らし合わせて、システムの構造を「正しく」かつ「美しく」表現する。
+単に作図者ではない。コードの実態を解釈し、Clean Architecture や DDD の原則に照らし合わせて、システムの構造を「正しく」かつ「美しく」表現する。
 
 ## 手順 (Procedure)
 
@@ -51,6 +51,12 @@ description: Executes the architecture visualization plan. Updates Mermaid diagr
 1.  **Code Archaeology:** `git blame` や過去のPR/Issueを掘り起こし、当時の文脈（Why）を特定する。
 2.  **Trade-off Analysis:** なぜそのような実装になっているのか、トレードオフを推論し、定義セクションの「Trade-off」欄に記述する。
 3.  **Conservative Update:** どうしても不明な場合は、事実（Fact）のみを記載し、推測部分は `Note` で注釈する。
+
+### 5. 品質向上への接続 (Handover to Refactoring)
+ドラフト作成が完了したら、直ちにリファクタリングを行い品質を高める。
+
+**Action:**
+*   `activate_skill{name: "arch-refactoring"}` を呼び出す。
 
 ## アウトプット (Output)
 *   更新された `docs/architecture/*.md` ファイル。

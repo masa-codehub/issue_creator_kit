@@ -1,5 +1,5 @@
 ---
-name: architecture-refactoring
+name: arch-refactoring
 description: Refines architecture diagrams for readability, consistency, and clarity without changing factual accuracy, adhering to Technical Designer values.
 ---
 
@@ -22,13 +22,13 @@ description: Refines architecture diagrams for readability, consistency, and cla
 *   **Domain Grouping:** ビジネス的な関連性が高い要素を `Boundary` で囲む。
 *   **Layer Grouping:** Clean Architecture のレイヤー（Infra, Interface, UseCase, Domain）ごとに配置を整理する。
 
-### 4. 整合性と標準化 (Integrity & Standardization)
+### 3. 整合性と標準化 (Integrity & Standardization)
 *   **SSOT Check:** `activate_skill{name: "ssot-verification"}` を実行し、図がADRや上位設計と矛盾していないか確認する。
 *   **Annotation:** 循環参照や非推奨な依存関係には警告色の `Note` を配置する。
 *   **Legend:** 特殊な記法には凡例を追加する。
 *   **Mermaid Polish:** 配置方向（TB/LR）を調整し、視線の流れを自然にする。
 
-### 5. 自己レビューと改善提案 (Self-Review & Proposal)
+### 4. 自己レビューと改善提案 (Self-Review & Proposal)
 以下のチェックリストに基づき、図面とドキュメントの品質を自律的に向上させる。
 
 *   **Checklist & Proposal:**
@@ -48,8 +48,9 @@ description: Refines architecture diagrams for readability, consistency, and cla
 ### 5. 反復 (Iterate)
 *   **Input:** Step 4 で選択された改善提案。
 *   **Action:**
-    - 改善提案が存在する場合、それをターゲットとして **Step 1 に戻り**、図面を修正する。
-    - 改善提案がない場合、リファクタリングサイクルを終了する。
+    - 改善提案が存在する場合、それをターゲットとして `arch-drafting` を呼び出し、修正を行う。
+      `activate_skill{name: "arch-drafting"}`
+    - 改善提案がない（チェックリストが全てクリアされた）場合、リファクタリングサイクルを終了する。
 
 ## アウトプット (Output)
 *   視覚的に整理され、意図が明確になった `docs/architecture/*.md`。

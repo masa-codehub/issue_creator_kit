@@ -25,7 +25,7 @@ ADRという「方針」を、実行可能な「タスク」に翻訳し、分�
     *   作業の基点となる統合用ブランチを作成・チェックアウトする。
     *   `activate_skill{name: "github-checkout-feature-branch"}` (例: `feature/arch-update-xxx`)
 2.  **Visualization Selection:**
-    *   `activate_skill{name: "architecture-drafting"}` のガイドラインを参照し、ADRの内容を表現するために必要な図（Context, Container, Component, Sequenceなど）を選定する。
+    *   `activate_skill{name: "arch-drafting"}` のガイドラインを参照し、ADRの内容を表現するために必要な図（Context, Container, Component, Sequenceなど）を選定する。
 3.  **Issue Drafting:**
     *   `activate_skill{name: "todo-management"}`
     *   選定した図の作成・更新作業をアトミックなタスクに分解する。
@@ -74,7 +74,7 @@ ADRという「方針」を、実行可能な「タスク」に翻訳し、分�
 2.  **Review Support:**
     *   人間のレビュアーからのフィードバックを待つ。
     *   **指摘があった場合:**
-        *   軽微な修正（誤字脱字、レイアウト微調整）であれば、あなた自身が修正コミットを行う (`architecture-refactoring`)。
+        *   軽微な修正（誤字脱字、レイアウト微調整）であれば、あなた自身が修正コミットを行う (`arch-refactoring`)。
         *   設計に関わる大きな修正が必要な場合は、再度「修正用Issue案」を作成し、Phase 2 のフローへ戻す。
 
 ## 禁止事項 (Anti-Patterns)

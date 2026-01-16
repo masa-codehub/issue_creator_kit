@@ -62,17 +62,17 @@ SSOT（ADR/Design Doc）に基づいて、アーキテクチャ図をどのよ�
 ## Tasks
 - [ ] **Step 1: [C4 Container] SSOT(ADR-005)に基づき、PaymentWorkerコンテナを追加する**
   - **Context (Red):** ADR-005「決済処理は、APIからの要求をキューに積み、独立したWorkerプロセスで非同期実行する」という構成が図面に反映されている必要がある。
-  - **Action (Green):** `architecture-drafting` を使用し、`docs/architecture/container.md` にコンテナ定義とMermaidノードを追加する。
-  - **Refine (Refactor):** `architecture-refactoring` を使用し、Queueとの関係が見やすいようにレイアウトを調整する。
+  - **Action (Green):** `arch-drafting` を使用し、`docs/architecture/container.md` にコンテナ定義とMermaidノードを追加する。
+  - **Refine (Refactor):** `arch-refactoring` を使用し、Queueとの関係が見やすいようにレイアウトを調整する。
   - **Verify:** `PaymentWorker` ノードが存在し、API -> Redis -> Worker の依存関係で描画されていること。
 
 - [ ] **Step 2: [Sequence Diagram] SSOT(ADR-005)に基づき、非同期決済フローを新規作成する**
   - **Context (Red):** 「APIが受付けレスポンスを返した後、Redisを介してWorkerが決済処理を開始する」という時系列の振る舞いが厳密に定義されている必要がある。
-  - **Action (Green):** `architecture-drafting` (Template: arch-behavior) を使用し、`docs/architecture/seq-payment-async.md` を作成する。
-  - **Refine (Refactor):** `architecture-refactoring` を使用し、例外フローのNoteを整理する。
+  - **Action (Green):** `arch-drafting` (Template: arch-behavior) を使用し、`docs/architecture/seq-payment-async.md` を作成する。
+  - **Refine (Refactor):** `arch-refactoring` を使用し、例外フローのNoteを整理する。
   - **Verify:** ファイルが作成され、メッセージフローがSSOTの時系列要件と一致していること。
 
 - [ ] **Final Step: 全ての更新図面とSSOTの整合性を確認する**
-  - Action: `architecture-audit` スキルを実行する。
-  - Verify: `architecture-audit` のチェックリストが全てパスすることを確認する。
+  - Action: `ssot-verification` スキルを実行し、ドキュメントのリンクチェックを行う。
+  - Verify: SSOTとの整合性に問題がないこと。
 ```
