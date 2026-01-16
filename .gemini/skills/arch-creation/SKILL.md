@@ -1,9 +1,9 @@
 ---
 name: arch-creation
-description: Orchestrator skill for visualizing approved Architecture Decision Records (ADR). Decomposes ADRs into specific diagramming tasks (Issues), and manages the integration of distributed implementation results.
+description: Orchestrator skill for realizing approved Architecture Decision Records (ADR). Decomposes ADRs into specific diagramming tasks (Issues), and manages the integration of distributed implementation results.
 ---
 
-# アーキテクチャ可視化オーケストレーション (Architecture Visualization Orchestration)
+# アーキテクチャ構築オーケストレーション (Architecture Creation Orchestration)
 
 承認された **ADR (Architecture Decision Record)** を入力とし、それを具体的なアーキテクチャ図（Map）としてコードベースに反映させるプロセスを統括する。
 
