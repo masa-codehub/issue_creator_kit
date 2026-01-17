@@ -19,30 +19,16 @@ ADRという「方針」を、実行可能な「タスク」に翻訳し、分�
 ## 手順 (Procedure)
 
 ### Phase 1: Planning & Issue Drafting (計画とIssue案作成)
-**目的:** ADRを読み解き、共通定義（Plan）を策定し、ドメイン単位で分割したIssue案を作成する。
+**目的:** ADRを読み解き、共通定義（Plan）とIssue案を作成し、レビューまで完了させる。
 
 1.  **Branching (Parent Branch):**
     *   作業の基点となる統合用ブランチを作成・チェックアウトする。
     *   `activate_skill{name: "github-checkout-feature-branch"}` (例: `feature/arch-update-xxx`)
 
-2.  **Strategic Planning:**
+2.  **Strategic Planning & Drafting:**
     *   `activate_skill{name: "arch-planning"}`
-    *   ADRを分析し、**Common Definitions Doc**（共通定義書）を作成する。
-    *   Path: `docs/architecture/plans/YYYYMMDD-{feature}.md`
-    *   *Content:* 全タスクで統一すべき用語、コンポーネント名、境界定義。
-
-3.  **Issue Drafting:**
-    *   `activate_skill{name: "todo-management"}`
-    *   `arch-planning` で定義されたドメイン分割（Slicing）に基づき、Issue案を作成する。
-    *   各タスクについて、`reqs/tasks/template/issue-draft.md` をテンプレートとして使用する。
-    *   作成先: `reqs/tasks/drafts/` ディレクトリ配下。
-    *   **Vital:** 全てのIssue案本文に、上記 **Common Definitions Doc へのリンク** を記載し、「この定義に従うこと」と明記する。
-
-4.  **Planning Review:**
-    *   `activate_skill{name: "arch-planning-review"}`
-    *   作成された共通定義書とIssue案をレビューする。
-    *   抜け漏れ（MECE）、リンク切れ、定義の曖昧さがないかチェックし、問題があればその場で修正する。
-    *   **Gate:** 重大な欠陥がある場合は PR 作成に進まず、Planning をやり直す。
+    *   このスキル内で、共通定義書の作成、Issue案の作成、および計画レビュー（`arch-planning-review`）までが一気通貫で実行される。
+    *   **Verify:** 実行後、`docs/architecture/plans/` と `reqs/tasks/drafts/` に成果物が生成され、レビューをパスしていることを確認する。
 
 ### Phase 2: Approval & Initiation (承認と開始)
 **目的:** 「共通定義」と「Issue案」のセットで承認を得て、実装フェーズを開始する。
@@ -86,7 +72,6 @@ ADRという「方針」を、実行可能な「タスク」に翻訳し、分�
     *   人間のレビュアーからのフィードバック対応（軽微なら自走、重ければIssue化）。
 
 ## 禁止事項 (Anti-Patterns)
-- **Skipping Review:** 時間短縮のために `arch-planning-review` を飛ばしてはならない。急がば回れ。
 - **Undefined Terms:** Common Definitions Doc で定義されていない用語を、各Issueで勝手に発明してはならない。
 - **Direct Implementation:** あなた自身が図を描いてはならない。
 - **Self-Correction:** 監査で見つかった重大な不整合を、Issueなしで勝手に直してはならない。
@@ -99,6 +84,6 @@ Draftingフェーズ完了時の報告。
 - **Source ADR:** [対象ADR]
 - **Common Definitions:** `docs/architecture/plans/YYYYMMDD-{feature}.md` (Created)
 - **Draft Issues:** `reqs/tasks/drafts/*.md` (Created [N] drafts)
-- **Review Status:** [Pass / Fixed]
+- **Planning Review:** Passed
 - **PR:** #<Number> (共通定義とIssue案の承認依頼)
 ```
