@@ -85,7 +85,7 @@ description: Formulates a comprehensive strategy for TDD-based implementation. A
 **目的:** 作成された計画（共通方針 + Issue案）の品質を保証する。
 
 - **Action:**
-  - `activate_skill{name: "tdd-planning-review"}` (後述: 新規作成)
+  - `activate_skill{name: "tdd-planning-review"}`
   - 作成された共通実装計画とIssue案をレビューする。
   - **Audit View:** 「このIssue案があれば、実装者は迷わず `tdd-implementation` を起動してRed-Green-Refactorを回せるか？」という視点でチェックする。
 
