@@ -58,10 +58,9 @@ ADRを分析し、「何を描くか」だけでなく、「どう分担する�
 **目的:** 定義された戦略に基づき、具体的なIssue案ファイルを作成する。
 
 - **Action:**
-  - `activate_skill{name: "todo-management"}`
-  - 各タスクについて、`reqs/tasks/template/issue-draft.md` をテンプレートとして使用し、Issue案を作成する。
-  - 作成先: `reqs/tasks/drafts/` ディレクトリ配下。
-  - **Mandatory:** 全てのIssue案本文に、Step 1で作成した **Common Definitions Doc へのリンク** を記載し、「この定義に従うこと」と明記する。
+  - `activate_skill{name: "issue-drafting"}`
+  - Step 2 で定義した各タスクについて、Issue案を作成する。
+  - **Mandatory:** 全てのIssue案本文に、Step 1で作成した **Common Definitions Doc へのリンク** を記載し、「この定義に従うこと」と明記するよう、`issue-drafting` 実行時に指示する。
 
 ### 4. 計画レビュー (Planning Review)
 
