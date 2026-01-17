@@ -9,6 +9,7 @@ description: Audits the architecture visualization plan (Common Definitions & Dr
 「計画の品質」が「実装の品質」を決定する。一切の妥協を許さず、完璧な状態（Zero Ambiguity）でのみ次工程へ進むことを許可する。
 
 ## 役割 (Role)
+
 **Plan Auditor (計画監査人)**
 ユーザーの代弁者として、計画書にあらゆる角度からツッコミを入れる。
 「なんとなく分かりそう」はNG。「これ以外に解釈しようがない」レベルまで記述を研ぎ澄ませる。
@@ -16,24 +17,27 @@ description: Audits the architecture visualization plan (Common Definitions & Dr
 ## 手順 (Procedure)
 
 ### 1. 共通定義の精査 (Audit Common Definitions)
+
 `docs/architecture/plans/*.md` を対象に、`SYSTEM_ARCHITECT` の価値観に照らしてチェックする。
 
 - **Strict Checklist:**
-    - [ ] **Zero Ambiguity:** 記述内容に一切の疑問や曖昧さを感じないか？（「適宜」「必要に応じて」などの逃げ言葉は修正必須）
-    - [ ] **MECE (No Gap/Overlap):** 定義内容に抜け漏れ・無理・無駄がないか？
-    - [ ] **SSOT Alignment:** 既存のドキュメント（ADR/Context）と矛盾していないか？
-    - [ ] **Evolutionary:** 将来の変更に対し、閉鎖的すぎず、かつ現在必要十分な定義か？
+  - [ ] **Zero Ambiguity:** 記述内容に一切の疑問や曖昧さを感じないか？（「適宜」「必要に応じて」などの逃げ言葉は修正必須）
+  - [ ] **MECE (No Gap/Overlap):** 定義内容に抜け漏れ・無理・無駄がないか？
+  - [ ] **SSOT Alignment:** 既存のドキュメント（ADR/Context）と矛盾していないか？
+  - [ ] **Evolutionary:** 将来の変更に対し、閉鎖的すぎず、かつ現在必要十分な定義か？
 
 ### 2. Issue案の精査 (Audit Draft Issues)
+
 `reqs/tasks/drafts/*.md` を対象にチェックする。
 
 - **Strict Checklist:**
-    - [ ] **Template Compliance:** `reqs/tasks/template/issue-draft.md` の項目が全て埋められているか？
-    - [ ] **Mandatory Reference:** 共通定義書へのリンクと遵守指示が明記されているか？
-    - [ ] **Clear Scope:** タスクの範囲（Boundary）が明確で、他のタスクと重複していないか？
-    - [ ] **No Regression:** 以前の計画と比較し、デグレ（必要な図の消失など）が起きていないか？
+  - [ ] **Template Compliance:** `reqs/tasks/template/issue-draft.md` の項目が全て埋められているか？
+  - [ ] **Mandatory Reference:** 共通定義書へのリンクと遵守指示が明記されているか？
+  - [ ] **Clear Scope:** タスクの範囲（Boundary）が明確で、他のタスクと重複していないか？
+  - [ ] **No Regression:** 以前の計画と比較し、デグレ（必要な図の消失など）が起きていないか？
 
 ### 3. 指摘と改善案の提示 (Finding & Proposal)
+
 監査で見つかった全ての問題に対し、**具体的な改善案**を作成する。
 
 - **Action:**
@@ -44,6 +48,7 @@ description: Audits the architecture visualization plan (Common Definitions & Dr
     - **Proposal:** [修正後の具体的な文言、または追加すべき具体的な項目]
 
 ### 4. 是正または再計画 (Correction or Re-Planning)
+
 改善案に基づき、アクションを決定する。
 
 - **Branch A: Immediate Correction (その場で修正)**
@@ -56,10 +61,12 @@ description: Audits the architecture visualization plan (Common Definitions & Dr
     `activate_skill{name: "arch-planning"}`
 
 ## アウトプット (Output)
+
 全ての指摘が解消（修正または再計画）された後に報告する。
 
 ```markdown
 ## Planning Review Result
+
 - **Status:** [Passed / Fixed / Re-Planning Triggered]
 - **Corrections Executed:**
   - [Fixed] 共通定義書の用語Aについて、ADRから定義を転記し具体化しました。
