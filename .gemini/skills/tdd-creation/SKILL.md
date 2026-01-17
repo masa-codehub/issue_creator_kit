@@ -52,11 +52,11 @@ _(この後、システムが自動的にIssueを起票し、別エージェン�
 _(前提: 起票された全てのIssueが完了し、統合ブランチにマージされていること)_
 
 1.  **Traceability & Quality Check:**
-    - `activate_skill{name: "tdd-audit"}`
+    - `activate_skill{name: "ssot-verification"}`
     - 作成されたプロダクトコード（UseCase/Logic）とテストが、以下の2点と整合しているか厳密にチェックする。
       1.  **詳細仕様 (Specs):** 全ての要件、エラーハンドリング、バリデーションが実装されているか。
       2.  **共通実装計画 (Common Implementation Plan):** 定義された方針、レイヤー構造に従っているか。
-    - **Automation Check:** 全てのテストがGreenであることを確認する。
+    - **Verification Action:** `run_shell_command` でプロジェクトのテストコマンドを実行し、全テストがGreenであることを物理的に確認する。
 
 2.  **Create Handover Items (Next Step):**
     - 次工程（通常はインフラ接続やUI統合、あるいは完了報告）に向けた引継ぎ事項を作成する。
