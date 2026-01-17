@@ -1,71 +1,69 @@
 ---
 name: issue-drafting
-description: Creates detailed issue drafts for task delegation. Ensures clarity and executability by integrating SMART goal setting into each issue and structuring tasks into verifiable Red/Green/Verify steps.
+description: Creates detailed issue drafts by filling the standardized 'issue-draft.md' template. Ensures metadata correctness and verifiable task descriptions based on objective-oriented analysis.
 ---
 
-# Issue Drafting (Objective-Oriented Task Architecture)
+# Issue Drafting (Template-Driven Task Architecture)
 
-他者（エージェントまたは人間）に委譲するタスクの「指示書（Issue Draft）」を作成するスキル。
-単なる作業リストではなく、`objective-setting` に基づくSMART目標をIssueの核に据え、達成すべき成果を「検証可能な構造」で記述する。
+`reqs/tasks/template/issue-draft.md` を正しく、かつ高品質に埋めるためのスキル。
+`objective-setting` の成果をテンプレートの各セクションへ正確にマッピングし、エージェントが自律的に実行可能な「完全な指示書」を生成する。
 
 ## 役割 (Role)
 **Task Architect (タスク設計者)**
-「何をやるか」だけでなく、「なぜ、どうなれば成功か」を定義する。
-SMART目標をIssue本文に焼き付け、作業者の迷いをゼロにする。
+テンプレートの「枠」を、具体的で矛盾のない「指示」で埋める。
+メタデータ（Frontmatter）の整合性と、本文（Content）の検証可能性を両立させる。
 
 ## 前提 (Prerequisites)
-- タスクの目的、スコープ、参照すべきドキュメント（SSOT/Common Definitions）が明確であること。
-- `reqs/tasks/template/issue-draft.md` が存在すること。
+- `reqs/tasks/template/issue-draft.md` を読み込んでいること。
+- 参照すべき Common Definitions Doc や ADR のパスが判明していること。
 
 ## 手順 (Procedure)
 
-### 1. 目標定義と構造化 (Objective & Structuring)
-**目的:** タスクの成功基準を明確にし、検証可能な手順へ分解する。
+### 1. メタデータ定義 (Frontmatter Setup)
+**目的:** システム連携に必要な属性情報を正しく設定する。
 
 - **Action:**
-  - `activate_skill{name: "objective-setting"}` (思考プロセスとして使用)
-  - 依頼内容から、**このIssueが達成すべきSMART目標**を定義する。
-    - *Specific:* どのファイルをどう変えるか？
-    - *Measurable:* 完了をどう数値や事実で確認するか？
-  - 目標を達成するための論理的な手順を構築する。
-    1.  **Context (Red):** 理想（SSOT）と現状（As-Is）の乖離。
-    2.  **Action (Green):** 乖離を埋めるための具体的アクション。
-    3.  **Verify (Check):** 成果物の客観的検証方法。
+  - 以下の項目を、`arch-planning` の戦略に基づいて決定する。
+  - **title:** `[Domain] Action + Object`
+  - **labels:** 担当ロール（例: `TECHNICAL_DESIGNER`）と優先度を設定。
+  - **roadmap / task_id:** 関連するロードマップと WBS ID を紐付ける。
+  - **depends_on:** 依存する他のIssueがあればファイル名をリストアップ。
 
-### 2. コンテンツ記述 (Drafting)
-**目的:** テンプレートを埋め、SMART目標を軸にした指示書を作成する。
+### 2. 目的・背景・入力の記述 (Sections 1 & 2)
+**目的:** タスクの「Why」と「前提知識」を定義する。
 
 - **Action:**
-  - `reqs/tasks/template/issue-draft.md` を読み込み、以下の基準で記述する。
+  - **1. 目的と背景:**
+    - **As-is (現状):** SSOTと現在のコード/図の具体的な乖離を記述（Red）。
+    - **To-be (あるべき姿):** このタスク完了後の理想状態（Goal）。
+    - **Design Evidence:** 根拠となる ADR のセクションや Common Definitions へのリンクを明記。
+  - **2. 参照資料・入力ファイル:**
+    - 作業開始時に `read_file` すべきファイルを具体的にリストアップする。
 
-  - **Title:** `[Domain] Verb + Object`
-  
-  - **Goal (Added Section or Header):**
-    - Step 1で定義した **SMART目標** を明記する。
-    - *Example:* 「ADR-005に基づき、決済完了後のメール送信シーケンスを、リトライフローを含めて完全に可視化する。」
-
-  - **Context (Background & SSOT):**
-    - **Why:** 共通定義書（Common Definitions）へのリンクと、その中のどの部分に関連するかを記述。
-    - **Gap:** 現状の不足点（Red）。
-
-  - **Requirements (Execution Steps):**
-    - 作業手順を `Red/Green/Verify` の構造で記述する。
-
-  - **Acceptance Criteria (Definition of Done):**
-    - 完了条件を「目標が達成された事実」として記述する。
-
-### 3. ファイル生成と自己検証 (Finalization & Check)
-**目的:** 生成物の品質を保証する。
+### 3. 実装手順と制約の記述 (Section 3)
+**目的:** 迷いのない「実行手順（How）」を定義する。
 
 - **Action:**
-  - 作成した内容をファイル（`reqs/tasks/drafts/*.md`）に書き出す。
-  - 以下のチェックリストで自己検証を行う。
+  - **3.1. 負の制約:** 「触ってはいけないファイル」や「今回のスコープ外」を明示し、余計な変更を防ぐ。
+  - **3.2. 実装手順:**
+    - `Action (Green)` に相当する具体的な操作を記述する。
+    - 使用すべきテンプレート（`docs/template/arch-*.md` 等）を明示する。
+  - **3.3. 構成変更:** 不要なファイルの削除や設定ファイルの変更があれば記述。
 
-- **Self-Correction Checklist:**
-  - [ ] **Objective-Oriented:** Issueの冒頭に「達成すべき目標」が明記されているか？
-  - [ ] **No Ambiguity:** 逃げ言葉（「適宜」等）を排除できているか？
-  - [ ] **Atomic:** 1つのIssueで扱う目標は1つに絞られているか？
-  - [ ] **Verifiable:** 誰がやっても同じ「完了」の判定ができるか？
+### 4. ブランチ戦略と検証手順の記述 (Sections 4 & 5)
+**目的:** プロセスの整合性と「完了（DoD）」を定義する。
+
+- **Action:**
+  - **4. ブランチ戦略:** ロードマップに基づくベースブランチと、一意な作業ブランチ名を定義。
+  - **5. 検証手順:**
+    - `Verify (Check)` に相当する客観的な確認方法を記述。
+    - アーキテクチャ図の場合、Mermaidの構文チェックや、Common Definitions との用語一致を必須項目とする。
+
+### 5. 自己検証 (Final Check)
+- **Action:**
+  - 生成したMarkdownがテンプレートの構造を壊していないか。
+  - `{{title}}` などの変数が適切に置換（または具体的な値で上書き）されているか。
+  - **Zero Ambiguity:** 指示内容に「適宜」「いい感じに」が含まれていないか。
 
 ## アウトプット (Output)
-- `reqs/tasks/drafts/` 配下に生成された、目標設定済みのMarkdownファイル。
+- `reqs/tasks/drafts/` 配下に、テンプレートを完全に埋めた状態で出力されたMarkdownファイル。
