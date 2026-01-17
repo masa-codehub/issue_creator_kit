@@ -27,7 +27,7 @@ ADRを分析し、「何を描くか」だけでなく、「どう分担する�
 - **Action:**
   - `activate_skill{name: "objective-setting"}`
   - 今回のADR反映作業において、「誰に」「何を」伝えることが最も重要か（Value）を定義し、それを満たすためのSMART目標を設定する。
-  - *Goal:* 「開発者が迷わず実装できるレベルのIssue案と共通定義を作成し、レビューをパスする。」
+  - _Goal:_ 「開発者が迷わず実装できるレベルのIssue案と共通定義を作成し、レビューをパスする。」
 
 ### 2. 意図の抽出と共通定義 (Intent & Common Definitions)
 
