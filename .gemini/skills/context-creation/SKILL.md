@@ -44,7 +44,11 @@ description: Orchestrator skill for creating and maintaining the System Context 
     - コード内で使われている用語（クラス名、変数名）と、ビジネス用語（Ubiquitous Language）の対応関係を整理する。
     - システムの境界線（Boundaries）を再定義する。
 
-2.  **Visualization Strategy (図解の構想):**
+2.  **Hypothesis & Options (境界・構造の仮説立案):**
+    - `activate_skill{name: "context-hypothesis"}`
+    - 発見されたGapを解消するための解決策（境界の再定義、コンポーネントの分割等）を、案A/B/Cの視点で立案・分析する。
+
+3.  **Visualization Strategy (図解の構想):**
     - `activate_skill{name: "context-diagram"}`
     - システムの全体像を表す C4 Context Diagram (Mermaid) の更新案を作成する。
     - 外部システム（User, External System）との関係性が正しく表現されているか確認する。
