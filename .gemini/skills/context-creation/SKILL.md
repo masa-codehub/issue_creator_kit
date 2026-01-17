@@ -69,6 +69,9 @@ description: Orchestrator skill for creating and maintaining the System Context 
     - `activate_skill{name: "context-drafting"}`
       - `docs/system-context.md` を更新する。
       - Phase 2で作図したMermaid図を埋め込む。
+    - **Self-Review:**
+      - `activate_skill{name: "context-review"}`
+      - 作成したドキュメントを監査し、コードとの乖離や抽象度のミスを自動修正する。
     - `activate_skill{name: "github-commit"}` (保存)
     - コミット後、再度 Orient に戻るか Act を続けるかを確認する。
 
