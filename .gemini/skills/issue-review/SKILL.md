@@ -1,6 +1,6 @@
 ---
 name: issue-review
-description: Audits created issue drafts for quality, clarity, and template compliance. Ensures alignment with SSOT by mandating context loading, and enforces core values of SYSTEM_ARCHITECT, TECHNICAL_DESIGNER, and BACKENDCODER.
+description: Audits created issue drafts for quality, clarity, and template compliance. Ensures alignment with SSOT by mandating context loading via active-reconnaissance, and enforces core values of SYSTEM_ARCHITECT, TECHNICAL_DESIGNER, and BACKENDCODER.
 ---
 
 # Issue Review (Value & Reality Driven Audit)
@@ -20,8 +20,8 @@ description: Audits created issue drafts for quality, clarity, and template comp
 
 - **Action:**
   - レビュー対象のIssueドラフトを読み込む。
-  - Issue内で参照されている **ADR**, **Common Definitions Doc**, および **`docs/system-context.md`** を `read_file` で読み込む。
-  - **Rule:** これらを読まずに「整合性OK」と判断することは許されない。
+  - `activate_skill{name: "active-reconnaissance"}` を実行し、Issue内で参照されている **ADR**, **Common Definitions Doc**, および **`docs/system-context.md`** の内容を正確に把握する。
+  - **Rule:** これを実行せずに「整合性OK」と判断することは許されない。
 
 ### 2. 形式と物理的整合性の監査 (Formal & Physical Audit)
 **目的:** 実行不可能なエラーを排除する。
@@ -62,7 +62,7 @@ description: Audits created issue drafts for quality, clarity, and template comp
 ```markdown
 ## Issue Review Result: [Issue Title]
 - **Status:** [Pass / Fixed / Failed]
-- **Context Loaded:** `docs/architecture/plans/xxx.md`, `reqs/design/_approved/adr-005.md`
+- **Context Loaded:** (active-reconnaissance result summary)
 - **Value Alignment:**
   - [OK] Domain-Centric: 決済用語が正しく使われている。
   - [Fixed] Simplicity: 不要なリファクタリング指示を削除しました。
