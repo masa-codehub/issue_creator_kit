@@ -43,8 +43,8 @@ Design Doc作成プロセスを**OODAループ (Observe -> Orient -> Decide -> A
 **目的:** 機能レベルでの「意思決定」と「構造設計」を行う。
 
 1.  **Design Decision (設計判断):**
-    - `activate_skill{name: "adr-hypothesis"}` (流用)
-    - 機能を実現するためのアプローチを、以下の3つの視点（`adr-hypothesis`準拠）で検討し、トレードオフを分析する。
+    - `activate_skill{name: "context-hypothesis"}` (流用)
+    - 機能を実現するためのアプローチを、以下の3つの視点（`context-hypothesis`準拠）で検討し、トレードオフを分析する。
       - **案A (実証的):** 基本に忠実でリスクの少ない案。
       - **案B (飛躍的):** 理想的なユーザー体験や将来性を追求した案。
       - **案C (逆説的):** 既存の仕組みをハックするような破壊的/代替的な案。

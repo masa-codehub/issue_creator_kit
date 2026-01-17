@@ -40,7 +40,7 @@ ADR作成プロセスを**OODAループ (Observe -> Orient -> Decide -> Act)** �
     - `activate_skill{name: "domain-modeling"}`
     - 問題領域の用語定義、関係性の整理を行い、メンタルモデルを合わせる。
 2.  **Hypothesis & Options (仮説立案):**
-    - `activate_skill{name: "adr-hypothesis"}`
+    - `activate_skill{name: "context-hypothesis"}`
     - 解決策の選択肢（Options）を、以下の3つの視点で洗い出す。
       - **案A (実証的):** 現状の事実とSSOTに基づいた堅実な本命案。
       - **案B (飛躍的):** 「ユーザーの真の理想」を先回りして提示する理想追求案。
