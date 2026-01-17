@@ -1,18 +1,18 @@
 ---
 name: issue-drafting
-description: Creates detailed issue drafts by strictly filling the 'issue-draft.md' template. Defines explicit rules for every section, integrating Red/Green/Verify verifiable task structure, and enforces quality review.
+description: Creates detailed issue drafts by strictly filling the 'issue-draft.md' template. Integrates 'objective-setting' for per-issue goals and 'Red/Green/Verify' for verifiable instructions, strictly enforcing template rules and zero ambiguity.
 ---
 
-# Issue Drafting (Template-Driven & Verifiable)
+# Issue Drafting (Objective-Oriented & Verifiable)
 
 `reqs/tasks/template/issue-draft.md` を、一切の抜け漏れ・無理・無駄なく埋めるためのスキル。
-テンプレートの各セクションに対して「書くべきこと」と「書いてはいけないこと」を厳密に定義し、`Red/Green/Verify` の思考プロセスを用いてエージェントが自律的に実行可能な「完全な指示書」を生成する。
+`objective-setting` により各IssueのSMART目標を確立し、`Red/Green/Verify` の思考プロセスを用いてエージェントが自律的に実行可能な「完全な指示書」を生成する。
 
 ## 役割 (Role)
 
 **Task Architect (タスク設計者)**
 テンプレートの「枠」を、具体的で矛盾のない「指示」で埋める。
-メタデータ（Frontmatter）の整合性と、本文（Content）の検証可能性を両立させる。
+目標設定（Outcome）を核に据え、メタデータの整合性と本文の検証可能性を両立させる。
 
 ## 前提 (Prerequisites)
 
@@ -21,31 +21,41 @@ description: Creates detailed issue drafts by strictly filling the 'issue-draft.
 
 ## 手順 (Procedure)
 
-### 1. メタデータ定義 (Frontmatter)
+### 1. 個別目標の定義 (Objective Setting)
+
+**目的:** このタスク（Issue）単体で達成すべき成果を明確化する。
+
+- **Action:**
+  - `activate_skill{name: "objective-setting"}` (思考プロセスとして使用)
+  - 依頼内容から、**このIssueが達成すべきSMART目標**を定義する。
+  - 完了を判定するための客観的な検証基準（DoD）を定める。
+
+### 2. メタデータ定義 (Frontmatter)
 
 **目的:** システム連携に必要な属性情報を定義する。
 
 - **Action:**
   - **title:** `[Domain] Action + Object` (例: `[Payment] Update Sequence for Async Retry`)
-  - **labels:** `task` および担当ロール（例: `TECHNICAL_DESIGNER`）を設定。
+  - **labels:** `task` (固定) および適切な担当ロール（例: `TECHNICAL_DESIGNER`）を設定。
   - **roadmap:** **Common Definitions Doc のパス** を指定する（例: `docs/architecture/plans/20240101-payment.md`）。
   - **task_id:** Planning段階で振られた一意なID（例: `T-01`）。
   - **depends_on:** 依存するIssueのファイル名（なければ空配列 `[]`）。
   - **status:** `Draft` (固定)
 
-### 2. 目的と背景 (1. Goal & Context)
+### 3. 目的と背景 (1. Goal & Context)
 
 **目的:** タスクの「Why」と「What」を定義し、作業者の目的意識を統一する。
 
 - **書くべきこと:**
+  - **Goal:** Step 1で定義したSMART目標。
   - **As-is (現状):** 現状のドキュメントやコードにおける具体的な「不足」や「誤り」。(Red)
-  - **To-be (あるべき姿):** このタスク完了後に実現されているべき状態（SMART目標）。
+  - **To-be (あるべき姿):** このタスク完了後に実現されているべき状態。
   - **Design Evidence:** 根拠となる ADR 番号、および Common Definitions Doc へのリンク。
 - **書いてはいけないこと:**
   - 曖昧な願望（「いい感じにする」「使いやすくする」）。
   - タスクの範囲外にある壮大なビジョン。
 
-### 3. 参照資料・入力ファイル (2. Input Context)
+### 4. 参照資料・入力ファイル (2. Input Context)
 
 **目的:** 作業開始時に必要な情報を過不足なく渡す。
 
@@ -57,7 +67,7 @@ description: Creates detailed issue drafts by strictly filling the 'issue-draft.
   - 存在しないファイルパス。
   - 今回のタスクに全く関係のない資料（ノイズになるため）。
 
-### 4. 実装手順と制約 (3. Implementation Steps & Constraints)
+### 5. 実装手順と制約 (3. Implementation Steps & Constraints)
 
 **目的:** 迷いのない「実行手順（How）」を定義する。
 
@@ -68,15 +78,15 @@ description: Creates detailed issue drafts by strictly filling the 'issue-draft.
   - **書くべきこと:** (Green)
     - 作成・編集するファイルパス。
     - 使用するテンプレート（`docs/template/arch-*.md`）。
-    - 記述すべき具体的な内容（クラス名、シーケンスの流れ、使用する用語）。
+    - 記述すべき具体的な内容（クラス名、シーケンスの流れ、使用する用語）をステップバイステップで記述。
   - **書いてはいけないこと:**
     - 「適宜実装する」「よしなに計らう」等の丸投げ。
 - **3.3. 構成変更 (Configuration):**
   - ファイルの削除や移動がある場合のみ記述。なければ「なし」と明記。
 
-### 5. ブランチ戦略と検証手順 (Sections 4 & 5)
+### 6. ブランチ戦略と検証手順 (Sections 4 & 5)
 
-**目的:** 作業場所の固定と、客観的な完了判定。
+**目的:** 作業場所の固定と、目標達成の証明方法。
 
 - **4. Branching Strategy:**
   - **Base Branch:** 統合用ブランチ名（例: `feature/arch-update-xxx`）。
@@ -89,7 +99,7 @@ description: Creates detailed issue drafts by strictly filling the 'issue-draft.
   - **書いてはいけないこと:**
     - 「品質が高いこと」「わかりやすいこと」などの主観的評価。
 
-### 6. 品質レビュー (Final Quality Gate)
+### 7. 品質レビュー (Final Quality Gate)
 
 - **Action:**
   - `activate_skill{name: "issue-review"}`
@@ -98,4 +108,4 @@ description: Creates detailed issue drafts by strictly filling the 'issue-draft.
 
 ## アウトプット (Output)
 
-- `reqs/tasks/drafts/` 配下に生成され、レビューをパスしたMarkdownファイル。
+- `reqs/tasks/drafts/` 配下に生成され、レビューをパスした目標達成型のMarkdownファイル。
