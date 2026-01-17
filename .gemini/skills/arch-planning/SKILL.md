@@ -20,7 +20,16 @@ ADRを分析し、「何を描くか」だけでなく、「どう分担する�
 
 ## 手順 (Procedure)
 
-### 1. 意図の抽出と共通定義 (Intent & Common Definitions)
+### 1. 目標設定 (Objective Setting)
+
+**目的:** 今回のPlanning活動のゴールと成功基準を明確にする。
+
+- **Action:**
+  - `activate_skill{name: "objective-setting"}`
+  - 今回のADR反映作業において、「誰に」「何を」伝えることが最も重要か（Value）を定義し、それを満たすためのSMART目標を設定する。
+  - *Goal:* 「開発者が迷わず実装できるレベルのIssue案と共通定義を作成し、レビューをパスする。」
+
+### 2. 意図の抽出と共通定義 (Intent & Common Definitions)
 
 **目的:** 全タスクで統一すべき「用語」や「境界」を先に定義し、コンフリクトの芽を摘む。
 **重要:** タスクが細分化されるため、この共通定義書が唯一の頼みの綱となる。一切の曖昧さを排除せよ。
@@ -34,7 +43,7 @@ ADRを分析し、「何を描くか」だけでなく、「どう分担する�
     - **Tech Decisions:** 全体で統一すべき技術選定（例: 「全APIはgRPCとする」）。
     - **Directory Structure:** 成果物ファイルの配置場所と命名規則。
 
-### 2. 図構成とタスク分割 (Portfolio & Slicing)
+### 3. 図構成とタスク分割 (Portfolio & Slicing)
 
 **目的:** レビューしやすく、並列作業可能な単位でタスクを分割する。
 
@@ -47,27 +56,27 @@ ADRを分析し、「何を描くか」だけでなく、「どう分担する�
       2.  **微修正 (Trivial Update):** 修正箇所が極めて少なく（数行程度）、分割のオーバーヘッドが見合わない場合。
 
   - **Output Definition:** 次のステップのために、以下の構成案を確定する。
-    1.  **Draft Issue List:** 作成するIssue案のタイトルとファイル名。
-    2.  **Target Scope:** 各Issueで作成/更新する具体的な図ファイル名と、その記述範囲。
+    1.  **Draft Issue List:** 作成するIssue案のタイトルとファイル名（例: `arch-update-payment.md`）。
+    2.  **Target Scope:** 各Issueで作成/更新する具体的な図ファイル名と、その記述範囲（Boundary）。
 
     **Example:**
-    - Issue: `[Context] Update System Context`
-      - File: `docs/architecture/context.md`
-    - Issue: `[Payment] Create Async Payment Sequence`
-      - File: `docs/architecture/seq-payment-async.md`
-    - Issue: `[User] Update User Component & State` (Exception: Tight Coupling)
-      - Files: `docs/architecture/component-user.md`, `docs/architecture/state-user.md`
+    - Issue: `[Payment Domain] Update Architecture Diagrams`
+      - Files: `context.md`, `container.md`, `seq-payment.md`
+      - Scope: 決済コンテナの内部構造と、API/Redisとの境界を記述。
+    - Issue: `[User Domain] Update Architecture Diagrams`
+      - Files: `container.md`, `component-user.md`
+      - Scope: ユーザー管理コンテナの永続化ロジックの変更を記述。
 
-### 3. Issue案の作成 (Issue Drafting)
+### 4. Issue案の作成 (Issue Drafting)
 
 **目的:** 定義された戦略に基づき、具体的なIssue案ファイルを作成する。
 
 - **Action:**
   - `activate_skill{name: "issue-drafting"}`
-  - Step 2 で定義した各タスクについて、Issue案を作成する。
-  - **Mandatory:** 全てのIssue案本文に、Step 1で作成した **Common Definitions Doc へのリンク** を記載し、「この定義に従うこと」と明記するよう、`issue-drafting` 実行時に指示する。
+  - Step 3 で定義した各タスクについて、Issue案を作成する。
+  - **Mandatory:** 全てのIssue案本文に、Step 2で作成した **Common Definitions Doc へのリンク** を記載し、「この定義に従うこと」と明記するよう、`issue-drafting` 実行時に指示する。
 
-### 4. 計画レビュー (Planning Review)
+### 5. 計画レビュー (Planning Review)
 
 **目的:** 作成された計画（共通定義 + Issue案）の品質を保証する。
 
