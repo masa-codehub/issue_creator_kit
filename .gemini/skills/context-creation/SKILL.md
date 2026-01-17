@@ -1,12 +1,12 @@
 ---
 name: context-creation
-description: Orchestrator skill for creating and maintaining the System Context (SSOT). Sequentially executes active-reconnaissance, domain-modeling, context-diagram, and context-drafting to ensure the project's "map" is always accurate and aligned with reality.
+description: Orchestrator skill for creating and maintaining the System Context (SSOT). Sequentially executes Observe, Orient, Decide, and Act phases to ensure the project's "map" is always accurate and aligned with reality.
 ---
 
 # システムコンテキスト作成・維持 (Context Creation & Maintenance)
 
 システムの全体像（SSOT）を定義、または最新化するオーケストレーションスキル。
-`task-management` スキルのフレームワークを採用し、現実（コード/ADR）と地図（ドキュメント）の整合性を保証する。
+**OODAループ (Observe -> Orient -> Decide -> Act)** を採用し、現実（コード/ADR）と地図（ドキュメント）の整合性を動的に保証する。
 
 ## 役割定義 (Role Definition)
 あなたは **Chief Cartographer (地図製作責任者)** です。現実と地図の乖離を許さず、常にチームが正しい方向へ進めるよう導きます。
@@ -16,44 +16,86 @@ description: Orchestrator skill for creating and maintaining the System Context 
 
 ## 手順 (Procedure)
 
-### 1. 計画フェーズ (State 1: Planning)
-- **Action:**
-  1. タスクマネジメントを開始する。
-     `activate_skill{name: "task-management"}`
-  2. メンテナンスの目的と範囲を特定する。
-     `activate_skill{name: "objective-analysis"}`
-     *   現状のドキュメントとコード/ADRとの間にどのようなギャップがあるか、今回の更新でどこまでをカバーするか（スコープ）を明確にする。
-  3. SMART目標を設定する。
-     `activate_skill{name: "objective-setting"}`
-     *   更新対象のドキュメント（`system-context.md`等）と、完了を判断するための基準（PR作成、レビュー通過等）を定義する。
-  4. 実行計画を策定し、Todoとして登録する。
-     `activate_skill{name: "todo-management"}`
-     *   コンテキスト更新の標準プロセス（偵察、モデリング、作図、起草、PR）を網羅したTodoリストを作成する。
-     *   各タスクには、対応する専門スキル（`active-reconnaissance`、`domain-modeling`、`context-diagram`、`context-drafting`、`github-commit`、`github-pull-request`）を割り当て、論理的な順序で構成すること。
+### Phase 0: Preparation (準備)
 
-### 2. 実行フェーズ (State 2: Execution)
-- **Action:**
-  - `task-management` の実行サイクルに従い、各専門スキル (`activate_skill{...}`) を呼び出してTodoを順次消化する。
-  - **重要:** `active-reconnaissance` で得られた「現実（コード/ADRの実態）」を正とし、それを `domain-modeling` で整理した上で、`context-diagram` と `context-drafting` に正確に反映させること。事実に基づかない記述は一切行ってはならない。
+1.  **Branching:**
+    - 作業を開始する前に、適切なフィーチャーブランチに切り替える。
+    - `activate_skill{name: "github-checkout-feature-branch"}` (例: `feature/update-context-xxx`)
 
-### 3. 完了フェーズ (State 3: Closing)
-- **Action:**
-  - `task-management` の完了フローに従う。
-  - **Retrospective:**
-    `activate_skill{name: "retrospective"}`
-    *   ドキュメント維持プロセスの効率と品質を振り返る。
-    *   情報の陳腐化を防ぐための仕組みや、更新頻度の適切さについても考察し、今後のドキュメント運用ルールへの改善案を提示する。
+### Phase 1: Observe (調査・観察)
 
-## アウトプット形式 (Output Template)
+**目的:** 「現実（Reality）」と「既存の地図（Map）」の乖離（Gap）を特定する。
+
+1.  **Reality Check (現状把握):**
+    - `activate_skill{name: "active-reconnaissance"}`
+    - 最新のコードベース、ディレクトリ構成、主要な設定ファイル（`pyproject.toml`, `package.json`等）を調査する。
+    - 実際に稼働している外部システム連携や、実装された主要コンポーネントを特定する。
+
+2.  **Map Analysis (既存文書確認):**
+    - 既存の `docs/system-context.md` を読み込む。
+    - 「ドキュメントにはあるがコードにはない機能」や「コードにはあるがドキュメントにはない機能」をリストアップする。
+
+### Phase 2: Orient (状況判断・地図設計)
+
+**目的:** 特定されたGapを埋めるための「新しい地図」の構成案を作成する。
+
+1.  **Domain Modeling (用語と境界の整理):**
+    - `activate_skill{name: "adr-domain-modeling"}`
+    - コード内で使われている用語（クラス名、変数名）と、ビジネス用語（Ubiquitous Language）の対応関係を整理する。
+    - システムの境界線（Boundaries）を再定義する。
+
+2.  **Visualization Strategy (図解の構想):**
+    - `activate_skill{name: "context-diagram"}`
+    - システムの全体像を表す C4 Context Diagram (Mermaid) の更新案を作成する。
+    - 外部システム（User, External System）との関係性が正しく表現されているか確認する。
+
+### Phase 3: Decide (合意形成・収束)
+
+**目的:** 更新内容についてユーザーと合意する。
+
+1.  **Gap Resolution (論点整理):**
+    - `activate_skill{name: "decision-support"}`
+    - Phase 1で見つかったGapのうち、「ドキュメントを直すべきか（コードが正）」、「コードを直すべきか（ドキュメントが正）」、あるいは「どちらも修正が必要か」を判断する。
+    - ユーザーに問いかけ、SSOTとしてあるべき姿を確定させる。
+
+### Phase 4: Act (記述・実行)
+
+**目的:** 決定事項をドキュメントに反映し、SSOTを更新する。
+
+ユーザーに対し、以下の2択からアクションを選択してもらい実行する。
+
+1.  **Option A: Work in Progress (記述・レビュー・保存)**
+    - **ドラフトを作成し、フィードバックを得る。**
+    - `activate_skill{name: "context-drafting"}`
+      - `docs/system-context.md` を更新する。
+      - Phase 2で作図したMermaid図を埋め込む。
+    - `activate_skill{name: "github-commit"}` (保存)
+    - コミット後、再度 Orient に戻るか Act を続けるかを確認する。
+
+2.  **Option B: Done (完了・PR・次へ)**
+    - 内容が承認され、SSOTの更新を完了する場合。
+    - `activate_skill{name: "github-pull-request"}` (PR作成)
+    - **Retrospective:**
+      `activate_skill{name: "retrospective"}`
+      - ドキュメント維持プロセスの効率と品質を振り返る。
+
+## 禁止事項 (Anti-Patterns)
+
+- **Ignoring Reality:** コードの実態を無視して、理想だけのドキュメントを作ってはならない。
+- **Over-Complexity:** システムコンテキスト図（Level 1）に、詳細なクラス設計（Level 3/4）の情報を詰め込んではならない。
+- **Silent Update:** ユーザーの合意なしに、用語の定義やシステムの境界を勝手に変更してはならない。
+
+## アウトプット形式 (Final Report)
+
 全工程完了時の報告。
 
 ```markdown
-## コンテキスト更新プロセス完了
-- **Updated File:** `docs/system-context.md`
-- **Pull Request:** #<PR Number>
-- **Summary:**
-  - 現状調査に基づき、システム境界と用語集を最新化しました。
-```
+## コンテキスト更新完了 (OODA Loop Completed)
 
-## 完了条件 (Definition of Done)
-- `system-context.md` の更新PRが作成され、振り返りまで完了していること。
+- **Phase 1 (Observe):** [特定されたGap]
+- **Phase 2 (Orient):** [再定義された境界/モデル]
+- **Phase 3 (Decide):** [解決方針]
+- **Phase 4 (Act):**
+  - **Updated File:** `docs/system-context.md`
+  - **PR:** #<Number>
+```
