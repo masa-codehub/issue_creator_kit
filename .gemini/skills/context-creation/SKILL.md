@@ -47,7 +47,7 @@ description: Orchestrator skill for creating and maintaining the System Context 
 2.  **Hypothesis & Options (境界・構造の仮説立案):**
     - `activate_skill{name: "context-hypothesis"}`
     - 発見されたGapを解消するための解決策（境界の再定義、コンポーネントの分割等）を、以下の3つの視点で立案・分析する。
-      - **実証的仮説 (Grounded):** 現状のコード（Reality）と既存のADRに基づいた、最も整合性の高い堅実な更新案。
+      - **実証的仮説 (Grounded):** 確定しているビジネス要件と外部制約（事実）に基づき、システムが果たすべき責任範囲を正確に定義する堅実案。
       - **飛躍的仮説 (Leap):** システムの将来的な拡張性や、あるべき理想の境界線を先回りして提示する理想追求案。
       - **逆説的仮説 (Paradoxical):** 既存のシステム境界や依存関係を根本から見直し、構造を劇的にシンプル化する破壊的提案。
 
