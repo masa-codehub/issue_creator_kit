@@ -8,7 +8,7 @@ description: Orchestrator skill for realizing approved Architecture Decision Rec
 承認された **ADR (Architecture Decision Record)** を入力とし、それを具体的なアーキテクチャ図（Map）としてコードベースに反映させるプロセスを統括する。
 
 本スキルは以下の2つの大きなフェーズを管理する：
-1.  **Drafting (発射台):** ADRを分析し、必要な作図タスクをIssue案として `reqs/tasks/drafts` に作成する。
+1.  **Drafting (発射台):** ADRを分析し、共通定義（Plan）とIssue案を作成して合意形成する。
 2.  **Integration (着陸):** 実装された成果物を監査し、SSOTとの整合性を保証してリリースする。
 
 ## 役割定義 (Role Definition)
@@ -18,34 +18,39 @@ ADRという「方針」を、実行可能な「タスク」に翻訳し、分�
 
 ## 手順 (Procedure)
 
-### Phase 1: Decomposition & Issue Drafting (分解とIssue案作成)
-**目的:** ADRを読み解き、作図戦略を策定し、実装可能なIssue案ファイルを作成する。
+### Phase 1: Planning & Issue Drafting (計画とIssue案作成)
+**目的:** ADRを読み解き、共通定義（Plan）を策定し、ドメイン単位で分割したIssue案を作成する。
 
 1.  **Branching (Parent Branch):**
     *   作業の基点となる統合用ブランチを作成・チェックアウトする。
     *   `activate_skill{name: "github-checkout-feature-branch"}` (例: `feature/arch-update-xxx`)
 
-2.  **Strategy Formulation (Analysis & Planning):**
+2.  **Strategic Planning:**
     *   `activate_skill{name: "arch-planning"}`
-    *   ADRを分析し、作成・更新すべき図のリストと、それぞれの記述要件（粒度、Stub定義）を決定する。
-    *   **Goal:** ここで「用語」や「依存関係」を解決し、並列作業時のコンフリクトを未然に防ぐ。
+    *   ADRを分析し、**Common Definitions Doc**（共通定義書）を作成する。
+    *   Path: `docs/architecture/plans/YYYYMMDD-{feature}.md`
+    *   *Content:* 全タスクで統一すべき用語、コンポーネント名、境界定義。
 
 3.  **Issue Drafting:**
     *   `activate_skill{name: "todo-management"}`
-    *   策定された戦略（Plan）に基づき、タスクを分解する。
-    *   各タスクについて、`reqs/tasks/template/issue-draft.md` をテンプレートとして使用し、Issue案を作成する。
-    *   作成先: `reqs/tasks/drafts/` ディレクトリ配下（例: `reqs/tasks/drafts/arch-update-context.md`）。
-    *   **Content:**
-        *   `arch-planning` で定義された「要件」「Stub（共通定義）」をIssue本文に明記する。
-        *   Acceptance Criteria（完了条件）を具体的に記述する。
+    *   `arch-planning` で定義されたドメイン分割（Slicing）に基づき、Issue案を作成する。
+    *   各タスクについて、`reqs/tasks/template/issue-draft.md` をテンプレートとして使用する。
+    *   作成先: `reqs/tasks/drafts/` ディレクトリ配下。
+    *   **Vital:** 全てのIssue案本文に、上記 **Common Definitions Doc へのリンク** を記載し、「この定義に従うこと」と明記する。
+
+4.  **Planning Review:**
+    *   `activate_skill{name: "arch-planning-review"}`
+    *   作成された共通定義書とIssue案をレビューする。
+    *   抜け漏れ（MECE）、リンク切れ、定義の曖昧さがないかチェックし、問題があればその場で修正する。
+    *   **Gate:** 重大な欠陥がある場合は PR 作成に進まず、Planning をやり直す。
 
 ### Phase 2: Approval & Initiation (承認と開始)
-**目的:** 作成したIssue案の承認を得て、実装フェーズ（他エージェントへの委譲）を開始する。
+**目的:** 「共通定義」と「Issue案」のセットで承認を得て、実装フェーズを開始する。
 
-1.  **Pull Request for Drafts:**
-    *   `reqs/tasks/drafts` に作成したIssue案ファイルをコミットする。
+1.  **Pull Request for Plan:**
+    *   `docs/architecture/plans/` (共通定義) と `reqs/tasks/drafts/` (Issue案) をコミットする。
     *   `activate_skill{name: "github-pull-request"}`
-    *   PRの概要に「このPRがマージされると、`reqs/tasks/drafts` の内容に基づき自動的にIssueが起票されます」と明記し、ユーザーの承認を求める。
+    *   PRの概要に「ADR反映のためのタスク分割案と、共通定義（辞書）です。これらを承認（マージ）するとIssueが起票されます」と記述する。
 
 *(この後、システムが自動的にIssueを起票し、別エージェントが実装を行う。あなたはそれらの完了を待つ)*
 
@@ -56,14 +61,13 @@ ADRという「方針」を、実行可能な「タスク」に翻訳し、分�
 1.  **Integrity & SSOT Check:**
     *   `activate_skill{name: "ssot-verification"}`
     *   現在の統合ブランチの状態が、元のADR（SSOT）の意図を正しく反映しているか厳密にチェックする。
-    *   図同士の矛盾（用語、関係性の不一致など）がないか確認する。
+    *   図同士の矛盾がないか確認する。
 
 2.  **Broken Link Check:**
     *   **Action:** ドキュメント内のリンク（相対パス、アンカーリンク等）が有効であることを確認する。
-    *   手動確認、または信頼できるチェックツール（もし利用可能なら）を使用して検証する。
 
 3.  **Correction Loop (If NG):**
-    *   監査（整合性またはリンク切れ）で問題が見つかった場合、**自分で修正してはならない**。
+    *   監査で問題が見つかった場合、**自分で修正してはならない**。
     *   修正内容を定義した「追加のIssue案」を `reqs/tasks/drafts` に作成する。
     *   再度 Phase 2 に戻り、追加Issue案のコミット・PR作成（承認依頼）を行う。
 
@@ -76,26 +80,25 @@ ADRという「方針」を、実行可能な「タスク」に翻訳し、分�
 1.  **Final Pull Request:**
     *   監査をパスした統合ブランチから、`main` (または `develop`) へのPull Requestを作成する。
     *   `activate_skill{name: "github-pull-request"}`
+    *   *Option:* この時点で `docs/architecture/plans/*.md` は役割を終えているため、削除してもよい（履歴には残る）。
 
 2.  **Review Support:**
-    *   人間のレビュアーからのフィードバックを待つ。
-    *   **指摘があった場合:**
-        *   軽微な修正（誤字脱字、レイアウト微調整）であれば、あなた自身が修正コミットを行う (`arch-refactoring`)。
-        *   設計に関わる大きな修正が必要な場合は、再度「修正用Issue案」を作成し、Phase 2 のフローへ戻す。
+    *   人間のレビュアーからのフィードバック対応（軽微なら自走、重ければIssue化）。
 
 ## 禁止事項 (Anti-Patterns)
-- **Ignoring Dead Links:** リンク切れを軽視してはならない。ドキュメントの信頼性を損なう重大な欠陥である。
-- **Direct Implementation:** あなた自身が図を描いてはならない（Phase 1/2/3）。あなたの仕事は「分解」と「統合・監査」である。
+- **Skipping Review:** 時間短縮のために `arch-planning-review` を飛ばしてはならない。急がば回れ。
+- **Undefined Terms:** Common Definitions Doc で定義されていない用語を、各Issueで勝手に発明してはならない。
+- **Direct Implementation:** あなた自身が図を描いてはならない。
 - **Self-Correction:** 監査で見つかった重大な不整合を、Issueなしで勝手に直してはならない。
 
 ## アウトプット形式 (Phase 1 Completion)
 Draftingフェーズ完了時の報告。
 
 ```markdown
-## アーキテクチャ更新タスク定義完了
+## アーキテクチャ更新計画策定完了
 - **Source ADR:** [対象ADR]
-- **Integration Branch:** `feature/arch-update-xxx`
-- **Strategy:** [arch-planningのサマリ]
+- **Common Definitions:** `docs/architecture/plans/YYYYMMDD-{feature}.md` (Created)
 - **Draft Issues:** `reqs/tasks/drafts/*.md` (Created [N] drafts)
-- **PR:** #<Number> (Issue起票の承認依頼)
+- **Review Status:** [Pass / Fixed]
+- **PR:** #<Number> (共通定義とIssue案の承認依頼)
 ```
