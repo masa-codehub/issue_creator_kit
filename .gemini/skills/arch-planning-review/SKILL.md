@@ -40,18 +40,17 @@ description: Audits the architecture visualization plan (Common Definitions & Dr
 - **Action:**
   - `activate_skill{name: "ssot-verification"}` を実行し、概念レベルでの不整合や原則への違反がないかを最終確認する。
 
-### 5. 指摘と改善案の提示 (Finding & Proposal)
-監査で見つかった全ての問題に対し、具体的な改善案を作成する。
-
+### 5. 指摘と是正 (Finding & Correction)
 - **Action:**
-  - 各問題点（Finding）に対し、具体的な改善案（Proposal）をセットにする。改善案が書けない指摘は無効とする。
+  - 各問題点に対し、具体的な改善案をセットで提示する。
+  - **Rule:** 改善案が具体的に提案できない項目は、指摘として扱わない（無効とする）。
 
-### 6. 是正または再計画 (Correction or Re-Planning)
-- **Branch A: Immediate Correction (その場で修正)**
-  - ファイルの修正 (`replace`, `write_file`) で解決可能な場合、直ちに修正する。
-- **Branch B: Re-Planning (再計画)**
-  - 根本的な構造変更が必要な場合、または一点でも修正しきれない指摘が残る場合、`arch-planning` スキルを再起動する。
-    `activate_skill{name: "arch-planning"}`
+- **Decision:**
+  - **Branch A: Has Proposal (改善案あり)**
+    - 一点でも改善案が存在する場合は、直ちに `arch-planning` を再呼び出しして計画全体を作り直させる。
+    - `activate_skill{name: "arch-planning"}`
+  - **Branch B: No Proposal (改善案なし)**
+    - 全てのチェックをパスし、改善案がゼロの場合のみ、レビュー完了（Approved）とする。
 
 ## アウトプット (Output)
 レビュー結果レポート。
