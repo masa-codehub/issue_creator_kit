@@ -1,0 +1,11 @@
+{
+    "general": {
+        "previewFeatures": true
+    },
+    "experimental": {
+        "skills": true
+    },
+    "ide": {
+        "enable": false
+    }
+}

@@ -6,64 +6,43 @@ description: Orchestrator skill for creating and maintaining the System Context 
 # システムコンテキスト作成・維持 (Context Creation & Maintenance)
 
 システムの全体像（SSOT）を定義、または最新化するオーケストレーションスキル。
-プロジェクト初期の地図作成だけでなく、定期的な「棚卸し（メンテナンス）」にも使用する。
+`task-management` スキルのフレームワークを採用し、現実（コード/ADR）と地図（ドキュメント）の整合性を保証する。
 
 ## 役割定義 (Role Definition)
-あなたは **Chief Cartographer (地図製作責任者)** です。現実（コード/ADR）と地図（ドキュメント）の乖離を許さず、常にチームが正しい方向へ進めるよう導きます。
+あなたは **Chief Cartographer (地図製作責任者)** です。現実と地図の乖離を許さず、常にチームが正しい方向へ進めるよう導きます。
 
 ## 前提 (Prerequisites)
 - プロジェクト開始時、または大規模な変更後、あるいは定期的なドキュメントメンテナンス時。
 
 ## 手順 (Procedure)
 
-### 0. 共通プロトコルの実行 (Initiate Protocol)
+### 1. 計画フェーズ (State 1: Planning)
 - **Action:**
-  - `objective-analysis` スキルを活用し、メンテナンスの目的と範囲について合意形成を行う。
-    - **Identify Intent:** 「なぜ今、システムコンテキストの更新が必要なのか？」
-    - **Context Mapping:** 「最新のADRや実装の変更をどう反映させるべきか？」
-    - **Proposal & Consensus:** 「このコンテキスト更新プロセスで進めて良いか？」
-    `activate_skill{name: "objective-analysis"}`
+  1. タスクマネジメントを開始する。
+     `activate_skill{name: "task-management"}`
+  2. メンテナンスの目的と範囲を特定する。
+     `activate_skill{name: "objective-analysis"}`
+     *   現状のドキュメントとコード/ADRとの間にどのようなギャップがあるか、今回の更新でどこまでをカバーするか（スコープ）を明確にする。
+  3. SMART目標を設定する。
+     `activate_skill{name: "objective-setting"}`
+     *   更新対象のドキュメント（`system-context.md`等）と、完了を判断するための基準（PR作成、レビュー通過等）を定義する。
+  4. 実行計画を策定し、Todoとして登録する。
+     `activate_skill{name: "todo-management"}`
+     *   コンテキスト更新の標準プロセス（偵察、モデリング、作図、起草、PR）を網羅したTodoリストを作成する。
+     *   各タスクには、対応する専門スキル（`active-reconnaissance`、`domain-modeling`、`context-diagram`、`context-drafting`、`github-commit`、`github-pull-request`）を割り当て、論理的な順序で構成すること。
 
-### 1. 計画とTodo作成 (Planning with Todo)
+### 2. 実行フェーズ (State 2: Execution)
 - **Action:**
-  - `todo-management` スキルを使用し、本スキルの実行手順を `.gemini/todo.md` に登録する。
-    `activate_skill{name: "todo-management"}`
+  - `task-management` の実行サイクルに従い、各専門スキル (`activate_skill{...}`) を呼び出してTodoを順次消化する。
+  - **重要:** `active-reconnaissance` で得られた「現実（コード/ADRの実態）」を正とし、それを `domain-modeling` で整理した上で、`context-diagram` と `context-drafting` に正確に反映させること。事実に基づかない記述は一切行ってはならない。
 
-### 2. 作業ブランチの作成・切り替え (Phase 0: Branch Setup)
+### 3. 完了フェーズ (State 3: Closing)
 - **Action:**
-  - `github-checkout-feature-branch` スキルを使用し、ドキュメント更新用のブランチ（`docs/update-context` 等）を作成・切り替える。
-    `activate_skill{name: "github-checkout-feature-branch"}`
-
-### 3. 能動的偵察 (Phase 1: Reconnaissance)
-- **Action:**
-  - `active-reconnaissance` スキルを呼び出し、現状の依存関係やADRとのギャップを洗い出す。
-  - **Target:** `docs/system-context.md` (Design Docではなく)
-    `activate_skill{name: "active-reconnaissance"}`
-
-### 4. ドメインモデリング (Phase 2: Modeling)
-- **Action:**
-  - `domain-modeling` スキルを呼び出し、最新のユビキタス言語を整理する。
-    `activate_skill{name: "domain-modeling"}`
-
-### 5. コンテキスト図作成 (Phase 3: Diagramming)
-- **Action:**
-  - `context-diagram` スキルを呼び出し、C4 System Context図を作成・更新する。
-    `activate_skill{name: "context-diagram"}`
-
-### 6. 起草と合意形成 (Phase 4: Drafting)
-- **Action:**
-  - `context-drafting` スキルを呼び出し、`docs/system-context.md` を完成させて合意を得る。
-    `activate_skill{name: "context-drafting"}`
-
-### 7. コミットとPR作成 (Phase 5: Commit & PR)
-- **Action:**
-  - `activate_skill{name: "github-commit"}`
-  - `activate_skill{name: "github-pull-request"}`
-
-### 8. 振り返り (Phase 6: Retrospective)
-- **Action:**
-  - `retrospective` スキルを呼び出し、ドキュメントの鮮度維持プロセス自体を振り返る。
+  - `task-management` の完了フローに従う。
+  - **Retrospective:**
     `activate_skill{name: "retrospective"}`
+    *   ドキュメント維持プロセスの効率と品質を振り返る。
+    *   情報の陳腐化を防ぐための仕組みや、更新頻度の適切さについても考察し、今後のドキュメント運用ルールへの改善案を提示する。
 
 ## アウトプット形式 (Output Template)
 全工程完了時の報告。

@@ -1,84 +1,99 @@
 ---
 name: adr-creation
-description: Orchestrator skill for the complete Architecture Decision Record (ADR) creation process. Sequentially executes active-reconnaissance, domain-modeling, architecture-hypothesis, and adr-drafting to ensure high-quality, evidence-based architectural decisions.
+description: Orchestrator skill for the complete Architecture Decision Record (ADR) creation process based on OODA Loop. Sequentially executes Observe, Orient, Decide, and Act phases to ensure high-quality, evidence-based architectural decisions.
 ---
 
 # ADR作成オーケストレーション (ADR Creation Orchestration)
 
-ADR作成の一連のプロセス（偵察 -> モデリング -> 仮説立案 -> 起草・合意）を統括・実行するスキル。
-`SYSTEM_ARCHITECT.md` の **共通プロトコル (Common Protocols)** に準拠し、「何を作るか」ではなく「どう進めるか」の合意形成を最優先する。
+ADR作成プロセスを**OODAループ (Observe -> Orient -> Decide -> Act)** に基づく4段階のフローとして実行する。
+事前にTodoリストでタスクを固定するのではなく、各フェーズでの「気付き」と「対話」を通じて、動的に意思決定プロセスを進める。
 
 ## 役割定義 (Role Definition)
-あなたは **Architecture Lead (アーキテクチャリード)** です。ユーザーの発言を鵜呑みにせず、その真意（Why）を理解し、SSOTとの整合性を保ちながら、確実な合意（Consensus）へと導きます。
 
-## 前提 (Prerequisites)
-- 解決すべき技術的課題、または設計の必要性が生じていること。
+あなたは **Architecture Facilitator (アーキテクチャ・ファシリテーター)** です。
+一方的にドキュメントを作るのではなく、ユーザーに判断材料（事実・選択肢・トレードオフ）を提供し、質の高い意思決定を引き出すことが役割です。
 
 ## 手順 (Procedure)
 
-### 0. 共通プロトコルの実行 (Initiate Protocol)
-- **Action:**
-  - `objective-analysis` スキルを活用し、以下の問いかけを通じてユーザーとの認識を完全に一致させる。
-    - **Identify Intent:** 「なぜ今、その変更が必要なのか？」（`objective-analysis` の仮説立案を使用）
-    - **Context Mapping:** 「現状のSSOTとどう整合させるか？」
-    - **Proposal & Consensus:** 「このADR作成プロセスで進めて良いか？」
-    `activate_skill{name: "objective-analysis"}`
+### Phase 0: Preparation (準備)
 
-### 1. 計画とTodo作成 (Planning with Todo)
-- **Action:**
-  - `todo-management` スキルを使用し、本スキルの実行手順（偵察、モデリング、仮説、起草...）を `.gemini/todo.md` に登録する。
-  - 各ステップの完了ごとにTodoを更新し、進捗を可視化する。
-    `activate_skill{name: "todo-management"}`
+1.  **Branching:**
+    - 作業を開始する前に、適切なフィーチャーブランチに切り替える。
+    - `activate_skill{name: "github-checkout-feature-branch"}`
 
-### 2. 作業ブランチの作成・切り替え (Phase 0: Branch Setup)
-- **Action:**
-  - 合意が得られたら、`github-checkout-feature-branch` スキルを使用し、ADR作成用のフィーチャーブランチを作成・切り替える。
-    `activate_skill{name: "github-checkout-feature-branch"}`
+### Phase 1: Observe (調査・観察)
 
-### 3. 能動的偵察 (Phase 1: Reconnaissance)
-- **Action:**
-  - `active-reconnaissance` スキルを呼び出し、ファクト、コンテキスト、およびギャップを調査し、ラフドラフトを作成する。
-    `activate_skill{name: "active-reconnaissance"}`
+**目的:** 意思決定に必要な「事実」を集める。憶測で語らず、コードと現状を直視する。
 
-### 4. ドメインモデリング (Phase 2: Modeling)
-- **Action:**
-  - 偵察結果を元に `domain-modeling` スキルを呼び出し、用語と境界を定義する。
-    `activate_skill{name: "domain-modeling"}`
+1.  **ユーザーヒアリング:**
+    - ユーザーが抱えている課題感、解決したいこと、制約条件を聞き出す。
+2.  **Active Reconnaissance (偵察):**
+    - `activate_skill{name: "active-reconnaissance"}`
+    - 関連する既存コード、既存ADR、仕様書を調査する。
+    - 「何が実装済みで、何が欠けているか」の事実（Fact）を収集する。
 
-### 5. 仮説立案 (Phase 3: Hypothesis)
-- **Action:**
-  - `architecture-hypothesis` スキルを呼び出し、技術的解決策と代替案を策定し、ADRドラフトを更新する。
-    `activate_skill{name: "architecture-hypothesis"}`
-  - `activate_skill architecture-hypothesis`
+### Phase 2: Orient (状況判断・多角分析)
 
-### 6. 起草と合意形成 (Phase 4: Drafting)
-- **Action:**
-  - `adr-drafting` スキルを呼び出し、ユーザーとの対話を通じてADRを完成させ、承認を得る。
-  - `activate_skill adr-drafting`
+**目的:** 集めた事実を解釈し、可能性を広げる（発散）。
 
-### 7. コミットとPR作成 (Phase 5: Commit & PR)
-- **Action:**
-  - 合意形成が完了したADRファイルをコミットし、プルリクエストを作成する。
-  - `activate_skill github-commit`
-  - `activate_skill github-pull-request`
+1.  **Domain Modeling (構造整理):**
+    - `activate_skill{name: "adr-domain-modeling"}`
+    - 問題領域の用語定義、関係性の整理を行い、メンタルモデルを合わせる。
+2.  **Hypothesis & Options (仮説立案):**
+    - `activate_skill{name: "adr-hypothesis"}`
+    - 解決策の選択肢（Options）を、以下の3つの視点で洗い出す。
+      - **案A (実証的):** 現状の事実とSSOTに基づいた堅実な本命案。
+      - **案B (飛躍的):** 「ユーザーの真の理想」を先回りして提示する理想追求案。
+      - **案C (逆説的):** 既存の前提を覆し、パラダイムシフトを起こす破壊的イノベーション案。
+    - 各案のトレードオフ（Pros/Cons）を分析する。
 
-### 8. 振り返り (Phase 6: Retrospective)
-- **Action:**
-  - `retrospective` スキルを呼び出し、今回の意思決定プロセスの質（論理的飛躍がなかったか、合意形成はスムーズだったか）を振り返る。
-  - `activate_skill retrospective`
+### Phase 3: Decide (意思決定・収束)
 
-## アウトプット形式 (Output Template)
+**目的:** 収束を促すための問いを立て、記述すべき方針を確定させる。
+
+1.  **Bottleneck Resolution (論点整理と問い):**
+    - `activate_skill{name: "decision-support"}` を使用し、合意へのボトルネックを特定する。
+    - 現在の分析結果とユーザーの意向を統合し、解像度を高めるための「たった一つの問い」を投げる。
+2.  **Steer Acquisition (記述方針の確定):**
+    - ユーザーの回答から「ADRにどう記述すべきか（または何が不足しているか）」の方針を固める。
+    - **Insight:** 議論を停滞させないため、方針が固まったら速やかに Phase 4 (Act) へ移り、ドキュメントとして可視化する。
+
+### Phase 4: Act (記述・実行)
+
+**目的:** 決定（または現在の仮説）を可視化し、フィードバックの土台を作る。
+
+ユーザーに対し、以下の2択からアクションを選択してもらい実行する。
+
+1.  **Option A: Work in Progress (記述・レビュー・保存)**
+    - **議論を前進させるための「プロトタイプ」作成。**
+    - `activate_skill{name: "adr-drafting"}` (記述)
+    - `activate_skill{name: "adr-review"}` (自己レビュー)
+    - `activate_skill{name: "github-commit"}` (保存)
+    - **Role:** 具体的なドキュメントを提示することで、ユーザーからより深いフィードバックを引き出す。修正が必要な場合は再度 Phase 3 または 4-1 を繰り返す。
+
+2.  **Option B: Done (完了・PR・次へ)**
+    - ドキュメントの内容にユーザーが最終承認し、ADR作成を完了する場合。
+    - `activate_skill{name: "github-pull-request"}` (PR作成)
+    - PR作成後、**Architecture Implementation (アーキテクチャの具体化・実装)** へ進むことを提案して終了する。
+
+## 禁止事項 (Anti-Patterns)
+
+- **Todoリストの事前作成:** OODAループは状況に応じて次の手が変化するため、最初に全てのタスクを固定してはならない。
+- **スキップ:** 「調査」や「分析」を飛ばして、いきなり「記述」に入ってはならない。
+- **独断:** 選択肢の提示なしに、エージェントが勝手に解決策を一つに絞ってはならない。
+
+## アウトプット形式 (Final Report)
+
 全工程完了時の報告。
 
 ```markdown
-## ADR作成プロセス完了
-- **Created ADR:** `reqs/design/_inbox/adr-XXX-title.md`
-- **Pull Request:** #<PR Number>
-- **Retrospective:**
-  - (KPT/YWTの結果を要約)
-- **Summary:**
-  - 偵察・モデリング・仮説検証を経て、上記ADRを作成・合意し、PRを提出しました。
-```
+## ADR作成完了 (OODA Loop Completed)
 
-## 完了条件 (Definition of Done)
-- ADRのPRが作成され、振り返りまで完了していること。
+- **Phase 1 (Observe):** [調査範囲]
+- **Phase 2 (Orient):** [検討した選択肢]
+- **Phase 3 (Decide):** [決定事項/記述方針]
+- **Phase 4 (Act):**
+  - **Artifact:** `reqs/design/_inbox/adr-XXX.md`
+  - **PR:** #<Number>
+  - **Next:** Proposed Architecture Implementation
+```

@@ -10,9 +10,11 @@ description: Core skill for setting actionable goals using intent analysis and S
 ## プロセス (Process)
 
 ### 1. 意図の把握
-`objective-analysis` スキルの要領で、ユーザーの真の意図と背景を理解する。
+
+`activate_skill{name: "objective-analysis"}` を実行し、ユーザーの真の意図と背景を理解する。
 
 ### 2. エージェント向けSMART分析 (Agent-SMART Analysis)
+
 把握した意図を、エージェントが「抜け・漏れ・無理・無駄」なく自律実行できる観点で構造化する。
 
 - **Specific (具体的アクションへの変換):**
@@ -32,5 +34,5 @@ description: Core skill for setting actionable goals using intent analysis and S
   - 複雑すぎる場合は、1ターンで完遂可能な小さなステップに分解されているか。
 
 ### 3. 目標の洗練 (Refine with Review)
-`objective-review` スキルを用いて、設定した目標を自己レビューする。
-**`objective-review` による指摘事項が完全になくなるまで**具体化とレビューを繰り返す。完了時に、最終的な目標を提示する。
+
+`activate_skill{name: "objective-review"}` を実行し、設定した目標を自己レビューする。

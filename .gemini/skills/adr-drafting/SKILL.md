@@ -1,82 +1,75 @@
 ---
 name: adr-drafting
-description: Skill for documenting architectural decisions and reaching consensus. Used for (1) drafting ADR files, (2) presenting decision points and trade-offs to the user, and (3) finalizing the decision through an iterative agreement loop.
+description: Skill for drafting ADR documents based on decided hypotheses. Focuses on clarity, formatting, and completeness of the record, ensuring alignment with architectural values.
 ---
 
-# ADR起草・合意形成 (ADR Drafting & Consensus)
+# ADR起草 (ADR Drafting)
 
-策定されたアーキテクチャ仮説を正式なドキュメント（ADR）として記述し、ユーザーとの対話を通じて合意形成（Consensus）に至るスキル。
+決定されたアーキテクチャ仮説を、プロジェクト標準のフォーマット（ADR）に従って正式なドキュメントとして記述するスキル。
+単なる記録ではなく、**「未来の開発者（あるいは自分）への手紙」** として、背景・理由・影響を論理的かつ情熱を持って記述する。
 
 ## 役割定義 (Role Definition)
-あなたは **Scribe & Facilitator (書記かつ進行役)** です。決定事項を正確に記録し、残された論点を提示して、ユーザーが自信を持って「承認」できる状態へ導きます。
+
+あなたは **Scribe (書記)** ですが、同時に **Storyteller (語り部)** でもあります。
+`SYSTEM_ARCHITECT` の価値観に基づき、決定に至るまでの文脈と、その決定がもたらす未来を明確に描きます。
 
 ## 前提 (Prerequisites)
-- アーキテクチャ仮説 (`architecture-hypothesis` の成果物) が存在すること。
-- ADRのテンプレート (`reqs/design/template/adr.md` 等) があることが望ましい。
+
+- 意思決定（Decision）が完了しており、採用する案と理由が明確であること。
+- テンプレート (`reqs/design/template/adr.md` 等) が存在すること。
 
 ## 手順 (Procedure)
 
-### 1. ADRドラフトの作成 (Drafting)
+### 1. テンプレートの準備 (Preparation)
+
 - **Action:**
-  - `reqs/design/_inbox/` に新しいADRファイルを作成する。
-  - ステータスは `Proposed` (提案中) とする。
-  - これまでのスキルで得られた Context, Evidence, Model, Decision, Alternatives を埋める。
-  - 実行すべきコマンド例:
-    `read_file reqs/design/template/adr.md`
-    `write_file reqs/design/_inbox/adr-XXX-title.md`
+  - `reqs/design/template/` から適切なテンプレートを読み込む。
+  - 出力先のファイル名を決定する（例: `reqs/design/_inbox/adr-XXX-title.md`）。
 
-- **Checklist:**
-  - [ ] **[Context]** ファイル名やフォーマットはプロジェクトの規約に従っているか？
-  - [ ] **[Alignment]** 「なぜその決定をしたか」だけでなく「なぜ他を捨てたか」が記述されているか？
+### 2. ドラフト作成 (Drafting Guidelines)
 
-### 2. 厳格な自己レビュー (Strict Self-Review)
+テンプレートの各セクションを、以下のガイドラインに従って記述する。
+
+#### Context (背景と課題)
+
+- **[Context Analysis]:** 「なぜ今、この決定が必要なのか？」をビジネスと技術の両面から記述する。
+- **[Active Reconnaissance]:** 現状のコードやシステムが抱える具体的な問題点（事実）を引用する。
+- **[Outcome-Oriented]:** 技術的な問題だけでなく、それがユーザー体験やビジネスにどう悪影響を与えているかを書く。
+
+#### Decision (決定事項)
+
+- **[Hypothesis-Driven]:** 採用した案を明確に宣言する（「A案を採用する」）。
+- **[Rationale]:** なぜその案を選んだのか、決定打となった理由（キードライバー）を論理的に説明する。
+- **[Clean Architecture]:** その決定が依存性のルールや責務の分離にどう寄与するかを言及する。
+- **[DDD]:** 定義されたユビキタス言語（`adr-domain-modeling`）を使用して記述する。
+
+#### Consequences (影響と結果)
+
+- **[Trade-offs]:** メリット（Positive）だけでなく、デメリット（Negative）やリスクを隠さずに書く。「銀の弾丸はない」ことを前提とする。
+- **[4 Big Risks]:** 価値・実現性・ユーザビリティ・生存性の観点で、残存するリスクがあれば明記する。
+- **[Evolutionary]:** この決定が将来の拡張や変更にどう影響するか（あるいはどう制限するか）を記述する。
+
+#### Alternatives (検討した代替案)
+
+- **[Comparison]:** 却下した案（案B:飛躍的、案C:逆説的 など）についても、「なぜ選ばなかったか」の理由を敬意を持って記録する。将来、状況が変わった時のための重要な手がかりとなる。
+
+### 3. ファイル作成と品質チェック (File Creation & Quality Check)
+
 - **Action:**
-  - 作成したドラフトに対し、以下の観点で厳しいレビューを行う。
-  - 問題が見つかった場合は、単に指摘するだけでなく、**「具体的かつ詳細な改善提案（修正案）」**を作成し、即座にドラフトを修正する。
+  - `write_file` を使用してファイルを新規作成する。
+  - 作成前に以下のチェックリストで内容を監査する。
 
-- **Review Checklist:**
-  - [ ] **[アウトカム志向]** 作ること自体を目的にせず、技術的決定がもたらす「具体的なビジネス価値・変化」が定義されていること。
-  - [ ] **[顧客価値の探求]** 顕在化している要望だけでなく、その奥にある「潜在的な課題や欲求」まで掘り下げられていること。
-  - [ ] **[仮説思考]** このADRが「検証可能な実験」として設計されており、成功/失敗の判定基準が明確であること。
-  - [ ] **[概念的整合性]** 部分ごとの継ぎ接ぎではなく、システム全体としてシンプルで調和の取れた構造（一貫した設計思想）であること。
-  - [ ] **[DDD]** 境界づけられたコンテキストが明確に定義され、ユビキタス言語がドキュメント全体で統一されていること。
-  - [ ] **[Clean Architecture]** 依存性のルール（内側への依存）が徹底され、ドメインロジックがフレームワーク等の詳細から保護されていること。
-  - [ ] **[特性/データ]** アーキテクチャ特性（性能・拡張性等）とデータ信頼性のトレードオフ分析が、事実に基づいて行われていること。
-  - [ ] **[進化性]** 現在の要件を満たすだけでなく、将来の変更を受け入れやすい（または捨てやすい）構造になっていること。
-  - [ ] **[4大リスク]** 価値(Value)、実現性(Feasibility)、使いやすさ(Usability)、生存性(Viability)の4点において致命的な穴がないこと。
-  - [ ] **[全体最適]** 個別機能の最適化が、システム全体のパフォーマンスや保守性を阻害していないこと。
-  - [ ] **[検証基準]** 実装完了を客観的に判断できる基準（Definition of Done）が具体的かつ計測可能であること。
-
-### 3. 論点の整理と分類 (Issues Categorization)
-- **Action:**
-  - 自己レビューで発見された課題を以下の2つに分類する。
-    1.  **自律修正項目 (Self-Fix):** エージェントの権限で即座に直せるもの（誤字、SSOTとの明白な矛盾、記述不足など）。 -> **即座に修正する。**
-    2.  **対話論点 (Discussion Points):** ユーザーの判断や承認が必要なもの（トレードオフの選択、全体最適のための提案、要件自体の見直しなど）。 -> **論点リストに追加する。**
-
-### 4. 合意形成ループ (Consensus Loop)
-- **Action:**
-  - **論点リストが空になるまで、またはユーザーからコミットの指示があるまで、以下を実行する。**
-  
-  1.  **論点の選択:** リストの中で**「意思決定のインパクトが最も大きい項目」を1つだけ**選択する。
-  2.  **問いかけ:** その論点について、背景（リスクやメリット）を説明した上で、ユーザーに判断を仰ぐ。
-  3.  **ADR修正:** 回答を反映してADRファイルを更新 (`replace`) する。
-  4.  **再レビュー:** **Step 2 (厳格な自己レビュー) に戻り、修正による副作用がないか再確認する。**
-
-- **Checklist:**
-  - [ ] **[Alignment]** 一度に複数の論点を混ぜて質問していないか？（One Issue One Question）
-  - [ ] **[Safety]** 修正後に必ず自己レビューを経由しているか？
-
-## アウトプット形式 (Output Template)
-ドラフト作成完了、または合意形成完了時の報告。
-
-```markdown
-## ADR作成完了 (Draft Created / Approved)
-- **File:** `reqs/design/_inbox/adr-XXX-title.md`
-- **Status:** `Proposed` (or `Approved`)
-- **Next Step:**
-  - [ ] ユーザーレビュー待ち
-  - [ ] (承認済みの場合) プルリクエスト作成へ
-```
+- **Checklist (MECE & Lean):**
+  - [ ] **[Completeness (抜け漏れなし)]**
+    - 決定に必要な「前提（Context）」「結論（Decision）」「理由（Rationale）」「影響（Consequences）」が全て記述されているか。
+    - 空欄（TBD）や「後で決める」といった記述が残っていないか（決定できないならADRにすべきではない）。
+  - [ ] **[Lean (無理無駄なし)]**
+    - 将来の実装において、オーバーエンジニアリング（YAGNI違反）になる要素が含まれていないか。
+    - 逆に、必要な拡張性が考慮されておらず、すぐに作り直しになるような「無理（短視眼的決定）」がないか。
+  - [ ] **[Clarity (明瞭性)]**
+    - 第三者が読んだとき、その決定に至るロジックを再現できるか。
+    - 専門用語はユビキタス言語で統一され、曖昧な表現（「よしなに」「適宜」）は排除されているか。
 
 ## 完了条件 (Definition of Done)
-- ADRファイルが作成され、ユーザーから内容に対する明確な承認（合意）が得られていること。
+
+- 指定されたパスにADRファイルが作成され、SYSTEM_ARCHITECTの価値観およびMECE/Leanの観点を満たした内容で記述されていること。

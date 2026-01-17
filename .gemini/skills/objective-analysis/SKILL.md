@@ -11,10 +11,12 @@ description: Skill for extracting core intent and formulating hypotheses. Used w
 ## プロセス (Process)
 
 ### 1. 情報収集 (Gather Information)
+
 - ユーザーの発言、チャット履歴、Issue記述全文を収集する。
 - **必ずその時点の全てのSSOT（`docs/`、`reqs/`、最新コード）をチェックし**、前提知識を最新化する。
 
 ### 2. 情報整理 (Structure with 5W1H)
+
 収集した情報を以下のフレームワークに沿って整理する（まだ解釈は加えず、事実を並べる）。
 
 - **Why (目的・背景):** 解決したい本質的課題、期待される価値。
@@ -25,6 +27,7 @@ description: Skill for extracting core intent and formulating hypotheses. Used w
 - **How (手段・制約):** 指定技術、制約条件。
 
 ### 3. 多角的仮説立案 (Hypothesize)
+
 整理した事実とSSOTの知識を統合し、ユーザーの「真の意図」について性質の異なる3つの仮説を立てる。
 
 1.  **実証的仮説 (Grounded Hypothesis):**
@@ -38,6 +41,8 @@ description: Skill for extracting core intent and formulating hypotheses. Used w
     - 「Aと言っているが、真の解決策はAをやめること（または全く別のDを行うこと）ではないか」という批判的視点。
 
 ### 4. 検証項目の策定 (Validation Questions)
+
 それぞれの仮説の確からしさを判断するために必要な情報（Unknowns）を特定し、ユーザーへの質問や調査項目としてリストアップする。
+
 - どの情報があれば仮説が確定するか？
 - どの事実が間違っていたら仮説が崩れるか？
