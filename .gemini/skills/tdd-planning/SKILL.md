@@ -1,99 +1,98 @@
 ---
 name: tdd-planning
-description: Analyzes requirements and SSOT to formulate a concrete TDD plan. Used for (1) translating ambiguous requirements into verifiable test scenarios, (2) ensuring new features align with existing architecture before coding, and (3) defining the "Red-Green-Refactor" strategy for complex logic.
+description: Formulates a comprehensive strategy for TDD-based implementation. Analyzes specifications (Specs) and handover items, defines shared implementation policies, and drafts specific TDD tasks (Issues).
 ---
 
-# TDD Planning
+# TDD Planning (Implementation Strategy)
 
-このスキルは、実装に入る前に「何を」「なぜ」「どのように」テストし実装するかを明確にし、手戻りを防ぐための計画策定を目的とします。
+詳細仕様（Specs）を分析し、テスト駆動開発（TDD）によってユースケースおよびロジックを実装するための計画を策定・実行するスキル。
+共通実装方針の策定、Issue案（TDDタスク）の作成、および自己レビューまでを一気通貫で行い、高品質な実装計画を作成する。
 
-## 役割定義 (Role Definition)
-あなたは **TDD Architect** です。要件を厳密なテスト仕様に変換し、ドメインの整合性とアーキテクチャの遵守を保証する計画を立てます。
+## 役割 (Role)
+
+**Implementation Strategist (実装戦略家)**
+「何を作るか」ではなく、「どの順序でテストを書き、どのレイヤー（Domain/UseCase/Infra）にどのような方針でコードを配置するか」を設計する。
+特に、**Implementer（実装者）が迷わず Red-Green-Refactor サイクルを回せるレベルの「検証可能なIssue案」**を作成することを重視する。
 
 ## 前提 (Prerequisites)
-- 既存スキル `active-reconnaissance`, `ssot-verification`, `todo-management` が利用可能であること。
-- 実装対象の Issue または要件が特定されていること。
+
+- 入力となる詳細仕様書（Specs）および、前工程からの引継ぎ事項（Handover）が存在すること。
 
 ## 手順 (Procedure)
 
-### 1. 能動的偵察 (Active Reconnaissance)
+### 0. 前工程の確認 (Handover Analysis)
+
+**目的:** 前フェーズ（Spec Creation）からの申し送り事項を読み込み、仕様のコンテキストを継承する。
+
 - **Action:**
-  - `todo-management` スキルをアクティベートする。
-    `activate_skill{name: "todo-management"}`
-  - `issue_read` を実行し、表面的な要件だけでなく「ユーザー価値（Why）」を特定する。
-  - `active-reconnaissance` スキルを活用し、関連するSSOT（ADR、仕様書、ガイドライン等）を読み込む。
-    `activate_skill{name: "active-reconnaissance"}`
-  - `read_file` で実装対象周辺の既存コードと既存テストを確認する。
+  - `docs/handovers/spec-to-tdd.md` を `read_file` する。
+  - 仕様策定時に想定された「テストのヒント」や「エッジケース」を把握し、実装計画に反映させる。
 
-### 2. 設計整合性チェック (SSOT Verification)
+### 1. 目標設定 (Objective Setting)
+
+**目的:** 今回の実装活動のゴールと成功基準を明確にする。
+
 - **Action:**
-  - `ssot-verification` スキルを活用し、以下の観点で現在の理解と設計を照合する。
-    `activate_skill{name: "ssot-verification"}`
-    - [ ] **ユビキタス言語:** 提案するメソッド名や引数名が、ドキュメントで定義された用語と一致しているか？
-    - [ ] **レイヤー構造:** 実装箇所がクリーンアーキテクチャの責務（Domain, UseCase等）に合致しているか？
-    - [ ] **依存の方向:** 下位レイヤーへの直接的な依存や、ビジネスロジックの漏洩がないか？
+  - `activate_skill{name: "objective-setting"}`
+  - 実装完了の定義（全テストパス、カバレッジ、アーキテクチャ準拠）をSMART目標として設定する。
+  - _Goal:_ 「仕様書を完全に満たし、UseCaseロジックが正常に動作するコードとテストを完遂するためのIssue案を作成し、レビューをパスする。」
 
-### 3. TDD Plan の策定
+### 2. 意図の抽出と共通実装方針 (Intent & Implementation Policy)
+
+**目的:** 全タスクで統一すべき「技術的判断」や「モックの方針」を先に定義し、実装の不整合を防ぐ。
+
 - **Action:**
-  - 収集した情報に基づき、以下のテンプレートを用いて具体的なシナリオを作成する。
-  - **Checklist:**
-    - [ ] **Red:** 失敗すべき振る舞いの **根拠 (Basis: ADR/Spec)** は明確か？
-    - [ ] **Green:** 実装すべきロジックの **最小限の定義** は何か？
-    - [ ] **Refactor:** 準拠すべき **規約 (Styleguide/ADR)** はどれか？
+  - `activate_skill{name: "active-reconnaissance"}` でSpecsと既存コードのテストパターンを分析。
+  - **Common Implementation Plan** (`docs/implementation/plans/YYYYMMDD-{feature}-plan.md`) を作成し、以下を定義する。
+    - **Architecture Mapping:** 仕様書の各要素をどのディレクトリ/クラスに配置するか。
+    - **Test Strategy:** ユニットテストの範囲、モック化する依存先（DB、外部API）の方針。
+    - **Shared Stubs:** 複数のタスクで共有する基盤コードやスタブの定義。
+    - **Coding Standards:** 今回特に遵守すべきパターン（例: 「Result型によるエラーハンドリングの統一」）。
 
-### 4. Todo分解 (via todo-management)
+### 3. タスク分割とTDDシナリオ (Slicing & TDD Scenarios)
+
+**目的:** 独立して実装・テスト可能であり、かつマージ時の衝突が少ない単位でタスクを分割する。
+
 - **Action:**
-  - `todo-management` の「タスク分解フレームワーク」に従い、策定した「TDD Plan」を `.gemini/todo.md` の形式に変換する。
-  - **マッピングルール:**
-    - **Task Name:** [Red/Green/Refactor] + 簡潔な作業名
-    - **Action:** 具体的なツール操作（`write_file`, `replace` 等）と、**その根拠となるドキュメントの参照**。
-    - **Verify:** 成功を判定するコマンド（`pytest`, `ruff`, `mypy` 等）と、期待される結果。
+  - **Slicing Strategy:** **Feature/Component Slice** を原則とする。
+    - _原則:_ 1つのユースケース、または1つの重要なドメインロジックにつき、1つのIssueを発行する。
+  - **Output Definition:** 次のステップのために、以下の構成案を確定する。
+    1.  **Draft Issue List:** 作成するIssue案のタイトルとファイル名（例: `tdd-usecase-registration.md`）。
+    2.  **TDD Scenarios (Critical):** 実装者が `tdd-implementation` スキルで使用する具体的な Red/Green シナリオ。
 
-### 5. レビューと洗練 (Review & Refinement)
+    **Example:**
+    - Issue: `[TDD] Implement User Registration UseCase`
+      - Files: `src/domain/`, `src/usecase/`, `tests/unit/`
+      - **TDD Scenarios:**
+        - **Red 1:** 未登録メールアドレスでの登録時、UseCaseが `User` オブジェクトを返すことを検証。
+        - **Red 2:** 既登録メールアドレス時、`AlreadyExistsError` を投げることを検証。
+        - **Green:** Specに記載されたバリデーションと永続化ロジックの実装。
+
+### 4. Issue案の作成 (Issue Drafting)
+
+**目的:** 定義された戦略に基づき、具体的なIssue案ファイルを作成する。
+
 - **Action:**
-  - 以下の「4大リスク」の観点でTDD Plan全体を自己評価し、懸念があれば計画を修正する。
-    - [ ] **価値 (Value):** 本当にこの実装でユーザー課題が解決されるか？
-    - [ ] **ユーザビリティ (Usability):** 実装されるインターフェース（API, CLI等）は使いやすいか？
-    - [ ] **実現可能性 (Feasibility):** 計画された時間と技術で完遂できるか？
-    - [ ] **ビジネス生存性 (Viability):** セキュリティ、保守性、コストに問題はないか？
-  - `todo-review` を実行し、計画が原子レベルまで砕かれているか、論理的な飛躍がないかを最終確認する。
-    `activate_skill{name: "todo-review"}`
-  - **修正フロー:**
-    - **要件・設計レベルの不備:** Step 3 (TDD Plan の策定) に戻る。
-    - **タスク粒度・記述の不備:** Step 4 (Todo分解) に戻る。
-  - 指摘事項が完全になくなり、承認条件（Approve）を満たすまでループする。
+  - `activate_skill{name: "issue-drafting"}`
+  - Step 3 で定義した各タスクについて、Issue案を作成する。
+  - **Mandatory:** 全てのIssue案本文に以下を含めるよう指示する：
+    1.  Step 2で作成した **Common Implementation Plan へのリンク**。
+    2.  **成果物のターゲット:** 「このタスクの成果物は、仕様を完全に満たす **プロダクトコード（UseCase/Logic）** および **ユニットテスト** である」という明示。
+    3.  Step 3で定義した **TDD Scenarios**。
 
-## アウトプット形式 (Output Template)
+### 5. 計画レビュー (Planning Review)
 
-```markdown
-## TDD Plan: [Issue Title/ID]
-- **Goal:** [SMART目標]
-- **Context:** [参照ドキュメント一覧]
+**目的:** 作成された計画（共通方針 + Issue案）の品質を保証する。
 
-### Scenarios
-1. **Red (Test Case)**
-   - **Basis:** [ADR-XXX / Spec Name]
-   - **Plan:** [ファイルパス] に [テスト名] を追加。
-   - **Expectation:** [期待される失敗理由] で失敗する。
+- **Action:**
+  - `activate_skill{name: "tdd-planning-review"}` (後述: 新規作成)
+  - 作成された共通実装計画とIssue案をレビューする。
+  - **Audit View:** 「このIssue案があれば、実装者は迷わず `tdd-implementation` を起動してRed-Green-Refactorを回せるか？」という視点でチェックする。
 
-2. **Green (Implementation)**
-   - **Basis:** [ロジックの仕様/要件]
-   - **Plan:** [ファイルパス] に最小限の [ロジック] を実装。
-   - **Expectation:** テストがパスする。
+## アウトプット (Output)
 
-3. **Refactor (Quality)**
-   - **Basis:** [Coding Guidelines / Styleguide]
-      - **Plan:** `tdd-refactoring` を起動し、[改 善対象] を整理。
-   - **Expectation:** Linter/Type Check パス、かつテストがGreen維持。
+`tdd-creation` がコミットすべきアーティファクト一式。
 
-- **Risks:** [4 Big Risks]
-```
-
----
-※ 詳細な実行ステップは上記マッピングルールに従い `.gemini/todo.md` に展開されました。
-
-
-## 完了条件 (Definition of Done)
-- ユーザーに TDD Plan を提示し、合意を得ていること。
-- `todo-management` によって、実行フェーズの具体的かつ原子的なステップが `.gemini/todo.md` に定義されていること。
-
+1.  **Common Implementation Plan:** `docs/implementation/plans/{date}-{name}.md`
+2.  **Draft Issues:** `reqs/tasks/drafts/*.md` (TDD Scenariosを含む)
+3.  **Review Report:** (Console Output or Comment)

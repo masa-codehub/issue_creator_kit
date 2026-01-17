@@ -20,6 +20,14 @@ description: Formulates a comprehensive strategy for creating specifications. An
 
 ## 手順 (Procedure)
 
+### 0. 前工程の確認 (Handover Analysis)
+
+**目的:** 前フェーズ（Arch Creation）からの申し送り事項を読み込み、設計のコンテキストを継承する。
+
+- **Action:**
+  - `docs/handovers/arch-to-spec.md` が存在する場合、その内容を `read_file` する。
+  - 前フェーズで「保留された事項」や「特に注意すべき境界」を把握し、今回のPlanningに反映させる。
+
 ### 1. 目標設定 (Objective Setting)
 
 **目的:** 今回のPlanning活動のゴールと成功基準を明確にする。
