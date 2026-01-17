@@ -49,7 +49,7 @@ Design Doc作成プロセスを**OODAループ (Observe -> Orient -> Decide -> A
       - **案B (飛躍的):** 理想的なユーザー体験や将来性を追求した案。
       - **案C (逆説的):** 既存の仕組みをハックするような破壊的/代替的な案。
 2.  **Structural Design (構造定義):**
-    - `activate_skill{name: "adr-domain-modeling"}`
+    - `activate_skill{name: "domain-modeling"}`
     - `activate_skill{name: "arch-structural-design"}` (**High-Level Only**)
     - 主要なドメインモデル、コンポーネント構成、および主要なデータの流れ（シーケンス）を定義する。
     - **Focus:** 「型定義」ではなく「責務分担」と「依存関係」を決める。

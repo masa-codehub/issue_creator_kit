@@ -37,7 +37,7 @@ ADR作成プロセスを**OODAループ (Observe -> Orient -> Decide -> Act)** �
 **目的:** 集めた事実を解釈し、可能性を広げる（発散）。
 
 1.  **Domain Modeling (構造整理):**
-    - `activate_skill{name: "adr-domain-modeling"}`
+    - `activate_skill{name: "domain-modeling"}`
     - 問題領域の用語定義、関係性の整理を行い、メンタルモデルを合わせる。
 2.  **Hypothesis & Options (仮説立案):**
     - `activate_skill{name: "adr-hypothesis"}`

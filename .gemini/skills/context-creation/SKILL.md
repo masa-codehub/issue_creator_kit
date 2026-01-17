@@ -40,7 +40,7 @@ description: Orchestrator skill for creating and maintaining the System Context 
 **目的:** 特定されたGapを埋めるための「新しい地図」の構成案を作成する。
 
 1.  **Domain Modeling (用語と境界の整理):**
-    - `activate_skill{name: "adr-domain-modeling"}`
+    - `activate_skill{name: "domain-modeling"}`
     - コード内で使われている用語（クラス名、変数名）と、ビジネス用語（Ubiquitous Language）の対応関係を整理する。
     - システムの境界線（Boundaries）を再定義する。
 
