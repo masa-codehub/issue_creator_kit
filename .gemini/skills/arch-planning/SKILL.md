@@ -23,6 +23,7 @@ ADRを分析し、「何を描くか」だけでなく、「どう分担する�
 ### 1. 意図の抽出と共通定義 (Intent & Common Definitions)
 
 **目的:** 全タスクで統一すべき「用語」や「境界」を先に定義し、コンフリクトの芽を摘む。
+**重要:** タスクが細分化されるため、この共通定義書が唯一の頼みの綱となる。一切の曖昧さを排除せよ。
 
 - **Action:**
   - `activate_skill{name: "active-reconnaissance"}` でADRと現状を分析。
@@ -31,27 +32,31 @@ ADRを分析し、「何を描くか」だけでなく、「どう分担する�
     - **Component Naming:** 新規・変更するコンポーネント/クラスの正式名称（Stub）。
     - **Boundaries:** どのドメインがどこまでを担当するか（境界線）。
     - **Tech Decisions:** 全体で統一すべき技術選定（例: 「全APIはgRPCとする」）。
+    - **Directory Structure:** 成果物ファイルの配置場所と命名規則。
 
 ### 2. 図構成とタスク分割 (Portfolio & Slicing)
 
 **目的:** レビューしやすく、並列作業可能な単位でタスクを分割する。
 
 - **Action:**
-  - **Slicing Strategy:** **Module/Bounded Context Slice (ドメイン分割)** を採用する。
-    - 機能やドメイン（例: 決済、会員、商品）ごとに、関連する図（Context, Container, Sequence等）をまとめる。
-  - **Selection Criteria:**
-    - ADRの説明に不可欠な図のみを選定する。「あれば良い」レベルの図は捨て、選定した図の中での文書補足で代替する。
+  - **Selection Criteria:** ADRの説明に不可欠な図のみを選定する。
+  - **Slicing Strategy:** **Atomic Slice (1 Issue = 1 Diagram File)** を原則とする。
+    - *原則:* 1つのアーキテクチャ図ファイルにつき、1つのIssueを発行する。
+    - *例外:* 以下の場合は複数の図を1つのIssueにまとめることを許容する。
+        1.  **密結合 (Tight Coupling):** クラス図とシーケンス図など、片方の修正がもう片方に即座に影響し、分離すると不整合リスクが高い場合。
+        2.  **微修正 (Trivial Update):** 修正箇所が極めて少なく（数行程度）、分割のオーバーヘッドが見合わない場合。
+
   - **Output Definition:** 次のステップのために、以下の構成案を確定する。
-    1.  **Draft Issue List:** 作成するIssue案のタイトルとファイル名（例: `arch-update-payment.md`）。
-    2.  **Target Scope:** 各Issueで作成/更新する具体的な図ファイル名と、その記述範囲（Boundary）。
+    1.  **Draft Issue List:** 作成するIssue案のタイトルとファイル名。
+    2.  **Target Scope:** 各Issueで作成/更新する具体的な図ファイル名と、その記述範囲。
 
     **Example:**
-    - Issue: `[Payment Domain] Update Architecture Diagrams`
-      - Files: `context.md`, `container.md`, `seq-payment.md`
-      - Scope: 決済コンテナの内部構造と、API/Redisとの境界を記述。
-    - Issue: `[User Domain] Update Architecture Diagrams`
-      - Files: `container.md`, `component-user.md`
-      - Scope: ユーザー管理コンテナの永続化ロジックの変更を記述。
+    - Issue: `[Context] Update System Context`
+      - File: `docs/architecture/context.md`
+    - Issue: `[Payment] Create Async Payment Sequence`
+      - File: `docs/architecture/seq-payment-async.md`
+    - Issue: `[User] Update User Component & State` (Exception: Tight Coupling)
+      - Files: `docs/architecture/component-user.md`, `docs/architecture/state-user.md`
 
 ### 3. Issue案の作成 (Issue Drafting)
 
