@@ -1,6 +1,6 @@
 ---
 name: arch-planning-review
-description: Audits the architecture visualization plan (Common Definitions & Draft Issues) before execution. Strictly enforces SYSTEM_ARCHITECT values (No Ambiguity, MECE, Template Compliance) and ensures zero regressions by validating against loaded SSOT context.
+description: Audits the architecture visualization plan (Common Definitions & Draft Issues) before execution. Strictly enforces SYSTEM_ARCHITECT values (No Ambiguity, MECE, Template Compliance) and ensures zero regressions by validating against loaded SSOT context via active-reconnaissance.
 ---
 
 # Architecture Planning Review
@@ -19,11 +19,11 @@ description: Audits the architecture visualization plan (Common Definitions & Dr
 **目的:** 計画の妥当性を判断するための「正解データ（SSOT）」を脳内に展開する。
 
 - **Action:**
-  - 以下のドキュメントを `read_file` で読み込む。
+  - `activate_skill{name: "active-reconnaissance"}` を実行し、以下の内容を正確に把握する。
     - **Source ADR:** 今回の変更の根拠となるADR。
     - **System Context:** `docs/system-context.md` (全体像との整合性確認)。
     - **Current Architecture:** 変更対象となっている既存の図面ファイル（As-Is確認）。
-  - **Rule:** これらを読まずに「MECEである」「矛盾がない」と判断することは許されない。
+  - **Rule:** これを実行せずに「MECEである」「矛盾がない」と判断することは許されない。
 
 ### 2. 共通定義の精査 (Audit Common Definitions)
 `docs/architecture/plans/*.md` を対象に、`SYSTEM_ARCHITECT` の価値観に照らしてチェックする。
@@ -71,7 +71,7 @@ description: Audits the architecture visualization plan (Common Definitions & Dr
 ```markdown
 ## Planning Review Result
 - **Status:** [Passed / Fixed / Re-Planning Triggered]
-- **Context Loaded:** `reqs/design/_approved/adr-005.md`, `docs/system-context.md`
+- **Context Loaded:** (active-reconnaissance result summary)
 - **Corrections Executed:**
   - [Fixed] 共通定義書の用語Aについて、ADRから定義を転記し具体化しました。
 ```
