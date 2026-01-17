@@ -1,79 +1,92 @@
 ---
 name: issue-drafting
-description: Creates detailed issue drafts for task delegation. Ensures clarity, completeness, and executability by structuring tasks into verifiable Red/Green/Verify steps, strictly adhering to templates and SSOT.
+description: Creates detailed issue drafts by strictly filling the 'issue-draft.md' template. Defines explicit rules for every section, integrating Red/Green/Verify verifiable task structure, and enforces quality review.
 ---
 
-# Issue Drafting (Verifiable Task Architecture)
+# Issue Drafting (Template-Driven & Verifiable)
 
-他者（エージェントまたは人間）に委譲するタスクの「指示書（Issue Draft）」を作成するスキル。
-`task-management` の哲学を継承し、指示内容を「検証可能なRed/Green/Verifyサイクル」として構造化することで、曖昧さを完全に排除する。
+`reqs/tasks/template/issue-draft.md` を、一切の抜け漏れ・無理・無駄なく埋めるためのスキル。
+テンプレートの各セクションに対して「書くべきこと」と「書いてはいけないこと」を厳密に定義し、`Red/Green/Verify` の思考プロセスを用いてエージェントが自律的に実行可能な「完全な指示書」を生成する。
 
 ## 役割 (Role)
 **Task Architect (タスク設計者)**
-「何をやるか」だけでなく、「どうなれば完了か」を定義する。
-文脈（Context）と制約（Constraint）を明記し、作業者の迷いをゼロにする。
+テンプレートの「枠」を、具体的で矛盾のない「指示」で埋める。
+メタデータ（Frontmatter）の整合性と、本文（Content）の検証可能性を両立させる。
 
 ## 前提 (Prerequisites)
-- タスクの目的、スコープ、参照すべきドキュメント（SSOT/Common Definitions）が明確であること。
-- `reqs/tasks/template/issue-draft.md` が存在すること。
+- `reqs/tasks/template/issue-draft.md` を読み込んでいること。
+- 参照すべき **Common Definitions Doc (Plan)** が存在し、パスが判明していること。
 
 ## 手順 (Procedure)
 
-### 1. 構成検討 (Structuring)
-**目的:** タスクを「検証可能な最小単位」に分解し、論理的な手順を構築する。
+### 1. メタデータ定義 (Frontmatter)
+**目的:** システム連携に必要な属性情報を定義する。
 
 - **Action:**
-  - 依頼内容を分析し、以下の3要素を明確にする。
-    1.  **Context (Red):** 現状の何が問題で、SSOT（ADR/Plan）とどう乖離しているか？
-    2.  **Action (Green):** その乖離を埋めるために、具体的に「どのファイルを」「どう操作」すべきか？
-    3.  **Verify (Check):** 作業完了を客観的に判断するための基準は何か？
+  - **title:** `[Domain] Action + Object` (例: `[Payment] Update Sequence for Async Retry`)
+  - **labels:** `task` および担当ロール（例: `TECHNICAL_DESIGNER`）を設定。
+  - **roadmap:** **Common Definitions Doc のパス** を指定する（例: `docs/architecture/plans/20240101-payment.md`）。
+  - **task_id:** Planning段階で振られた一意なID（例: `T-01`）。
+  - **depends_on:** 依存するIssueのファイル名（なければ空配列 `[]`）。
+  - **status:** `Draft` (固定)
 
-### 2. コンテンツ記述 (Drafting)
-**目的:** テンプレートを埋め、実行可能な指示書を作成する。
+### 2. 目的と背景 (1. Goal & Context)
+**目的:** タスクの「Why」と「What」を定義し、作業者の目的意識を統一する。
 
-- **Action:**
-  - `reqs/tasks/template/issue-draft.md` を読み込み、以下の基準で記述する。
+- **書くべきこと:**
+  - **As-is (現状):** 現状のドキュメントやコードにおける具体的な「不足」や「誤り」。(Red)
+  - **To-be (あるべき姿):** このタスク完了後に実現されているべき状態（SMART目標）。
+  - **Design Evidence:** 根拠となる ADR 番号、および Common Definitions Doc へのリンク。
+- **書いてはいけないこと:**
+  - 曖昧な願望（「いい感じにする」「使いやすくする」）。
+  - タスクの範囲外にある壮大なビジョン。
 
-  - **Title:**
-    - `[Domain/Subject] Verb + Object` (例: `[Payment] Update Sequence Diagram for Async Retry`)
-  
-  - **Context (Background & SSOT):**
-    - **Why:** タスクの背景（ADR-xxxにより決定された非同期処理を可視化するため）。
-    - **Reference:** **Common Definitions Doc** へのリンクを「必須」で含める。
-    - **Current State:** 現状（As-Is）の不足点を指摘する（例: `seq-payment.md` が未作成である）。
+### 3. 参照資料・入力ファイル (2. Input Context)
+**目的:** 作業開始時に必要な情報を過不足なく渡す。
 
-  - **Requirements (Execution Steps):**
-    - 作業手順を `Red/Green/Verify` の構造を意識して記述する。
-    - *Example:*
-      1. **Setup:** `arch-behavior.md` テンプレートをコピーして `docs/architecture/seq-payment.md` を作成する。
-      2. **Drafting:** Common Definitions の用語定義（`BillingWorker`等）に従い、Mermaidでシーケンスを記述する。
-      3. **Refining:** `arch-refactoring` の基準に従い、Noteで例外処理を補足する。
+- **書くべきこと:**
+  - Common Definitions Doc のパス。
+  - 編集対象となる既存のアーキテクチャ図のパス。
+  - 参照すべきソースコードや既存の仕様書。
+- **書いてはいけないこと:**
+  - 存在しないファイルパス。
+  - 今回のタスクに全く関係のない資料（ノイズになるため）。
 
-  - **Acceptance Criteria (Definition of Done):**
-    - 完了条件を具体的かつ機械的に検証可能なレベルで記述する。
-    - *Example:*
-      - [ ] `docs/architecture/seq-payment.md` が存在し、Mermaid構文エラーがないこと。
-      - [ ] `BillingWorker` コンテナが登場していること。
-      - [ ] Redis接続エラー時のリトライ処理が記述されていること。
+### 4. 実装手順と制約 (3. Implementation Steps & Constraints)
+**目的:** 迷いのない「実行手順（How）」を定義する。
 
-### 3. ファイル生成と自己検証 (Finalization & Check)
-**目的:** 生成物の品質を保証する。
+- **3.1. 負の制約 (Negative Constraints):**
+  - **書くべきこと:** 「編集してはいけないファイル」「依存してはいけないモジュール」「使用してはいけない記法」。
+  - **例:** 「`docs/system-context.md` は参照のみとし、変更してはならない。」
+- **3.2. 実装手順 (Changes):**
+  - **書くべきこと:** (Green)
+    - 作成・編集するファイルパス。
+    - 使用するテンプレート（`docs/template/arch-*.md`）。
+    - 記述すべき具体的な内容（クラス名、シーケンスの流れ、使用する用語）。
+  - **書いてはいけないこと:**
+    - 「適宜実装する」「よしなに計らう」等の丸投げ。
+- **3.3. 構成変更 (Configuration):**
+  - ファイルの削除や移動がある場合のみ記述。なければ「なし」と明記。
 
-- **Action:**
-  - 作成した内容をファイル（`reqs/tasks/drafts/*.md`）に書き出す。
-  - 以下のチェックリストで自己検証を行う。
+### 5. ブランチ戦略と検証手順 (Sections 4 & 5)
+**目的:** 作業場所の固定と、客観的な完了判定。
 
-- **Self-Correction Checklist:**
-  - [ ] **No Ambiguity:** 「いい感じに」「適宜」という言葉を使っていないか？
-  - [ ] **Link Validity:** 参照しているドキュメント（Common Definitions, ADR）へのパスは正しいか？
-  - [ ] **Atomic:** 1つのIssueで扱う範囲は適切か？（原則 1 Issue = 1 File）
-  - [ ] **Verifiable:** Acceptance Criteria はYes/Noで判定できるか？
+- **4. Branching Strategy:**
+  - **Base Branch:** 統合用ブランチ名（例: `feature/arch-update-xxx`）。
+  - **Feature Branch:** `feature/task-{{task_id}}-{{title_slug}}` の形式に従ったブランチ名。
+- **5. Verification & DoD:**
+  - **書くべきこと:** (Verify)
+    - **観測される挙動:** 生成されたファイルが存在し、内容が空でないこと。
+    - **ファイル状態:** Mermaidの構文エラーがないこと（プレビューで確認可能であること）。
+    - **整合性:** Common Definitions Doc で定義された用語（Stub）が正確に使われていること。
+  - **書いてはいけないこと:**
+    - 「品質が高いこと」「わかりやすいこと」などの主観的評価。
 
-### 4. 品質レビュー (Final Quality Gate)
+### 6. 品質レビュー (Final Quality Gate)
 - **Action:**
   - `activate_skill{name: "issue-review"}`
-  - 作成したIssue Draftをレビューし、品質基準に達しているか確認する。
+  - 作成したIssue Draftをレビューし、品質基準（Ambiguity-Free, Atomic, Verifiable）に達しているか確認する。
   - 指摘があれば直ちに修正し、完璧な状態にする。
 
 ## アウトプット (Output)
-- `reqs/tasks/drafts/` 配下に生成されたMarkdownファイル。
+- `reqs/tasks/drafts/` 配下に生成され、レビューをパスしたMarkdownファイル。
