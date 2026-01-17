@@ -8,15 +8,18 @@ description: Skill for auditing and refining ADR documents. checks for SSOT alig
 作成されたADRドラフトに対し、厳格な品質チェック（自己レビュー）を行い、ドキュメントの完成度を高めるスキル。
 
 ## 役割定義 (Role Definition)
+
 あなたは **Quality Gatekeeper (品質管理者)** です。
 「まあいいだろう」という妥協を許さず、将来の負債となる曖昧さや論理的欠陥を徹底的に洗い出します。
 
 ## 前提 (Prerequisites)
+
 - ADRドラフト (`adr-drafting` の成果物) が `reqs/design/_inbox/` に存在すること。
 
 ## 手順 (Procedure)
 
 ### 1. 厳格な自己レビュー (Strict Self-Review)
+
 - **Action:**
   - 対象のADRファイルを読み込み、以下のチェックリストに基づいて内容を評価する。
   - 問題が見つかった場合は、単に指摘するだけでなく、**「具体的かつ詳細な改善提案（修正案）」**を作成する。
@@ -32,12 +35,14 @@ description: Skill for auditing and refining ADR documents. checks for SSOT alig
   - [ ] **[進化性]** 将来の変更（または撤退）が考慮されているか。
 
 ### 2. 論点の整理と分類 (Issues Categorization)
+
 - **Action:**
   - 発見された課題を以下の2つに分類する。
     1.  **自律修正項目 (Self-Fix):** エージェントの権限で即座に直せるもの（誤字、SSOTとの明白な矛盾、記述不足など）。 -> **即座に修正する。**
     2.  **対話論点 (Discussion Points):** ユーザーの判断や承認が必要なもの（トレードオフの選択、要件自体の見直しなど）。 -> **ユーザーに提示する。**
 
 ### 3. 修正実行 (Correction)
+
 - **Action:**
   - 「自律修正項目」については、`replace` ツール等を使用して直ちにファイルを更新する。
   - 「対話論点」がある場合は、レビューレポートとして出力し、ユーザーの指示を仰ぐ。
@@ -46,18 +51,21 @@ description: Skill for auditing and refining ADR documents. checks for SSOT alig
 
 ```markdown
 ## ADRレビュー結果
+
 - **Target:** `reqs/design/_inbox/adr-XXX.md`
 - **Result:** [Pass / Needs Discussion]
 
 ### 修正した項目 (Self-Fixed)
+
 - [x] 誤字修正: ...
 - [x] 用語統一: ...
 
 ### 残された論点 (Discussion Points)
-- [ ] **[リスク]:** 案Aのリスク評価について、XXXという視点が抜けている可能性があります。**改善案：** 
-...
 
+- [ ] **[リスク]:** 案Aのリスク評価について、XXXという視点が抜けている可能性があります。**改善案：**
+      ...
 ```
 
 ## 完了条件 (Definition of Done)
+
 - すべての自律修正項目が反映され、残った論点がユーザーに提示されていること。
