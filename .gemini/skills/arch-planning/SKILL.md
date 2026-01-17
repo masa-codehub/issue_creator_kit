@@ -12,7 +12,7 @@ description: Formulates a comprehensive strategy for visualizing ADRs. Analyzes 
 
 **Architecture Strategist (アーキテクチャ戦略家)**
 ADRを分析し、「何を描くか」だけでなく、「どう分担するか」を設計する。
-全タスクが参照すべき**共通の辞書（Common Definitions）**を作成し、タスク間の依存を疎結合にする。
+特に、**後続の「Spec Strategist（仕様戦略家）」が、仕様策定計画を立てるために必要な「境界」と「方針」を明確にすること**を重視する。
 
 ## 前提 (Prerequisites)
 
@@ -27,7 +27,7 @@ ADRを分析し、「何を描くか」だけでなく、「どう分担する�
 - **Action:**
   - `activate_skill{name: "objective-setting"}`
   - 今回のADR反映作業において、「誰に」「何を」伝えることが最も重要か（Value）を定義し、それを満たすためのSMART目標を設定する。
-  - _Goal:_ 「開発者が迷わず実装できるレベルのIssue案と共通定義を作成し、レビューをパスする。」
+  - _Goal:_ 「**Spec Strategist (仕様戦略家)** が、迷わず仕様書（Specs）の分割・計画を行えるレベルのIssue案と共通定義を作成し、レビューをパスする。」
 
 ### 2. 意図の抽出と共通定義 (Intent & Common Definitions)
 
@@ -38,8 +38,7 @@ ADRを分析し、「何を描くか」だけでなく、「どう分担する�
   - `activate_skill{name: "active-reconnaissance"}` でADRと現状を分析。
   - **Common Definitions Doc** (`docs/architecture/plans/YYYYMMDD-{feature}-plan.md`) を作成し、以下を定義する。
     - **Ubiquitous Language:** 今回の変更で導入/変更される用語の定義。
-    - **Component Naming:** 新規・変更するコンポーネント/クラスの正式名称（Stub）。
-    - **Boundaries:** どのドメインがどこまでを担当するか（境界線）。
+    - **Boundaries (Critical):** コンポーネント間の境界線。どのロジックがどのコンテナ/クラスに属するかをSpec Strategistに伝える。
     - **Tech Decisions:** 全体で統一すべき技術選定（例: 「全APIはgRPCとする」）。
     - **Directory Structure:** 成果物ファイルの配置場所と命名規則。
 
@@ -48,12 +47,9 @@ ADRを分析し、「何を描くか」だけでなく、「どう分担する�
 **目的:** レビューしやすく、並列作業可能な単位でタスクを分割する。
 
 - **Action:**
-  - **Selection Criteria:** ADRの説明に不可欠な図のみを選定する。
   - **Slicing Strategy:** **Atomic Slice (1 Issue = 1 Diagram File)** を原則とする。
     - _原則:_ 1つのアーキテクチャ図ファイルにつき、1つのIssueを発行する。
-    - _例外:_ 以下の場合は複数の図を1つのIssueにまとめることを許容する。
-      1.  **密結合 (Tight Coupling):** クラス図とシーケンス図など、片方の修正がもう片方に即座に影響し、分離すると不整合リスクが高い場合。
-      2.  **微修正 (Trivial Update):** 修正箇所が極めて少なく（数行程度）、分割のオーバーヘッドが見合わない場合。
+    - _例外:_ 密結合、微修正の場合はまとめることを許容する。
 
   - **Output Definition:** 次のステップのために、以下の構成案を確定する。
     1.  **Draft Issue List:** 作成するIssue案のタイトルとファイル名（例: `arch-update-payment.md`）。
@@ -62,10 +58,7 @@ ADRを分析し、「何を描くか」だけでなく、「どう分担する�
     **Example:**
     - Issue: `[Payment Domain] Update Architecture Diagrams`
       - Files: `context.md`, `container.md`, `seq-payment.md`
-      - Scope: 決済コンテナの内部構造と、API/Redisとの境界を記述。
-    - Issue: `[User Domain] Update Architecture Diagrams`
-      - Files: `container.md`, `component-user.md`
-      - Scope: ユーザー管理コンテナの永続化ロジックの変更を記述。
+      - Scope: 決済コンテナの内部構造と、API/Redisとの境界を記述。Spec StrategistがAPI仕様を計画するための入力となる。
 
 ### 4. Issue案の作成 (Issue Drafting)
 
@@ -74,7 +67,9 @@ ADRを分析し、「何を描くか」だけでなく、「どう分担する�
 - **Action:**
   - `activate_skill{name: "issue-drafting"}`
   - Step 3 で定義した各タスクについて、Issue案を作成する。
-  - **Mandatory:** 全てのIssue案本文に、Step 2で作成した **Common Definitions Doc へのリンク** を記載し、「この定義に従うこと」と明記するよう、`issue-drafting` 実行時に指示する。
+  - **Mandatory:** 全てのIssue案本文に以下を含めるよう指示する：
+    1.  Step 2で作成した **Common Definitions Doc へのリンク**。
+    2.  **成果物のターゲット:** 「このアーキテクチャ図の主な読者は **Spec Strategist (仕様戦略家)** であり、彼らが詳細仕様の計画を立てるのに十分な情報（境界、責務、データの流れ）を提供すること」という旨の指示。
 
 ### 5. 計画レビュー (Planning Review)
 
@@ -83,7 +78,7 @@ ADRを分析し、「何を描くか」だけでなく、「どう分担する�
 - **Action:**
   - `activate_skill{name: "arch-planning-review"}`
   - 作成された共通定義書とIssue案をレビューする。
-  - 抜け漏れ（MECE）、リンク切れ、定義の曖昧さがないかチェックし、問題があればその場で修正する。
+  - **Resulting Value Check:** 「このIssue案の通りに成果物が作成された場合、Spec Strategistは迷わず仕様書の計画を立てられるか？」という視点でチェックする。
   - **Correction:** 修正が必要な場合は、直ちにファイル (`docs/architecture/plans/*.md`, `reqs/tasks/drafts/*.md`) を更新する。
 
 ## アウトプット (Output)

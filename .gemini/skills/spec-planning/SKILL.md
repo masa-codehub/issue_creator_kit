@@ -1,58 +1,94 @@
 ---
 name: spec-planning
-description: Analyzes requirements (Issue/ADR) and existing specs to formulate a concrete plan for specification creation. Defines the "Requirements" for the specs.
+description: Formulates a comprehensive strategy for creating specifications. Analyzes requirements (ADR/Issue), defines shared definitions, drafts specific issues, and reviews the plan for quality assurance.
 ---
 
 # Specification Planning
 
-ADRやIssue（Why/What）を分析し、どのような「仕様書（Specs）」を作成すべきか（Howの定義場所）を計画するスキル。
+要件（Issue/ADR）を分析し、開発者が実装に着手できるレベルの「詳細仕様書（Specs）」を作成するための計画を策定・実行するスキル。
+共通定義の策定、Issue案の作成、および自己レビューまでを一気通貫で行い、高品質な仕様策定計画を作成する。
 
 ## 役割 (Role)
-**Spec Planner (仕様計画者)**
-「何を実装するか」ではなく「どのドキュメントに何を定義すれば実装できるか」を設計する。
+
+**Spec Strategist (仕様戦略家)**
+「何を実装するか」ではなく、「どのドキュメントに、どのような粒度で仕様を記述するか」を設計する。
+特に、作成される仕様書が**後続の「Implementer（実装者）」にとって、迷いなくコードとテストを書ける内容になること**を保証する。
+
+## 前提 (Prerequisites)
+
+- 入力となる要件（Issue）または上位設計（Arch/Design Doc）が存在すること。
 
 ## 手順 (Procedure)
 
-### 1. 要件の特定 (Context Analysis)
+### 1. 目標設定 (Objective Setting)
+
+**目的:** 今回のPlanning活動のゴールと成功基準を明確にする。
+
 - **Action:**
-  - `activate_skill{name: "active-reconnaissance"}` を使い、IssueのAcceptance Criteriaや関連ADRを読み込む。
-  - **Question:** 「この機能を実装するために、開発者は何を知る必要があるか？」
-    - APIのI/F定義？
-    - DBのスキーマ？
-    - 複雑な計算ロジック？
+  - `activate_skill{name: "objective-setting"}`
+  - 今回の仕様策定において、「誰に」「何を」伝えることが最も重要か（Value）を定義し、それを満たすためのSMART目標を設定する。
+  - _Goal:_ 「**Implementer (実装者)** が、迷わずTDD（テスト駆動開発）を開始できるレベルのIssue案と共通定義を作成し、レビューをパスする。」
 
-### 2. 既存資産の調査 (Asset Reconnaissance)
+### 2. 意図の抽出と共通定義 (Intent & Common Definitions)
+
+**目的:** 全タスクで統一すべき「用語」や「規約」を先に定義し、仕様間の不整合を防ぐ。
+
 - **Action:**
-  - `glob("docs/specs/**/*.md")` 等で既存の仕様書を確認する。
-  - 継承すべき共通仕様（エラーハンドリング、認証フロー）や、修正すべき既存仕様を特定する。
+  - `activate_skill{name: "active-reconnaissance"}` でIssue/ADRと現状の仕様書群を分析。
+  - **Common Definitions Doc** (`docs/specs/plans/YYYYMMDD-{feature}-plan.md`) を作成し、以下を定義する。
+    - **Ubiquitous Language:** 実装コード（クラス名、変数名）として使用されるべき用語の定義。
+    - **Data Models:** エンティティやデータ構造の共通型定義。
+    - **Error Codes:** 実装者がテストで検証すべき共通エラーコード。
+    - **API Paths:** エンドポイントのパス構造。
+    - **Doc Structure:** 作成する仕様書のディレクトリ構成とファイル名規則。
 
-### 3. Spec Plan の策定
+### 3. タスク分割と検証条件 (Slicing & Criteria Strategy)
+
+**目的:** 並列作業可能かつ、自己完結する単位でタスクを分割し、TDD可能な検証条件を定義する。
+
 - **Action:**
-  - 必要な仕様書の種類を選定し、Todoを作成する。
-  - **Doc Type Selection:**
-    - **API Spec:** 外部/内部インターフェース定義（OpenAPI等）。
-    - **Data Spec:** DBスキーマ、データ構造定義。
-    - **Logic Spec:** 複雑なアルゴリズム、ステートマシン詳細。
+  - **Slicing Strategy:** **Atomic Slice (1 Issue = 1 Spec File)** を原則とする。
+  - **Output Definition:** 次のステップのために、以下の構成案を確定する。
+    1.  **Draft Issue List:** 作成するIssue案のタイトルとファイル名。
+    2.  **Target Scope:** 各Issueで作成/更新する具体的な仕様ファイル名。
+    3.  **TDD Criteria (Critical for Implementer):** その仕様書に基づき、実装者がテストコードを書くための具体的な観点。
+        - **Happy Path:** 正常な入力に対し、どのような状態変化や戻り値が期待されるか。
+        - **Error Path:** 具体的にどの条件で、どの例外/エラーコードが発生すべきか。
+        - **Boundary:** 最大長、最小値、Null許容などの境界条件。
 
-### 4. Todo分解 (Breakdown)
+    **Example:**
+    - Issue: `[API Spec] Create User Registration API`
+      - Files: `docs/specs/api/user-registration.md`
+      - **Verify (TDD Criteria):**
+        - 「パスワードが8文字未満の場合、`400 Bad Request` とエラーコード `PASSWORD_TOO_SHORT` が返ること」が仕様書に明記されているか？
+        - 「重複アドレス登録時、`409 Conflict` が返ること」が仕様書に明記されているか？
+
+### 4. Issue案の作成 (Issue Drafting)
+
+**目的:** 定義された戦略に基づき、具体的なIssue案ファイルを作成する。
+
 - **Action:**
-  - `activate_skill{name: "todo-management"}` を使用し、`.gemini/todo.md` を作成する。
-  - **Context (Red) の記述ルール:** 「ADR-XXXに基づき、YYYのAPI仕様が必要である」と記述する。
+  - `activate_skill{name: "issue-drafting"}`
+  - Step 3 で定義した各タスクについて、Issue案を作成する。
+  - **Mandatory:** 全てのIssue案本文に以下を含めるよう指示する：
+    1.  Step 2で作成した **Common Definitions Doc へのリンク**。
+    2.  **成果物のターゲット:** 「この仕様書の主な読者は **Implementer (実装者)** であり、彼らが迷わずコードとテストを書ける（TDDを回せる）レベルの具体性を提供すること」という旨の指示。
+    3.  Step 3で定義した **TDD Criteria (検証項目)**。「Verify」セクションに記載する。
 
-## アウトプット形式 (.gemini/todo.md)
+### 5. 計画レビュー (Planning Review)
 
-```markdown
-# Goal: [Issueに基づく仕様策定目標]
+**目的:** 作成された計画（共通定義 + Issue案）の品質を保証する。
 
-## Tasks
-- [ ] **Step 1: [API Spec] ユーザー登録APIの仕様策定**
-  - **Context (Red):** Issue #123により、`POST /users` のI/F定義が必要。
-  - **Action (Green):** `spec-drafting` を使用し、`docs/specs/api/user-registration.md` を作成する。
-  - **Refine (Refactor):** `spec-refactoring` でエッジケース（重複登録等）の考慮漏れを防ぐ。
-  - **Verify:** ファイルが作成され、Request/Responseが厳密に定義されていること。
+- **Action:**
+  - `activate_skill{name: "spec-planning-review"}`
+  - 作成された共通定義書とIssue案をレビューする。
+  - **Resulting Value Check:** 「このIssue案の通りに仕様書が作成された場合、実装者は迷わずTDDを開始できるか？」という視点でチェックする。
+  - **Correction:** 修正が必要な場合は、直ちにファイル (`docs/specs/plans/*.md`, `reqs/tasks/drafts/*.md`) を更新する。
 
-- [ ] **Step 2: [Data Spec] Usersテーブルのスキーマ定義**
-  - **Context (Red):** ユーザー情報を永続化するためのテーブル設計が必要。
-  - **Action (Green):** `spec-drafting` を使用し、`docs/specs/data/users-schema.md` を作成する。
-...
-```
+## アウトプット (Output)
+
+`spec-creation` がコミットすべきアーティファクト一式。
+
+1.  **Common Definitions Doc:** `docs/specs/plans/{date}-{name}.md`
+2.  **Draft Issues:** `reqs/tasks/drafts/*.md` (TDD Criteriaを含む)
+3.  **Review Report:** (Console Output or Comment)
