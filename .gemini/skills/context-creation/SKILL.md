@@ -46,7 +46,7 @@ description: Orchestrator skill for creating and maintaining the System Context 
 
 2.  **Hypothesis & Options (境界・構造の仮説立案):**
     - `activate_skill{name: "context-hypothesis"}`
-    - 発見されたGapを解消するための解決策（境界の再定義、コンポーネントの分割等）を、実証的（案A）、飛躍的（案B）、逆説的（案C）の3つの視点で立案・分析する。
+    - 発見されたGapを解消するための解決策（境界の再定義、コンポーネントの分割等）を、実証的仮説、飛躍的仮説、逆説的仮説の3つの視点で立案・分析する。
 
 3.  **Visualization Strategy (図解の構想):**
     - `activate_skill{name: "context-diagram"}`
