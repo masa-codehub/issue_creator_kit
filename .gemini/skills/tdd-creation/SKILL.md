@@ -56,7 +56,9 @@ _(前提: 起票された全てのIssueが完了し、統合ブランチにマ�
     - 作成されたプロダクトコード（UseCase/Logic）とテストが、以下の2点と整合しているか厳密にチェックする。
       1.  **詳細仕様 (Specs):** 全ての要件、エラーハンドリング、バリデーションが実装されているか。
       2.  **共通実装計画 (Common Implementation Plan):** 定義された方針、レイヤー構造に従っているか。
-    - **Verification Action:** `run_shell_command` でプロジェクトのテストコマンドを実行し、全テストがGreenであることを物理的に確認する。
+    - **Verification Action:** 言語に応じた検証スキルを実行し、全テストがGreenであることを確認する。
+      - **Python:** `activate_skill{name: "python-verification"}` を使用する。
+      - **Others:** `run_shell_command` で適切なテストコマンドを実行する。
 
 2.  **Create Handover Items (Next Step):**
     - 次工程（通常はインフラ接続やUI統合、あるいは完了報告）に向けた引継ぎ事項を作成する。
