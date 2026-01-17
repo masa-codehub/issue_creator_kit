@@ -1,6 +1,6 @@
 ---
 name: arch-planning-review
-description: Audits the architecture visualization plan (Common Definitions & Draft Issues) before execution. Strictly enforces SYSTEM_ARCHITECT values (No Ambiguity, MECE, Template Compliance) and ensures zero regressions by validating against loaded SSOT context via active-reconnaissance.
+description: Audits the architecture visualization plan (Common Definitions & Draft Issues) before execution. Strictly enforces SYSTEM_ARCHITECT values via active-reconnaissance and ssot-verification to ensure zero regressions.
 ---
 
 # Architecture Planning Review
@@ -28,10 +28,12 @@ description: Audits the architecture visualization plan (Common Definitions & Dr
 ### 2. 共通定義の精査 (Audit Common Definitions)
 `docs/architecture/plans/*.md` を対象に、`SYSTEM_ARCHITECT` の価値観に照らしてチェックする。
 
+- **Action:**
+  - `activate_skill{name: "ssot-verification"}` を実行し、定義された用語や境界がSSOTと矛盾していないか検証する。
+
 - **Strict Checklist:**
-    - [ ] **Zero Ambiguity:** 記述内容に一切の疑問や曖昧さを感じないか？（「適宜」「必要に応じて」などの逃げ言葉は修正必須）
+    - [ ] **Zero Ambiguity:** 記述内容に一切の疑問や曖昧さを感じないか？
     - [ ] **MECE (No Gap/Overlap):** 定義内容に抜け漏れ・無理・無駄がないか？
-    - [ ] **SSOT Alignment:** 読み込んだADR/Contextと矛盾していないか？
     - [ ] **Evolutionary:** 将来の変更に対し、閉鎖的すぎず、かつ現在必要十分な定義か？
 
 ### 3. Issue案の精査 (Audit Draft Issues)
@@ -71,7 +73,8 @@ description: Audits the architecture visualization plan (Common Definitions & Dr
 ```markdown
 ## Planning Review Result
 - **Status:** [Passed / Fixed / Re-Planning Triggered]
-- **Context Loaded:** (active-reconnaissance result summary)
+- **Context Loaded:** (active-reconnaissance result)
+- **SSOT Verification:** (ssot-verification result)
 - **Corrections Executed:**
   - [Fixed] 共通定義書の用語Aについて、ADRから定義を転記し具体化しました。
 ```

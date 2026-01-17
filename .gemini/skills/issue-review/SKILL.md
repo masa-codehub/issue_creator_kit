@@ -1,6 +1,6 @@
 ---
 name: issue-review
-description: Audits created issue drafts for quality, clarity, and template compliance. Ensures alignment with SSOT by mandating context loading via active-reconnaissance, and enforces core values of SYSTEM_ARCHITECT, TECHNICAL_DESIGNER, and BACKENDCODER.
+description: Audits created issue drafts for quality, clarity, and template compliance. Ensures alignment with SSOT by mandating context loading via active-reconnaissance and executing ssot-verification checks.
 ---
 
 # Issue Review (Value & Reality Driven Audit)
@@ -35,20 +35,15 @@ description: Audits created issue drafts for quality, clarity, and template comp
 ### 3. 価値観とSSOT整合性の監査 (Value & SSOT Audit)
 読み込んだドキュメントと比較し、各エージェントの行動規範に合致しているか精査する。
 
-#### A. SYSTEM_ARCHITECT Perspective (全体最適と価値)
-- [ ] **Outcome-Oriented:** 「作業（Output）」だけでなく「達成すべき状態（Outcome）」がゴールとして定義されているか？
-- [ ] **Context Integrity:** 記述内容は読み込んだ **ADR/Common Definitions** と矛盾していないか？（用語、方針）
-- [ ] **Domain-Centric:** システム内部の技術用語だけでなく、ドメイン（ビジネス）の用語で意図が語られているか？
+- **Action:**
+  - `activate_skill{name: "ssot-verification"}` を実行し、Issueの内容がSSOT（ADR/Context）と矛盾していないか、概念レベルでの整合性を検証する。
 
-#### B. TECHNICAL_DESIGNER Perspective (明確性と厳密性)
-- [ ] **Clarity & Rigor:** 「適宜」「いい感じに」等の曖昧な表現が排除されているか？ 解釈の余地はないか？
-- [ ] **Implementation-Aware:** 実装者が迷わないレベルまで、参照ファイルや手順が具体的か？
-- [ ] **Visual/Explicit:** 複雑なロジックが必要な場合、図解（Mermaid）や具体的なコード例への言及があるか？
-
-#### C. BACKENDCODER Perspective (実装と品質)
-- [ ] **Simplicity (YAGNI):** タスクの範囲が必要最小限に絞られているか？（過剰な要件が含まれていないか）
-- [ ] **Test-Driven / Verifiable:** 完了条件（DoD）に「テストのパス」や「具体的な観測結果」が含まれているか？
-- [ ] **Negative Constraints:** 「やってはいけないこと（破壊してはいけない既存機能）」が明記されているか？
+- **Perspective Checklist:**
+    - [ ] **Outcome-Oriented:** 「作業（Output）」だけでなく「達成すべき状態（Outcome）」がゴールとして定義されているか？
+    - [ ] **Domain-Centric:** システム内部の技術用語だけでなく、ドメイン（ビジネス）の用語で意図が語られているか？
+    - [ ] **Clarity & Rigor:** 「適宜」「いい感じに」等の曖昧な表現が排除されているか？
+    - [ ] **Simplicity (YAGNI):** タスクの範囲が必要最小限に絞られているか？
+    - [ ] **Negative Constraints:** 「やってはいけないこと」が明記されているか？
 
 ### 4. 指摘と是正 (Finding & Correction)
 - **Action:**
@@ -63,9 +58,7 @@ description: Audits created issue drafts for quality, clarity, and template comp
 ## Issue Review Result: [Issue Title]
 - **Status:** [Pass / Fixed / Failed]
 - **Context Loaded:** (active-reconnaissance result summary)
-- **Value Alignment:**
-  - [OK] Domain-Centric: 決済用語が正しく使われている。
-  - [Fixed] Simplicity: 不要なリファクタリング指示を削除しました。
+- **SSOT Verification:** (ssot-verification result summary)
 - **Improvements:**
   - [Fixed] リンク切れを修正しました。
 ```
