@@ -5,51 +5,46 @@ description: Refines specification documents for clarity, consistency, and compl
 
 # Specification Refactoring
 
-記述された仕様書を、開発者が「迷いなく実装できる」レベルまで昇華させるスキル。
-`TECHNICAL_DESIGNER` の価値観（厳密性、実装への配慮、整合性）に基づき、曖昧さを徹底的に排除する。
+作成された仕様書を、開発者が「迷いなく実装できる」状態へ昇華させるスキル。
+記述の揺らぎや曖昧さを検出し、厳密な定義へと修正する。
 
 ## 役割 (Role)
-**Technical Auditor (技術監査員)**
-単なる誤字脱字チェックではない。実装者視点で「この定義でコードが書けるか？」をシミュレーションし、論理的な穴や考慮漏れを塞ぐ。
+
+あなたは **Specification Auditor (仕様監査人)** です。
+「たぶんこういうことだろう」という推測を許さず、ドキュメントに書かれていることだけが正解（SSOT）となるよう徹底します。
 
 ## 手順 (Procedure)
 
-### 1. 実装可能性の強化 (Enhance Implementability)
-*   **Type Rigor:** `Any` や `String` などの曖昧な型定義を、`UUID`, `EmailStr`, `Decimal(10,2)` のように具体化する。
-*   **Constraints:** 必須/任意、最大長、正規表現パターンなどが明記されているか確認し、追記する。
+### 1. 曖昧性チェック (Ambiguity Check)
 
-### 2. 信頼性とエッジケース (Reliability & Edge Cases)
-*   **Failure Scenarios:** ネットワークタイムアウト、DB接続エラー、バリデーションエラー時の挙動（HTTP Status, Error Code）が定義されているか確認する。
-*   **Consistency:** トランザクション境界や整合性モデル（ACID vs Base）が明記されているか確認する。
+以下のキーワードやパターンが含まれていないかスキャンし、具体的な定義に置き換える。
 
-### 3. 整合性と標準化 (Integrity & Standardization)
-*   **SSOT Check:** `activate_skill{name: "ssot-verification"}` を実行し、ADRやアーキテクチャ図と矛盾していないか確認する。
-*   **Formatting:** 見出しレベルや用語がプロジェクトの規約（`system-context.md`）と統一されているか確認する。
+- **Forbidden Terms:** "TBD", "Pending", "Later", "Approx.", "Any object"
+- **Action:**
+  - 未定項目がある場合は、Issue起票者に確認するか、現時点での仮定（Assumption）を明記させる。
+  - `Any` 型や `Object` 型は、必ずスキーマ定義を行うか、参照リンクを貼る。
 
-### 4. 自己レビューと改善提案 (Self-Review & Proposal)
-以下のチェックリストに基づき、仕様書の品質を自律的に向上させる。
+### 2. TDD適合性チェック (TDD Readiness)
 
-*   **Checklist & Proposal:**
-    *   [ ] **Clarity & Rigor:** 実装者が「どう実装すればいいか」を質問する必要がないか？
-        - *Proposal:* 曖昧な表現の削除、具体的数値への置き換え。
-    *   [ ] **Testability:** 入力と出力（正常/異常）の組み合わせが網羅され、テストケースが書けるか？
-        - *Proposal:* エッジケースの追記、前提条件（Pre-condition）の明記。
-    *   [ ] **Consistency:** 変数名やエンドポイント名は、既存のAPIやDB定義と整合しているか？
-        - *Proposal:* 命名のリネーム、参照リンクの追加。
-    *   [ ] **Clean Architecture:** 仕様の中に、不適切なレイヤーの関心事（例: ドメイン仕様書にSQLの詳細）が混ざっていないか？
-        - *Proposal:* 実装詳細の分離、または抽象化。
-    *   [ ] **Security/Privacy:** PII（個人情報）の扱いや、認可スコープは定義されているか？
-        - *Proposal:* セキュリティ要件の追記。
+この仕様書を見て、テストコードが書けるかを確認する。
 
-*   **Action:**
-    - 提案の中から、**最も効果が高く、リスクが低い1つ**を選択し、宣言する。次ステップ（Iterate）へのインプットとする。
-    
-### 5. 反復 (Iterate)
-*   **Input:** Step 4 で選択された改善提案。
-*   **Action:**
-    - 改善提案が存在する場合、それをターゲットとして **Step 1 に戻り**、仕様書を修正する。
-    - 改善提案がない場合、リファクタリングサイクルを終了する。
+- **Checklist:**
+  - [ ] **Input/Output:** 入力引数と期待される戻り値が明確か？
+  - [ ] **Validation:** バリデーションルール（必須、最大長、正規表現）が具体的か？
+  - [ ] **Errors:** どの条件でどの例外/エラーコードが返るかが表形式で網羅されているか？
+  - [ ] **Edge Cases:** 空リスト、null、境界値（0, -1, MaxInt）の挙動が定義されているか？
+
+### 3. SSOT整合性 (SSOT Integrity)
+
+- **Action:**
+  - `activate_skill{name: "ssot-verification"}` を呼び出す（必要に応じて）。
+  - 仕様書内の用語が、`Common Definitions` や上位のアーキテクチャ図と一致しているか確認する。
+
+### 4. 自己修正と改善 (Self-Correction)
+
+- **Formatting:** Markdownのテーブル崩れや、インデントの不整合を修正する。
+- **Link Fix:** リンク切れや、相対パスの間違いを修正する。
 
 ## アウトプット (Output)
-*   洗練された仕様書（`docs/specs/**/*.md`）。
-*   矛盾、曖昧さ、考慮漏れが排除された状態。
+
+- 曖昧さが排除され、TDDの入力として十分な品質を持つ `docs/specs/*.md`。

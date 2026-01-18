@@ -1,40 +1,56 @@
 ---
 name: spec-drafting
-description: Creates detailed specification documents using standardized templates. Focuses on clarity, rigor, and implementability.
+description: Creates detailed specification documents using standardized templates. Focuses on clarity, rigor, and implementability, utilizing `spec-refactoring` for final polish.
 ---
 
 # Specification Drafting
 
-計画された仕様書を、テンプレートを用いて具体的に記述するスキル。
-曖昧さを排除し、開発者が「これを見ればコードが書ける」状態にする。
+計画フェーズ(`spec-creation`)で作成されたIssueに基づき、詳細仕様書（Spec）を作成・更新するスキル。
+曖昧さを排除し、TDD（テスト駆動開発）の入力として「そのままテストコードが書ける」レベルの具体性を持たせる。
 
 ## 役割 (Role)
-**Spec Writer (仕様記述者)**
-自然言語の曖昧さを排除し、型、制約、挙動を厳密に定義する。
+
+あなたは **Technical Specification Writer** です。
+アーキテクチャ図（Design Doc）を読み解き、実装者が迷わないための「厳密な契約（Contract）」と「ロジック」を定義します。
 
 ## 手順 (Procedure)
 
 ### 1. テンプレート選択 (Template Selection)
-作成する仕様書の種類に応じてテンプレートを選択する。
-*   **API Spec:** `docs/template/spec-api.md` (新設予定)
-*   **Data Spec:** `docs/template/spec-data.md` (新設予定)
-*   **Logic Spec:** `docs/template/spec-logic.md` (新設予定)
-*   *Note:* テンプレートがない場合は `docs/template/spec-template.md` (汎用) を使用する。
 
-### 2. 仕様の記述 (Drafting)
-**Action:**
-1.  テンプレートを読み込む。
-2.  対象ドキュメント（`docs/specs/**/*.md`）を作成し、内容を記述する。
-3.  **記述ルール:**
-    - **型定義:** `String` ではなく `UUID`, `EmailStr` (max 255) のように具体的に。
-    - **必須/任意:** パラメータの `Required` / `Optional` を明記。
-    - **例外:** 正常系だけでなく、エラーケース（400, 404, 500）を網羅する。
+Issueの要件に基づき、適切なテンプレートを選択する。
 
-### 3. プロトタイピング (Prototyping - Optional)
+- **API Specification:** `docs/template/spec-api.md`
+  - _Usage:_ REST APIエンドポイント、リクエスト/レスポンス、ステータスコード。
+- **Data Specification:** `docs/template/spec-data.md`
+  - _Usage:_ DBスキーマ、テーブル定義、インデックス、マイグレーション戦略。
+- **Logic Specification:** `docs/template/spec-logic.md`
+  - _Usage:_ 複雑なビジネスロジック、アルゴリズム、計算式。
+
 **Action:**
-- ライブラリの挙動や複雑なロジックに確信が持てない場合、一時的なスクリプト (`spike.py`) を作成して動作検証（Spike）を行う。
-- 検証結果（「このライブラリで実現可能」という事実）を仕様書の `Note` や `Trade-off` に追記する。
+
+1.  対象ドキュメント（`docs/specs/*.md`）を作成または開く。
+2.  テンプレートの内容を適用する。
+
+### 2. 詳細記述 (Detailed Drafting)
+
+テンプレートの各項目を埋める。**「共通定義書 (Common Definitions)」** の内容を厳守すること。
+
+**Key Focus:**
+
+- **Strict Typing:** データ型は言語の曖昧な型（例: `number`）ではなく、具体的制約（例: `integer (min 0, max 100)`）まで記述する。
+- **Error Handling:** 発生しうるエラーケースを網羅的にリストアップする（単なる `500 Error` で済ませない）。
+- **Edge Cases:** 境界値や異常系の挙動を「Edge Cases」セクションに明記する（TDDのテストケースとなる）。
+
+### 3. リファクタリング連携 (Refactoring Connection)
+
+ドラフト作成完了後、**必ず** `spec-refactoring` を呼び出し、仕様書の品質と一貫性を向上させる。
+
+**Action:**
+
+- `activate_skill{name: "spec-refactoring"}` を実行する。
+- これにより、曖昧さの排除、フォーマットの統一、SSOTチェックが行われる。
 
 ## アウトプット (Output)
-*   `docs/specs/` 配下の仕様書。
-*   曖昧さがなく、実装可能なレベルで記述されていること。
+
+- 実装可能なレベルまで詳細化された `docs/specs/*.md`。
+- `spec-refactoring` によって監査済みの状態であること。

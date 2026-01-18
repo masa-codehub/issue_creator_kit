@@ -1,6 +1,6 @@
 ---
 name: context-creation
-description: Orchestrator skill for creating and maintaining the System Context (SSOT). Sequentially executes Observe, Orient, Decide, and Act phases to ensure the project's "map" is always accurate and aligned with reality.
+description: Orchestrator skill for creating and maintaining the System Context (SSOT). Sequentially executes Observe, Orient, Decide, and Act phases. Representative use cases include (1) Defining initial system boundaries and domain models for a new project, (2) Realigning documentation with codebase reality to correct drift, and (3) Establishing a grounded SSOT foundation before initiating Architectural Decision Records (ADR).
 ---
 
 # システムコンテキスト作成・維持 (Context Creation & Maintenance)

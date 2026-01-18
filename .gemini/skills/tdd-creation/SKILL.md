@@ -1,6 +1,6 @@
 ---
 name: tdd-creation
-description: Orchestrator skill for implementing features based on detailed specifications (Specs). Decomposes specs into TDD tasks (Issues) with a shared plan, and manages the integration of implemented code and tests.
+description: Orchestrator skill for implementing features based on detailed specifications (Specs). Representative use cases include (1) Decomposing specs into TDD-based implementation tasks (Issues) with a shared plan, (2) Managing the integration of distributed TDD results (code & tests) into a unified codebase, and (3) Auditing the final implementation to ensure strict adherence to specifications and test coverage requirements.
 ---
 
 # TDD Implementation Orchestration
