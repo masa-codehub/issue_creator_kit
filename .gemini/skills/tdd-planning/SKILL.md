@@ -58,9 +58,11 @@ description: Formulates a comprehensive strategy for TDD-based implementation. A
     - _原則:_ 1つのユースケース、または1つの重要なドメインロジックにつき、1つのIssueを発行する。
   - **Output Definition:** 次のステップのために、以下の構成案を確定する。
     1.  **Draft Issue List:** 作成するIssue案のタイトルとファイル名（例: `tdd-usecase-registration.md`）。
-    2.  **TDD Scenarios (Critical):** 実装者が `tdd-implementation` スキルで使用する具体的な Red/Green シナリオ。
+    2.  **Output Directory:** `reqs/tasks/drafts/{feature_name}/` (例: `reqs/tasks/drafts/payment-impl/`)。
+    3.  **TDD Scenarios (Critical):** 実装者が `tdd-implementation` スキルで使用する具体的な Red/Green シナリオ。
 
     **Example:**
+    - Directory: `reqs/tasks/drafts/payment-impl/`
     - Issue: `[TDD] Implement User Registration UseCase`
       - Files: `src/domain/`, `src/usecase/`, `tests/unit/`
       - **TDD Scenarios:**
