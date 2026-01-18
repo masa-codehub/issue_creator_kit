@@ -53,11 +53,11 @@ ADRを分析し、「何を描くか」だけでなく、「どう分担する�
 
   - **Output Definition:** 次のステップのために、以下の構成案を確定する。
     1.  **Draft Issue List:** 作成するIssue案のタイトルとファイル名（例: `arch-update-payment.md`）。
-    2.  **Output Directory:** `reqs/tasks/drafts/{feature_name}/` (例: `reqs/tasks/drafts/payment-arch/`)。
+    2.  **Output Directory:** `reqs/tasks/drafts/{starting_doc_name}/` (例: `reqs/tasks/drafts/adr-005-payment/`)。
     3.  **Target Scope:** 各Issueで作成/更新する具体的な図ファイル名と、その記述範囲（Boundary）。
 
     **Example:**
-    - Directory: `reqs/tasks/drafts/payment-arch/`
+    - Directory: `reqs/tasks/drafts/adr-005-payment/`
     - Issue: `[Payment Domain] Update Architecture Diagrams`
       - Files: `context.md`, `container.md`, `seq-payment.md`
       - Scope: 決済コンテナの内部構造と、API/Redisとの境界を記述。Spec StrategistがAPI仕様を計画するための入力となる。
