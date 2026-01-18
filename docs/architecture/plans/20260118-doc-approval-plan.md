@@ -13,7 +13,7 @@
 ## 2. 参照したSSOT一覧 (SSOT Audit Log)
 - [x] `reqs/design/_archive/adr-002-document-approval-flow.md`
 - [x] `docs/system-context.md`
-- [x] `src/issue_creator_kit/` (Source Code Structure)
+- [x] `src/issue_creator_kit/infrastructure/` (git_adapter.py, github_adapter.py)
 
 ## 3. 共通定義とマッピング (Common Definitions & Mapping)
 
@@ -22,7 +22,7 @@
 | :--- | :--- | :--- |
 | **Inbox** | 承認待ちドキュメントの置き場 | `reqs/design/_inbox/` (Path) |
 | **Approved** | 承認済みドキュメントの保管場所 | `reqs/design/_approved/` (Path) |
-| **Adapter** | 外部システムとのIOを担うクラス | `infrastructure.*_adapter.py` |
+| **Adapter** | 外部システムとのIOを担うクラス | `infrastructure.GitAdapter`, `infrastructure.GitHubAdapter` |
 | **Workflow** | 承認プロセス全体の制御を行うクラス | `usecase.workflow.Workflow` (想定) |
 
 ### 3.2. レイヤーとコンポーネント (Layers & Components)
@@ -30,7 +30,7 @@
 | :--- | :--- | :--- | :--- |
 | **CLI Layer** | ユーザー入力の受付とDI構成 | `src/issue_creator_kit/cli.py` | ビジネスロジックの実装 |
 | **Usecase Layer** | ビジネスルールと順序制御 | `src/issue_creator_kit/usecase/*.py` | `infrastructure` への直接依存 (Interface経由ならOK) |
-| **Domain Layer** | データ構造と純粋なロジック | `src/issue_creator_kit/domain/*.py` | 外部ライブラリへの依存 |
+| **Domain Layer** | データ構造と純粋なロジック | `src/issue_creator_kit/domain/document.py` | 外部ライブラリへの依存 |
 | **Infrastructure Layer** | 外部API/Git/FS操作の実装 | `src/issue_creator_kit/infrastructure/*.py` | ドメインルールの実装 |
 
 ## 4. 作図戦略 (Diagram Strategy)
