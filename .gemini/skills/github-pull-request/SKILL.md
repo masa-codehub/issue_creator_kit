@@ -1,6 +1,6 @@
 ---
 name: github-pull-request
-description: Create and manage pull requests when a feature is complete, a bug is fixed, or documentation is updated, ensuring changes are committed and templates are followed.
+description: Create and manage pull requests when a feature is complete, a bug is fixed, or documentation is updated. Typical use cases include (1) Proposing a finished feature or bug fix for integration into the base branch, (2) Requesting approval for design artifacts (ADR, Architecture, Specs) to promote to the next phase, and (3) Updating descriptions, addressing review feedback, or syncing with origin before merging.
 ---
 
 # プルリクエストの管理 (PR Protocol)
@@ -15,7 +15,6 @@ description: Create and manage pull requests when a feature is complete, a bug i
 3. **Baseブランチとの同期と競合チェック (Sync & Conflict Check):**
    PRを作成する前に、マージ先となる `base` ブランチの最新状態を取り込み、コンフリクトがないか確認する。
    `run_shell_command{command: "git pull --rebase origin <base>"}`
-   
    - **コンフリクトが発生した場合:**
      手動で解消し、コミット（またはrebase continue）を行ってから次の手順へ進む。
 
@@ -27,23 +26,30 @@ description: Create and manage pull requests when a feature is complete, a bug i
    `create_pull_request --title "<以下のテンプレートを参照>" --body "<以下のテンプレートを参照>" --head "<head>" --base "<base>"`
 
 **PR Title テンプレート:**
+
 ```markdown
 <type>(<scope>): <subject>
 ```
 
 **PR Body テンプレート:**
+
 ```markdown
 ## 目的 (Goal)
+
 <!-- なぜこの変更が必要か（背景とアウトカム） -->
 
 ## 変更の概要 (Summary)
+
 <!-- 何をどのように変更したか -->
 
 ## 関連Issue (References)
+
 Closes #<Issue番号>
 
 ## 検証方法 (Verification)
+
 <!-- 実施したテストや動作確認の手順と結果（ログ等） -->
-- [ ] Unit Test: 
-- [ ] Manual Check: 
+
+- [ ] Unit Test:
+- [ ] Manual Check:
 ```
