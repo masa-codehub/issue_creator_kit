@@ -1,73 +1,76 @@
 ---
 name: arch-drafting
-description: Executes the architecture visualization plan. Updates Mermaid diagrams and documentation to reflect the codebase reality defined in the planning phase, adhering to Technical Designer values.
+description: Executes the architecture visualization plan by integrating structural and quality design. Updates Mermaid diagrams and documentation to reflect the codebase reality and architectural intent, utilizing `arch-refactoring` for final polish.
 ---
 
 # Architecture Drafting
 
-計画フェーズで特定された「Gap」を解消し、抽象的なアーキテクチャを「実行可能な設計図」へと昇華させるスキル。
-`TECHNICAL_DESIGNER` として、ただ図を描くのではなく、**「なぜその構造なのか」という設計意図**をドキュメントに焼き付ける。
+計画フェーズ(`arch-creation`)で作成されたIssueに基づき、アーキテクチャ図とドキュメントを作成・更新する包括的なスキル。
+**構造設計 (Structural)** と **品質設計 (Quality)** の観点を統合し、実行可能な設計図を作成する。作成後は `arch-refactoring` と連携し、視覚的な品質を高める。
 
 ## 役割 (Role)
 
-**Technical Draftsman (自律的設計者)**
-単に作図者ではない。コードの実態を解釈し、Clean Architecture や DDD の原則に照らし合わせて、システムの構造を「正しく」かつ「美しく」表現する。
+あなたは **Technical Architect & Draftsman** です。
+単に図を描くだけでなく、以下の3つの視点を統合してドキュメントに焼き付けます。
+1.  **Structural Designer:** コンポーネントの責務、データ構造、連携フローを定義する。
+2.  **Quality Architect:** 整合性、エラー処理、可観測性の方針を埋め込む。
+3.  **Visual Communicator:** 複雑な概念を、Clean ArchitectureやDDDの原則に従って分かりやすく図解する。
 
 ## 手順 (Procedure)
 
-### 1. テンプレート選択 (Template Selection)
+### 1. テンプレート選択と準備 (Template & Preparation)
 
-作成・更新する図の種類（UML Type）に応じて、適切なテンプレートを選択する。
+Issueの要件に基づき、適切なテンプレートを選択する。
 
-- **C4 (Context/Container/Component):** `docs/template/arch-structure.md`
-  - _Usage:_ 構造の定義と静的な関係性を記述する。
-- **Sequence Diagram:** `docs/template/arch-behavior.md`
-  - _Usage:_ 時系列のフロー、非同期処理、詳細な例外ルールを記述する。
-- **State Diagram:** `docs/template/arch-state.md`
-  - _Usage:_ オブジェクトのライフサイクルと遷移ルールを記述する。
-- **ER Diagram:** `docs/template/arch-data.md`
-  - _Usage:_ データモデルと永続化要件を記述する。
-
-### 2. 構造定義と記述 (Defining & Drafting)
-
-図を描く前に、テンプレートの定義セクション（Element Definitions / Notes / State Definitions）を埋める。
-曖昧さを排除し、実装者が迷わないレベルの厳密さ（Clarity & Rigor）で記述する。
+- **C4 (Structure):** `docs/template/arch-structure.md` (コンポーネント、コンテナ、境界)
+- **Sequence (Behavior):** `docs/template/arch-behavior.md` (動的フロー、非同期処理)
+- **State (Lifecycle):** `docs/template/arch-state.md` (状態遷移)
+- **ER (Data):** `docs/template/arch-data.md` (データモデル、永続化)
 
 **Action:**
+1.  対象ドキュメント（`docs/architecture/*.md`）を作成または開く。
+2.  テンプレートの内容を適用する。
 
-1.  選択したテンプレートを読み込む。
-2.  対象ドキュメント（`docs/architecture/*.md`）を作成または開き、テンプレートの内容を適用する。
-3.  **Domain-Centric** (ビジネス用語) かつ **Implementation-Aware** (技術的実態) な定義を記述する。
+### 2. 構造と品質の定義 (Structural & Quality Design)
+
+図を描く前に、テンプレートの定義セクション（Definitions / Policies）を記述する。ここで `arch-structural-design` と `arch-quality-design` の責務を遂行する。
+
+**A. 構造の定義 (Structure):**
+- **Data Modeling:** ドメインモデルをER図やクラス図の要素として定義する。
+- **Interface:** APIリソースやメッセージ構造を定義する。
+- **Behavior:** コンポーネント間の連携フロー（Happy Path/Error Path）をテキストで整理する。
+
+**B. 品質方針の埋め込み (Quality Policy):**
+- **Consistency:** データ整合性戦略（強整合/結果整合）を定義し、図上のトランザクション境界として表現する。
+- **Error Handling:** リトライ、フォールバックの方針を記述する（Sequence図のAlternative Frame等）。
+- **Observability:** 監視すべき主要な状態やメトリクスポイントを `Note` として定義する。
 
 ### 3. 図解更新 (Visualization with Mermaid)
 
-定義した要素を Mermaid で可視化する。ここでは「メンタルモデルの統一（Visual Communication）」を最優先する。
+定義した要素を Mermaid で可視化する。
 
-- **Structure (C4):**
-  - システム境界（Boundary）を明確にする。
-  - 依存の矢印は必ず「依存する側」から「依存される側」へ引く（Clean Arch準拠）。
-- **Behavior (Sequence):**
-  - 外部システムとの境界や、非同期メッセージ（Queue）のやり取りを明確にする。
-- **State/Data:**
-  - 許容されない遷移や、あり得ないリレーションを表現しないよう注意する。
+**Action:**
+- **Strict Direction:** 依存の矢印は必ず「依存する側」から「依存される側」へ引く（Clean Arch準拠）。
+- **Explicit Boundaries:** システム境界、トランザクション境界を `subgraph` 等で明確にする。
+- **Visualizing Policy:** 品質方針（非同期境界、排他制御など）を視覚的に識別可能にする。
 
 ### 4. 自律的解決ループ (Autonomy Loop)
 
-コードの意図が読み取れない場合：
+既存コードやADRとのギャップがある場合：
 
-1.  **Code Archaeology:** `git blame` や過去のPR/Issueを掘り起こし、当時の文脈（Why）を特定する。
-2.  **Trade-off Analysis:** なぜそのような実装になっているのか、トレードオフを推論し、定義セクションの「Trade-off」欄に記述する。
-3.  **Conservative Update:** どうしても不明な場合は、事実（Fact）のみを記載し、推測部分は `Note` で注釈する。
+1.  **Code Archaeology:** 実装の意図を調査する。
+2.  **Trade-off Analysis:** 設計判断の理由（Why）をドキュメントの「Trade-off」セクションに記述する。
+3.  **Conservative Update:** 不明点は推測せず事実のみを記載し、`Note` で注釈する。
 
-### 5. 品質向上への接続 (Handover to Refactoring)
+### 5. リファクタリング連携 (Refactoring Connection)
 
-ドラフト作成が完了したら、直ちにリファクタリングを行い品質を高める。
+ドラフト作成完了後、**必ず** `arch-refactoring` を呼び出し、図の可読性と一貫性を向上させる。
 
 **Action:**
-
-- `activate_skill{name: "arch-refactoring"}` を呼び出す。
+- `activate_skill{name: "arch-refactoring"}` を実行する。
+- これにより、認知負荷の最適化、レイヤー配置の整理、SSOTチェックが行われる。
 
 ## アウトプット (Output)
 
-- 更新された `docs/architecture/*.md` ファイル。
-- 適切なテンプレートが適用され、テキスト定義とMermaid図が整合していること。
+- 構造（Structure）と品質（Quality）の観点が反映された `docs/architecture/*.md`。
+- `arch-refactoring` によって視覚的に洗練された状態であること。
