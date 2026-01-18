@@ -11,12 +11,14 @@ description: Defines standard branch management logic. Typical use cases include
 ## ブランチの定義 (Definitions)
 
 ### 1. Base Branch (統合元/マージ先)
+
 - **役割:** 開発の起点となり、最終的な統合先となるブランチ。
 - **決定ロジック:**
   1. **明示的な指定:** ユーザーが指定した場合はそのブランチ。
   2. **デフォルト:** 指定がない場合、`main` または `master`。
 
 ### 2. Feature Branch (作業ブランチ)
+
 - **役割:** 特定のタスク、機能追加、バグ修正を行うための短命なブランチ。
 - **決定ロジック:**
   1. **明示的な指定:** ユーザーが指定した場合はそのブランチ。

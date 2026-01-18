@@ -26,6 +26,7 @@ description: Skill for recording changes to the local repository. Typical use ca
 `<type>: <subject>` 形式で記述する。
 
 ### Type の例
+
 - `feat`: 新機能の追加
 - `fix`: バグ修正
 - `docs`: ドキュメントの変更
@@ -36,6 +37,7 @@ description: Skill for recording changes to the local repository. Typical use ca
 - `chore`: ビルドプロセスや補助ツールの変更（上記以外の変更）
 
 ### Subject の例
+
 - `ユーザー登録機能を追加`
 - `ログイン時の認証バグを修正`
 - `READMEにセットアップ手順を追記`
