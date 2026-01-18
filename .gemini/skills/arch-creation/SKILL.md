@@ -58,9 +58,13 @@ _(前提: 起票された全てのIssueの実装が完了し、統合ブラン�
     - **Action:** ドキュメント内のリンク（相対パス、アンカーリンク等）が有効であることを確認する。
 
 3.  **Correction Loop (If NG):**
-    - 監査で問題が見つかった場合、**自分で修正してはならない**。
-    - 修正内容を定義した「追加のIssue案」を `reqs/tasks/drafts` に作成する。
-    - 再度 Phase 2 に戻り、追加Issue案のコミット・PR作成（承認依頼）を行う。
+    - 監査で不備が見つかった場合、以下のどちらかの対応を行う。
+    - **重要:** いかなる場合も、**あなた自身が上流ドキュメント（ADR等）や成果物を直接修正してはならない。** 必ずIssue案を作成し、別の作業サイクルとして実行させること。
+      - **Case A (Local Fix):** 図の誤りや定義漏れの場合。修正内容を定義した「追加のIssue案」を作成する。
+      - **Case B (Upstream Fix):** 上流のADR自体に矛盾や実現不可能な点が見つかった場合。
+        - **Action:** 「ADR修正用のIssue案」を作成する（例: `fix-adr-xxx.md`）。
+        - **Content:** 問題の箇所、発生するリスク、修正案を明記する。
+    - 再度 Phase 2 に戻り、追加Issue案のコミット・PR作成を行う。
 
 4.  **Proceed (If OK):**
     - 問題がなければ Phase 4 へ進む。
@@ -69,12 +73,16 @@ _(前提: 起票された全てのIssueの実装が完了し、統合ブラン�
 
 **目的:** 最終成果物を確定し、メインラインへのマージを行う。
 
-1.  **Final Pull Request:**
+1.  **Create Handover Items:**
+    - `docs/handovers/arch-to-spec.md` を作成（または追記）する。
+    - **内容:** 今回のアーキテクチャ構築を通じて得られた知見、Spec Strategistが仕様を分割・詳細化する際に注意すべき点、保留した細かい懸念事項などを記載する。
+
+2.  **Final Pull Request:**
     - 監査をパスした統合ブランチから、`main` (または `develop`) へのPull Requestを作成する。
     - `activate_skill{name: "github-pull-request"}`
     - _Option:_ この時点で `docs/architecture/plans/*.md` は役割を終えているため、削除してもよい（履歴には残る）。
 
-2.  **Review Support:**
+3.  **Review Support:**
     - 人間のレビュアーからのフィードバック対応（軽微なら自走、重ければIssue化）。
 
 ## 禁止事項 (Anti-Patterns)

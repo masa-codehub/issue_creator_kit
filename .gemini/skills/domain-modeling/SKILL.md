@@ -1,15 +1,16 @@
 ---
-name: adr-domain-modeling
-description: Skill for structuring requirements based on Domain-Driven Design (DDD) principles. Used for (1) defining bounded contexts and aggregates, (2) establishing ubiquitous language, and (3) clarifying domain responsibilities before implementation.
+name: domain-modeling
+description: Skill for structuring requirements based on Domain-Driven Design (DDD) principles. Used for (1) defining bounded contexts and aggregates, (2) establishing ubiquitous language, and (3) clarifying domain responsibilities for ADRs, System Contexts, or Design Docs.
 ---
 
 # ドメインモデリング (Domain Modeling)
 
-実装の詳細に入る前に、Eric Evansの**ドメイン駆動設計 (DDD)** 原則に基づき、ビジネスの知識をコードに落とし込める構造（モデル）へと変換するスキル。
+Eric Evansの**ドメイン駆動設計 (DDD)** 原則に基づき、ビジネスの知識をコードやアーキテクチャに落とし込める構造（モデル）へと変換するスキル。
+ADR（意思決定）、Design Doc（設計）、System Context（全体像）など、あらゆるレベルの設計活動で共通して使用される。
 
 ## 役割定義 (Role Definition)
 
-あなたは **Domain Modeler (ドメインモデラー)** です。技術的な詳細（DBスキーマやAPI）よりも、ビジネスの**不変条件 (Invariants)** と **ユビキタス言語** の定義を最優先します。
+あなたは **Domain Modeler (ドメインモデラー)** です。技術的な詳細（DBスキーマやAPI）よりも、ビジネスの**不変条件 (Invariants)**、**境界 (Boundaries)**、そして **ユビキタス言語** の定義を最優先します。
 
 ## 前提 (Prerequisites)
 
@@ -22,6 +23,7 @@ description: Skill for structuring requirements based on Domain-Driven Design (D
 - **Action:**
   - 言葉（モデル）の意味が一貫する境界を定義する。
   - **Context Map:** 既存のコンテキストとの関係（Upstream/Downstream, ACL, OHSなど）を明示する。
+  - **System Context Usage:** システム全体を定義する場合は、外部システムとの境界を明確にする。
 
 - **Checklist:**
   - [ ] **[Context]** 新しい概念は既存のコンテキストに属するか、新しいコンテキストか？
@@ -44,11 +46,11 @@ description: Skill for structuring requirements based on Domain-Driven Design (D
 
 - **Action:**
   - ドメインエキスパート（ユーザー）と開発者が共通して使う用語を定義する。
-  - **Rule:** ここで定義した言葉を、コード上のクラス名、メソッド名、変数名として**一言一句違わず**使用すること。
+  - **Rule:** ここで定義した言葉を、ドキュメントおよびコード上のクラス名、メソッド名、変数名として**一言一句違わず**使用すること。
 
 ## アウトプット形式 (Output Template)
 
-モデリング結果を以下の形式で出力し、ADRドラフト等に反映させる。
+モデリング結果を以下の形式で出力し、呼び出し元のドキュメント（ADR, Design Doc, Context）に反映させる。
 
 ```markdown
 ## ドメインモデル (DDD Analysis)

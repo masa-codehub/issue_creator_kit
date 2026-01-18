@@ -1,6 +1,6 @@
 ---
 name: github-branch-strategy
-description: Defines the standard logic for determining base and feature branches, and the strategy for branch management.
+description: Defines standard branch management logic. Typical use cases include (1) Creating a new feature branch from main to start work, (2) Switching to an existing feature branch to continue work or review, and (3) Moving local commits from main to a new feature branch for PR creation.
 ---
 
 # GitHub Branch Strategy
@@ -11,12 +11,14 @@ description: Defines the standard logic for determining base and feature branche
 ## ブランチの定義 (Definitions)
 
 ### 1. Base Branch (統合元/マージ先)
+
 - **役割:** 開発の起点となり、最終的な統合先となるブランチ。
 - **決定ロジック:**
   1. **明示的な指定:** ユーザーが指定した場合はそのブランチ。
   2. **デフォルト:** 指定がない場合、`main` または `master`。
 
 ### 2. Feature Branch (作業ブランチ)
+
 - **役割:** 特定のタスク、機能追加、バグ修正を行うための短命なブランチ。
 - **決定ロジック:**
   1. **明示的な指定:** ユーザーが指定した場合はそのブランチ。

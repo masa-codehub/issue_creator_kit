@@ -9,15 +9,18 @@ description: Skill for drafting comprehensive Design Documents based on domain m
 実装者が「これを読めば迷わず作れる」状態を目指す。
 
 ## 役割定義 (Role Definition)
+
 あなたは **Technical Writer & Reviewer** です。情報を正確に統合し、論理的な飛躍や矛盾がないか厳しく監査した上で、開発チーム（ユーザー）との合意を取り付けます。
 
 ## 前提 (Prerequisites)
+
 - `technical-design`, `reliability-design` の成果物が揃っていること。
 - テンプレート `reqs/design/template/design-doc.md` が存在すること。
 
 ## 手順 (Procedure)
 
 ### 1. ドラフト作成 (Drafting)
+
 - **Action:**
   - `reqs/design/_inbox/` に新しい Design Doc を作成する。
   - 各スキルの成果物（Context, Model, Specs, Reliability）をテンプレートにマッピングする。
@@ -26,6 +29,7 @@ description: Skill for drafting comprehensive Design Documents based on domain m
     `write_file reqs/design/_inbox/design-XXX-title.md`
 
 ### 2. 厳格な自己レビュー (Strict Self-Review)
+
 - **Action:**
   - 作成したドラフトに対し、以下の観点で厳しいレビューを行う。
   - **自律修正項目 (Self-Fix)** は即座に直し、**対話論点 (Discussion Points)** はリスト化する。
@@ -41,25 +45,28 @@ description: Skill for drafting comprehensive Design Documents based on domain m
   - [ ] **[検証基準]** テストコードのAssert条件としてそのまま使えるレベルで、完了条件が具体的かつ計測可能であること。
 
 ### 3. 論点の整理と分類 (Issues Categorization)
+
 - **Action:**
   - 自己レビューで発見された課題を以下の2つに分類する。
     1.  **自律修正項目 (Self-Fix):** エージェントの権限で即座に直せるもの（誤字、内部不整合、記述不足など）。 -> **即座に修正する。**
     2.  **対話論点 (Discussion Points):** ユーザーの判断や承認が必要なもの（UI/UXの挙動、仕様の変更、トレードオフの選択）。 -> **論点リストに追加する。**
 
 ### 4. 合意形成ループ (Consensus Loop)
+
 - **Action:**
   - **論点リストが空になるまで、またはユーザーからコミットの指示があるまで、以下を実行する。**
-  
   1.  **論点の選択:** リストの中で**「実装への影響が最も大きい項目」を1つだけ**選択する。
   2.  **問いかけ:** 具体的な画面遷移や例外挙動を示し、ユーザーに判断を仰ぐ。
   3.  **Design Doc修正:** 回答を反映してファイルを更新 (`replace`) する。
   4.  **再レビュー:** **Step 2 (厳格な自己レビュー) に戻り、修正による副作用がないか再確認する。**
 
 ## アウトプット形式 (Output Template)
+
 ドラフト作成完了、または合意形成完了時の報告。
 
 ```markdown
 ## Design Doc作成完了
+
 - **File:** `reqs/design/_inbox/design-XXX-title.md`
 - **Status:** `Proposed`
 - **Next Step:**
@@ -67,4 +74,5 @@ description: Skill for drafting comprehensive Design Documents based on domain m
 ```
 
 ## 完了条件 (Definition of Done)
+
 - Design Docが作成され、すべての論点が解消され、ユーザーからのコミット指示が出ていること。

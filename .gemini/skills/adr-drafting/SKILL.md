@@ -23,7 +23,7 @@ description: Skill for drafting ADR documents based on decided hypotheses. Focus
 ### 1. テンプレートの準備 (Preparation)
 
 - **Action:**
-  - `reqs/design/template/` から適切なテンプレートを読み込む。
+  - `read_file` を使用して `reqs/design/template/` から適切なテンプレートを読み込む。
   - 出力先のファイル名を決定する（例: `reqs/design/_inbox/adr-XXX-title.md`）。
 
 ### 2. ドラフト作成 (Drafting Guidelines)
@@ -33,15 +33,15 @@ description: Skill for drafting ADR documents based on decided hypotheses. Focus
 #### Context (背景と課題)
 
 - **[Context Analysis]:** 「なぜ今、この決定が必要なのか？」をビジネスと技術の両面から記述する。
-- **[Active Reconnaissance]:** 現状のコードやシステムが抱える具体的な問題点（事実）を引用する。
+- **[Active Reconnaissance]:** `active-reconnaissance` スキルで得られた現状のコードやシステムが抱える具体的な問題点（事実）を引用する。
 - **[Outcome-Oriented]:** 技術的な問題だけでなく、それがユーザー体験やビジネスにどう悪影響を与えているかを書く。
 
 #### Decision (決定事項)
 
-- **[Hypothesis-Driven]:** 採用した案を明確に宣言する（「A案を採用する」）。
+- **[Hypothesis-Driven]:** 採用した案を明確に宣言する（「案Aを採用する」）。
 - **[Rationale]:** なぜその案を選んだのか、決定打となった理由（キードライバー）を論理的に説明する。
 - **[Clean Architecture]:** その決定が依存性のルールや責務の分離にどう寄与するかを言及する。
-- **[DDD]:** 定義されたユビキタス言語（`adr-domain-modeling`）を使用して記述する。
+- **[DDD]:** `activate_skill{name: "domain-modeling"}` で定義されたユビキタス言語を使用して記述する。
 
 #### Consequences (影響と結果)
 
@@ -53,11 +53,11 @@ description: Skill for drafting ADR documents based on decided hypotheses. Focus
 
 - **[Comparison]:** 却下した案（案B:飛躍的、案C:逆説的 など）についても、「なぜ選ばなかったか」の理由を敬意を持って記録する。将来、状況が変わった時のための重要な手がかりとなる。
 
-### 3. ファイル作成と品質チェック (File Creation & Quality Check)
+### 3. ファイル作成 (File Creation)
 
 - **Action:**
   - `write_file` を使用してファイルを新規作成する。
-  - 作成前に以下のチェックリストで内容を監査する。
+  - 作成後、以下のチェックリストで内容を自己監査する。（より厳密なレビューが必要な場合は `activate_skill{name: "adr-review"}` を使用すること）
 
 - **Checklist (MECE & Lean):**
   - [ ] **[Completeness (抜け漏れなし)]**
