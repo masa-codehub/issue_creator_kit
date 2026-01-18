@@ -22,20 +22,31 @@ description: Audits the architecture visualization plan (Common Definitions & Dr
 
 ### 2. 共通定義の精査 (Audit Common Definitions)
 
-`docs/architecture/plans/*.md` を対象に、`SYSTEM_ARCHITECT` の価値観に照らしてチェックする。
+`docs/architecture/plans/*.md` を対象にチェックする。
+
+- **Action:**
+  - ドキュメント内の「SSOT Audit Log」セクションを確認し、**記載されているファイルが実際に存在し、内容が反映されているか**をチェックする。
+  - 各レイヤー/コンポーネント定義に対し、「具体的なファイルパス（Physical Path）が書かれているか？」を批判的に確認する。
 
 - **Strict Checklist:**
-  - [ ] **Zero Ambiguity:** 記述内容に一切の疑問や曖昧さを感じないか？
-  - [ ] **MECE (No Gap/Overlap):** 定義内容に抜け漏れ・無理・無駄がないか？
+  - [ ] **Physical Mapping:** 抽象的な定義に対し、対応する具体的なディレクトリやファイルパスがマッピングされているか？
+  - [ ] **No Jargon:** プロジェクト固有の定義なしに一般的な専門用語を使っていないか？
   - [ ] **SSOT Alignment:** 読み込んだADR/Contextと矛盾していないか？
-  - [ ] **Evolutionary:** 将来の変更に対し、閉鎖的すぎず、かつ現在必要十分な定義か？
+  - [ ] **Audit Trail:** 参照したSSOTファイルの一覧が記録されているか？
+
+- **Log Output:**
+  - チェックリストの判定結果に加え、**「なぜその定義が不十分なのか（例：Infra層のパスが書かれていない）」** という具体的な指摘理由をログに出力する。
 
 ### 3. Issue案の精査 (Audit Draft Issues)
 
 `reqs/tasks/drafts/*.md` を対象にチェックする。
 
+- **Action:**
+  - `reqs/tasks/template/issue-draft.md` を `read_file` し、期待されるYAML Front Matterのキーとセクション構成を把握する。
+  - 作成されたIssue案とテンプレートを比較し、構造が一致しているか厳密に確認する。
+
 - **Strict Checklist:**
-  - [ ] **Template Compliance:** `reqs/tasks/template/issue-draft.md` の項目が全て埋められているか？
+  - [ ] **Template Compliance:** `reqs/tasks/template/issue-draft.md` の全ての必須項目（YAMLキー、セクション見出し）が存在するか？
   - [ ] **Mandatory Reference:** 共通定義書へのリンクと遵守指示が明記されているか？
   - [ ] **Clear Scope:** タスクの範囲（Boundary）が明確で、他のタスクと重複していないか？
   - [ ] **No Regression:** 以前の計画と比較し、デグレが起きていないか？
