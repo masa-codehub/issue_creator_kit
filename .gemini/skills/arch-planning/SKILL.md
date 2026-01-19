@@ -35,12 +35,11 @@ ADRを分析し、「何を描くか」だけでなく、「どう分担する�
 **重要:** タスクが細分化されるため、この共通定義書が唯一の頼みの綱となる。一切の曖昧さを排除せよ。
 
 - **Action:**
-  - `activate_skill{name: "active-reconnaissance"}` でADRと現状を分析。
-  - **Common Definitions Doc** (`docs/architecture/plans/YYYYMMDD-{feature}-plan.md`) を作成し、以下を定義する。
-    - **Ubiquitous Language:** 今回の変更で導入/変更される用語の定義。
-    - **Boundaries (Critical):** コンポーネント間の境界線。どのロジックがどのコンテナ/クラスに属するかをSpec Strategistに伝える。
-    - **Tech Decisions:** 全体で統一すべき技術選定（例: 「全APIはgRPCとする」）。
-    - **Directory Structure:** 成果物ファイルの配置場所と命名規則。
+  - `activate_skill{name: "active-reconnaissance"}` でADRと現状を分析し、**参照したファイルパスを記録する**。
+  - **Template:** `docs/architecture/template/arch-plan.md` を `read_file` する。
+  - **Common Definitions Doc** (`docs/architecture/plans/YYYYMMDD-{feature}-plan.md`) を作成し、テンプレートの全項目を埋める。
+    - **SSOT Audit Log:** 参照したADR, Context, Codeのパスを列挙する。
+    - **Physical Mapping (Critical):** 「レイヤー/コンポーネント」の定義に対し、必ず**具体的なディレクトリやファイルパス**をマッピングする。（抽象的な定義のみは不可）
 
 ### 3. 図構成とタスク分割 (Portfolio & Slicing)
 

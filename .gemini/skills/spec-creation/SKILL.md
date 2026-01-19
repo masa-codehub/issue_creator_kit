@@ -30,10 +30,13 @@ description: Orchestrator skill for creating detailed technical specifications (
 
 2.  **Strategic Planning & Drafting:**
     - `activate_skill{name: "spec-planning"}`
-    - このスキルを使用し、以下の2つを作成する：
-      1.  **Common Definitions (共通定義書):** 複数の仕様書間で統一すべき用語、データ型、エラーコード、ディレクトリ構成、依存関係を定義した計画ドキュメント（`docs/specs/plans/YYYYMMDD-{feature}.md`）。
-      2.  **Draft Issues (Issue案):** 実装単位に分割されたタスク定義書（`reqs/tasks/drafts/*.md`）。
-    - **Verify:** `ssot-verification` を使用し、計画とIssue案が上位設計（Arch/Design Doc）と矛盾していないか確認する。
+    - このスキルを使用し、Common Definitions と 個別の Issue 案を作成する。
+
+3.  **Integration Issue Drafting (Critical):**
+    - **個別の仕様策定タスクとは別に、全体の監査とマージを担当する「統合用Issue案」を作成する。**
+    - **内容:** 他の全仕様Issueへの `depends_on` を設定し、Phase 3 (Audit) & Phase 4 (Finalization) の手順をタスクとして記述する。
+
+4.  **Verify:** `ssot-verification` を使用し、計画と全Issue案が上位設計（Arch/Design Doc）と矛盾していないか確認する。
 
 ### Phase 2: Approval & Initiation (承認と開始)
 
