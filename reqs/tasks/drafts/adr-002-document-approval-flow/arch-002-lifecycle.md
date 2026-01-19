@@ -6,7 +6,7 @@ labels:
   - "TECHNICAL_DESIGNER"
 roadmap: "reqs/roadmap/active/roadmap-phase-4-refactoring.md"
 task_id: "ARCH-002-3"
-depends_on: ["arch-002-behavior.md"]
+depends_on: ["ARCH-002-2"]
 next_phase_path: ""
 status: "Draft"
 ---
@@ -51,6 +51,7 @@ status: "Draft"
 ## 5. 検証手順・完了条件 (Verification & DoD)
 - [ ] **SSOT整合性**: `ssot-verification` を実行し、遷移ルールがADRの定義と矛盾していないこと。
 - [ ] **ターゲット読者**: Spec Strategist がこの図を見て、ステータスバリデーション仕様を計画できること。
+- [ ] **状態網羅**: `Draft`, `In Review`, `Approved` の各状態と物理配置が表現されていること。
 
 ## 6. 成果物 (Deliverables)
 - `docs/architecture/arch-state-doc-lifecycle.md`

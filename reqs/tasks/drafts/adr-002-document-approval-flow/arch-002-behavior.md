@@ -6,7 +6,7 @@ labels:
   - "TECHNICAL_DESIGNER"
 roadmap: "reqs/roadmap/active/roadmap-phase-4-refactoring.md"
 task_id: "ARCH-002-2"
-depends_on: ["arch-002-structure.md"]
+depends_on: ["ARCH-002-1"]
 next_phase_path: ""
 status: "Draft"
 ---
