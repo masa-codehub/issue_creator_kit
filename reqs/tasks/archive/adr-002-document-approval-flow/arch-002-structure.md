@@ -1,14 +1,15 @@
 ---
-title: "[Arch] Visualize Static Structure (C4 Container) for ADR-002"
-labels:
-  - "architecture"
-  - "P1"
-  - "TECHNICAL_DESIGNER"
-roadmap: "reqs/roadmap/active/roadmap-phase-4-refactoring.md"
-task_id: "ARCH-002-1"
 depends_on: []
-next_phase_path: ""
-status: "Draft"
+issue: '#200'
+labels:
+- architecture
+- P1
+- TECHNICAL_DESIGNER
+next_phase_path: ''
+roadmap: reqs/roadmap/active/roadmap-phase-4-refactoring.md
+status: Draft
+task_id: ARCH-002-1
+title: '[Arch] Visualize Static Structure (C4 Container) for ADR-002'
 ---
 # [Arch] Visualize Static Structure (C4 Container) for ADR-002
 

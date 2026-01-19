@@ -1,17 +1,18 @@
 ---
-title: "[Arch] Audit and Integrate ADR-002 Architecture Visualization"
-labels:
-  - "architecture"
-  - "P1"
-  - "SYSTEM_ARCHITECT"
-roadmap: "reqs/roadmap/active/roadmap-phase-4-refactoring.md"
-task_id: "ARCH-002-INT"
 depends_on:
-  - "arch-002-structure.md"
-  - "arch-002-behavior.md"
-  - "arch-002-lifecycle.md"
-next_phase_path: "reqs/tasks/drafts/adr-002-spec-creation/"
-status: "Draft"
+- arch-002-structure.md
+- arch-002-behavior.md
+- arch-002-lifecycle.md
+issue: '#201'
+labels:
+- architecture
+- P1
+- SYSTEM_ARCHITECT
+next_phase_path: reqs/tasks/drafts/adr-002-spec-creation/
+roadmap: reqs/roadmap/active/roadmap-phase-4-refactoring.md
+status: Draft
+task_id: ARCH-002-INT
+title: '[Arch] Audit and Integrate ADR-002 Architecture Visualization'
 ---
 # [Arch] Audit and Integrate ADR-002 Architecture Visualization
 
