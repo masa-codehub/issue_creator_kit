@@ -30,10 +30,13 @@ description: Orchestrator skill for implementing features based on detailed spec
 
 2.  **Strategic Planning & Drafting:**
     - `activate_skill{name: "tdd-planning"}`
-    - このスキルを使用し、以下の2つを作成する：
-      1.  **Common Implementation Plan (共通実装計画):** 複数タスク間で統一すべき実装方針、モック定義、配置場所を定義した計画ドキュメント（`docs/implementation/plans/YYYYMMDD-{feature}.md`）。
-      2.  **Draft Issues (Issue案):** TDD単位に分割されたタスク定義書（`reqs/tasks/drafts/*.md`）。
-    - **Verify:** `tdd-planning-review` を使用し、計画とIssue案が仕様書と整合しているか確認する。
+    - このスキルを使用し、共通実装計画と個別の Issue 案を作成する。
+
+3.  **Integration Issue Drafting (Critical):**
+    - **個別の実装タスクとは別に、全体の監査とマージを担当する「統合用Issue案」を作成する。**
+    - **内容:** 他の全実装Issueへの `depends_on` を設定し、Phase 3 (Audit) & Phase 4 (Finalization) の手順をタスクとして記述する。
+
+4.  **Verify:** `tdd-planning-review` を使用し、計画と全Issue案が仕様書と整合しているか確認する。
 
 ### Phase 2: Approval & Initiation (承認と開始)
 
