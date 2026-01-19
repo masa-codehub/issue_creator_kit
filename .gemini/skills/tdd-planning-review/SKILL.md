@@ -34,11 +34,14 @@ description: Audits the TDD implementation plan (Common Implementation Plan & Dr
 
 `reqs/tasks/drafts/*.md` を対象にチェックする。
 
+- **Action:**
+  - `reqs/tasks/template/issue-draft.md` を `read_file` し、期待されるYAML Front Matterのキーとセクション構成を把握する。
+  - 作成されたIssue案とテンプレートを比較し、構造が一致しているか厳密に確認する。
+
 - **Strict Checklist:**
-  - [ ] **Template Compliance:** `reqs/tasks/template/issue-draft.md` の項目が全て埋められているか？
+  - [ ] **Template Compliance:** `reqs/tasks/template/issue-draft.md` の全ての必須項目（YAMLキー、セクション見出し）が存在するか？
   - [ ] **Mandatory Reference:** 共通実装計画へのリンクと遵守指示が明記されているか？
-  - [ ] **TDD Scenarios (Critical):** Red (失敗すべき理由) と Green (達成すべき最小要件) が具体的に記述されており、機械的にテストコードに変換可能か？
-  - [ ] **Atomic Scope:** 1つのIssueで扱う範囲が適切（大きすぎず、かつ並列作業を阻害しない）か？
+  - [ ] **TDD Scenarios:** 「TDD Scenarios」セクションに、具体的なRed/Greenの手順が記載されているか？
 
 ### 4. SSOT整合性検証 (SSOT Verification)
 

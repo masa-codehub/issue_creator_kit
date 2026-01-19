@@ -58,13 +58,15 @@ description: Formulates a comprehensive strategy for creating specifications. An
   - **Slicing Strategy:** **Atomic Slice (1 Issue = 1 Spec File)** を原則とする。
   - **Output Definition:** 次のステップのために、以下の構成案を確定する。
     1.  **Draft Issue List:** 作成するIssue案のタイトルとファイル名。
-    2.  **Target Scope:** 各Issueで作成/更新する具体的な仕様ファイル名。
-    3.  **TDD Criteria (Critical for Implementer):** その仕様書に基づき、実装者がテストコードを書くための具体的な観点。
+    2.  **Output Directory:** `reqs/tasks/drafts/{starting_doc_name}/` (例: `reqs/tasks/drafts/arch-005-payment/`)。
+    3.  **Target Scope:** 各Issueで作成/更新する具体的な仕様ファイル名。
+    4.  **TDD Criteria (Critical for Implementer):** その仕様書に基づき、実装者がテストコードを書くための具体的な観点。
         - **Happy Path:** 正常な入力に対し、どのような状態変化や戻り値が期待されるか。
         - **Error Path:** 具体的にどの条件で、どの例外/エラーコードが発生すべきか。
         - **Boundary:** 最大長、最小値、Null許容などの境界条件。
 
     **Example:**
+    - Directory: `reqs/tasks/drafts/arch-005-payment/`
     - Issue: `[API Spec] Create User Registration API`
       - Files: `docs/specs/api/user-registration.md`
       - **Verify (TDD Criteria):**

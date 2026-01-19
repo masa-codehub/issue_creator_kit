@@ -34,8 +34,12 @@ description: Audits the specification creation plan (Common Definitions & Draft 
 
 `reqs/tasks/drafts/*.md` を対象にチェックする。
 
+- **Action:**
+  - `reqs/tasks/template/issue-draft.md` を `read_file` し、期待されるYAML Front Matterのキーとセクション構成を把握する。
+  - 作成されたIssue案とテンプレートを比較し、構造が一致しているか厳密に確認する。
+
 - **Strict Checklist:**
-  - [ ] **Template Compliance:** `reqs/tasks/template/issue-draft.md` の項目が全て埋められているか？
+  - [ ] **Template Compliance:** `reqs/tasks/template/issue-draft.md` の全ての必須項目（YAMLキー、セクション見出し）が存在するか？
   - [ ] **Mandatory Reference:** 共通定義書へのリンクと遵守指示が明記されているか？
   - [ ] **Atomic Scope:** 各タスクの範囲が明確で、担当者が迷わず作業開始できるか？
   - [ ] **Output Definition:** 作成すべきファイル名と場所が具体的に指定されているか？
