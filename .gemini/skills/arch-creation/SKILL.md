@@ -30,8 +30,13 @@ ADRという「方針」を、実行可能な「タスク」に翻訳し、分�
 
 2.  **Strategic Planning & Drafting:**
     - `activate_skill{name: "arch-planning"}`
-    - このスキル内で、共通定義書の作成、Issue案の作成、および計画レビュー（`arch-planning-review`）までが一気通貫で実行される。
-    - **Verify:** 実行後、`docs/architecture/plans/` と `reqs/tasks/drafts/` に成果物が生成され、レビューをパスしていることを確認する。
+    - このスキル内で、共通定義書の作成、個別タスクのIssue案の作成、および計画レビュー（`arch-planning-review`）までが一気通貫で実行される。
+
+3.  **Integration Issue Drafting (Critical):**
+    - **個別タスクとは別に、全体の監査とマージを担当する「統合用Issue案」を作成する。**
+    - **内容:** 他の全Issueへの `depends_on` を設定し、Phase 3 (Audit) & Phase 4 (Finalization) の手順をタスクとして記述する。
+
+4.  **Verify:** 実行後、`docs/architecture/plans/` と `reqs/tasks/drafts/` に成果物（共通定義、個別Issue案、統合用Issue案）が生成され、レビューをパスしていることを確認する。
 
 ### Phase 2: Approval & Initiation (承認と開始)
 
