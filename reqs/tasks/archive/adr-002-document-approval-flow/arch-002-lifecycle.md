@@ -1,14 +1,16 @@
 ---
-title: "[Arch] Visualize Document Lifecycle (State Diagram) for ADR-002"
+depends_on:
+- ARCH-002-2
+issue: '#199'
 labels:
-  - "architecture"
-  - "P1"
-  - "TECHNICAL_DESIGNER"
-roadmap: "reqs/roadmap/active/roadmap-phase-4-refactoring.md"
-task_id: "ARCH-002-3"
-depends_on: ["ARCH-002-2"]
-next_phase_path: ""
-status: "Draft"
+- architecture
+- P1
+- TECHNICAL_DESIGNER
+next_phase_path: ''
+roadmap: reqs/roadmap/active/roadmap-phase-4-refactoring.md
+status: Draft
+task_id: ARCH-002-3
+title: '[Arch] Visualize Document Lifecycle (State Diagram) for ADR-002'
 ---
 # [Arch] Visualize Document Lifecycle (State Diagram) for ADR-002
 
