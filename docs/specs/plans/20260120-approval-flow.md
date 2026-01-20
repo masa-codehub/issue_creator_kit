@@ -14,7 +14,7 @@
 | **Document** | マークダウンファイル全体を表す概念。メタデータと本文を持つ。 | `Domain.Document` |
 | **Metadata** | ファイル先頭のYAMLフロントマター、またはそれに準ずるKey-Value記述。 | `Domain.Metadata` |
 | **Tracking Issue** | ドキュメント承認に伴い自動起票されるGitHub Issue。 | `GitHubIssue` |
-| **Archive (Directory)** | ADR-002では `_approved` と同義として扱うが、Task管理とは区別する。 | - |
+| **Archive (Directory)** | タスク（Issue）の完了後の保管場所。ADR-002の承認済みドキュメントとは区別される。 | `reqs/tasks/archive/` |
 
 ## 2. Specification Directory Structure
 
@@ -27,7 +27,7 @@
 - **Infrastructure / Components**:
   - `docs/specs/components/infra_adapters.md`: `GitHubAdapter`, `GitAdapter`, `FileSystemAdapter` のインターフェースと挙動。
 - **Interface / CLI**:
-  - `docs/specs/api/cli_commands.md`: CLI引数、サブコマンド (`run-workflow`) の定義。
+  - `docs/specs/api/cli_commands.md`: CLI引数、サブコマンド (`issue-kit run-workflow`) の定義。
 
 ## 3. Implementation Strategy (Slicing)
 
@@ -45,13 +45,13 @@
 
 ### Slice 4: CLI Integration
 - **Goal**: コマンドライン引数をパースし、UseCaseを実行するエントリポイント。
-- **Verify**: `run_shell_command` で実際にヘルプが表示される、引数エラーが出る等の動作確認。
+- **Verify**: シェルから `issue-kit run-workflow --help` を実行し、ヘルプが表示されることや、引数エラー時の挙動を確認する。
 
 ## 4. Common Technical Policies
 
 ### Error Codes
 - `DOC_NOT_FOUND`: 対象ファイルが存在しない。
-- `METADATA_INVALID`: 必須フィールド（Status, Date等）が欠落している。
+- `METADATA_INVALID`: 必須フィールド（`status`, `date` 等）が欠落している。
 - `GITHUB_API_ERROR`: GitHub API呼び出し失敗。
 - `GIT_OPERATION_ERROR`: Gitコマンド失敗。
 

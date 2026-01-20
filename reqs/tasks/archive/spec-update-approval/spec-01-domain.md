@@ -17,7 +17,7 @@ status: "Draft"
 - **Common Definitions**: docs/specs/plans/20260120-approval-flow.md
 
 ## 1. 目的と背景 (Goal & Context)
-- **As-is (現状)**: ドキュメントの解析ロジックがスクリプト（`create_issues.py`）に埋め込まれており、SSOTとしてのデータ構造が定義されていない。
+- **As-is (現状)**: ドキュメントの解析ロジックが `src/issue_creator_kit/domain/document.py` の `Document.parse` や既存 UseCase 実装に散在しており、SSOTとしてのドメインデータ構造が明示的に定義されていない。
 - **To-be (あるべき姿)**: `Domain.Document` および `Domain.Metadata` クラスの仕様が明確化され、実装者がパースロジックを TDD で実装できる状態。
 - **Design Evidence**: `docs/architecture/arch-structure-issue-kit.md` (Domain Layer)
 

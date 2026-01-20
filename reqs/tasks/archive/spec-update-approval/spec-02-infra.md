@@ -33,9 +33,9 @@ status: "Draft"
 ### 3.2. 実装手順 (Changes)
 - [ ] **ファイル**: `docs/specs/components/infra_adapters.md`
     - **処理内容**: 以下のAdapterのメソッドシグネチャと期待動作を定義する。
-      - `GitHubAdapter`: `create_issue(title, body) -> int`
-      - `GitAdapter`: `commit_changes(message) -> void`
-      - `FileSystemAdapter`: `move_file(src, dst)`, `write_file(path, content)`
+      - `GitHubAdapter`: `find_or_create_issue(title, body) -> int`
+      - `GitAdapter`: `commit(message) -> void`
+      - `FileSystemAdapter`: `safe_move_file(src_path, dst_dir, ...)`, `write_file(path, content)`
     - **Verify (TDD Criteria)**:
       - 「APIエラー時に例外 `InfrastructureError` が送出されること」
       - 「Gitコミット失敗時の挙動（再試行するか、エラーにするか）」

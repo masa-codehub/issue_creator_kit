@@ -32,8 +32,8 @@ status: "Draft"
 ### 3.2. 実装手順 (Changes)
 - [ ] **ファイル**: `docs/specs/api/cli_commands.md`
     - **処理内容**:
-      - コマンド: `issue-kit approve`
-      - 引数: `--dry-run` (Option)
+      - コマンド: `issue-kit run-workflow`
+      - 引数: なし（ ワークフローの詳細な挙動・パラメータは別仕様で定義）
       - 環境変数: `GITHUB_MCP_PAT` (必須)
     - **Verify (TDD Criteria)**:
       - 「`GITHUB_MCP_PAT` がない場合、エラーメッセージを表示して終了コード 1 を返すこと」

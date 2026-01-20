@@ -26,6 +26,9 @@ status: "Draft"
 
 ## 3. 実装手順と制約 (Implementation Steps & Constraints)
 
+### 3.1. Negative Constraints
+- 現時点で、SPEC-05 固有の追加の Negative Constraints はない。
+
 ### 3.2. 実装手順 (Changes)
 - [ ] **SSOT監査**: `ssot-verification` を実行し、作成されたSpecがArchitectureとCommon Definitionsに適合しているか確認。
 - [ ] **リンク検証**: Spec間のリンクが正しく機能しているか確認。
@@ -33,8 +36,8 @@ status: "Draft"
 - [ ] **PR作成**: 統合ブランチ（`feature/spec-update-approval-flow`）から `main` へのPRを作成する。
 
 ## 4. ブランチ戦略 (Branching Strategy)
-- **ベースブランチ (Base Branch)**: `feature/spec-update-approval-flow` <!-- NOTE: 作業開始元。全変更を含む統合ブランチを指定 (Not main) -->
-- **作業ブランチ (Feature Branch)**: `feature/spec-update-approval-flow` (This is the integration task, so it stays on parent branch or uses a new one if merging from others. Let's say it works on the integration branch itself)
+- **ベースブランチ (Base Branch)**: `feature/spec-update-approval-flow` <!-- NOTE: 作業開始元。全変更を含む統合ブランチを指定 (mainではない) -->
+- **作業ブランチ (Feature Branch)**: `feature/spec-update-approval-flow` <!-- NOTE: 統合タスクのため、統合ブランチ上で直接作業する -->
 
 ## 5. 検証手順・完了条件 (Verification & DoD)
 - [ ] **All Checks Pass**: 全ての監査が合格していること。

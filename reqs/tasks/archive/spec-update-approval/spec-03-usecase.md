@@ -33,10 +33,10 @@ status: "Draft"
 ### 3.2. 実装手順 (Changes)
 - [ ] **ファイル**: `docs/specs/logic/approval_usecase.md`
     - **処理内容**:
-      - `ApprovalUseCase.run()` のフロー定義。
+      - `ApprovalUseCase.process_single_file()` および `ApprovalUseCase.process_all_files()` のフロー定義（オーケストレーションは `WorkflowUseCase.run()`）。
       - 異常系フロー（Issue起票失敗時の補償トランザクション）の定義。
     - **Verify (TDD Criteria)**:
-      - 「Issue起票に失敗した場合、移動したファイルを元のInboxに戻すこと」
+      - 「Issue起票に失敗した場合、移動したファイルを元のInboxに戻し、先行して更新したメタデータも元に戻すこと」
       - 「全ての処理が成功した場合のみ、GitAdapter.commit() を呼ぶこと」
 
 ## 4. ブランチ戦略 (Branching Strategy)
