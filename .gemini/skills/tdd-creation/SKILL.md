@@ -81,14 +81,26 @@ _(前提: 起票された全てのIssueが完了し、統合ブランチにマ�
 
 ### Phase 4: Finalization (完了とレビュー対応)
 
-**目的:** 最終成果物を確定し、メインラインへのマージを行う。
+
+
+**目的:** 最終成果物を確定し、メインラインへのマージリクエスト（PR作成）を行う。**自動マージは行わない。**
+
+
 
 1.  **Final Pull Request:**
+
     - 監査をパスした統合ブランチから、`main` (または `develop`) へのPull Requestを作成する。
+
     - `activate_skill{name: "github-pull-request"}`
 
+    - **注意:** PRを作成するまでが責務であり、**マージ自体は行わないこと。**
+
+
+
 2.  **Retrospective:**
+
     - `activate_skill{name: "retrospective"}`
+
     - 今回の実装計画の精度や、仕様書との乖離について振り返りを行う。
 
 ## 禁止事項 (Anti-Patterns)
