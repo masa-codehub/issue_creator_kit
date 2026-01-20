@@ -76,7 +76,7 @@ _(前提: 起票された全てのIssueの実装が完了し、統合ブラン�
 
 ### Phase 4: Finalization (完了とレビュー対応)
 
-**目的:** 最終成果物を確定し、メインラインへのマージを行う。
+**目的:** 最終成果物を確定し、メインラインへのマージリクエスト（PR作成）を行う。**自動マージは行わない。**
 
 1.  **Create Handover Items:**
     - `docs/handovers/arch-to-spec.md` を作成（または追記）する。
@@ -85,6 +85,7 @@ _(前提: 起票された全てのIssueの実装が完了し、統合ブラン�
 2.  **Final Pull Request:**
     - 監査をパスした統合ブランチから、`main` (または `develop`) へのPull Requestを作成する。
     - `activate_skill{name: "github-pull-request"}`
+    - **注意:** PRを作成するまでが責務であり、**マージ自体は行わないこと。**
     - _Option:_ この時点で `docs/architecture/plans/*.md` は役割を終えているため、削除してもよい（履歴には残る）。
 
 3.  **Review Support:**
