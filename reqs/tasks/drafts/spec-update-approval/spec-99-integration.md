@@ -30,10 +30,10 @@ status: "Draft"
 - [ ] **SSOT監査**: `ssot-verification` を実行し、作成されたSpecがArchitectureとCommon Definitionsに適合しているか確認。
 - [ ] **リンク検証**: Spec間のリンクが正しく機能しているか確認。
 - [ ] **Handover作成**: `docs/handovers/spec-to-tdd.md` を作成し、実装者への申し送り事項をまとめる。
-- [ ] **PR作成**: 統合ブランチから `main` へのPRを作成する。
+- [ ] **PR作成**: 統合ブランチ（`feature/spec-update-approval-flow`）から `main` へのPRを作成する。
 
 ## 4. ブランチ戦略 (Branching Strategy)
-- **ベースブランチ (Base Branch)**: `feature/spec-update-approval-flow`
+- **ベースブランチ (Base Branch)**: `feature/spec-update-approval-flow` <!-- NOTE: 作業開始元。全変更を含む統合ブランチを指定 (Not main) -->
 - **作業ブランチ (Feature Branch)**: `feature/spec-update-approval-flow` (This is the integration task, so it stays on parent branch or uses a new one if merging from others. Let's say it works on the integration branch itself)
 
 ## 5. 検証手順・完了条件 (Verification & DoD)
