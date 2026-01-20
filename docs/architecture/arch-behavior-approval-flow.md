@@ -11,13 +11,13 @@
     - GitHub Actions ランナー上で `gh` コマンドまたは `GITHUB_TOKEN` が利用可能である。
 - **Post-conditions (保証):**
     - 対象ファイルが `reqs/design/_approved/` に移動されている。
-    - ファイル内の `Status` が `Approved` に、`Date` が実行日に更新されている。
+    - ファイル内の `Status` が `承認済み` に、`Date` が実行日に更新されている。
     - GitHub Issue が起票（または特定）され、そのIDがファイルに記載されている。
     - 変更がGitコミットされている（Pushは呼び出し元が行う想定、またはAdapterが行う）。
 
 ## Related Structures
 *   `src/issue_creator_kit/cli.py`
-*   `src/issue_creator_kit/usecase/approval_workflow.py`
+*   `src/issue_creator_kit/usecase/approval.py`
 *   `src/issue_creator_kit/infrastructure/git_adapter.py`
 *   `src/issue_creator_kit/infrastructure/github_adapter.py`
 
@@ -56,43 +56,39 @@ sequenceDiagram
     INF_FS-->>UC: file_paths
 
     loop For each file
-        UC->>INF_FS: read_content(path)
-        INF_FS-->>UC: content
-        UC->>DOM: parse(content)
-        activate DOM
-        DOM-->>UC: document_obj
-        deactivate DOM
-        
-        Note right of UC: 1. Update Metadata (In-Memory)
-        UC->>DOM: update_status("Approved")
-        UC->>DOM: update_date(today)
+        UC->>INF_FS: read_document(path)
+        INF_FS-->>UC: document_obj
 
-        Note right of UC: 2. Create/Link Issue
+        Note right of UC: 1. Update Metadata (Persist at _inbox_)
+        UC->>INF_FS: update_metadata(path, status="承認済み", date=today)
+
+        Note right of UC: 2. Move File
+        UC->>INF_FS: move_file(path, new_path)
+
+        Note right of UC: 3. Create/Link Issue
         UC->>INF_GH: find_or_create_issue(title, body)
         activate INF_GH
         INF_GH-->>UC: issue_number
         deactivate INF_GH
         
-        UC->>DOM: set_issue_id(issue_number)
-
-        Note right of UC: 3. Move & Save (Persist)
-        UC->>INF_FS: write_file(new_path, document_obj.text)
-        UC->>INF_FS: delete_file(old_path)
-        
-        Note right of UC: 4. Git Commit
-        UC->>INF_GIT: add(new_path)
-        UC->>INF_GIT: add(old_path)
-        UC->>INF_GIT: commit("Approve: {filename}")
-        activate INF_GIT
-        
-        alt Commit Success
-            INF_GIT-->>UC: success
-        else Commit Failure
-            INF_GIT-->>UC: error
-            UC->>UC: handle_error (log & continue/abort)
-        end
-        deactivate INF_GIT
+        Note right of UC: 4. Update Approved File with Issue ID
+        UC->>INF_FS: update_metadata(new_path, issue_id=issue_number)
     end
+
+    Note right of UC: 5. Git Add/Commit/Push (Bulk)
+    UC->>INF_GIT: add(".")
+    UC->>INF_GIT: commit("Approve design documents")
+    activate INF_GIT
+    
+    alt Commit Success
+        INF_GIT-->>UC: success
+        Note right of UC: (optional) Push to remote
+        UC->>INF_GIT: push()
+    else Commit Failure
+        INF_GIT-->>UC: error
+        UC->>UC: handle_error (log & abort)
+    end
+    deactivate INF_GIT
 
     UC-->>CLI: result_summary
     deactivate UC
@@ -103,5 +99,5 @@ sequenceDiagram
 ## Reliability & Failure Handling
 - **Consistency Model:** Eventual Consistency (File system updates -> Git commit -> Push)
 - **Failure Scenarios:**
-    - *GitHub API Error:* Issue起票に失敗した場合、ファイルの移動・更新（`write_file`）を行わず、エラーログを出力して次のファイルの処理へ移行する。これにより、メタデータとIssueの不整合を防ぐ (Fail-Fast)。
+    - *GitHub API Error:* Issue起票は、(1) メタデータ更新の永続化（`write_file`）、(2) ファイルの移動、(3) Issue起票 の順に行われる。Issue起票に失敗した場合は、直前に行ったファイル移動およびメタデータ更新をロールバックして元の状態に戻し、エラーログを出力した上で次のファイルの処理へ移行する。これにより、最終的にメタデータとIssueの不整合が残らないようにする（短いトランザクション＋ロールバック戦略）。
     - *Git Commit Error:* ローカルでのコミットに失敗した場合、後続のPushも失敗するため、CLIは非ゼロの終了コードを返却し、CIを失敗させる。
