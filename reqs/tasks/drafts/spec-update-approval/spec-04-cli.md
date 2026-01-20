@@ -34,9 +34,9 @@ status: "Draft"
     - **処理内容**:
       - コマンド: `issue-kit approve`
       - 引数: `--dry-run` (Option)
-      - 環境変数: `GITHUB_TOKEN` (必須)
+      - 環境変数: `GITHUB_MCP_PAT` (必須)
     - **Verify (TDD Criteria)**:
-      - 「`GITHUB_TOKEN` がない場合、エラーメッセージを表示して終了コード 1 を返すこと」
+      - 「`GITHUB_MCP_PAT` がない場合、エラーメッセージを表示して終了コード 1 を返すこと」
 
 ## 4. ブランチ戦略 (Branching Strategy)
 - **ベースブランチ (Base Branch)**: `feature/spec-update-approval-flow`
