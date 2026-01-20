@@ -4,7 +4,7 @@
 - **Bounded Context:** Document Lifecycle Management
 - **System Purpose:** 設計ドキュメント（ADR/Design Doc）のライフサイクル（承認・タスク化）を自動化し、SSOTとしての信頼性を担保する。
 
-## Diagram (C4 Component - Clean Architecture Lite)
+## Diagram (Component Diagram - Clean Architecture Lite)
 ```mermaid
 graph TB
     %% Definitions
@@ -36,7 +36,7 @@ graph TB
         subgraph "Layer: Infrastructure (Adapter)"
             INF_GH[GitHub Adapter]
             INF_GIT[Git Adapter]
-            INF_FS[FileSystem Adapter]
+            INF_FS[File System Adapter]
         end
     end
 
@@ -57,6 +57,8 @@ graph TB
     %% Note: UseCase defines the interface, Infrastructure implements it.
     UC_WF -.-> INF_GH
     UC_WF -.-> INF_GIT
+    UC_WF -.-> INF_FS
+    UC_APP -.-> INF_GH
     UC_APP -.-> INF_FS
     
     %% Infra Implementation
@@ -95,19 +97,19 @@ graph TB
 - **Layer (Clean Arch):** Use Cases
 - **Dependencies:**
     - **Upstream:** CLI
-    - **Downstream:** Domain, Infrastructure (Interface)
+    - **Downstream:** Domain, Infrastructure (Concrete Adapters)
 - **Tech Stack:** Python (Pure Logic)
-- **Trade-off:** テスト容易性を優先し、外部システムへの依存を排除（DI前提）。
+- **Trade-off:** テスト容易性を優先し、外部システムの具体的な実装詳細をDIにより差し替え可能にし、テスト時にモック化を容易にしている。
 
 ### Document Entity
 - **Type:** Component
 - **Code Mapping:** `src/issue_creator_kit/domain/document.py`
-- **Role (Domain-Centric):** ドキュメントの解析、メタデータ（Status, Date）の更新ロジック、パス操作のルールを持つ。
+- **Role (Domain-Centric):** ドキュメントの構造（メタデータと本文）を表現し、テキストとの相互変換（解析・シリアライズ）ロジックを持つ。
 - **Layer (Clean Arch):** Entities (Domain)
 - **Dependencies:**
     - **Upstream:** UseCase
     - **Downstream:** None
-- **Tech Stack:** Python (Pure Data Class)
+- **Tech Stack:** Python, PyYAML
 
 ### Infrastructure Adapters
 - **Type:** Component
@@ -117,5 +119,5 @@ graph TB
 - **Dependencies:**
     - **Upstream:** CLI (Instantiation), UseCase (Call)
     - **Downstream:** External Systems
-- **Tech Stack:** PyGithub, Subprocess
+- **Tech Stack:** requests, Subprocess
 - **Data Reliability:** Fail-Fast (APIエラー時は即座に例外送出)
