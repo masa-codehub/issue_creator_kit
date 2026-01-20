@@ -8,23 +8,19 @@
 ## Diagram (State)
 ```mermaid
 stateDiagram-v2
-    [*] --> Draft : Create New File
-    
     state "Draft (Inbox)" as Draft {
-        [*] --> InReview : Open PR
-        InReview --> [*] : Merge (Trigger Workflow)
+        [*] --> Drafting : Create New File
+        Drafting --> InReview : Open PR
     }
 
     state "Approved (Official)" as Approved {
-        [*] --> Published : Move & Update Metadata
+        note right of Approved
+            SSOTとして確定。
+            以後の変更は新たなPRを必要とする。
+        end note
     }
 
-    Draft --> Approved : run-workflow (Approve)
-    
-    note right of Approved
-        SSOTとして確定。
-        以後の変更は新たなPRを必要とする。
-    end note
+    Draft:InReview --> Approved : Merge PR (triggers workflow)
 ```
 
 ## State Definitions & Transitions
