@@ -1,13 +1,14 @@
 ---
-title: "[Spec] Define Document Domain Model"
-labels:
-  - "task"
-  - "P1"
-  - "TECHNICAL_DESIGNER"
-roadmap: "reqs/roadmap/archive/roadmap-adr002-document-approval-flow.md"
-task_id: "SPEC-01"
 depends_on: []
-status: "Draft"
+issue: '#214'
+labels:
+- task
+- P1
+- TECHNICAL_DESIGNER
+roadmap: reqs/roadmap/archive/roadmap-adr002-document-approval-flow.md
+status: Draft
+task_id: SPEC-01
+title: '[Spec] Define Document Domain Model'
 ---
 # [Spec] Define Document Domain Model
 

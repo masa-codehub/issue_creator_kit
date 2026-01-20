@@ -1,13 +1,16 @@
 ---
-title: "[Spec] Define Approval UseCase"
+depends_on:
+- spec-01-domain.md
+- spec-02-infra.md
+issue: '#216'
 labels:
-  - "task"
-  - "P1"
-  - "TECHNICAL_DESIGNER"
-roadmap: "reqs/roadmap/archive/roadmap-adr002-document-approval-flow.md"
-task_id: "SPEC-03"
-depends_on: ["spec-01-domain.md", "spec-02-infra.md"]
-status: "Draft"
+- task
+- P1
+- TECHNICAL_DESIGNER
+roadmap: reqs/roadmap/archive/roadmap-adr002-document-approval-flow.md
+status: Draft
+task_id: SPEC-03
+title: '[Spec] Define Approval UseCase'
 ---
 # [Spec] Define Approval UseCase
 

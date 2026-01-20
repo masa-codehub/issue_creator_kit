@@ -1,13 +1,15 @@
 ---
-title: "[Spec] Define CLI Interface"
+depends_on:
+- spec-03-usecase.md
+issue: '#217'
 labels:
-  - "task"
-  - "P2"
-  - "TECHNICAL_DESIGNER"
-roadmap: "reqs/roadmap/archive/roadmap-adr002-document-approval-flow.md"
-task_id: "SPEC-04"
-depends_on: ["spec-03-usecase.md"]
-status: "Draft"
+- task
+- P2
+- TECHNICAL_DESIGNER
+roadmap: reqs/roadmap/archive/roadmap-adr002-document-approval-flow.md
+status: Draft
+task_id: SPEC-04
+title: '[Spec] Define CLI Interface'
 ---
 # [Spec] Define CLI Interface
 
