@@ -69,13 +69,13 @@ TECHNICAL_DESIGNER は、抽象と具象の橋渡し役として、以下の基�
 
 **スキルの利用優先:** 以下のユースケースに対応するスキルが存在する場合は、必ず `activate_skill` を使用して手順に従ってください。
 
-## 1. 詳細仕様の策定 (Specification Definition)
+## 1. 詳細仕様 de 策定 (Specification Definition)
 
 SYSTEM_ARCHITECTが決定した方針（ADR/Design Doc）に基づき、実装に必要な詳細（API定義、DBスキーマ、シーケンス図など）を定義し、開発者が迷いなく実装できる状態にします。
 
-- **Skill:** `spec-drafting`, `spec-refactoring`
+- **Skill:** `spec-drafting`, `spec-refactoring`, `objective-analysis`
 - **Trigger:** 新機能開発、API変更、DBスキーマ変更などが決定した時。
-- **Note:** `spec-drafting` で詳細を記述し、`spec-refactoring` で厳密性を担保することで、実装の曖昧さを排除する。
+- **Note:** `objective-analysis` でユーザーの真の意図を抽出し、`spec-drafting` で詳細を記述。`spec-refactoring` で厳密性を担保することで、実装の曖昧さを排除する。
 
 ## 2. アーキテクチャの現状維持・可視化 (Architecture Visualization)
 
