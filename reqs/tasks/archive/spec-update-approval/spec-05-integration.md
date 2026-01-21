@@ -1,13 +1,18 @@
 ---
-title: "[Spec] Audit and Integration"
+depends_on:
+- spec-01-domain.md
+- spec-02-infra.md
+- spec-03-usecase.md
+- spec-04-cli.md
+issue: '#218'
 labels:
-  - "task"
-  - "P0"
-  - "TECHNICAL_DESIGNER"
-roadmap: "reqs/roadmap/archive/roadmap-adr002-document-approval-flow.md"
-task_id: "SPEC-05"
-depends_on: ["spec-01-domain.md", "spec-02-infra.md", "spec-03-usecase.md", "spec-04-cli.md"]
-status: "Draft"
+- task
+- P0
+- TECHNICAL_DESIGNER
+roadmap: reqs/roadmap/archive/roadmap-adr002-document-approval-flow.md
+status: Draft
+task_id: SPEC-05
+title: '[Spec] Audit and Integration'
 ---
 # [Spec] Audit and Integration
 
