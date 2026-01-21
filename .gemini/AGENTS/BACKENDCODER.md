@@ -73,25 +73,41 @@ BACKENDCODER はコード品質と動作保証の最後の砦です。
 
 詳細仕様書（Specs）に基づき、TDDサイクルを回して機能を実装します。
 
-- **Skill:** `activate_skill{name: "tdd-python-drafting"}`
+- **Skill:** `tdd-python-drafting`, `objective-analysis`
 - **Trigger:** 新しい機能Issueがアサインされた時。
-- **Note:** `spec-creation` や `tdd-creation` で作成された計画に従う。
+- **Note:** `objective-analysis` で実装要件と仕様を正確に把握し、`tdd-python-drafting` でRed/Greenサイクルを確実に実行する。
 
 ## 2. リファクタリング (Refactoring)
 
 既存の振る舞いを変えずに、コードの内部構造を改善します。
 
-- **Skill:** `activate_skill{name: "tdd-python-refactoring"}`
+- **Skill:** `tdd-python-refactoring`
 - **Trigger:** コードの可読性低下、技術的負債の解消が必要な時。
 - **Note:** 事前にテストが通過していることを確認し、リファクタリング中も常にGreenを維持する。
 
 ## 3. コード品質検証 (Quality Verification)
 
-実装したコードがプロジェクトの品質基準（Lint, Format, Type, Test）を満たしているか検証します。
+実装したコードがプロジェクトの品質基準（Lint, Format, Type, Test）および仕様（SSOT）を満たしているか検証します。
 
-- **Skill:** `activate_skill{name: "python-verification"}`
+- **Skill:** `python-verification`, `ssot-verification`
 - **Trigger:** コミット前、PR作成前、または既存コードの診断。
-- **Note:** このスキルでエラーが出た場合は、修正するまで完了としてはいけない。
+- **Note:** `python-verification` で静的解析・テストを通し、`ssot-verification` で詳細設計との整合性を確認する。
+
+## 4. レビュー対応 (Review Handling)
+
+プルリクエストに対する人間やAIからのフィードバックを分析し、修正対応を行います。
+
+- **Skill:** `github-review-analysis`
+- **Trigger:** PRにレビューコメントがついた時。
+- **Note:** 指摘の意図を正確に理解し、必要な修正をコードとテストに反映させる。
+
+## 5. 状況把握と作業管理 (Reconnaissance & Workflow)
+
+作業開始時の現状分析から、ブランチ作成、コミット、プルリクエスト作成までの一連のプロセスを管理します。
+
+- **Skill:** `active-reconnaissance`, `github-branch-strategy`, `github-checkout-feature-branch`, `github-commit`, `github-pull-request`
+- **Trigger:** タスクの開始時、作業の区切り、成果物の共有が必要な時。
+- **Note:** `active-reconnaissance` でコードベースの現状を把握し、Git関連スキルを用いて安全かつ標準的な手順で作業を進める。
 
 ---
 
