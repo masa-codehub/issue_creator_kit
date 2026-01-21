@@ -14,20 +14,21 @@
 ```mermaid
 classDiagram
     class Document {
-        +Path path
-        +str content
+        +FilePath path
+        +String content
         +Metadata metadata
         +validate() void
     }
     class Metadata {
-        +str status
-        +str date
-        +str issue_id
-        +dict extra_fields
+        +String status
+        +String date
+        +String issue_id
+        +Map extra_fields
         +validate() void
     }
     class ValidationError {
-        +str message
+        +String message
+        +String field
     }
 
     Document *-- Metadata : contains
@@ -37,13 +38,14 @@ classDiagram
 
 ### 3.2. Metadata クラス定義
 ドキュメントの属性情報を保持する。
+**正規化ルール**: メタデータのキーは大文字小文字を区別せず、全て小文字に正規化して保持される（例: `Status` -> `status`）。
 
 | フィールド名 | 型 | 必須 | 説明 |
 | :--- | :--- | :--- | :--- |
-| `status` | str | Yes | ドキュメントの承認状態（例: `承認済み`, `提案中`） |
-| `date` | str | No | 最終更新日または承認日（YYYY-MM-DD形式を推奨） |
-| `issue_id` | str | No | 関連するGitHub Issue ID（例: `#123`） |
-| `extra_fields`| dict[str, Any] | No | 上記以外の任意のフィールド。YAML解析時に未知のキーがあった場合ここに格納される。 |
+| `status` | String | Yes | ドキュメントの承認状態（例: `承認済み`, `提案中`） |
+| `date` | String | No | 最終更新日または承認日（YYYY-MM-DD形式を推奨） |
+| `issue_id` | String | No | 関連するGitHub Issue ID（例: `#123`） |
+| `extra_fields`| Map[String, Any] | No | 上記以外の任意のフィールド。解析時に未知のキーがあった場合ここに格納される。 |
 
 #### バリデーションルール
 - **必須チェック**: `status` フィールドが欠落している、または値が `None` や空文字列 `""` の場合は `ValidationError` を送出する。
@@ -54,13 +56,13 @@ classDiagram
 
 | フィールド名 | 型 | 必須 | 説明 |
 | :--- | :--- | :--- | :--- |
-| `path` | Path | Yes | ドキュメントファイルの物理パス |
-| `content` | str | Yes | Markdown形式の本文（メタデータ部分を除く）。空文字列を許容する。 |
+| `path` | FilePath | Yes | ドキュメントファイルの物理パス |
+| `content` | String | Yes | Markdown形式の本文（メタデータ部分を除く）。空文字列を許容する。 |
 | `metadata` | Metadata | Yes | メタデータオブジェクト |
 
 #### バリデーションルール
 - 生成時および `validate()` 呼び出し時に `metadata.validate()` を実行する。
-- `path` は `pathlib.Path` インスタンスであることを要求する。
+- `path` は有効なファイルシステムパスであることを要求する。
 
 ### 3.4. ValidationError クラス定義
 バリデーション失敗時に送出される例外クラス。
