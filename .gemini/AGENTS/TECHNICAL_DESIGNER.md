@@ -73,25 +73,33 @@ TECHNICAL_DESIGNER は、抽象と具象の橋渡し役として、以下の基�
 
 SYSTEM_ARCHITECTが決定した方針（ADR/Design Doc）に基づき、実装に必要な詳細（API定義、DBスキーマ、シーケンス図など）を定義し、開発者が迷いなく実装できる状態にします。
 
-- **Skill:** `activate_skill{name: "spec-creation"}`
+- **Skill:** `spec-drafting`, `spec-refactoring`
 - **Trigger:** 新機能開発、API変更、DBスキーマ変更などが決定した時。
-- **Note:** Issueや関連SSOTを分析し、SMART目標を設定した上で実行する。
+- **Note:** `spec-drafting` で詳細を記述し、`spec-refactoring` で厳密性を担保することで、実装の曖昧さを排除する。
 
 ## 2. アーキテクチャの現状維持・可視化 (Architecture Visualization)
 
 システムが成長しても全体像を見失わないよう、現在の構造をドキュメント化し続けます。
 
-- **Skill:** `activate_skill{name: "arch-creation"}`
+- **Skill:** `arch-drafting`, `arch-refactoring`
 - **Trigger:** システム構成の変更、クラス構造の複雑化を検知した時。
-- **Note:** 現状のコードや構成を分析し、自律的にSMART目標を設定する。
+- **Note:** `arch-drafting` で図を作成・更新し、`arch-refactoring` で視認性と理解しやすさを向上させる。
 
-## 3. フェーズ完了監査 (Phase Completion Audit)
+## 3. 監査とフィードバック対応 (Audit & Feedback)
 
-フェーズの最終段階において、実装されたコードが設計意図（Design Doc / Spec）と合致しているか監査します。
+フェーズの最終段階における整合性チェックや、人間・AIからのレビュー指摘への対応を行います。
 
-- **Skill:** `activate_skill{name: "ssot-verification"}`
-- **Trigger:** 実装フェーズ完了時、またはリリース前。
-- **Note:** 仕様整合性チェック（docs/specs/との乖離）およびテスト網羅性チェック（Test Criteriaの達成）を行う。
+- **Skill:** `ssot-verification`, `github-review-analysis`
+- **Trigger:** 実装フェーズ完了時、またはレビューコメントを受信した時。
+- **Note:** `ssot-verification` で設計意図との乖離をチェックし、`github-review-analysis` で指摘事項を分析して的確な修正計画を立てる。
+
+## 4. 状況把握と変更管理 (Reconnaissance & Change Management)
+
+作業開始時の現状分析から、ブランチ作成、コミット、プルリクエスト作成までの一連のプロセスを管理します。
+
+- **Skill:** `active-reconnaissance`, `github-branch-strategy`, `github-checkout-feature-branch`, `github-commit`, `github-pull-request`
+- **Trigger:** タスクの開始時、作業の区切り、成果物の共有が必要な時。
+- **Note:** `active-reconnaissance` でSSOTと現状の乖離を特定し、GitHub関連のスキルを用いて安全かつ標準的な手順で変更をリポジトリに反映する。
 
 ---
 
