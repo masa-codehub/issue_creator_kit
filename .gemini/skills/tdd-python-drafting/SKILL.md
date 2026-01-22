@@ -1,6 +1,6 @@
 ---
 name: tdd-python-drafting
-description: Executes the Python TDD implementation cycle (Red/Green) based on specifications. Writes test code and Python product code (UseCase/Logic) to satisfy requirements, ensuring strict adherence to the Common Implementation Plan.
+description: Replaces the creation of test code based on specifications and the minimal implementation to pass them (Red/Green) in Python projects. Typical use cases: (1) Creating failing tests (Red) based on API or logic specifications, (2) Implementing Python UseCase or Domain Logic layers to pass tests (Green), (3) Constructing pure unit tests isolated from external dependencies using unittest.mock, etc.
 ---
 
 # TDD Drafting (Python)

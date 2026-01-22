@@ -1,6 +1,6 @@
 ---
 name: github-commit
-description: Skill for recording changes to the local repository. Typical use cases include (1) Committing product code and tests after completing a feature or bug fix, (2) Recording structural changes such as architecture updates or ADR drafting, and (3) Staging and committing multiple small maintenance changes or documentation updates.
+description: Replaces the work of recording changes to the repository following specific conventions. Typical use cases: (1) Batch staging and committing product code and tests after implementation, (2) Reliably recording design artifacts such as architectural diagrams or ADR drafts, (3) Managing automatic fix and retry processes when pre-commit hooks fail.
 ---
 
 # GitHub Commit

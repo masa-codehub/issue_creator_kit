@@ -1,6 +1,6 @@
 ---
 name: adr-drafting
-description: Skill for drafting ADR documents based on decided hypotheses. Focuses on clarity, formatting, and completeness of the record, ensuring alignment with architectural values.
+description: Replaces the work of drafting determined architectural hypotheses into logical and detailed ADR documents following standard formats. Typical use cases: (1) Recording the background, reasoning, and impact of decisions as a "story" for future developers, (2) Citing reconnaissance facts from the current codebase to justify solutions, (3) Articulating not only benefits but also trade-offs and residual risks (4 Big Risks) transparently.
 ---
 
 # ADR起草 (ADR Drafting)

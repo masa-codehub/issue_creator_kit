@@ -1,6 +1,6 @@
 ---
 name: arch-refactoring
-description: Refines architecture diagrams for readability, consistency, and clarity without changing factual accuracy, adhering to Technical Designer values.
+description: Replaces the "information organization" task of improving readability and consistency of architecture diagrams while maintaining accuracy. Typical use cases: (1) Optimizing cognitive load by minimizing crossing arrows and repositioning elements, (2) Grouping elements based on domain boundaries or Clean Architecture layers, (3) Visual standardization through fixing naming inconsistencies or adding legends.
 ---
 
 # Architecture Refactoring

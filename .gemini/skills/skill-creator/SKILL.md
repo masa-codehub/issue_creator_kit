@@ -1,6 +1,6 @@
 ---
 name: skill-creator
-description: Meta-skill for designing, drafting, and refining new agent skills. Used for (1) formalizing recurring successful patterns identified in retrospectives, (2) establishing standardized safety protocols for complex operations, and (3) creating new workflows when introducing new tools or frameworks.
+description: Replaces the work of presiding over the creation of new skills or refinement of existing ones to capitalize agent capabilities as reproducible knowledge. Typical use cases: (1) Formalizing successful retrospective patterns into generic skills, (2) Designing safety protocols (4 axes) for complex operations, (3) Building standard workflows for introducing new tools or frameworks.
 ---
 
 # スキル作成 (Skill Creator)

@@ -1,6 +1,6 @@
 ---
 name: context-hypothesis
-description: Skill for formulating and evaluating architectural and contextual decisions. Used for (1) proposing solutions aligned with SSOT, (2) analyzing trade-offs using 4 Axes (Value, Feasibility, Usability, Viability), and (3) selecting the best approach among alternatives.
+description: Replaces the design study of formulating and analyzing "verifiable hypotheses" that align with SSOT based on domain models and requirements. Typical use cases: (1) Proposing optimal solutions following Clean Architecture or DDD principles, (2) Constructing multi-perspective hypotheses from grounded, leap, and paradoxical viewpoints, (3) Comparing each proposal quantitatively and qualitatively based on 4 Big Risks (Value, Feasibility, UI, Viability).
 ---
 
 # コンテキスト仮説立案 (Context Hypothesis)

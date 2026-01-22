@@ -1,6 +1,6 @@
 ---
 name: objective-analysis
-description: Skill for extracting core intent and formulating hypotheses. Used when (1) a new task or Issue is assigned, (2) user inquiries or bug reports are received, (3) additional requirements or feedback are received mid-project, or (4) before proposing significant design or architectural changes.
+description: Replaces the work of extracting the true intent behind user statements or Issues and formulating multi-perspective solution hypotheses. Typical use cases: (1) Structuring information using the 5W1H framework, (2) Formulating grounded, leap, and paradoxical hypotheses by integrating current status and SSOT, (3) Identifying missing information (Unknowns) required to verify hypotheses.
 ---
 
 # 目的分析 (Objective Analysis)

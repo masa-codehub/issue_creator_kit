@@ -1,6 +1,6 @@
 ---
 name: tdd-planning
-description: Formulates a comprehensive strategy for TDD-based implementation. Analyzes specifications (Specs) and handover items, defines shared implementation policies, and drafts specific TDD tasks (Issues).
+description: Replaces the implementation strategy formulation work of analyzing detailed specifications and deciding how code and tests should be placed across layers. Typical use cases: (1) Mapping each element of the specification to domain, use case, or infrastructure layers, (2) Defining test scope, mocking policies, and shared stubs, (3) Designing specific TDD Scenarios for implementers to follow the Red-Green-Refactor cycle.
 ---
 
 # TDD Planning (Implementation Strategy)

@@ -1,6 +1,6 @@
 ---
 name: spec-planning
-description: Formulates a comprehensive strategy for creating specifications. Analyzes requirements (ADR/Issue), defines shared definitions, drafts specific issues, and reviews the plan for quality assurance.
+description: Replaces the work of analyzing requirements, formulating strategies to create high-quality detailed specifications, creating shared definitions, and decomposing tasks. Typical use cases: (1) Defining ubiquitous language and shared data types to be unified across all specifications, (2) Organizing Issue drafts in units of "one task per specification file" that allow for parallel work, (3) Defining TDD Verification Criteria (normal, error, boundary) as guidelines for implementers writing test code.
 ---
 
 # Specification Planning

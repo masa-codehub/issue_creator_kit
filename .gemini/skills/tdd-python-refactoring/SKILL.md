@@ -1,6 +1,6 @@
 ---
 name: tdd-python-refactoring
-description: Executes the Python Refactoring Loop to improve code quality without changing behavior. Iterates through analysis, improvement, and verification using `python-verification` until all standards (SSOT, Ruff, Mypy) are met.
+description: Replaces the refactoring work of improving quality and maintainability of passed Python code without changing behavior. Typical use cases: (1) Enhancing type safety by eliminating Any types and tightening type hints (Mypy compliance), (2) Optimizing readability by introducing PEP 8 compliance or Pythonic idioms, (3) Resolving circular imports or redefining module responsibilities for structural improvement.
 ---
 
 # TDD Refactoring Cycle (Python)

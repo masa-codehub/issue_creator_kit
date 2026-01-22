@@ -1,6 +1,6 @@
 ---
 name: domain-modeling
-description: Skill for structuring requirements based on Domain-Driven Design (DDD) principles. Used for (1) defining bounded contexts and aggregates, (2) establishing ubiquitous language, and (3) clarifying domain responsibilities for ADRs, System Contexts, or Design Docs.
+description: Replaces the DDD-based modeling work of translating business knowledge into structures that can be reflected in code and architecture. Typical use cases: (1) Defining bounded contexts and creating relationship maps, (2) Identifying aggregates, entities, and value objects and articulating invariants, (3) Establishing a ubiquitous language used consistently across documentation and code.
 ---
 
 # ドメインモデリング (Domain Modeling)

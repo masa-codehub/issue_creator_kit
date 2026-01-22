@@ -1,6 +1,6 @@
 ---
 name: spec-planning-review
-description: Audits the specification creation plan (Common Definitions & Draft Issues) before execution. Strictly enforces Technical Designer values and ensures zero regressions by validating against loaded SSOT context via active-reconnaissance and ssot-verification.
+description: Replaces the review process for strictly auditing specification formulation plans from a Technical Designer perspective to ensure developers can implement without confusion. Typical use cases: (1) Confirming definitions of terms, types, and error codes do not contradict existing specifications, (2) Scrutinizing the Verify section of Issue drafts for concrete test perspectives, (3) SSOT consistency verification to ensure no regressions from high-level designs (Arch/Design Docs).
 ---
 
 # Specification Planning Review

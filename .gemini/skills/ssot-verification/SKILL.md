@@ -1,6 +1,6 @@
 ---
 name: ssot-verification
-description: Ensures conceptual integrity by verifying alignment with the Single Source of Truth (SSOT). Used when (1) proposing a new technical design or architecture, (2) refactoring core domain logic, or (3) verifying deliverables (e.g., design docs, code) to ensure they strictly adhere to existing ADRs and system principles.
+description: Replaces the task of strictly verifying whether proposals or deliverables conceptually align with the project's Single Source of Truth (SSOT). Typical use cases: (1) Confirming new design proposals do not violate past ADRs or design principles, (2) Checking ubiquitous language consistency and system boundary compliance, (3) Outputting findings with logical reasoning to guarantee consistency.
 ---
 
 # SSOTとの整合性検証プロトコル (Conceptual Integrity & Scrutiny)

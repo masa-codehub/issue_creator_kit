@@ -1,6 +1,6 @@
 ---
 name: github-checkout-feature-branch
-description: Ensure work is done on a feature branch. Uses the strategy defined in github-branch-strategy to determine branches and switch/create them.
+description: Replaces the task of ensuring development proceeds on the correct branch by switching and synchronizing branches. Typical use cases: (1) Creating a new feature branch after incorporating the latest Base Branch changes, (2) Safely returning to existing branches and synchronizing remote changes, (3) Instantly securing a workspace via automatic branch generation with timestamps.
 ---
 
 # GitHub Checkout Feature Branch

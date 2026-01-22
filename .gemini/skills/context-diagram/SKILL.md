@@ -1,6 +1,6 @@
 ---
 name: context-diagram
-description: Skill for creating C4 System Context Diagrams using Mermaid. Visualizes the system's boundaries, external actors (Users, External Systems), and high-level relationships.
+description: Replaces the diagramming task of visualizing the "big picture" and "external boundaries" of the system based on the C4 model (Level 1). Typical use cases: (1) MECE identification of actors and external systems involved with the system, (2) Defining dependency directions and data flows between elements with verb labels, (3) Automatically generating renderable Mermaid C4Context code.
 ---
 
 # コンテキスト図作成 (C4 System Context Diagram)

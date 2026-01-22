@@ -1,6 +1,6 @@
 ---
 name: github-branch-strategy
-description: Defines standard branch management logic. Typical use cases include (1) Creating a new feature branch from main to start work, (2) Switching to an existing feature branch to continue work or review, and (3) Moving local commits from main to a new feature branch for PR creation.
+description: Replaces the work of prescribing and adhering to branch definitions and operational rules (Git Flow) in the project. Typical use cases: (1) Identifying and updating the Base Branch that serves as the development starting point, (2) Creating new feature branches using naming conventions (type/subject), (3) Enforcing branch protection rules such as prohibiting direct commits to the main branch.
 ---
 
 # GitHub Branch Strategy

@@ -1,6 +1,6 @@
 ---
 name: spec-refactoring
-description: Refines specification documents for clarity, consistency, and completeness. Ensures no logical gaps or ambiguities exist, adhering to Technical Designer values.
+description: Replaces the work of detecting inconsistencies or ambiguities in drafted specifications and elevating them to a rigorous and complete Implementation SSOT. Typical use cases: (1) Eliminating vague expressions like TBD or Pending and replacing them with concrete definitions, (2) Verifying that inputs, outputs, validations, and error behaviors have enough specificity for TDD, (3) Automatically fixing document quality issues such as broken tables, indentation, or relative paths.
 ---
 
 # Specification Refactoring

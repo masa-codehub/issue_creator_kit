@@ -1,6 +1,6 @@
 ---
 name: retrospective
-description: Skill for conducting retrospectives using YWT and KPT. Used for (YWT) (1) deep-diving into technical failures, (2) analyzing unexpected tool/system behavior, (3) documenting key learnings from complex bug fixes; and (KPT) (1) improving task estimation and planning accuracy, (2) refining step-by-step procedures, (3) optimizing communication or tool usage workflows.
+description: Replaces the work of reflecting on completed tasks using YWT or KPT frameworks to derive structural improvement actions. Typical use cases: (1) Root cause analysis for technical failures or unknown behaviors (YWT), (2) Identifying and institutionalizing success factors in team processes and efficiency (KPT), (3) Formulating improvement hypotheses across 4 major axes (Safety, Efficiency, Context, Alignment).
 ---
 
 # 振り返り (Retrospective)

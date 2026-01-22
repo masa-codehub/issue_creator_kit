@@ -1,6 +1,6 @@
 ---
 name: spec-drafting
-description: Creates detailed specification documents using standardized templates. Focuses on clarity, rigor, and implementability, utilizing `spec-refactoring` for final polish.
+description: Replaces the actual work of drafting and updating detailed specifications that can be used directly as input for TDD using templates based on plans. Typical use cases: (1) Formulating rigorous API contracts defining data types and status codes, (2) Describing data specifications including DB schemas, indices, and migration strategies, (3) Articulating complex business logic, algorithms, and boundary value conditions.
 ---
 
 # Specification Drafting

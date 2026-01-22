@@ -1,6 +1,6 @@
 ---
 name: decision-support
-description: Skill for facilitating technical decisions through hypothesis verification. Identifies information gaps based on architectural values and factual clarity, asks a single high-impact question, and analyzes the response to converge on a decision.
+description: Replaces the task of identifying information gaps needed for decision-making and proposing strategic approaches to resolve bottlenecks. Typical use cases: (1) Analyzing trade-offs and 4 Big Risks among multiple options, (2) Generating the one single question most important for consensus, (3) Translating user responses into specific descriptive policies to be reflected in SSOT (ADRs, etc.).
 ---
 
 # 意思決定支援 (Decision Support)

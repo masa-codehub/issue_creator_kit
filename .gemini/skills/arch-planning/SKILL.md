@@ -1,6 +1,6 @@
 ---
 name: arch-planning
-description: Formulates a comprehensive strategy for visualizing ADRs. Analyzes the architectural intent, selects necessary diagrams, defines shared definitions, drafts specific issues, and reviews the plan for quality assurance.
+description: Replaces the design work of formulating a visualization strategy (Blueprint) to accurately convey ADR intent, defining terminology, and decomposing tasks. Typical use cases: (1) Defining mappings between ubiquitous language and physical directory structures, (2) Creating configuration plans for diagrams needed from structural, behavioral, and state perspectives, (3) Drafting verifiable Issue proposals that downstream diagrammers can execute without confusion.
 ---
 
 # Architecture Planning (Visualization Strategy)

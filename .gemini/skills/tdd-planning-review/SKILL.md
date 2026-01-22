@@ -1,6 +1,6 @@
 ---
 name: tdd-planning-review
-description: Audits the TDD implementation plan (Common Implementation Plan & Draft Issues) before execution. Ensures alignment with Specs, Architecture, and TDD principles.
+description: Replaces the review task of strictly auditing whether the created implementation plan satisfies specification coverage and architectural compliance. Typical use cases: (1) Confirming that planned test cases cover error cases and boundary values from the specifications, (2) Verifying that code placement follows project conventions such as Clean Architecture, (3) Scrutinizing the feasibility of proceeding with implementation using the proposed TDD scenarios.
 ---
 
 # TDD Planning Review

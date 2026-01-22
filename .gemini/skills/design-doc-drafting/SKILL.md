@@ -1,6 +1,6 @@
 ---
 name: design-doc-drafting
-description: Skill for drafting comprehensive Design Documents based on domain models and technical specifications. Facilitates strict self-review and user consensus to finalize the implementation blueprint.
+description: Replaces the work of drafting and refining Design Docs, which serve as the Implementation SSOT, by integrating various design outcomes. Typical use cases: (1) Creating comprehensive Design Doc drafts based on templates, (2) Strict self-review from perspectives of implementability, internal consistency, and data reliability, (3) Categorizing discovered issues into self-fixable items and discussion points requiring user judgment.
 ---
 
 # Design Doc起草 (Design Doc Drafting)

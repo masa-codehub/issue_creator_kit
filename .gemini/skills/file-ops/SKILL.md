@@ -1,6 +1,6 @@
 ---
 name: file-ops
-description: Skill for performing safe and precise file operations, including partial replacement, appending, and inserting content.
+description: Replaces the procedures for executing basic file operations such as rewriting, adding, and inserting content accurately and safely. Typical use cases: (1) Safe partial replacement of existing code and verifying consistency after reflection, (2) Reliable appending of metadata or new items to the end of a file, (3) Accurate insertion of code between specific lines to prevent syntax breakage.
 ---
 
 # ファイル操作 (File Operations)

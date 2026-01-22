@@ -1,6 +1,6 @@
 ---
 name: context-review
-description: Skill for auditing and refining System Context documents. Checks for Reality (Code) alignment, C4 model compliance, and clarity of boundaries before finalization.
+description: Replaces the task of auditing whether the updated system context accurately reflects the "real code" to ensure reliability. Typical use cases: (1) Verifying that described external system integrations match actual imports or API calls, (2) Checking for appropriate abstraction levels as C4 Context, (3) Ensuring no contradictions in terminology or relationships between Mermaid diagrams and text descriptions.
 ---
 
 # システムコンテキストレビュー (Context Review)

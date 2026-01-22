@@ -1,6 +1,6 @@
 ---
 name: objective-review
-description: Skill for auditing and refining proposed objectives. Used to strictly verify alignment with SSOT/Context and compliance with SMART criteria, ensuring no gaps, waste, or feasibility issues exist before execution.
+description: Replaces the quality management task of strictly auditing set objectives to eliminate defects and risks before execution. Typical use cases: (1) Physical consistency checks against the current file structure and code implementation, (2) Scrutinizing objectives against SMART criteria (specificity, measurability, feasibility, etc.), (3) Proposing improvements and encouraging re-setting of objectives towards more reliable steps.
 ---
 
 # 目標レビュー (Objective Review)
