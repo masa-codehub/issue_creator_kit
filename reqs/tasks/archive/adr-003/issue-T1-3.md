@@ -1,13 +1,15 @@
 ---
-title: "[Arch] Create Behavior Diagram for Auto-PR (Phase Chain)"
+depends_on:
+- issue-T1-1.md
+issue: '#229'
 labels:
-  - task
-  - TECHNICAL_DESIGNER
-roadmap: "docs/architecture/plans/20260122-adr003-plan.md"
-task_id: "T1-3"
-depends_on: ["issue-T1-1.md"]
-next_phase_path: ""
-status: "Draft"
+- task
+- TECHNICAL_DESIGNER
+next_phase_path: ''
+roadmap: docs/architecture/plans/20260122-adr003-plan.md
+status: Draft
+task_id: T1-3
+title: '[Arch] Create Behavior Diagram for Auto-PR (Phase Chain)'
 ---
 
 ## 1. Goal & Context (Why & What)

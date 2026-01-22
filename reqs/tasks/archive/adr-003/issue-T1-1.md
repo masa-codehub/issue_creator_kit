@@ -1,13 +1,14 @@
 ---
-title: "[Arch] Create Structure Diagram for Virtual Queue & Adapters"
-labels:
-  - task
-  - TECHNICAL_DESIGNER
-roadmap: "docs/architecture/plans/20260122-adr003-plan.md"
-task_id: "T1-1"
 depends_on: []
-next_phase_path: ""
-status: "Draft"
+issue: '#226'
+labels:
+- task
+- TECHNICAL_DESIGNER
+next_phase_path: ''
+roadmap: docs/architecture/plans/20260122-adr003-plan.md
+status: Draft
+task_id: T1-1
+title: '[Arch] Create Structure Diagram for Virtual Queue & Adapters'
 ---
 
 ## 1. Goal & Context (Why & What)

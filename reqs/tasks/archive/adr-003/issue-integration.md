@@ -1,13 +1,18 @@
 ---
-title: "[Arch] Create Integration Issue for ADR-003 Architecture"
+depends_on:
+- issue-T1-1.md
+- issue-T1-2.md
+- issue-T1-3.md
+- issue-T1-4.md
+issue: '#230'
 labels:
-  - task
-  - SYSTEM_ARCHITECT
-roadmap: "docs/architecture/plans/20260122-adr003-plan.md"
-task_id: "T1-Integration"
-depends_on: ["issue-T1-1.md", "issue-T1-2.md", "issue-T1-3.md", "issue-T1-4.md"]
-next_phase_path: ""
-status: "Draft"
+- task
+- SYSTEM_ARCHITECT
+next_phase_path: ''
+roadmap: docs/architecture/plans/20260122-adr003-plan.md
+status: Draft
+task_id: T1-Integration
+title: '[Arch] Create Integration Issue for ADR-003 Architecture'
 ---
 
 ## 1. Goal & Context (Why & What)

@@ -1,13 +1,14 @@
 ---
-title: "[Arch] Create State Diagram for Task Lifecycle"
-labels:
-  - task
-  - TECHNICAL_DESIGNER
-roadmap: "docs/architecture/plans/20260122-adr003-plan.md"
-task_id: "T1-4"
 depends_on: []
-next_phase_path: ""
-status: "Draft"
+issue: '#227'
+labels:
+- task
+- TECHNICAL_DESIGNER
+next_phase_path: ''
+roadmap: docs/architecture/plans/20260122-adr003-plan.md
+status: Draft
+task_id: T1-4
+title: '[Arch] Create State Diagram for Task Lifecycle'
 ---
 
 ## 1. Goal & Context (Why & What)
