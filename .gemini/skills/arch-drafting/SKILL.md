@@ -1,6 +1,6 @@
 ---
 name: arch-drafting
-description: 計画に基づき、構造設計と品質設計を統合したアーキテクチャ図（Mermaid）とドキュメントを作成・更新する実作業を代替します。代表的なユースケース：(1) C4モデルに基づいたコンポーネント構造の可視化。(2) シーケンス図による動的フローと例外処理（Alternative Frame）の設計。(3) データ整合性や可観測性など、非機能要件に基づいた品質方針の図解。
+description: Replaces the actual work of creating and updating architecture diagrams (Mermaid) and documents that integrate structural and quality design based on plans. Typical use cases: (1) Visualizing component structures based on the C4 model, (2) Designing dynamic flows and exception handling (Alternative Frames) via sequence diagrams, (3) Illustrating quality policies based on non-functional requirements such as data consistency or observability.
 ---
 
 # Architecture Drafting

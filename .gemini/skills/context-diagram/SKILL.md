@@ -1,6 +1,6 @@
 ---
 name: context-diagram
-description: C4モデル（Level 1）に基づき、システムの「全体像」と「外部との境界」を可視化する作図作業を代替します。代表的なユースケース：(1) システムに関わるアクターと外部システムをMECEに特定する。(2) 要素間の依存方向とデータの流れを動詞ラベル付きで定義する。(3) レンダリング可能なMermaid C4Contextコードの自動生成。
+description: Replaces the diagramming task of visualizing the "big picture" and "external boundaries" of the system based on the C4 model (Level 1). Typical use cases: (1) MECE identification of actors and external systems involved with the system, (2) Defining dependency directions and data flows between elements with verb labels, (3) Automatically generating renderable Mermaid C4Context code.
 ---
 
 # コンテキスト図作成 (C4 System Context Diagram)

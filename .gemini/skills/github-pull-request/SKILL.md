@@ -1,6 +1,6 @@
 ---
 name: github-pull-request
-description: プルリクエストの作成から管理、マージ前の最終確認プロセス全体を代替します。代表的なユースケース：(1) マージ先ブランチとの同期と競合チェック、および自動リベース。(2) 規約に基づいたタイトルと、目的・変更概要・検証方法を含む詳細なBodyの作成。(3) レビュー指摘への対応や、依存関係に基づいたフェーズ昇進のPR管理。
+description: Replaces the entire process from creating and managing pull requests to final verification before merging. Typical use cases: (1) Synchronizing with the base branch, checking for conflicts, and automatic rebasing, (2) Creating titles based on conventions and detailed bodies including purpose, change summary, and verification methods, (3) Managing PRs through review feedback cycles and phase promotions based on dependencies.
 ---
 
 # プルリクエストの管理 (PR Protocol)

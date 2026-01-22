@@ -1,6 +1,6 @@
 ---
 name: spec-planning
-description: 要件を分析し、高品質な詳細仕様書を作成するための戦略策定、共通定義作成、およびタスク分割作業を代替します。代表的なユースケース：(1) 全仕様書で統一すべきユビキタス言語や共通データ型を定義する。(2) 並列作業可能な「1タスク1仕様ファイル」の単位でIssue案を構成する。(3) 実装者がテストコードを書く際の指針となる「TDD検証基準（正常・異常・境界値）」を定義する。
+description: Replaces the work of analyzing requirements, formulating strategies to create high-quality detailed specifications, creating shared definitions, and decomposing tasks. Typical use cases: (1) Defining ubiquitous language and shared data types to be unified across all specifications, (2) Organizing Issue drafts in units of "one task per specification file" that allow for parallel work, (3) Defining TDD Verification Criteria (normal, error, boundary) as guidelines for implementers writing test code.
 ---
 
 # Specification Planning

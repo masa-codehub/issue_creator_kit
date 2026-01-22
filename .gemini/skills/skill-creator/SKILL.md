@@ -1,6 +1,6 @@
 ---
 name: skill-creator
-description: 新しいスキルの作成や既存スキルの改修を統括し、エージェントの能力を再現可能な形式知として資産化する作業を代替します。代表的なユースケース：(1) 成功した振り返りパターンを汎用的なスキルとして定式化する。(2) 複雑な操作に対する安全プロトコル（4大評価軸）を設計する。(3) 新しいツールやフレームワーク導入時の標準ワークフローの構築。
+description: Replaces the work of presiding over the creation of new skills or refinement of existing ones to capitalize agent capabilities as reproducible knowledge. Typical use cases: (1) Formalizing successful retrospective patterns into generic skills, (2) Designing safety protocols (4 axes) for complex operations, (3) Building standard workflows for introducing new tools or frameworks.
 ---
 
 # スキル作成 (Skill Creator)

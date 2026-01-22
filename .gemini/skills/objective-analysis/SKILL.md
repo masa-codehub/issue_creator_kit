@@ -1,6 +1,6 @@
 ---
 name: objective-analysis
-description: ユーザーの発言やIssueの背景にある「真の意図」を抽出し、多角的な解決仮説を立案する作業を代替します。代表的なユースケース：(1) 5W1Hフレームワークを用いた情報の構造化。(2) 現状とSSOTを統合した「実証的・飛躍的・逆説的」な3つの仮説の立案。(3) 仮説を検証するために必要な情報の欠損（Unknowns）の特定。
+description: Replaces the work of extracting the true intent behind user statements or Issues and formulating multi-perspective solution hypotheses. Typical use cases: (1) Structuring information using the 5W1H framework, (2) Formulating grounded, leap, and paradoxical hypotheses by integrating current status and SSOT, (3) Identifying missing information (Unknowns) required to verify hypotheses.
 ---
 
 # 目的分析 (Objective Analysis)

@@ -1,6 +1,6 @@
 ---
 name: adr-drafting
-description: 決定されたアーキテクチャ仮説を、標準フォーマットに従って論理的かつ詳細なADRドキュメントとして起草する作業を代替します。代表的なユースケース：(1) 未来の開発者のために、決定の背景・理由・影響を「物語」として記録する。(2) 現状のコードベースの偵察結果（事実）を引用し、課題解決の正当性を記述する。(3) メリットだけでなく、トレードオフや残存リスク（4大リスク）を隠さず明文化する。
+description: Replaces the work of drafting determined architectural hypotheses into logical and detailed ADR documents following standard formats. Typical use cases: (1) Recording the background, reasoning, and impact of decisions as a "story" for future developers, (2) Citing reconnaissance facts from the current codebase to justify solutions, (3) Articulating not only benefits but also trade-offs and residual risks (4 Big Risks) transparently.
 ---
 
 # ADR起草 (ADR Drafting)

@@ -1,6 +1,6 @@
 ---
 name: spec-drafting
-description: 計画に基づき、テンプレートを用いてTDDの入力としてそのまま使えるレベルの詳細仕様書を起草・更新する実作業を代替します。代表的なユースケース：(1) データ型やステータスコードまで定義した厳密なAPIコントラクトの策定。(2) DBスキーマ、インデックス、マイグレーション戦略を含むデータ仕様の記述。(3) 複雑なビジネスロジックやアルゴリズム、境界値条件の明文化。
+description: Replaces the actual work of drafting and updating detailed specifications that can be used directly as input for TDD using templates based on plans. Typical use cases: (1) Formulating rigorous API contracts defining data types and status codes, (2) Describing data specifications including DB schemas, indices, and migration strategies, (3) Articulating complex business logic, algorithms, and boundary value conditions.
 ---
 
 # Specification Drafting

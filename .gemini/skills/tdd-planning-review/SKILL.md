@@ -1,6 +1,6 @@
 ---
 name: tdd-planning-review
-description: 作成された実装計画が、仕様の網羅性とアーキテクチャ準拠性を満たしているかを厳格に監査するレビュー作業を代替します。代表的なユースケース：(1) 計画されたテストケースが仕様書のエラーケースや境界値を網羅しているかの確認。(2) コードの配置場所がクリーンアーキテクチャ等のプロジェクト規約に従っているかの検証。(3) 提示されたTDDシナリオで実際に実装が進められるかの妥当性精査。
+description: Replaces the review task of strictly auditing whether the created implementation plan satisfies specification coverage and architectural compliance. Typical use cases: (1) Confirming that planned test cases cover error cases and boundary values from the specifications, (2) Verifying that code placement follows project conventions such as Clean Architecture, (3) Scrutinizing the feasibility of proceeding with implementation using the proposed TDD scenarios.
 ---
 
 # TDD Planning Review

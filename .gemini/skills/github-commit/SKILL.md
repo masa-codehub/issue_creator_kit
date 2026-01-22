@@ -1,6 +1,6 @@
 ---
 name: github-commit
-description: 変更内容をリポジトリに記録する際、規約に沿った形式で確実にコミットする作業を代替します。代表的なユースケース：(1) 実装完了後のプロダクトコードとテストの一括ステージングとコミット。(2) アーキテクチャ図やADRの起草など、設計成果物の確実な記録。(3) pre-commit フックによるエラー発生時の自動修正と再試行プロセスの管理。
+description: Replaces the work of recording changes to the repository following specific conventions. Typical use cases: (1) Batch staging and committing product code and tests after implementation, (2) Reliably recording design artifacts such as architectural diagrams or ADR drafts, (3) Managing automatic fix and retry processes when pre-commit hooks fail.
 ---
 
 # GitHub Commit

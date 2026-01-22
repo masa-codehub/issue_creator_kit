@@ -1,6 +1,6 @@
 ---
 name: github-branch-strategy
-description: プロジェクトにおけるブランチの定義と運用ルール（Git Flow）を規定・遵守する作業を代替します。代表的なユースケース：(1) 開発の起点となる Base Branch の特定と最新化。(2) 規約に基づいた命名（type/subject）による機能ブランチの新規作成。(3) メインブランチへの直接コミット禁止など、ブランチ保護ルールの徹底。
+description: Replaces the work of prescribing and adhering to branch definitions and operational rules (Git Flow) in the project. Typical use cases: (1) Identifying and updating the Base Branch that serves as the development starting point, (2) Creating new feature branches using naming conventions (type/subject), (3) Enforcing branch protection rules such as prohibiting direct commits to the main branch.
 ---
 
 # GitHub Branch Strategy

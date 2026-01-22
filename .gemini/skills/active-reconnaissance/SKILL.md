@@ -1,6 +1,6 @@
 ---
 name: active-reconnaissance
-description: 理想（ユーザーの要求）と現実（コード/ドキュメント）の間の「ギャップ」を能動的に調査し、特定する作業を代替します。代表的なユースケース：(1) 依頼内容と矛盾する既存ADRや制約の洗い出し。(2) 抽象的な要望に対し、影響を受ける具体的なコードやパスの特定。(3) 実現可能性や技術的負債に基づく初期リスク評価。
+description: Replaces the work of actively investigating and identifying gaps between the ideal (user request) and reality (code/documents). Typical use cases: (1) Uncovering existing ADRs or constraints that contradict requests, (2) Identifying specific code or paths affected by abstract requests, (3) Initial risk assessment based on feasibility and technical debt.
 ---
 
 # 能動的偵察 (Active Reconnaissance)

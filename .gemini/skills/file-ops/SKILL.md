@@ -1,6 +1,6 @@
 ---
 name: file-ops
-description: ファイルの書き換え、追加、挿入などの基本的なファイル操作を正確かつ安全に実行する手順を代替します。代表的なユースケース：(1) 既存コードの安全な部分置換と反映後の整合性確認。(2) ファイル末尾へのメタデータや新規項目の確実な追記。(3) 特定の行間への正確なコード挿入と構文崩れの防止。
+description: Replaces the procedures for executing basic file operations such as rewriting, adding, and inserting content accurately and safely. Typical use cases: (1) Safe partial replacement of existing code and verifying consistency after reflection, (2) Reliable appending of metadata or new items to the end of a file, (3) Accurate insertion of code between specific lines to prevent syntax breakage.
 ---
 
 # ファイル操作 (File Operations)

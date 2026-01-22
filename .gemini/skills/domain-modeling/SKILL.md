@@ -1,6 +1,6 @@
 ---
 name: domain-modeling
-description: ビジネス知識をコードやアーキテクチャに落とし込める構造へと変換する、DDD（ドメイン駆動設計）に基づくモデリング作業を代替します。代表的なユースケース：(1) 境界づけられたコンテキストの定義と関係性マップの作成。(2) 集約・エンティティ・値オブジェクトの特定と不変条件の明文化。(3) ドキュメントとコードで共通して使用するユビキタス言語の確立。
+description: Replaces the DDD-based modeling work of translating business knowledge into structures that can be reflected in code and architecture. Typical use cases: (1) Defining bounded contexts and creating relationship maps, (2) Identifying aggregates, entities, and value objects and articulating invariants, (3) Establishing a ubiquitous language used consistently across documentation and code.
 ---
 
 # ドメインモデリング (Domain Modeling)

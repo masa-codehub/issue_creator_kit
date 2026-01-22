@@ -1,6 +1,6 @@
 ---
 name: arch-planning
-description: ADRの意図を正確に伝えるための図解戦略（Blueprint）を策定し、用語定義やタスク分割を行う設計作業を代替します。代表的なユースケース：(1) ユビキタス言語と物理的なディレクトリ構造のマッピングを定義する。(2) 構造・振る舞い・状態の各視点で必要な図の構成案を作成する。(3) 後続の作図者が迷わず実行できる、検証可能なIssue案を起草する。
+description: Replaces the design work of formulating a visualization strategy (Blueprint) to accurately convey ADR intent, defining terminology, and decomposing tasks. Typical use cases: (1) Defining mappings between ubiquitous language and physical directory structures, (2) Creating configuration plans for diagrams needed from structural, behavioral, and state perspectives, (3) Drafting verifiable Issue proposals that downstream diagrammers can execute without confusion.
 ---
 
 # Architecture Planning (Visualization Strategy)

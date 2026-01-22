@@ -1,6 +1,6 @@
 ---
 name: context-drafting
-description: プロジェクトの憲法となる `system-context.md` の作成・更新作業を代替し、チームのメンタルモデルを統一します。代表的なユースケース：(1) ビジネス価値、境界、戦略的トレードオフなどの根本方針の明文化。(2) 厳格な自己レビューによる論理矛盾の排除と、ユーザー判断が必要な論点の抽出。(3) ユーザーとの対話を通じたシステム定義の合意形成ループの管理。
+description: Replaces the work of creating and updating the system-context.md, which serves as the project's constitution, to unify the team's mental model. Typical use cases: (1) Articulating fundamental policies such as business value, boundaries, and strategic trade-offs, (2) Eliminating logical contradictions through strict self-review and extracting points requiring user judgment, (3) Managing consensus loops on system definitions through user dialogue.
 ---
 
 # システムコンテキスト起草 (System Context Drafting)

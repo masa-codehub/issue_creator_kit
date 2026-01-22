@@ -1,6 +1,6 @@
 ---
 name: issue-review
-description: 作成されたIssueドラフトが、プロジェクトのSSOTやエージェントの価値観に合致しているかを厳格に監査する作業を代替します。代表的なユースケース：(1) リンクされたファイルパスの実在確認やメタデータの形式チェック。(2) アウトカム志向や厳密性など、各ロールの視点からの品質監査。(3) 概念レベルでの不整合を検出し、具体的な改善案をセットで提示する。
+description: Replaces the task of strictly auditing created Issue drafts to ensure they align with the project's SSOT and agent values. Typical use cases: (1) Verifying the existence of linked file paths and format checking of metadata, (2) Quality auditing from perspectives of outcome-orientation and rigor across roles, (3) Detecting conceptual inconsistencies and providing specific improvement proposals.
 ---
 
 # Issue Review (Value & Reality Driven Audit)

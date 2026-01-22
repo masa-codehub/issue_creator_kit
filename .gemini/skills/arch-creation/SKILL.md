@@ -1,6 +1,6 @@
 ---
 name: arch-creation
-description: 承認されたADRを具体的な構成図やシーケンス図として可視化するプロセスを統括し、アーキテクチャの整合性を保証する作業を代替します。代表的なユースケース：(1) ADRを具体的な作図タスク（Issue案）へ分解し、作業の基盤を構築する。(2) 分散して作成された複数の図を統合し、SSOTとの完全な整合性を監査する。(3) 後続の仕様策定（Spec Creation）のための前提条件としてアーキテクチャ状態を確定させる。
+description: Replaces the process of visualizing approved ADRs into concrete diagrams and sequence charts while ensuring architectural integrity. Typical use cases: (1) Decomposing approved ADRs into specific diagramming tasks (Issue drafts) to build the work foundation, (2) Integrating multiple distributed diagrams and auditing complete alignment with SSOT, (3) Finalizing the architectural state as a prerequisite for subsequent specification (Spec Creation).
 ---
 
 # アーキテクチャ構築オーケストレーション (Architecture Creation Orchestration)

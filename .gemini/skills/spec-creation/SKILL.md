@@ -1,6 +1,6 @@
 ---
 name: spec-creation
-description: 上位設計（Arch/Design Doc）を開発者がそのまま実装できるレベルの詳細仕様書（Specs）に翻訳・統合するプロセス全体を代替します。代表的なユースケース：(1) 大規模な設計変更を具体的な仕様策定タスク（Issue案）へ分解する。(2) 分散して作成された複数の仕様書（API, DB, ロジック）間の整合性を監査し、統合する。(3) TDD（テスト駆動開発）を開始するための厳密な入力情報としての仕様一式を確定させる。
+description: Replaces the entire process of translating high-level designs (Architecture/Design Docs) into detailed technical specifications (Specs) that developers can implement immediately. Typical use cases: (1) Decomposing large design changes into specific specification tasks (Issue drafts), (2) Auditing and integrating consistency between multiple distributed specification documents (API, DB, Logic), (3) Finalizing a rigorous set of specifications as the formal input for Test-Driven Development (TDD).
 ---
 
 # Specification Creation Orchestration

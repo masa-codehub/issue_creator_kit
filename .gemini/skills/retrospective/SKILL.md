@@ -1,6 +1,6 @@
 ---
 name: retrospective
-description: 完了したタスクを YWT または KPT のフレームワークで振り返り、構造的な改善アクションを導き出す作業を代替します。代表的なユースケース：(1) 技術的な失敗や未知の挙動に対する根本原因分析（YWT）。(2) チームのプロセスや効率における成功要因の特定と定着化（KPT）。(3) 4大評価軸（安全性・効率性・コンテキスト・合意形成）による多角的な改善仮説の立案。
+description: Replaces the work of reflecting on completed tasks using YWT or KPT frameworks to derive structural improvement actions. Typical use cases: (1) Root cause analysis for technical failures or unknown behaviors (YWT), (2) Identifying and institutionalizing success factors in team processes and efficiency (KPT), (3) Formulating improvement hypotheses across 4 major axes (Safety, Efficiency, Context, Alignment).
 ---
 
 # 振り返り (Retrospective)

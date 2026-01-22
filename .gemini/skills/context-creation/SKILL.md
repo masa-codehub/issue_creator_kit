@@ -1,6 +1,6 @@
 ---
 name: context-creation
-description: システムの全体像（SSOT）を定義し、現実のコードと設計図の整合性を動的に維持するプロセス全体を代替します。代表的なユースケース：(1) 新規プロジェクト開始時における初期のシステム境界とドメインモデルの定義。(2) 実装が進んだ後のコードベースの実態に合わせ、古くなったドキュメントを最新化する。(3) 重大なアーキテクチャ決定（ADR）を開始する前の、確固たる前提知識（SSOT）の構築。
+description: Replaces the process of defining the system's overall picture (SSOT) and dynamically maintaining alignment between codebase reality and design maps. Typical use cases: (1) Defining initial system boundaries and domain models at project start, (2) Updating outdated documentation to match the current state of the implementation as it progresses, (3) Building firm prerequisite knowledge (SSOT) before initiating significant Architecture Decision Records (ADR).
 ---
 
 # システムコンテキスト作成・維持 (Context Creation & Maintenance)

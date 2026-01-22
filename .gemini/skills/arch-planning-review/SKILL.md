@@ -1,6 +1,5 @@
----
 name: arch-planning-review
-description: 作成されたアーキテクチャ更新計画が、ADRやシステムコンテキストと整合しているかを厳格に監査するレビュー作業を代替します。代表的なユースケース：(1) 抽象的な定義が具体的なファイルパスに正しくマッピングされているかの精査。(2) Issue案がテンプレートに準拠し、境界が明確であるかの確認。(3) 既存設計からのデグレや原則違反がないかのSSOT整合性検証。
+description: Replaces the review process for strictly auditing created architecture update plans against ADRs and system contexts. Typical use cases: (1) Scrutinizing whether abstract definitions are correctly mapped to concrete file paths, (2) Confirming Issue drafts adhere to templates and have clear boundaries, (3) Verifying SSOT consistency to ensure no regressions or principle violations from existing designs.
 ---
 
 # Architecture Planning Review

@@ -1,6 +1,6 @@
 ---
 name: decision-support
-description: 意思決定に必要な情報の欠損を特定し、ボトルネックを解消するための戦略的アプローチを提案する作業を代替します。代表的なユースケース：(1) 複数の選択肢のトレードオフと4大リスクの分析。(2) 合意形成のために最も重要な「たった一つの質問」の生成。(3) ユーザーの回答をSSOT（ADR等）へ反映すべき具体的な記述方針への翻訳。
+description: Replaces the task of identifying information gaps needed for decision-making and proposing strategic approaches to resolve bottlenecks. Typical use cases: (1) Analyzing trade-offs and 4 Big Risks among multiple options, (2) Generating the one single question most important for consensus, (3) Translating user responses into specific descriptive policies to be reflected in SSOT (ADRs, etc.).
 ---
 
 # 意思決定支援 (Decision Support)

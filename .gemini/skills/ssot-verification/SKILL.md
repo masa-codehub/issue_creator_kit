@@ -1,6 +1,6 @@
 ---
 name: ssot-verification
-description: 提案や成果物が、プロジェクトの「唯一の正解（SSOT）」と概念的に整合しているかを厳密に検証する作業を代替します。代表的なユースケース：(1) 新しい設計案が過去のADRや設計原則に違反していないかの確認。(2) ユビキタス言語の一貫性やシステム境界の遵守チェック。(3) 考察結果を論理的な根拠と共に詳細に出力し、一貫性を保証する。
+description: Replaces the task of strictly verifying whether proposals or deliverables conceptually align with the project's Single Source of Truth (SSOT). Typical use cases: (1) Confirming new design proposals do not violate past ADRs or design principles, (2) Checking ubiquitous language consistency and system boundary compliance, (3) Outputting findings with logical reasoning to guarantee consistency.
 ---
 
 # SSOTとの整合性検証プロトコル (Conceptual Integrity & Scrutiny)

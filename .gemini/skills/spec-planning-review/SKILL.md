@@ -1,6 +1,6 @@
 ---
 name: spec-planning-review
-description: 仕様策定計画を Technical Designer の価値観で厳格に監査し、開発者が迷わず実装できる品質であることを保証する作業を代替します。代表的なユースケース：(1) 用語・型・エラーコードの定義が既存仕様と矛盾していないかの確認。(2) Issue案の「Verify」セクションに具体的なテスト観点が記述されているかの精査。(3) 上位設計（Arch/Design Doc）からのデグレがないかのSSOT整合性検証。
+description: Replaces the review process for strictly auditing specification formulation plans from a Technical Designer perspective to ensure developers can implement without confusion. Typical use cases: (1) Confirming definitions of terms, types, and error codes do not contradict existing specifications, (2) Scrutinizing the Verify section of Issue drafts for concrete test perspectives, (3) SSOT consistency verification to ensure no regressions from high-level designs (Arch/Design Docs).
 ---
 
 # Specification Planning Review

@@ -1,6 +1,6 @@
 ---
 name: tdd-creation
-description: 詳細仕様書に基づき、TDD（テスト駆動開発）によって機能を実現するための実装計画策定と結果の統合プロセス全体を代替します。代表的なユースケース：(1) 詳細仕様をTDDベースの実装タスク（Issue案）へ分解し、共通の実装方針を定める。(2) 分散して行われた実装結果（コードとテスト）を統合し、システム全体の一貫性を保証する。(3) 最終的な実装成果物が仕様を完全に満たし、テストカバレッジ要件をクリアしているか監査する。
+description: Replaces the entire process of formulating implementation plans and integrating results based on detailed specifications through Test-Driven Development (TDD). Typical use cases: (1) Decomposing detailed specifications into TDD-based implementation tasks (Issue drafts) and establishing common implementation policies, (2) Integrating distributed implementation results (code and tests) to guarantee system-wide consistency, (3) Auditing whether the final implementation deliverables completely satisfy specifications and clear test coverage requirements.
 ---
 
 # TDD Implementation Orchestration

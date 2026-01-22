@@ -1,6 +1,6 @@
 ---
 name: context-review
-description: 更新されたシステムコンテキストが「現実のコード」を正確に反映しているかを監査し、信頼性を保証する作業を代替します。代表的なユースケース：(1) 記述された外部システム連携が、実際のimportやAPI呼び出しと一致しているかの検証。(2) C4 Contextとしての適切な抽象度が保たれているかのチェック。(3) Mermaid図とテキスト記述の間で、用語や関係性に矛盾がないかの確認。
+description: Replaces the task of auditing whether the updated system context accurately reflects the "real code" to ensure reliability. Typical use cases: (1) Verifying that described external system integrations match actual imports or API calls, (2) Checking for appropriate abstraction levels as C4 Context, (3) Ensuring no contradictions in terminology or relationships between Mermaid diagrams and text descriptions.
 ---
 
 # システムコンテキストレビュー (Context Review)

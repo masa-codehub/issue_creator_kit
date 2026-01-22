@@ -1,6 +1,6 @@
 ---
 name: tdd-python-refactoring
-description: テストがパスした状態のPythonコードに対し、振る舞いを変えずに品質と保守性を向上させるリファクタリング作業を代替します。代表的なユースケース：(1) `Any` 型の排除や型ヒントの厳密化による型安全性の向上（Mypy対応）。(2) PEP 8 準拠やPythonicなイディオムの導入による可読性の最適化。(3) 循環インポートの解消やモジュールの責務の再定義による構造的改善。
+description: Replaces the refactoring work of improving quality and maintainability of passed Python code without changing behavior. Typical use cases: (1) Enhancing type safety by eliminating Any types and tightening type hints (Mypy compliance), (2) Optimizing readability by introducing PEP 8 compliance or Pythonic idioms, (3) Resolving circular imports or redefining module responsibilities for structural improvement.
 ---
 
 # TDD Refactoring Cycle (Python)

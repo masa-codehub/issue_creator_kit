@@ -1,6 +1,6 @@
 ---
 name: tdd-planning
-description: 詳細仕様を分析し、どのレイヤーにどのような方針でコードとテストを配置するかという実装戦略の策定作業を代替します。代表的なユースケース：(1) 仕様書の各要素をドメイン・ユースケース・インフラの各層へマッピングする。(2) テスト範囲やモックの方針、共有すべきスタブの定義。(3) 実装者が Red-Green-Refactor サイクルを回すための具体的な「TDDシナリオ」の設計。
+description: Replaces the implementation strategy formulation work of analyzing detailed specifications and deciding how code and tests should be placed across layers. Typical use cases: (1) Mapping each element of the specification to domain, use case, or infrastructure layers, (2) Defining test scope, mocking policies, and shared stubs, (3) Designing specific TDD Scenarios for implementers to follow the Red-Green-Refactor cycle.
 ---
 
 # TDD Planning (Implementation Strategy)

@@ -1,6 +1,6 @@
 ---
 name: design-doc-creation
-description: 新機能や大規模変更におけるアーキテクチャ上の意思決定と全体構造の設計プロセス全体を代替します。代表的なユースケース：(1) ユーザー要件と技術的制約に基づいた多角的なアプローチ（仮説）の立案と評価。(2) 主要なドメインモデルとコンポーネント間の依存関係の定義。(3) ユーザーとの対話を通じた設計方針の収束とDesign Docの承認取得。
+description: Replaces the entire design process for architectural decision-making and overall structural design for new features or major changes. Typical use cases: (1) Formulating and evaluating multi-perspective approaches (hypotheses) based on user requirements and technical constraints, (2) Defining dependencies between major domain models and components, (3) Converging on design policies through user dialogue and obtaining Design Doc approval.
 ---
 
 # Design Doc作成オーケストレーション (Design Doc Creation)
