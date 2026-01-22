@@ -1,6 +1,6 @@
 ---
 name: objective-setting
-description: Core skill for setting actionable goals using intent analysis and SMART criteria tailored for autonomous agents. Ensures tasks are Specific (tool-level), Measurable (verification-based), Achievable (context-sufficient), Relevant (scope-strict), and Time-boxed (single-turn).
+description: ユーザーの抽象的な意図を、エージェントが自律実行可能な具体的かつ検証可能な目標（SMART）に変換する作業を代替します。代表的なユースケース：(1) 会話やIssueから「達成すべき状態（Outcome）」を定義する。(2) 目標を具体的なツール操作とパラメータレベルまで落とし込む。(3) 客観的な判定が可能な検証コマンドと期待結果を定義する。
 ---
 
 # 目標設定 (Objective Setting)

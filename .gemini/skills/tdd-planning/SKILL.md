@@ -1,6 +1,6 @@
 ---
 name: tdd-planning
-description: Formulates a comprehensive strategy for TDD-based implementation. Analyzes specifications (Specs) and handover items, defines shared implementation policies, and drafts specific TDD tasks (Issues).
+description: 詳細仕様を分析し、どのレイヤーにどのような方針でコードとテストを配置するかという実装戦略の策定作業を代替します。代表的なユースケース：(1) 仕様書の各要素をドメイン・ユースケース・インフラの各層へマッピングする。(2) テスト範囲やモックの方針、共有すべきスタブの定義。(3) 実装者が Red-Green-Refactor サイクルを回すための具体的な「TDDシナリオ」の設計。
 ---
 
 # TDD Planning (Implementation Strategy)

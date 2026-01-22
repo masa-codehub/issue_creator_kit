@@ -1,6 +1,6 @@
 ---
 name: decision-support
-description: Skill for facilitating technical decisions through hypothesis verification. Identifies information gaps based on architectural values and factual clarity, asks a single high-impact question, and analyzes the response to converge on a decision.
+description: 意思決定に必要な情報の欠損を特定し、ボトルネックを解消するための戦略的アプローチを提案する作業を代替します。代表的なユースケース：(1) 複数の選択肢のトレードオフと4大リスクの分析。(2) 合意形成のために最も重要な「たった一つの質問」の生成。(3) ユーザーの回答をSSOT（ADR等）へ反映すべき具体的な記述方針への翻訳。
 ---
 
 # 意思決定支援 (Decision Support)

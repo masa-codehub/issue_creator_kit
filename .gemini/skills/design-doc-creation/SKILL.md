@@ -1,6 +1,6 @@
 ---
 name: design-doc-creation
-description: Orchestrator skill for creating Design Documents. Focuses on architectural decisions and structural design within a feature scope, bridging the gap between abstract requirements and concrete specifications (Spec) for AI implementation.
+description: 新機能や大規模変更におけるアーキテクチャ上の意思決定と全体構造の設計プロセス全体を代替します。代表的なユースケース：(1) ユーザー要件と技術的制約に基づいた多角的なアプローチ（仮説）の立案と評価。(2) 主要なドメインモデルとコンポーネント間の依存関係の定義。(3) ユーザーとの対話を通じた設計方針の収束とDesign Docの承認取得。
 ---
 
 # Design Doc作成オーケストレーション (Design Doc Creation)

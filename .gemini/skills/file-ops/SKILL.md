@@ -1,6 +1,6 @@
 ---
 name: file-ops
-description: Skill for performing safe and precise file operations, including partial replacement, appending, and inserting content.
+description: ファイルの書き換え、追加、挿入などの基本的なファイル操作を正確かつ安全に実行する手順を代替します。代表的なユースケース：(1) 既存コードの安全な部分置換と反映後の整合性確認。(2) ファイル末尾へのメタデータや新規項目の確実な追記。(3) 特定の行間への正確なコード挿入と構文崩れの防止。
 ---
 
 # ファイル操作 (File Operations)

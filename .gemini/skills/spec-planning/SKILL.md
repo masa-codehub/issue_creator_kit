@@ -1,6 +1,6 @@
 ---
 name: spec-planning
-description: Formulates a comprehensive strategy for creating specifications. Analyzes requirements (ADR/Issue), defines shared definitions, drafts specific issues, and reviews the plan for quality assurance.
+description: 要件を分析し、高品質な詳細仕様書を作成するための戦略策定、共通定義作成、およびタスク分割作業を代替します。代表的なユースケース：(1) 全仕様書で統一すべきユビキタス言語や共通データ型を定義する。(2) 並列作業可能な「1タスク1仕様ファイル」の単位でIssue案を構成する。(3) 実装者がテストコードを書く際の指針となる「TDD検証基準（正常・異常・境界値）」を定義する。
 ---
 
 # Specification Planning

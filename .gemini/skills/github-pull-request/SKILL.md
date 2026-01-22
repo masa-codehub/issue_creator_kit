@@ -1,6 +1,6 @@
 ---
 name: github-pull-request
-description: Create and manage pull requests when a feature is complete, a bug is fixed, or documentation is updated. Typical use cases include (1) Proposing a finished feature or bug fix for integration into the base branch, (2) Requesting approval for design artifacts (ADR, Architecture, Specs) to promote to the next phase, and (3) Updating descriptions, addressing review feedback, or syncing with origin before merging.
+description: プルリクエストの作成から管理、マージ前の最終確認プロセス全体を代替します。代表的なユースケース：(1) マージ先ブランチとの同期と競合チェック、および自動リベース。(2) 規約に基づいたタイトルと、目的・変更概要・検証方法を含む詳細なBodyの作成。(3) レビュー指摘への対応や、依存関係に基づいたフェーズ昇進のPR管理。
 ---
 
 # プルリクエストの管理 (PR Protocol)

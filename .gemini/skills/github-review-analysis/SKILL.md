@@ -1,6 +1,6 @@
 ---
 name: github-review-analysis
-description: Analyzes PR review comments, verifies them against SSOT, and formulates a plan. Categorizes comments into Accept, Discuss, or Explain, and executes 'Accept' items while highlighting others for user decision.
+description: PRについたレビューコメントを分析・分類し、実行可能な修正計画を策定する作業を代替します。代表的なユースケース：(1) 未解決のコメントとその周辺コード、SSOTとの整合性の自動確認。(2) 指摘事項を「受諾・議論・説明」に分類し、対応方針を明確化する。(3) 具体的修正プランを含む分析レポートの作成と、修正の自律実行。
 ---
 
 # GitHub Review Analysis

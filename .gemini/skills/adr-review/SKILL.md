@@ -1,6 +1,6 @@
 ---
 name: adr-review
-description: Skill for auditing and refining ADR documents. checks for SSOT alignment, logical consistency, and adherence to architectural values before finalization.
+description: 起草されたADRドラフトに対し、論理的欠陥や不整合がないかを厳格にチェックし、品質を向上させる作業を代替します。代表的なユースケース：(1) 技術的決定が「ビジネス価値（アウトカム）」に直結しているかの再検証。(2) システム全体の設計思想や既存のADR群との整合性チェック。(3) 課題を自律修正可能な項目と、ユーザー判断が必要な論点に整理する。
 ---
 
 # ADRレビュー (ADR Review)

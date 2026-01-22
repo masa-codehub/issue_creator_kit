@@ -1,6 +1,6 @@
 ---
 name: design-doc-drafting
-description: Skill for drafting comprehensive Design Documents based on domain models and technical specifications. Facilitates strict self-review and user consensus to finalize the implementation blueprint.
+description: 各種設計成果物を統合し、実装のSSOTとなるDesign Docを起草・洗練する作業を代替します。代表的なユースケース：(1) テンプレートに基づいた包括的なDesign Docドラフトの作成。(2) 実装可能性、内部整合性、データ信頼性の観点からの厳格な自己レビュー。(3) 発見された課題の分類と、ユーザー判断が必要な論点の整理。
 ---
 
 # Design Doc起草 (Design Doc Drafting)

@@ -1,6 +1,6 @@
 ---
 name: tdd-creation
-description: Orchestrator skill for implementing features based on detailed specifications (Specs). Representative use cases include (1) Decomposing specs into TDD-based implementation tasks (Issues) with a shared plan, (2) Managing the integration of distributed TDD results (code & tests) into a unified codebase, and (3) Auditing the final implementation to ensure strict adherence to specifications and test coverage requirements.
+description: 詳細仕様書に基づき、TDD（テスト駆動開発）によって機能を実現するための実装計画策定と結果の統合プロセス全体を代替します。代表的なユースケース：(1) 詳細仕様をTDDベースの実装タスク（Issue案）へ分解し、共通の実装方針を定める。(2) 分散して行われた実装結果（コードとテスト）を統合し、システム全体の一貫性を保証する。(3) 最終的な実装成果物が仕様を完全に満たし、テストカバレッジ要件をクリアしているか監査する。
 ---
 
 # TDD Implementation Orchestration

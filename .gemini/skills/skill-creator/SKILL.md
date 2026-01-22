@@ -1,6 +1,6 @@
 ---
 name: skill-creator
-description: Meta-skill for designing, drafting, and refining new agent skills. Used for (1) formalizing recurring successful patterns identified in retrospectives, (2) establishing standardized safety protocols for complex operations, and (3) creating new workflows when introducing new tools or frameworks.
+description: 新しいスキルの作成や既存スキルの改修を統括し、エージェントの能力を再現可能な形式知として資産化する作業を代替します。代表的なユースケース：(1) 成功した振り返りパターンを汎用的なスキルとして定式化する。(2) 複雑な操作に対する安全プロトコル（4大評価軸）を設計する。(3) 新しいツールやフレームワーク導入時の標準ワークフローの構築。
 ---
 
 # スキル作成 (Skill Creator)

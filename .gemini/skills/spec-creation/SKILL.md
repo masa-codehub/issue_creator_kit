@@ -1,6 +1,6 @@
 ---
 name: spec-creation
-description: Orchestrator skill for creating detailed technical specifications (API, DB, Component). Representative use cases include (1) Decomposing high-level designs (Architecture/Design Doc) into actionable specification tasks (Issues) for distributed drafting, (2) Managing the integration of multiple specification documents to ensure consistency, and (3) Producing rigorous, implementable specifications as a mandatory input for Test-Driven Development (tdd-creation).
+description: 上位設計（Arch/Design Doc）を開発者がそのまま実装できるレベルの詳細仕様書（Specs）に翻訳・統合するプロセス全体を代替します。代表的なユースケース：(1) 大規模な設計変更を具体的な仕様策定タスク（Issue案）へ分解する。(2) 分散して作成された複数の仕様書（API, DB, ロジック）間の整合性を監査し、統合する。(3) TDD（テスト駆動開発）を開始するための厳密な入力情報としての仕様一式を確定させる。
 ---
 
 # Specification Creation Orchestration

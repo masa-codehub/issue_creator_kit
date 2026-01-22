@@ -1,6 +1,6 @@
 ---
 name: context-drafting
-description: Skill for drafting and maintaining the `system-context.md` file. Ensures the Single Source of Truth (SSOT) regarding system boundaries, ubiquitous language, and primary data flows is kept up-to-date and consistent.
+description: プロジェクトの憲法となる `system-context.md` の作成・更新作業を代替し、チームのメンタルモデルを統一します。代表的なユースケース：(1) ビジネス価値、境界、戦略的トレードオフなどの根本方針の明文化。(2) 厳格な自己レビューによる論理矛盾の排除と、ユーザー判断が必要な論点の抽出。(3) ユーザーとの対話を通じたシステム定義の合意形成ループの管理。
 ---
 
 # システムコンテキスト起草 (System Context Drafting)

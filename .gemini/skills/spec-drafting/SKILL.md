@@ -1,6 +1,6 @@
 ---
 name: spec-drafting
-description: Creates detailed specification documents using standardized templates. Focuses on clarity, rigor, and implementability, utilizing `spec-refactoring` for final polish.
+description: 計画に基づき、テンプレートを用いてTDDの入力としてそのまま使えるレベルの詳細仕様書を起草・更新する実作業を代替します。代表的なユースケース：(1) データ型やステータスコードまで定義した厳密なAPIコントラクトの策定。(2) DBスキーマ、インデックス、マイグレーション戦略を含むデータ仕様の記述。(3) 複雑なビジネスロジックやアルゴリズム、境界値条件の明文化。
 ---
 
 # Specification Drafting

@@ -1,6 +1,6 @@
 ---
 name: arch-drafting
-description: Executes the architecture visualization plan by integrating structural and quality design. Updates Mermaid diagrams and documentation to reflect the codebase reality and architectural intent, utilizing `arch-refactoring` for final polish.
+description: 計画に基づき、構造設計と品質設計を統合したアーキテクチャ図（Mermaid）とドキュメントを作成・更新する実作業を代替します。代表的なユースケース：(1) C4モデルに基づいたコンポーネント構造の可視化。(2) シーケンス図による動的フローと例外処理（Alternative Frame）の設計。(3) データ整合性や可観測性など、非機能要件に基づいた品質方針の図解。
 ---
 
 # Architecture Drafting

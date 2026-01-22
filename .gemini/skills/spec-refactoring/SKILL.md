@@ -1,6 +1,6 @@
 ---
 name: spec-refactoring
-description: Refines specification documents for clarity, consistency, and completeness. Ensures no logical gaps or ambiguities exist, adhering to Technical Designer values.
+description: 作成された仕様書の記述の揺らぎや曖昧さを検出し、厳密で完全な「実装の正解（SSOT）」へと昇華させる作業を代替します。代表的なユースケース：(1) "TBD" や "Pending" などの曖昧な表現を排除し、具体的な定義に置き換える。(2) 入出力、バリデーション、エラー挙動がTDDに適した具体性を持っているかの検証。(3) 表組の崩れ、インデント、相対パスなどのドキュメント品質の自動修正。
 ---
 
 # Specification Refactoring

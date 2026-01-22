@@ -1,6 +1,6 @@
 ---
 name: github-checkout-feature-branch
-description: Ensure work is done on a feature branch. Uses the strategy defined in github-branch-strategy to determine branches and switch/create them.
+description: 常に適切な作業ブランチ上で開発が進められるよう、ブランチの切り替えと同期を保証する作業を代替します。代表的なユースケース：(1) 最新の Base Branch を取り込んだ上での作業ブランチの新規作成。(2) 既存のブランチへの安全な復帰とリモート変更の同期。(3) タイムスタンプ付きの自動ブランチ生成による作業場所の即時確保。
 ---
 
 # GitHub Checkout Feature Branch

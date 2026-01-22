@@ -1,6 +1,6 @@
 ---
 name: python-verification
-description: Ensures Python code quality through static analysis (Ruff, Mypy) and efficient testing workflows (Pytest). Used (1) during new feature development to catch logic errors early, (2) before committing bug fixes to prevent regressions, and (3) as a final quality gate before creating a pull request.
+description: Pythonコードの品質を静的解析とテストによって保証する品質ゲートとしての作業を代替します。代表的なユースケース：(1) 新機能実装時の型安全性の確認（Mypy）とスタイルチェック（Ruff）。(2) 効率的なデバッグワークフロー（lf, pdb等）によるテスト失敗の修正。(3) PR作成前やコミット前の最終的な品質担保チェックの自動化。
 ---
 
 # Pythonにおける静的解析とテスト

@@ -1,6 +1,6 @@
 ---
 name: arch-planning-review
-description: Audits the architecture visualization plan (Common Definitions & Draft Issues) before execution. Strictly enforces SYSTEM_ARCHITECT values and ensures zero regressions by validating against loaded SSOT context via active-reconnaissance and ssot-verification.
+description: 作成されたアーキテクチャ更新計画が、ADRやシステムコンテキストと整合しているかを厳格に監査するレビュー作業を代替します。代表的なユースケース：(1) 抽象的な定義が具体的なファイルパスに正しくマッピングされているかの精査。(2) Issue案がテンプレートに準拠し、境界が明確であるかの確認。(3) 既存設計からのデグレや原則違反がないかのSSOT整合性検証。
 ---
 
 # Architecture Planning Review

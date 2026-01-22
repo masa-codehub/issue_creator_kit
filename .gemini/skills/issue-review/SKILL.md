@@ -1,6 +1,6 @@
 ---
 name: issue-review
-description: Audits created issue drafts for quality, clarity, and template compliance. Ensures alignment with SSOT via active-reconnaissance and ssot-verification, while enforcing core agent values.
+description: 作成されたIssueドラフトが、プロジェクトのSSOTやエージェントの価値観に合致しているかを厳格に監査する作業を代替します。代表的なユースケース：(1) リンクされたファイルパスの実在確認やメタデータの形式チェック。(2) アウトカム志向や厳密性など、各ロールの視点からの品質監査。(3) 概念レベルでの不整合を検出し、具体的な改善案をセットで提示する。
 ---
 
 # Issue Review (Value & Reality Driven Audit)

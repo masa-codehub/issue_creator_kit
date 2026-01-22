@@ -1,6 +1,6 @@
 ---
 name: active-reconnaissance
-description: Skill for identifying the gap between a user's request and the project's current reality (code, existing ADRs, and documentation). Used for (1) uncovering discrepancies between intent and implementation, (2) gathering factual evidence from the codebase and SSOT, and (3) establishing a grounded starting point for new architectural decisions.
+description: 理想（ユーザーの要求）と現実（コード/ドキュメント）の間の「ギャップ」を能動的に調査し、特定する作業を代替します。代表的なユースケース：(1) 依頼内容と矛盾する既存ADRや制約の洗い出し。(2) 抽象的な要望に対し、影響を受ける具体的なコードやパスの特定。(3) 実現可能性や技術的負債に基づく初期リスク評価。
 ---
 
 # 能動的偵察 (Active Reconnaissance)

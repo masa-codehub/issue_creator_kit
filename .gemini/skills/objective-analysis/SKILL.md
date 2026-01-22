@@ -1,6 +1,6 @@
 ---
 name: objective-analysis
-description: Skill for extracting core intent and formulating hypotheses. Used when (1) a new task or Issue is assigned, (2) user inquiries or bug reports are received, (3) additional requirements or feedback are received mid-project, or (4) before proposing significant design or architectural changes.
+description: ユーザーの発言やIssueの背景にある「真の意図」を抽出し、多角的な解決仮説を立案する作業を代替します。代表的なユースケース：(1) 5W1Hフレームワークを用いた情報の構造化。(2) 現状とSSOTを統合した「実証的・飛躍的・逆説的」な3つの仮説の立案。(3) 仮説を検証するために必要な情報の欠損（Unknowns）の特定。
 ---
 
 # 目的分析 (Objective Analysis)

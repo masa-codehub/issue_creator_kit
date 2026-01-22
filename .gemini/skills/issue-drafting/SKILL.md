@@ -1,6 +1,6 @@
 ---
 name: issue-drafting
-description: Creates detailed issue drafts by strictly filling the 'issue-draft.md' template. Integrates 'objective-setting' for per-issue goals and 'Red/Green/Verify' for verifiable instructions, strictly enforcing template rules and zero ambiguity.
+description: テンプレートに基づき、目的志向で検証可能なIssueドラフトを作成する作業を代替します。代表的なユースケース：(1) ユーザー依頼からSMART原則に基づいた具体的な個別目標を設定する。(2) システム連携に必要なメタデータや前後コンテキストを漏れなく定義する。(3) エージェントが迷わず実行できる「負の制約」を含めた詳細な実装手順を起草する。
 ---
 
 # Issue Drafting (Objective-Oriented & Verifiable)

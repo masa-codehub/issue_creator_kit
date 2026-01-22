@@ -1,6 +1,6 @@
 ---
 name: arch-refactoring
-description: Refines architecture diagrams for readability, consistency, and clarity without changing factual accuracy, adhering to Technical Designer values.
+description: アーキテクチャ図の情報の正確さを保ちつつ、可読性と一貫性を向上させる「情報の整理」作業を代替します。代表的なユースケース：(1) 交差する矢印の最小化や要素の再配置による認知負荷の最適化。(2) ドメイン境界やクリーンアーキテクチャのレイヤーに基づいた要素のグルーピング。(3) 表記揺れの修正や凡例の追加による視覚的標準化。
 ---
 
 # Architecture Refactoring

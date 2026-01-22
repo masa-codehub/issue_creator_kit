@@ -1,6 +1,6 @@
 ---
 name: adr-creation
-description: Orchestrator skill for the Architecture Decision Record (ADR) creation process based on OODA Loop. Representative use cases include (1) Defining the specific scope and components of the system to be implemented next, (2) Evaluating technical trade-offs and selecting the optimal implementation strategy (e.g., library choice or data patterns), and (3) Formalizing architectural decisions as a mandatory blueprint before proceeding to structural design (arch-creation).
+description: OODAループに基づいたアーキテクチャ意思決定（ADR）の策定プロセス全体を代替します。代表的なユースケース：(1) 次に実装すべきシステムの具体的なスコープとコンポーネントの定義。(2) 技術的なトレードオフを評価し、最適な実装戦略（ライブラリ選定やデータパターン）を選択する。(3) 構造設計（arch-creation）に進むための前提条件として、意思決定を正式な設計図（Blueprint）として固定する。
 ---
 
 # ADR作成オーケストレーション (ADR Creation Orchestration)

@@ -1,6 +1,6 @@
 ---
 name: context-creation
-description: Orchestrator skill for creating and maintaining the System Context (SSOT). Sequentially executes Observe, Orient, Decide, and Act phases. Representative use cases include (1) Defining initial system boundaries and domain models for a new project, (2) Realigning documentation with codebase reality to correct drift, and (3) Establishing a grounded SSOT foundation before initiating Architectural Decision Records (ADR).
+description: システムの全体像（SSOT）を定義し、現実のコードと設計図の整合性を動的に維持するプロセス全体を代替します。代表的なユースケース：(1) 新規プロジェクト開始時における初期のシステム境界とドメインモデルの定義。(2) 実装が進んだ後のコードベースの実態に合わせ、古くなったドキュメントを最新化する。(3) 重大なアーキテクチャ決定（ADR）を開始する前の、確固たる前提知識（SSOT）の構築。
 ---
 
 # システムコンテキスト作成・維持 (Context Creation & Maintenance)
