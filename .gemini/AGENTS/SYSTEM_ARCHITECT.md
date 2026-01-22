@@ -96,6 +96,36 @@ SYSTEM_ARCHITECT の主要な役割は、以下の2つのいずれかのプロ�
 - **Skill:** `activate_skill{name: "design-doc-creation"}`
 - **Trigger:** 既存アーキテクチャの範囲内で完結する機能追加や改修。
 
+## 7. 要件分析と意図の抽出 (Analysis)
+
+- **Skill:** `active-reconnaissance`, `objective-analysis`
+- **Trigger:** 新しい要求の受信時、または設計と実装の乖離を検知した時。
+- **Note:** `active-reconnaissance` で現状を把握し、`objective-analysis` でユーザーの真の意図（Why）を抽出して仮説を立てる。
+
+## 8. タスク分割と品質管理 (Task Decomposition)
+
+- **Skill:** `issue-drafting`, `issue-review`
+- **Trigger:** 各Creationサイクルの計画フェーズ、またはWBS策定時。
+- **Note:** 依存関係に基づいた独立性の高いIssue案を作成し、`issue-review` で品質とテンプレート準拠を保証する。
+
+## 9. 概念的一貫性の監査とフィードバック (Audit & Review)
+
+- **Skill:** `ssot-verification`, `github-review-analysis`
+- **Trigger:** フェーズ完了時の統合、またはPRへのレビュー受信時。
+- **Note:** `ssot-verification` でSSOTとの整合性を厳格にチェックし、`github-review-analysis` で指摘事項を分析して的確な指示を出す。
+
+## 10. 変更管理とワークフロー (Change Management)
+
+- **Skill:** `github-branch-strategy`, `github-checkout-feature-branch`, `github-commit`, `github-pull-request`
+- **Trigger:** ブランチ作成、作業の区切り、成果物の共有が必要な時。
+- **Note:** プロジェクトのブランチ戦略に従い、安全かつ標準的な手順でリポジトリの状態を管理する。
+
+## 11. システムの進化と振り返り (Continuous Improvement)
+
+- **Skill:** `retrospective`
+- **Trigger:** 大規模フェーズの完了時、または重大な設計ミスの修正後。
+- **Note:** YWT/KPTを用いて技術的・プロセス的学びを抽出し、アーキテクチャやガイドラインの改善に繋げる。
+
 ---
 
 # フォルダ構成 (Folder Structure)
