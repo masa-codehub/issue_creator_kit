@@ -23,7 +23,7 @@ GitHub API を介した操作を担当する。
 新規 Issue を起票する。
 - **例外**: API エラー時は `GitHubAPIError` を送出する。
 
-### 3.2. `find_or_create_issue(title: str, body: str) -> int`
+### 3.2. `find_or_create_issue(title: str, body: str, labels: list[str] | None = None) -> int`
 同一タイトルの Open 状態の Issue を検索し、存在すればその番号を、存在しなければ新規作成してその番号を返す。
 - **検索ロジック**: `is:issue is:open in:title "{title}"` をクエリとして検索を実行する。
 - **複数ヒット時**: 検索結果は作成日時の降順でソートし、最も新しく作成された Issue を採用する。
@@ -85,13 +85,13 @@ Git コマンドによるローカルリポジトリ操作を担当する。
 ファイルのメタデータ部分のみを更新する。既存のファイル形式（YAML Frontmatter または Markdown List）を維持すること。
 - **例外**: `FileSystemError`
 
-### 5.3. `safe_move_file(src_path: str, dst_dir: str, overwrite: bool = False) -> None`
+### 5.3. `safe_move_file(src_path: str, dst_dir: str, overwrite: bool = False) -> str`
 ファイルを安全に移動する（Git インデックスは操作しない）。
 - **引数**:
   - `src_path`: 移動元パス
   - `dst_dir`: 移動先ディレクトリ
   - `overwrite`: 既存ファイルがある場合に上書きするかどうか
-- **戻り値**: なし
+- **戻り値**: 移動後のファイルパス（`str`）
 - **例外**: `src_path` 不在時や、移動先が重複し `overwrite=False` の場合は `FileSystemError`。
 
 ### 5.4. `read_file(path: str) -> str`
@@ -100,6 +100,11 @@ Git コマンドによるローカルリポジトリ操作を担当する。
 
 ### 5.5. `write_file(path: str, content: str) -> None`
 指定した内容をファイルに書き込む。
+- **例外**: `FileSystemError`
+
+### 5.6. `list_files(dir_path: str) -> list[str]`
+指定ディレクトリ配下のファイル一覧（再帰的ではない）を取得する。
+- **戻り値**: ファイルパス（`str`）のリスト
 - **例外**: `FileSystemError`
 
 ## 6. 検証手順 (Verification)

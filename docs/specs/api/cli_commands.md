@@ -29,7 +29,6 @@
 - **オプション引数**:
   - `--inbox-dir`: 承認待ちドキュメントのディレクトリ（デフォルト: `reqs/design/_inbox`）
   - `--approved-dir`: 承認済みドキュメントのディレクトリ（デフォルト: `reqs/design/_approved`）
-  - `--token`: GitHub トークン（設定されている場合、環境変数 `GITHUB_MCP_PAT` より優先される）
 - **UseCase への委譲**: `WorkflowUseCase.run()` を呼び出す。
 
 ### 3.2. その他のサブコマンド (参考)
@@ -42,8 +41,8 @@
 ## 4. バリデーションとエラーハンドリング
 
 ### 4.1. 認証チェック
-- 実行時に `--token` 引数が指定されておらず、かつ環境変数 `GITHUB_MCP_PAT` も設定されていない場合、以下のメッセージを標準エラー出力に表示し、終了コード `1` で終了すること。
-  `Error: GitHub token is required via --token or GITHUB_MCP_PAT environment variable.`
+- 実行時に環境変数 `GITHUB_MCP_PAT` が設定されていない場合、以下のメッセージを標準エラー出力に表示し、終了コード `1` で終了すること。
+  `Error: GitHub token is required via GITHUB_MCP_PAT environment variable.`
 
 ### 4.2. 引数バリデーション
 - 必要な引数（`run-workflow` におけるブランチ名など、UseCase が要求するもの）が不足している場合、エラーメッセージを表示し終了コード `1` で終了する。

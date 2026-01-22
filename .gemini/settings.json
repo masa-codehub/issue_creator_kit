@@ -10,8 +10,7 @@
     },
     "context": {
         "fileFiltering": {
-        "respectGitIgnore": false
+            "respectGitIgnore": false
         }
     }
-
 }
