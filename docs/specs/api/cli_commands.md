@@ -1,59 +1,68 @@
-# CLI Interface Specification
+# CLI Interface Specification (ADR-003)
 
-## 1. 概要
-`issue-kit` CLI のエントリポイント、コマンド構成、および実行環境に関する仕様を定義する。
-本 CLI は Clean Architecture Lite の Interface 層として機能し、ユーザー入力を解析して UseCase 層へ処理を委譲する責務を持つ。
+## 1. Overview
+Defines the entry points and command structure for the `issue-kit` CLI.
+The CLI serves as the Interface layer in the Clean Architecture, responsible for parsing user input and orchestrating UseCases.
 
-## 2. 共通仕様
+## 2. Common Specifications
 
-### 2.1. 終了コード (Exit Codes)
-| コード | 意味 | 説明 |
+### 2.1. Exit Codes
+| Code | Meaning | Description |
 | :--- | :--- | :--- |
-| `0` | Success | 全ての処理が正常に完了した。 |
-| `1` | Error | 一般的なエラー（バリデーション失敗、環境変数不足、ランタイムエラー等）。 |
+| `0` | Success | The command completed all operations successfully. |
+| `1` | Error | General error (validation failure, missing environment variables, runtime error). |
 
-### 2.2. 共通環境変数
-| 変数名 | 必須 | 説明 |
+### 2.2. Environment Variables
+| Variable | Required | Description |
 | :--- | :--- | :--- |
-| `GITHUB_MCP_PAT` | Yes | GitHub API を操作するための Personal Access Token。 |
-| `GITHUB_REPOSITORY`| No | 操作対象のリポジトリ (`owner/repo`)。引数で指定されない場合に使用される。 |
+| `GITHUB_MCP_PAT` | Yes | Personal Access Token for GitHub API operations. |
+| `GITHUB_REPOSITORY`| No | Target repository (`owner/repo`). Defaults to current context if not provided via args. |
 
-## 3. コマンド定義
+## 3. Command Definitions
 
-### 3.1. `run-workflow`
-承認フローのオーケストレーションを実行するメインコマンド。
+### 3.1. `process-diff`
+Orchestrates the "Virtual Queue" processing logic triggered by a merge to the archive directory.
 
-- **概要**: Inbox ディレクトリから Approved ディレクトリへのドキュメント移動、Issue 起票、Git コミットまでを一連のワークフローとして実行する。
-- **必須引数**:
-  - `--branch`: 変更をプッシュする先のブランチ名。
-- **オプション引数**:
-  - `--inbox-dir`: 承認待ちドキュメントのディレクトリ（デフォルト: `reqs/design/_inbox`）
-  - `--approved-dir`: 承認済みドキュメントのディレクトリ（デフォルト: `reqs/design/_approved`）
-- **UseCase への委譲**: `WorkflowUseCase.run()` を呼び出す。
+- **Usage**: `issue-kit process-diff --base-ref <ref> --head-ref <ref> [--archive-dir <path>]`
+- **Arguments**:
+    - `--base-ref` (Required): The base commit/branch for diffing (e.g., `HEAD~1` or `main`).
+    - `--head-ref` (Required): The head commit/branch (e.g., `HEAD`).
+    - `--archive-dir` (Optional): Path to the task archive (default: `reqs/tasks/archive`).
+- **Logic Mapping**: Calls `IssueCreationUseCase.create_issues_from_virtual_queue()`.
+- **Side Effects**: Creates GitHub Issues, updates local files, syncs roadmap, and pushes changes to origin.
 
-### 3.2. その他のサブコマンド (参考)
-既存の `cli.py` に実装されている以下のコマンドは、後続のフェーズで本仕様に統合または再定義される。
-- `init`: プロジェクトテンプレートの展開。
-- `process-diff`: Virtual Queue の自動処理。
-- `process-merge`: Auto-PR 処理。
-- `approve`: 単一ファイルの承認（開発者用）。
+### 3.2. `process-merge`
+Orchestrates the "Auto-PR (Phase Chain)" logic triggered by a task PR merge.
 
-## 4. バリデーションとエラーハンドリング
+- **Usage**: `issue-kit process-merge --pr-body <body> [--archive-dir <path>]`
+- **Arguments**:
+    - `--pr-body` (Required): The body text of the merged PR to extract issue numbers from.
+    - `--archive-dir` (Optional): Path to the task archive to find task definitions (default: `reqs/tasks/archive`).
+- **Logic Mapping**: Calls `WorkflowUseCase.promote_from_merged_pr()`.
+- **Side Effects**: Creates a new foundation branch, moves files from `drafts/` to `archive/`, and opens a new PR on GitHub.
 
-### 4.1. 認証チェック
-- 実行時に環境変数 `GITHUB_MCP_PAT` が設定されていない場合、以下のメッセージを標準エラー出力に表示し、終了コード `1` で終了すること。
-  `Error: GitHub token is required via GITHUB_MCP_PAT environment variable.`
+### 3.3. `run-workflow` (Integrated/Legacy)
+A high-level command for backward compatibility or manual orchestration.
 
-### 4.2. 引数バリデーション
-- 必要な引数（`run-workflow` におけるブランチ名など、UseCase が要求するもの）が不足している場合、エラーメッセージを表示し終了コード `1` で終了する。
+- **Usage**: `issue-kit run-workflow --branch <name> [--inbox-dir <path>] [--approved-dir <path>]`
+- **Role**: In ADR-003 context, this may act as an alias that sequentially calls `process-diff` or simply executes the legacy ADR-002 approval flow. For ADR-003 projects, `process-diff` and `process-merge` are preferred.
 
-## 5. 検証手順 (TDD Criteria)
+## 4. Validation & Error Handling
 
-### 5.1. 環境変数の検証
-- **Given**: `GITHUB_MCP_PAT` が未設定の状態。
-- **When**: `issue-kit run-workflow` を実行。
-- **Then**: 終了コードが `1` であること。
+### 4.1. Authentication Check
+- If `GITHUB_MCP_PAT` is missing, the CLI must print an error to stderr and exit with code `1`.
+- Error Message: `Error: GitHub token is required via GITHUB_MCP_PAT environment variable.`
 
-### 5.2. ロジックの分離
-- CLI 層の関数（`run_workflow` 等）が、`WorkflowUseCase` のインスタンスを生成し、その `run` メソッドを呼び出すだけの構造になっていること。
-- CLI 層で直接 `requests` や `subprocess` を呼び出していないこと（Adapter を介して UseCase に渡すのは可）。
+### 4.2. Exception Handling
+- UseCase exceptions (e.g., `RuntimeError` from Fail-fast) must be caught by the CLI.
+- The CLI should log the error details clearly and exit with code `1`.
+- **Constraint**: No direct usage of `subprocess` or `requests` in the CLI module. All I/O must be delegated to UseCases/Adapters.
+
+## 5. Verification (TDD Criteria)
+
+| Scenario | When | Then |
+| :--- | :--- | :--- |
+| Missing Base Ref | `issue-kit process-diff --head-ref main` | Exit 1, show help/error. |
+| Missing Token | `GITHUB_MCP_PAT="" issue-kit process-diff ...` | Exit 1, show "token required". |
+| UseCase Failure | `IssueCreationUseCase` raises `RuntimeError` | Exit 1, log the exception message. |
+| Successful Promotion | `issue-kit process-merge --pr-body "Closes #1"` | Exit 0. |
