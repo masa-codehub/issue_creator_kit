@@ -1,13 +1,15 @@
 ---
-title: "[Spec] Define Phase Promotion Logic (Auto-PR & 1PR=1Task)"
+depends_on:
+- issue-S1-1.md
+issue: '#240'
 labels:
-  - task
-  - TECHNICAL_DESIGNER
-roadmap: "docs/specs/plans/20260122-spec-adr003-plan.md"
-task_id: "S1-3"
-depends_on: ["issue-S1-1.md"]
-next_phase_path: ""
-status: "Draft"
+- task
+- TECHNICAL_DESIGNER
+next_phase_path: ''
+roadmap: docs/specs/plans/20260122-spec-adr003-plan.md
+status: Draft
+task_id: S1-3
+title: '[Spec] Define Phase Promotion Logic (Auto-PR & 1PR=1Task)'
 ---
 
 ## 1. Goal & Context (Why & What)

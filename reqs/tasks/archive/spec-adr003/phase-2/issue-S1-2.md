@@ -1,13 +1,16 @@
 ---
-title: "[Spec] Define Issue Creation Logic (Virtual Queue & Atomicity)"
+depends_on:
+- issue-S1-1.md
+- issue-S1-5.md
+issue: '#241'
 labels:
-  - task
-  - TECHNICAL_DESIGNER
-roadmap: "docs/specs/plans/20260122-spec-adr003-plan.md"
-task_id: "S1-2"
-depends_on: ["issue-S1-1.md", "issue-S1-5.md"]
-next_phase_path: ""
-status: "Draft"
+- task
+- TECHNICAL_DESIGNER
+next_phase_path: ''
+roadmap: docs/specs/plans/20260122-spec-adr003-plan.md
+status: Draft
+task_id: S1-2
+title: '[Spec] Define Issue Creation Logic (Virtual Queue & Atomicity)'
 ---
 
 ## 1. Goal & Context (Why & What)

@@ -1,13 +1,15 @@
 ---
-title: "[Spec] Define Roadmap Sync Logic (Regex & WBS Update)"
+depends_on:
+- issue-S1-2.md
+issue: '#242'
 labels:
-  - task
-  - TECHNICAL_DESIGNER
-roadmap: "docs/specs/plans/20260122-spec-adr003-plan.md"
-task_id: "S1-4"
-depends_on: ["issue-S1-2.md"]
-next_phase_path: ""
-status: "Draft"
+- task
+- TECHNICAL_DESIGNER
+next_phase_path: ''
+roadmap: docs/specs/plans/20260122-spec-adr003-plan.md
+status: Draft
+task_id: S1-4
+title: '[Spec] Define Roadmap Sync Logic (Regex & WBS Update)'
 ---
 
 ## 1. Goal & Context (Why & What)

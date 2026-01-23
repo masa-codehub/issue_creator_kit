@@ -1,13 +1,16 @@
 ---
-title: "[Spec] Update CLI Command Definitions (Orchestration)"
+depends_on:
+- issue-S1-2.md
+- issue-S1-3.md
+issue: '#243'
 labels:
-  - task
-  - TECHNICAL_DESIGNER
-roadmap: "docs/specs/plans/20260122-spec-adr003-plan.md"
-task_id: "S1-6"
-depends_on: ["issue-S1-2.md", "issue-S1-3.md"]
-next_phase_path: ""
-status: "Draft"
+- task
+- TECHNICAL_DESIGNER
+next_phase_path: ''
+roadmap: docs/specs/plans/20260122-spec-adr003-plan.md
+status: Draft
+task_id: S1-6
+title: '[Spec] Update CLI Command Definitions (Orchestration)'
 ---
 
 ## 1. Goal & Context (Why & What)

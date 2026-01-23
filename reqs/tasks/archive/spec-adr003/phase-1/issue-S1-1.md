@@ -1,13 +1,14 @@
 ---
-title: "[Spec] Update Document Domain Model (Metadata & Status)"
-labels:
-  - task
-  - TECHNICAL_DESIGNER
-roadmap: "docs/specs/plans/20260122-spec-adr003-plan.md"
-task_id: "S1-1"
 depends_on: []
-next_phase_path: ""
-status: "Draft"
+issue: '#238'
+labels:
+- task
+- TECHNICAL_DESIGNER
+next_phase_path: ''
+roadmap: docs/specs/plans/20260122-spec-adr003-plan.md
+status: Draft
+task_id: S1-1
+title: '[Spec] Update Document Domain Model (Metadata & Status)'
 ---
 
 ## 1. Goal & Context (Why & What)
