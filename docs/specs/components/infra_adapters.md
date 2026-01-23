@@ -12,6 +12,7 @@ Infrastructure 層における各 Adapter（GitHub, Git, FileSystem）のイン�
 | :--- | :--- | :--- |
 | `InfrastructureError` | `RuntimeError` | 全てのインフラ層エラーの基底クラス。 |
 | `GitHubAPIError` | `InfrastructureError` | GitHub API 呼び出し失敗（4xx, 5xx）時に送出される。 |
+| `GitHubRateLimitError` | `GitHubAPIError` | 429 (Too Many Requests) や、secondary rate limit もしくは `X-RateLimit-Remaining: 0` 等によりレートリミット超過と判定できる 403 応答時に送出される。 |
 | `GitOperationError` | `InfrastructureError` | Git コマンド実行失敗（非ゼロ終了）時に送出される。 |
 | `FileSystemError` | `InfrastructureError` | ファイル操作失敗（権限不足、不在、重複等）時に送出される。 |
 
@@ -19,26 +20,38 @@ Infrastructure 層における各 Adapter（GitHub, Git, FileSystem）のイン�
 
 GitHub API を介した操作を担当する。
 
-### 3.1. `create_issue(title: str, body: str, labels: list[str] | None = None) -> int`
-新規 Issue を起票する。
-- **例外**: API エラー時は `GitHubAPIError` を送出する。
+### 3.1. リトライポリシー (Retry Policy)
+GitHub API 呼び出しにおいて、以下のエラーに遭遇した場合は、指数バックオフを伴う自動リトライを実行することを推奨する。
+- **対象ステータスコード**: `429` (Too Many Requests), `403` (secondary rate limit または `X-RateLimit-Remaining: 0`), `502`, `503`, `504`
+- **推奨設定**: 
+  - 最大リトライ回数: 3回
+  - 初回待機時間: 5秒
+  - 指数係数: 2
 
-### 3.2. `find_or_create_issue(title: str, body: str, labels: list[str] | None = None) -> int`
+### 3.2. `create_issue(title: str, body: str, labels: list[str] | None = None) -> int`
+新規 Issue を起票する。
+- **例外**: API エラー時は `GitHubAPIError` を送出する。レートリミット超過時はリトライ後に `GitHubRateLimitError` を送出する。
+
+### 3.3. `find_or_create_issue(title: str, body: str, labels: list[str] | None = None) -> int`
 同一タイトルの Open 状態の Issue を検索し、存在すればその番号を、存在しなければ新規作成してその番号を返す。
 - **検索ロジック**: `is:issue is:open in:title "{title}"` をクエリとして検索を実行する。
 - **複数ヒット時**: 検索結果は作成日時の降順でソートし、最も新しく作成された Issue を採用する。
 - **戻り値**: Issue 番号
-- **例外**: `GitHubAPIError`
+- **例外**: `GitHubAPIError`, `GitHubRateLimitError`
 
-### 3.3. `create_pull_request(title: str, body: str, head: str, base: str) -> tuple[str, int]`
+### 3.4. `create_pull_request(title: str, body: str, head: str, base: str) -> tuple[str, int]`
 プルリクエストを作成し、PR の URL と番号を返す。
-- **例外**: `GitHubAPIError`
+- **引数**:
+  - `head`: 変更を含むブランチ名。
+  - `base`: マージ先のブランチ名（通常は `main`）。
+- **戻り値**: `(html_url, pr_number)` のタプル。
+- **例外**: API エラー時は `GitHubAPIError` を送出する。レートリミット超過時はリトライ後に `GitHubRateLimitError` を送出する。
 
-### 3.4. `add_labels(issue_number: int, labels: list[str]) -> None`
+### 3.5. `add_labels(issue_number: int, labels: list[str]) -> None`
 指定した Issue または PR にラベルを付与する。
 - **例外**: `GitHubAPIError`
 
-### 3.5. `add_comment(issue_number: int, body: str) -> None`
+### 3.6. `add_comment(issue_number: int, body: str) -> None`
 指定した Issue または PR にコメントを投稿する。
 - **例外**: `GitHubAPIError`
 
@@ -48,10 +61,15 @@ Git コマンドによるローカルリポジトリ操作を担当する。
 
 ### 4.1. `get_added_files(base_ref: str, head_ref: str, path: str) -> list[str]`
 指定パス配下で追加（Added）されたファイルリストを取得する。
+- **コマンド詳細**: `git diff-tree -r --no-commit-id --name-only --diff-filter=A --no-renames {base_ref} {head_ref} -- {path}` を使用。
+- **注意点**: `--no-renames` を指定することで、`git mv` による移動も「移動元削除」と「移動先追加」として検知し、仮想キュー（archive/への追加）として扱えるようにする。
 - **例外**: `GitOperationError`
 
 ### 4.2. `checkout(branch: str, create: bool = False, base: str | None = None) -> None`
 指定したブランチに切り替える。
+- **引数**:
+  - `create`: `True` の場合、ブランチを新規作成する (`-b`)。
+  - `base`: ブランチ作成時の基点となるブランチやコミットを指定する。
 - **例外**: `GitOperationError`
 
 ### 4.3. `add(paths: list[str]) -> None`

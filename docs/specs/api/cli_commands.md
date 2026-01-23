@@ -31,12 +31,35 @@
   - `--approved-dir`: 承認済みドキュメントのディレクトリ（デフォルト: `reqs/design/_approved`）
 - **UseCase への委譲**: `WorkflowUseCase.run()` を呼び出す。
 
-### 3.2. その他のサブコマンド (参考)
-既存の `cli.py` に実装されている以下のコマンドは、後続のフェーズで本仕様に統合または再定義される。
+### 3.2. `process-diff`
+仮想キュー（Virtual Queue）の自動起票を実行するコマンド。
+
+- **概要**: `archive/` ディレクトリに新しく追加された未採番のタスクファイルを検知し、GitHub Issue を起票する。
+- **必須引数**:
+  - `--before`: 比較元（Base）の Git Ref。
+  - `--after`: 比較先（Head）の Git Ref。
+- **オプション引数**:
+  - `--archive-dir`: タスクアーカイブのディレクトリ（デフォルト: `reqs/tasks/archive/`）
+  - `--roadmap`: ロードマップファイルのパス。
+  - `--use-pr`: 直接 Push せず、メタデータ同期用の PR を作成するフラグ。
+  - `--base-branch`: メタデータ同期 PR のマージ先ブランチ（デフォルト: `main`）。
+- **UseCase への委譲**: `IssueCreationUseCase.create_issues_from_virtual_queue()` を呼び出す。
+
+### 3.3. `process-merge`
+フェーズ連鎖（Auto-PR）を実行するコマンド。
+
+- **概要**: マージされた PR の本文を解析し、次フェーズのタスクを Draft から Archive へプロモーションする PR を作成する。
+- **オプション引数**:
+  - `--pr-body`: PR の本文（文字列）。
+  - `--event-path`: GitHub Event JSON ファイルのパス。
+  - `--archive-dir`: アーカイブディレクトリ（デフォルト: `reqs/tasks/archive/`）
+- **UseCase への委譲**: `WorkflowUseCase.promote_from_merged_pr()` を呼び出す。
+
+### 3.4. その他のサブコマンド
+既存の `cli.py` に実装されている以下のコマンドは、必要に応じて利用される。
 - `init`: プロジェクトテンプレートの展開。
-- `process-diff`: Virtual Queue の自動処理。
-- `process-merge`: Auto-PR 処理。
-- `approve`: 単一ファイルの承認（開発者用）。
+- `approve`: 単一ファイルの承認。
+- `approve-all`: 全ファイルのバッチ承認。
 
 ## 4. バリデーションとエラーハンドリング
 
