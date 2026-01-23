@@ -34,7 +34,6 @@ C4Container
     Rel(cli, creation_uc, "Calls (process-diff)")
     Rel(cli, workflow_uc, "Calls (process-merge)")
 
-    Rel(creation_uc, workflow_uc, "Uses (for promotion check)")
     Rel(creation_uc, roadmap_uc, "Uses (for synchronization)")
     Rel(creation_uc, git_adapter, "Depends on")
     Rel(creation_uc, github_adapter, "Depends on")
@@ -58,7 +57,7 @@ C4Container
 - **Role (Domain-Centric):** フェーズ完了の合図（PRマージ）を受け取り、次フェーズの Draft を Archive へ移動させるための Auto-PR を作成・制御する。
 - **Layer (Clean Arch):** Use Cases
 - **Dependencies:**
-  - **Upstream:** `CLI`, `IssueCreationUseCase`
+  - **Upstream:** `CLI`
   - **Downstream:** `GitAdapter`, `GitHubAdapter`, `FileSystemAdapter`
 - **Tech Stack:** Python
 - **Data Reliability:** Async (GitHub API calls), Retry Policy needed for API rate limits.
@@ -71,7 +70,7 @@ C4Container
 - **Layer (Clean Arch):** Use Cases
 - **Dependencies:**
   - **Upstream:** `CLI`
-  - **Downstream:** `WorkflowUseCase`, `RoadmapSyncUseCase`, `GitAdapter`, `GitHubAdapter`, `FileSystemAdapter`
+  - **Downstream:** `RoadmapSyncUseCase`, `GitAdapter`, `GitHubAdapter`, `FileSystemAdapter`
 - **Tech Stack:** Python
 - **Data Reliability:** 原子性を担保するため、全件起票が成功するまで Git への書き戻しを行わない（Fail-fast）。
 - **Trade-off:** 重複起票のリスクを許容し、Git の不整合（SSOTの破壊）を防止することを優先する。
