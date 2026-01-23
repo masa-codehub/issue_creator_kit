@@ -1,13 +1,20 @@
 ---
-title: "[Spec] Integration & Audit for ADR-003 Detailed Specs"
+depends_on:
+- issue-S1-1.md
+- issue-S1-2.md
+- issue-S1-3.md
+- issue-S1-4.md
+- issue-S1-5.md
+- issue-S1-6.md
+issue: '#244'
 labels:
-  - task
-  - SYSTEM_ARCHITECT
-roadmap: "docs/specs/plans/20260122-spec-adr003-plan.md"
-task_id: "S1-Integration"
-depends_on: ["issue-S1-1.md", "issue-S1-2.md", "issue-S1-3.md", "issue-S1-4.md", "issue-S1-5.md", "issue-S1-6.md"]
-next_phase_path: ""
-status: "Draft"
+- task
+- SYSTEM_ARCHITECT
+next_phase_path: ''
+roadmap: docs/specs/plans/20260122-spec-adr003-plan.md
+status: Draft
+task_id: S1-Integration
+title: '[Spec] Integration & Audit for ADR-003 Detailed Specs'
 ---
 
 ## 1. Goal & Context (Why & What)
