@@ -25,12 +25,12 @@ status: "Draft"
     - **Validation**: 必須フィールド (`title`, `status`) のチェック。
 
 ### Design Evidence
-- [Architecture Plan](../../../docs/architecture/plans/20260122-adr003-plan.md)
-- [Handover Doc](../../../docs/handovers/arch-to-spec.md)
+- [Architecture Plan](../../../../../docs/architecture/plans/20260122-adr003-plan.md)
+- [Handover Doc](../../../../../docs/handovers/arch-to-spec.md)
 
 ## 2. Input Context (資料 & 情報)
 - **Common Definitions**: `docs/specs/plans/20260122-spec-adr003-plan.md`
-- **Reference Diagram**: `docs/architecture/arch-state-003-task-lifecycle.md`
+- **Reference Diagram**: `../../../../../docs/architecture/arch-state-003-task-lifecycle.md`
 
 ## 3. Implementation Steps & Constraints (How)
 

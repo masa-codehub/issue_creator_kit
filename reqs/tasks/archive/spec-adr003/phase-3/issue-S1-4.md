@@ -25,8 +25,8 @@ status: "Draft"
     - **Idempotency**: 既に置換済みのリンクを二重に置換しないためのガード。
 
 ### Design Evidence
-- [Architecture Plan Section 4 (Behavior)](../../../docs/architecture/plans/20260122-adr003-plan.md)
-- [Handover Doc Section 2.2](../../../docs/handovers/arch-to-spec.md)
+- [Architecture Plan Section 4 (Behavior)](../../../../../docs/architecture/plans/20260122-adr003-plan.md)
+- [Handover Doc Section 2.2](../../../../../docs/handovers/arch-to-spec.md)
 
 ## 2. Input Context (資料 & 情報)
 - **Common Definitions**: `docs/specs/plans/20260122-spec-adr003-plan.md`

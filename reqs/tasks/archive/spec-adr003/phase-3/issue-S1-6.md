@@ -20,14 +20,14 @@ status: "Draft"
 
 ### To-be (あるべき姿)
 - `docs/specs/api/cli_commands.md` が更新され、以下のコマンド仕様が定義されている。
-    - **`run-workflow`**: 汎用的なオーケストレーション。
+    - **`run-workflow`**: 後方互換または統合用コマンドとして定義（実体は `process-diff` と `process-merge` を順次呼び出す等）。
     - **`process-diff`**: 仮想キュー検知から一括起票、メタデータ・ロードマップ同期までを一気通貫で実行。
     - **`process-merge`**: マージ済み PR の本文解析から、必要に応じた Auto-PR 作成を実行。
     - **Exit Codes**: 各エラー状態に対応する終了コード。
 
 ### Design Evidence
-- [Structure Diagram (App Layer)](../../../docs/architecture/arch-structure-003-vqueue.md)
-- [Creation Behavior Diagram](../../../docs/architecture/arch-behavior-003-creation.md)
+- [Structure Diagram (App Layer)](../../../../../docs/architecture/arch-structure-003-vqueue.md)
+- [Creation Behavior Diagram](../../../../../docs/architecture/arch-behavior-003-creation.md)
 
 ## 2. Input Context (資料 & 情報)
 - **Common Definitions**: `docs/specs/plans/20260122-spec-adr003-plan.md`

@@ -24,8 +24,8 @@ status: "Draft"
 - `docs/handovers/spec-to-tdd.md` が更新され、実装者（Backend Coder）への最終的な注意事項が整理されている。
 
 ### Design Evidence
-- [Architecture Plan](../../../docs/architecture/plans/20260122-adr003-plan.md)
-- [Spec Plan](../../../docs/specs/plans/20260122-spec-adr003-plan.md)
+- [Architecture Plan](../../../../../docs/architecture/plans/20260122-adr003-plan.md)
+- [Spec Plan](../../../../../docs/specs/plans/20260122-spec-adr003-plan.md)
 
 ## 2. Input Context (資料 & 情報)
 - **All Specs**: `docs/specs/**/*.md`

@@ -5,7 +5,7 @@ labels:
   - TECHNICAL_DESIGNER
 roadmap: "docs/specs/plans/20260122-spec-adr003-plan.md"
 task_id: "S1-2"
-depends_on: ["issue-S1-1.md"]
+depends_on: ["issue-S1-1.md", "issue-S1-5.md"]
 next_phase_path: ""
 status: "Draft"
 ---
@@ -19,15 +19,15 @@ status: "Draft"
 - ADR-002 の「承認プロセス」としての起票ロジックはあるが、ADR-003 の「Git 差分ベースの一括起票」および「Fail-fast」の厳密なアルゴリズムが未定義。
 
 ### To-be (あるべき姿)
-- `docs/specs/logic/issue_creation_logic.md` が作成され、以下のロジックが定義されている。
+- `docs/specs/logic/creation_logic.md` が作成され、以下のロジックが定義されている。
     - **Detection**: `GitAdapter` から得たファイルリストのうち、「採番済み (`issue` フィールドあり)」を除外するフィルタリング。
     - **Dependency Resolution**: `depends_on` に基づく Topological Sort。
     - **Atomicity**: 全件の `create_issue` 成功後のみ、ファイルへの書き戻しを行うトランザクション境界。
     - **Error Handling**: API 失敗時に例外を送出し、Git を更新せずに終了する手順。
 
 ### Design Evidence
-- [Creation Behavior Diagram](../../../docs/architecture/arch-behavior-003-creation.md)
-- [Handover Doc Section 1.1](../../../docs/handovers/arch-to-spec.md)
+- [Creation Behavior Diagram](../../../../../docs/architecture/arch-behavior-003-creation.md)
+- [Handover Doc Section 1.1](../../../../../docs/handovers/arch-to-spec.md)
 
 ## 2. Input Context (資料 & 情報)
 - **Common Definitions**: `docs/specs/plans/20260122-spec-adr003-plan.md`

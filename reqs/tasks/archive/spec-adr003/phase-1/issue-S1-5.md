@@ -26,11 +26,11 @@ status: "Draft"
         - `move_file(src, dst)`: `git mv` 相当。
     - **GitHubAdapter**:
         - `create_pull_request(title, body, head, base)`: 自動連鎖用。
-        - `Retry Policy`: レートリミット (403/429) 時の内部リトライ挙動。
+        - `Retry Policy`: レートリミット (429, およびヘッダーやボディでレートリミットと判断できる403) 時の内部リトライ挙動。
 
 ### Design Evidence
-- [Structure Diagram](../../../docs/architecture/arch-structure-003-vqueue.md)
-- [Handover Doc Section 2.1](../../../docs/handovers/arch-to-spec.md)
+- [Structure Diagram](../../../../../docs/architecture/arch-structure-003-vqueue.md)
+- [Handover Doc Section 2.1](../../../../../docs/handovers/arch-to-spec.md)
 
 ## 2. Input Context (資料 & 情報)
 - **Common Definitions**: `docs/specs/plans/20260122-spec-adr003-plan.md`

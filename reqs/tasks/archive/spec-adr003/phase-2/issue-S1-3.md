@@ -25,11 +25,11 @@ status: "Draft"
     - **Task Mapping**: 抽出された Issue 番号に対応する Archive 下のファイルを特定する手順。
     - **1PR=1Task Rule**: 複数の Issue が見つかった場合、最初の 1 件のみをトリガーとする。
     - **Promotion Action**: ブランチ作成 (`main` 基点)、ファイル移動 (`git mv`)、PR 作成の連鎖。
-    - **Infinite Loop Guard**: 深度制限 (Max 10) の定義。
+    - **Infinite Loop Guard**: 深度制限 (Max 10) および 循環参照検知の定義。
 
 ### Design Evidence
-- [Auto-PR Behavior Diagram](../../../docs/architecture/arch-behavior-003-autopr.md)
-- [Decision on Simple Implementation](../../../reqs/design/_approved/adr-003-task-and-roadmap-lifecycle.md)
+- [Auto-PR Behavior Diagram](../../../../../docs/architecture/arch-behavior-003-autopr.md)
+- [Decision on Simple Implementation](../../../../../reqs/design/_approved/adr-003-task-and-roadmap-lifecycle.md)
 
 ## 2. Input Context (資料 & 情報)
 - **Common Definitions**: `docs/specs/plans/20260122-spec-adr003-plan.md`
@@ -55,4 +55,4 @@ status: "Draft"
 
 ## 5. Verification & DoD (完了条件)
 - [ ] 「1つのPRで #1 と #2 を Close した場合、#1 の `next_phase_path` のみが処理されること」が明記されている。
-- [ ] 循環参照を検知して停止するフローが図解またはステップで定義されている。
+- [ ] 深度制限および循環参照を検知して停止するフローが図解またはステップで定義されている。
