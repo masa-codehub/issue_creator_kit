@@ -1,113 +1,87 @@
 # Document Domain Model Specification
 
-## 1. 概要
-ドキュメントおよびそのメタデータを表現するドメインモデルの仕様を定義する。
-本モデルは、SSOT（真実の単一ソース）としてドキュメントの状態を厳密に管理し、不正な状態のドキュメントがシステム内で流通することを防ぐ。
+## 1. Overview
+Defines the `Document` object and its `Metadata` schema, which serve as the Single Source of Truth (SSOT) for managing task lifecycle (Draft -> Active -> Archived) as per ADR-003.
+This model encapsulates normalization, validation, and status transition rules.
 
-## 2. 関連ドキュメント
-- ADR: `reqs/design/_archive/adr-002-document-approval-flow.md`
-- Architecture: `docs/architecture/arch-structure-issue-kit.md`
+## 2. Domain Model (Classes)
 
-## 3. ドメインモデル (Domain Model)
-
-### 3.1. クラス構造 (Mermaid Class Diagram)
+### 2.1. Class Diagram
 ```mermaid
 classDiagram
     class Document {
-        +FilePath path
-        +String content
+        +Path path
+        +str content
         +Metadata metadata
         +validate() void
     }
     class Metadata {
-        +String status
-        +String date
-        +String issue_id
-        +Map extra_fields
+        +str title
+        +str status
+        +str|int issue
+        +list[str] depends_on
+        +str next_phase_path
+        +dict extra_fields
         +validate() void
     }
     class ValidationError {
-        +String message
-        +String field
+        +str message
+        +str field
     }
 
     Document *-- Metadata : contains
     ValidationError <.. Document : throws
-    ValidationError <.. Metadata : throws
 ```
 
-### 3.2. Metadata クラス定義
-ドキュメントの属性情報を保持する。
-**正規化ルール**:
-- メタデータのキーは大文字小文字を区別せず、全て小文字に正規化して保持される（例: `Status` -> `status`）。
-- 特定の日本語キーは以下のように標準キーにマッピングされる（エイリアス）。
+### 2.2. Metadata Schema
+Metadata manages key attributes of a task.
+It enforces strict normalization and validation rules.
+
+#### Normalization Rules
+1.  **Lowercase Keys**: All keys are converted to lowercase (e.g., `Status` -> `status`).
+2.  **Alias Mapping (Japanese Support)**:
     - `タイトル` -> `title`
     - `ラベル` -> `labels`
+    - `ステータス` -> `status`
+    - `依存` -> `depends_on`
 
-| フィールド名 | 型 | 必須 | 説明 |
-| :--- | :--- | :--- | :--- |
-| `status` | String | Yes | ドキュメントの承認状態（例: `承認済み`, `提案中`） |
-| `date` | String | No | 最終更新日または承認日（YYYY-MM-DD形式を推奨） |
-| `issue_id` | String | No | 関連するGitHub Issue ID（例: `#123`） |
-| `extra_fields`| Map[String, Any] | No | 上記以外の任意のフィールド。解析時に未知のキーがあった場合ここに格納される。 |
+| Field | Type | Required | Description | Constraints |
+| :--- | :--- | :--- | :--- | :--- |
+| `title` | `str` | Yes | Task title for Issue creation. | Must not be empty. |
+| `status` | `str` | Yes | Lifecycle status. | Must be one of `Draft`, `Active`, `Archived`. |
+| `issue` | `str` \| `int` | No | GitHub Issue number (e.g., `#123`). | Required if status is `Active` or `Archived`. |
+| `depends_on` | `list[str]` | No | List of dependent filenames. | Must be a list of strings. |
+| `next_phase_path`| `str` | No | Path to next phase drafts. | Required for phase promotion trigger. |
 
-#### バリデーションルール
-- **必須チェック**: `status` フィールドが欠落している、または値が `None` や空文字列 `""` の場合は `ValidationError` を送出する。
-- **型チェック**: `status`, `date`, `issue_id` は文字列型であることを期待する。
+### 2.3. Validation Rules
+The `validate()` method enforces the following rules:
 
-### 3.3. Document クラス定義
-ドキュメント全体（ファイルパス、本文、メタデータ）を表現する。
+1.  **Required Fields**: `title` and `status` must exist.
+2.  **Status Integrity**:
+    - If `status` is `Active` or `Archived`, the `issue` field must represent a valid issue number (starting with `#` or pure digits).
+    - If `path` is in `archive/` directory, `status` must NOT be `Draft`.
+3.  **Type Consistency**: `depends_on` must be a list, `labels` must be a list.
 
-| フィールド名 | 型 | 必須 | 説明 |
-| :--- | :--- | :--- | :--- |
-| `path` | FilePath | Yes | ドキュメントファイルの物理パス |
-| `content` | String | Yes | Markdown形式の本文（メタデータ部分を除く）。空文字列を許容する。 |
-| `metadata` | Metadata | Yes | メタデータオブジェクト |
+## 3. Parsing & Serialization
 
-#### バリデーションルール
-- 生成時および `validate()` 呼び出し時に `metadata.validate()` を実行する。
-- `path` は有効なファイルシステムパスであることを要求する。
+### 3.1. Parsing Logic
+Supports hybrid parsing (YAML Frontmatter priority).
 
-### 3.4. ValidationError クラス定義
-バリデーション失敗時に送出される例外クラス。
+1.  **YAML Frontmatter**:
+    - If file starts with `---`, parse content between delimiters as YAML.
+2.  **Markdown List (Fallback)**:
+    - Scan lines matching `^- \*\*([^*]+)\*\*: (.*)$`.
+    - Stop scanning after 15 lines or upon encountering an empty line after metadata.
 
-| 属性名 | 型 | 説明 |
-| :--- | :--- | :--- |
-| `message` | str | エラー詳細メッセージ |
-| `field` | str (optional) | エラーが発生したフィールド名 |
+### 3.2. Serialization Logic
+- Always serialize as **YAML Frontmatter** when saving.
+- If the original file used Markdown List format, convert it to YAML Frontmatter to standardize the codebase.
 
-## 4. 解析ルール (Parsing Rules)
+## 4. Edge Cases & Error Handling
 
-ドキュメントは以下の2種類の形式からのパースをサポートする。
-
-### 4.1. YAML Frontmatter 形式
-ファイル先頭が `---` で始まり、次の `---` までの間を YAML としてパースする。
-
-**例:**
-```markdown
----
-status: 承認済み
-date: 2026-01-20
-issue_id: "#123"
----
-# 本文
-...
-```
-
-### 4.2. Markdown List 形式 (埋め込みメタデータ)
-ファイル内の特定のパターン（`- **Key**: Value`）をメタデータとして抽出する。
-
-**解析ルール:**
-- 行が `- **([^*]+)**: (.*)` の正規表現にマッチする場合、メタデータとして扱う。
-- メタデータキー（`status` 等）は大文字小文字を区別せず、正規化して扱う（例: `Status` -> `status`）。
-- 最初のメタデータ行から、メタデータ以外の行（空行を除く）が出現するまでをメタデータブロックとみなす。
-- メタデータブロック以降を本文 (`content`) とする。本文冒頭の空行は削除する。
-
-## 5. 異常系ハンドリング (Error Handling)
-
-| ケース | 挙動 |
+| Scenario | Behavior |
 | :--- | :--- |
-| メタデータに `status` が存在しない | `ValidationError` (field="status") を送出する。 |
-| YAML 形式が不正（文法エラー等） | YAMLとしての解析を中断し、全文を対象に Markdown List 形式としての解析を試みる。 |
-| YAML/Markdown List 両方で解析不能 | `metadata` を空の状態で生成し、その後の `validate()` により `ValidationError` を送出する。 |
-| ファイルが空 | `content=""`, `metadata={}` で生成を試み、`ValidationError` を送出する。 |
+| **Missing Status** | Raise `ValidationError(field="status")`. |
+| **Invalid Status Value** | Raise `ValidationError("Invalid status: {value}. Must be Draft, Active, or Archived")`. |
+| **Active but No Issue** | Raise `ValidationError("Active tasks must have an issue number")`. |
+| **Japanese Key** | Normalize to English key internally. `metadata["title"]` returns value for `タイトル`. |
