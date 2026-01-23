@@ -1,3 +1,4 @@
+---
 name: adr-review
 description: Replaces the task of strictly checking drafted ADRs for logical flaws or inconsistencies to improve quality. Typical use cases: (1) Re-verifying that technical decisions directly link to business value (outcomes), (2) Checking consistency with the overall design philosophy and existing ADR groups, (3) Organizing issues into self-fixable items and points requiring user judgment.
 ---
