@@ -1,3 +1,4 @@
+---
 name: arch-planning-review
 description: Replaces the review process for strictly auditing created architecture update plans against ADRs and system contexts. Typical use cases: (1) Scrutinizing whether abstract definitions are correctly mapped to concrete file paths, (2) Confirming Issue drafts adhere to templates and have clear boundaries, (3) Verifying SSOT consistency to ensure no regressions or principle violations from existing designs.
 ---
