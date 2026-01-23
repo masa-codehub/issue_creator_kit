@@ -16,9 +16,9 @@ ADR-003 で定義された「フェーズ連鎖 (Phase Chain)」メカニズム�
     - 移動後の変更を含むプルリクエストが `main` に向けて自動作成される。
 
 ## Related Structures
-*   `WorkflowUseCase` (see `docs/architecture/arch-structure-003-vqueue.md`)
-*   `GitAdapter` (see `docs/architecture/arch-structure-003-vqueue.md`)
-*   `GitHubAdapter` (see `docs/architecture/arch-structure-003-vqueue.md`)
+*   `WorkflowUseCase` (see `./arch-structure-003-vqueue.md`)
+*   `GitAdapter` (see `./arch-structure-003-vqueue.md`)
+*   `GitHubAdapter` (see `./arch-structure-003-vqueue.md`)
 
 ## Diagram (Sequence)
 ```mermaid

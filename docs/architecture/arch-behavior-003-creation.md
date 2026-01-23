@@ -53,7 +53,9 @@ sequenceDiagram
 
     rect rgb(220, 240, 220)
         note right of UC: Success Path: Commit & Push
-        UC->>FS: update_metadata(file_path, issue_number)
+        loop for each result in results
+            UC->>FS: update_metadata(result.file_path, result.issue_number)
+        end
         
         opt Roadmap Sync (Best-effort)
             UC->>RS: sync(roadmap_path, results)
@@ -62,14 +64,14 @@ sequenceDiagram
         
         alt use_pr is True
             UC->>GIT: checkout(sync-branch, create=True)
-            UC->>GIT: add(processed_files)
-            UC->>GIT: commit("docs: update issue numbers...")
+            UC->>GIT: add(all_updated_files)
+            UC->>GIT: commit("docs: update issue numbers and sync roadmap")
             UC->>GIT: push(origin, sync_branch)
             UC->>GH: create_pull_request(title, body)
             GH-->>UC: PR_URL
         else use_pr is False
-            UC->>GIT: add(processed_files)
-            UC->>GIT: commit("docs: update issue numbers...")
+            UC->>GIT: add(all_updated_files)
+            UC->>GIT: commit("docs: update issue numbers and sync roadmap")
             UC->>GIT: push(origin, current_branch)
         end
     end

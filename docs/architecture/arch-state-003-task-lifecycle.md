@@ -29,11 +29,11 @@ stateDiagram-v2
         Task is now being implemented.
     end note
 
-    Processing --> Processing : Fail-fast (Retry)
+    Processing --> Processing : Fail-fast (Stays for next run)
     note right of Processing
         Fail-fast により Issue 起票処理は中断されるが、
         ファイルは main ブランチの archive/ に存在し続ける。
-        メタデータ更新が行われていないため、状態は Processing のまま再試行される。
+        メタデータ更新が行われていないため、状態は Processing のまま次回の実行で再処理される。
     end note
 
     Active --> Archived : Final task PR merged
