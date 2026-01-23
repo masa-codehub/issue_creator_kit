@@ -8,7 +8,7 @@ ADR-003 で定義された「フェーズ連鎖 (Phase Chain)」メカニズム�
 
 ## Contracts (Pre/Post)
 - **Pre-conditions (前提):**
-    - マージされた PR の内容（またはリンクされた Issue）に `next_phase_path` が定義されたドキュメントが含まれている。
+    - マージされたPRが閉じるIssueに対応するタスクファイル（`archive/`内に存在）に`next_phase_path`が定義されている。
     - 次フェーズのドキュメントが `reqs/tasks/drafts/` 下に準備されている。
 - **Post-conditions (保証):**
     - `main` ブランチから新しい Foundation Branch が作成される。
@@ -32,9 +32,8 @@ sequenceDiagram
 
     CLI->>UC: promote_from_merged_pr(pr_body)
     UC->>UC: Extract issue numbers from PR body
-    UC->>FS: Scan archive/ for metadata
-    FS-->>UC: task_files (with next_phase_path)
-
+    UC->>UC: Find next phases from issues (using FS)
+    
     loop for each next_phase_path
         UC->>UC: promote_next_phase(next_phase_path)
         
@@ -45,7 +44,7 @@ sequenceDiagram
         UC->>GIT: checkout(new_branch, create=True, base="main")
         
         UC->>GIT: move_file(draft_path, archive_path)
-        note over GIT, FS: File System: mv reqs/tasks/drafts/X reqs/tasks/archive/X
+        note over GIT: Stages file move via 'git mv' (e.g., drafts/X -> archive/X)
         
         UC->>GIT: commit("feat: promote phase X tasks...")
         UC->>GIT: push(remote, branch)
