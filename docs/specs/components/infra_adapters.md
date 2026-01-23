@@ -47,11 +47,11 @@ GitHub API 呼び出しにおいて、以下のエラーに遭遇した場合は
 - **戻り値**: `(html_url, pr_number)` のタプル。
 - **例外**: API エラー時は `GitHubAPIError` を送出する。レートリミット超過時はリトライ後に `GitHubRateLimitError` を送出する。
 
-### 3.4. `add_labels(issue_number: int, labels: list[str]) -> None`
+### 3.5. `add_labels(issue_number: int, labels: list[str]) -> None`
 指定した Issue または PR にラベルを付与する。
 - **例外**: `GitHubAPIError`
 
-### 3.5. `add_comment(issue_number: int, body: str) -> None`
+### 3.6. `add_comment(issue_number: int, body: str) -> None`
 指定した Issue または PR にコメントを投稿する。
 - **例外**: `GitHubAPIError`
 
