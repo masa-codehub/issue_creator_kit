@@ -11,10 +11,12 @@ permissions:
 
 jobs:
   analyze-comment:
-    if: |
-      contains(github.event.pull_request.labels.*.name, 'gemini:arch') ||
-      contains(github.event.pull_request.labels.*.name, 'gemini:spec') ||
-      contains(github.event.pull_request.labels.*.name, 'gemini:tdd')
+    if: >
+      (github.event.comment.user.login == 'copilot-pull-request-reviewer' || github.event.comment.user.login == 'masa-codehub') && (
+        contains(github.event.pull_request.labels.*.name, 'gemini:arch') ||
+        contains(github.event.pull_request.labels.*.name, 'gemini:spec') ||
+        contains(github.event.pull_request.labels.*.name, 'gemini:tdd')
+      )
     runs-on: [self-hosted]
     concurrency:
       group: gemini-review-analyzer-${{ github.event.pull_request.number }}
