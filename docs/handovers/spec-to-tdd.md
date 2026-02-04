@@ -37,3 +37,9 @@
 - ADR-003: `reqs/design/_approved/adr-003-task-and-roadmap-lifecycle.md`
 - Logic Spec: `docs/specs/logic/creation_logic.md`
 - Adapter Spec: `docs/specs/components/infra_adapters.md`
+
+## 6. 完了条件 (Definition of Done)
+- [ ] 全ての `docs/specs/**/*.md` の要件がコード化されていること。
+- [ ] `pytest` が全件パスし、カバレッジ目標（未定の場合は妥当な範囲）を満たしていること。
+- [ ] `mypy --strict` で型エラーが出ないこと。
+- [ ] `ruff check .` および `ruff format .` をパスしていること。

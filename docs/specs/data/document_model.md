@@ -1,22 +1,22 @@
 # Document Domain Model Specification
 
-## 1. Overview
-Defines the `Document` object and its `Metadata` schema, which serve as the Single Source of Truth (SSOT) for managing task lifecycle as per ADR-003.
-This model encapsulates normalization, validation, and status transition rules.
+## 1. 概要 (Overview)
+ADR-003 に従い、タスクライフサイクルを管理するための SSOT（Single Source of Truth）となる `Document` オブジェクトおよび `Metadata` スキーマを定義する。
+本モデルは、正規化、バリデーション、およびステータス遷移のルールをカプセル化する。
 
-### 1.1. Logical States vs. Physical Status
-While ADR-003 defines 5 states (`Draft`, `Queued`, `Processing`, `Active`, `Archived`), the physical `status` field in Metadata only stores three primary values. `Queued` and `Processing` are **logical states** determined by the system based on the file's physical location and the absence of an issue number.
+### 1.1. 論理ステータスと物理ステータス (Logical States vs. Physical Status)
+ADR-003 では 5 つのステータス (`Draft`, `Queued`, `Processing`, `Active`, `Archived`) が定義されているが、Metadata の物理的な `status` フィールドには主要な 3 つの値のみを保持する。`Queued` と `Processing` は、ファイルの物理的な配置場所と Issue 番号の有無に基づいてシステムが判定する **論理ステータス** である。
 
-- **Logical `Queued`**: File is in `archive/` on a non-main branch. Physical `status` is typically `Draft`.
-- **Logical `Processing`**: File is in `archive/` on `main` branch but has no `issue` field. Physical `status` is typically `Draft`.
+- **論理 `Queued`**: 非 main ブランチの `archive/` 配下にファイルが存在する状態。物理 `status` は通常 `Draft`。
+- **論理 `Processing`**: main ブランチの `archive/` 配下にファイルが存在するが、`issue` フィールドが未採番の状態。物理 `status` は通常 `Draft`。
 
-## 2. Domain Model (Classes)
+## 2. ドメインモデル (Domain Model)
 
-### 2.1. Class Diagram
+### 2.1. クラス図 (Class Diagram)
 ```mermaid
 classDiagram
     class Document {
-        +Path path
+        +pathlib.Path path
         +str content
         +Metadata metadata
         +validate() void
@@ -42,70 +42,70 @@ classDiagram
     ValidationError <.. Metadata : throws
 ```
 
-### 2.2. Document Class Definition
-Represents the entire document file.
+### 2.2. Document クラス定義
+ドキュメントファイル全体を表現する。
 
-| Field | Type | Required | Description |
+| フィールド名 | 型 | 必須 | 説明 |
 | :--- | :--- | :--- | :--- |
-| `path` | `pathlib.Path` | Yes | Physical path of the file. |
-| `content` | `str` | Yes | Markdown body content (excluding metadata). |
-| `metadata` | `Metadata` | Yes | Metadata object containing task attributes. |
+| `path` | `pathlib.Path` | Yes | ファイルの物理パス。 |
+| `content` | `str` | Yes | Markdown 本文（メタデータを除く）。 |
+| `metadata` | `Metadata` | Yes | タスク属性を含むメタデータオブジェクト。 |
 
-### 2.3. Metadata Schema
-Metadata manages key attributes of a task.
-It enforces strict normalization and validation rules.
+### 2.3. Metadata スキーマ
+タスクの主要な属性を管理する。
+厳格な正規化とバリデーションルールを適用する。
 
-#### Normalization Rules
-1.  **Lowercase Keys**: All keys are converted to lowercase (e.g., `Status` -> `status`).
-2.  **Alias Mapping (Japanese & Legacy Support)**:
+#### 正規化ルール (Normalization Rules)
+1.  **キーの小文字化**: 全てのキーは小文字に変換される（例: `Status` -> `status`）。
+2.  **エイリアスマッピング (日本語対応 & レガシーサポート)**:
     - `タイトル` -> `title`
     - `ラベル` -> `labels`
     - `ステータス` -> `status`
     - `依存` -> `depends_on`
     - `Depends-On` -> `depends_on`
-    - `Issue` -> `issue` (legacy capitalized key)
+    - `Issue` -> `issue` (大文字キーのサポート)
 
-| Field | Type | Required | Description | Constraints |
+| フィールド名 | 型 | 必須 | 説明 | 制約 |
 | :--- | :--- | :--- | :--- | :--- |
-| `title` | `str` | Yes | Task title for Issue creation. | Must not be empty. |
-| `status` | `str` | Yes | Lifecycle status. | Must be one of `Draft`, `Active`, `Archived`. |
-| `issue` | `str` \| `int` | No | GitHub Issue number (e.g., `#123`). | Required if status is `Active` or `Archived`. |
-| `labels` | `list[str]` | No | List of labels for the issue. | Must be a list of strings. |
-| `depends_on` | `list[str]` | No | List of dependent filenames. | Must be a list of strings. |
-| `roadmap_path`| `str` | No | Path to roadmap file for WBS sync. | Optional. |
-| `next_phase_path`| `str` | No | Path to next phase drafts. | Required for phase promotion trigger. |
-| `extra_fields`| `dict` | No | Catch-all for unknown fields. | |
+| `title` | `str` | Yes | Issue 作成時のタイトル。 | 空文字不可。 |
+| `status` | `str` | Yes | ライフサイクルステータス。 | `Draft`, `Active`, `Archived` のいずれか。 |
+| `issue` | `str` \| `int` | No | GitHub Issue 番号（例: `#123`）。 | status が `Active` または `Archived` の場合必須。 |
+| `labels` | `list[str]` | No | Issue ラベルのリスト。 | 文字列のリストであること。 |
+| `depends_on` | `list[str]` | No | 依存するファイル名のリスト。 | 文字列のリストであること。 |
+| `roadmap_path`| `str` | No | WBS 同期用ロードマップファイルのパス。 | 任意。 |
+| `next_phase_path`| `str` | No | 次フェーズのドラフト格納パス。 | フェーズ連鎖トリガーとして使用。 |
+| `extra_fields`| `dict` | No | 未知のフィールドを格納する辞書。 | |
 
-### 2.4. Validation Rules
-The `validate()` method enforces the following rules:
+### 2.4. バリデーションルール (Validation Rules)
+`validate()` メソッドは以下のルールを強制する：
 
-1.  **Required Fields**: `title` and `status` must exist.
-2.  **Status Integrity**:
-    - If `status` is `Active` or `Archived`, the `issue` field must represent a valid issue number (starting with `#` or pure digits).
-    - If `path` is in `archive/` directory and the `issue` field exists, `status` must be `Active` or `Archived`.
-3.  **Type Consistency**: `depends_on` must be a list, `labels` must be a list.
+1.  **必須フィールド**: `title` と `status` が存在すること。
+2.  **ステータス整合性**:
+    - `status` が `Active` または `Archived` の場合、`issue` フィールドは有効な Issue 番号（`#` 始まりまたは数字）でなければならない。
+    - `path` が `archive/` ディレクトリにあり、かつ `issue` フィールドが存在する場合、`status` は `Active` または `Archived` でなければならない。
+3.  **型の一貫性**: `depends_on` と `labels` はリスト型でなければならない。
 
-## 3. Parsing & Serialization
+## 3. 解析とシリアライズ (Parsing & Serialization)
 
-### 3.1. Parsing Logic
-Supports hybrid parsing (YAML Frontmatter priority).
+### 3.1. 解析ロジック (Parsing Logic)
+ハイブリッド解析をサポートする（YAML Frontmatter 優先）。
 
 1.  **YAML Frontmatter**:
-    - If file starts with `---`, parse content between delimiters as YAML.
-2.  **Markdown List (Fallback)**:
-    - Scan lines matching `^- \*\*([^*]+)\*\*: (.*).
-    - Scan until a non-metadata, non-empty line is encountered. Implementations MAY impose a documented maximum number of lines (e.g., 100) for performance reasons.
+    - ファイルが `---` で始まる場合、区切り文字の間のコンテンツを YAML として解析する。
+2.  **Markdown List (フォールバック)**:
+    - 正規表現 `^- \*\*([^*]+)\*\*: (.*)$` にマッチする行をスキャンする。
+    - メタデータ以外の行、または空行以外の行に遭遇するまでスキャンを続ける。パフォーマンスのため、最大行数（例: 100行）の制限を設けてもよい。
 
-### 3.2. Serialization Logic
-- Always serialize as **YAML Frontmatter** when saving.
-- If the original file used Markdown List format, convert it to YAML Frontmatter to standardize the codebase.
+### 3.2. シリアライズロジック (Serialization Logic)
+- 保存時は常に **YAML Frontmatter** 形式でシリアライズする。
+- 元のファイルが Markdown List 形式であった場合、YAML Frontmatter に変換して保存し、コードベースを標準化する。
 
-## 4. Edge Cases & Error Handling
+## 4. エッジケースとエラーハンドリング (Edge Cases & Error Handling)
 
-| Scenario | Behavior |
+| シナリオ | 挙動 |
 | :--- | :--- |
-| **Missing Status** | Raise `ValidationError(field="status")`. |
-| **Invalid Status Value** | Raise `ValidationError("Invalid status: {value}. Must be Draft, Active, or Archived")`. |
-| **Active but No Issue** | Raise `ValidationError("Active tasks must have an issue number")`. |
-| **YAML Syntax Error** | Abort YAML parsing and attempt to parse the entire document using the Markdown List format (fallback strategy). |
-| **Japanese Key** | Normalize to English key internally. `metadata["title"]` returns value for `タイトル`. |
+| **ステータス欠落** | `ValidationError(field="status")` を送出する。 |
+| **不正なステータス値** | `ValidationError("Invalid status: {value}. Must be Draft, Active, or Archived")` を送出する。 |
+| **Active だが Issue 番号なし** | `ValidationError("Active tasks must have an issue number")` を送出する。 |
+| **YAML 構文エラー** | YAML 解析を中断し、ドキュメント全体に対して Markdown List 形式での解析を試みる（フォールバック）。 |
+| **日本語キー** | 内部的に英語キーに正規化する。`metadata["title"]` で `タイトル` の値を取得可能にする。 |
