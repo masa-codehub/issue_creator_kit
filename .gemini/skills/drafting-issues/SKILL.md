@@ -39,21 +39,35 @@ description: Generates objective-oriented and verifiable Issue drafts based on t
 
 
 
-- **id:** Planning段階で振られた一意なID（例: `T-1`）。
+- **id:** ADR番号をプレフィックスとした一貫した通し番号（例: `007-T1`）。フェーズ（Arch/Spec/TDD）を跨いでもリセットせず、ADR内で一意な連番を振る。
+
+
 
 - **parent:** 紐づくADRの一意なID（例: `adr-007`）。
 
+
+
 - **type:** タスクの種別（`task` | `integration`）。
+
+
 
 - **title:** `[Domain] Action + Object` (例: `[Auth] Implementation of JWT Token Issuance`)
 
+
+
 - **status:** 初期値は `Draft`。
+
+
 
 - **phase:** 実施フェーズ（`domain` | `infrastructure` | `usecase` | `interface` | `architecture` | `spec` | `tdd`）。
 
+
+
 - **roadmap:** 参照すべき **刷新計画書（ロードマップ）のパス** (例: `docs/architecture/plans/20260204-adr007-refresh-plan.md`)。
 
-- **depends_on:** 依存するタスクの **ID** リスト（例: `["T-0"]`）。なければ空配列 `[]`。
+
+
+- **depends_on:** 依存するタスクの **ID** リスト（例: `["007-T0"]`）。なければ空配列 `[]`。
 
 - **issue_id:** 【自動追記】手動で設定しないでください。
 

@@ -1,12 +1,12 @@
 ---
-id: T-3
+id: 007-T3
 parent: adr-007
 type: task
 title: "旧アーキテクチャドキュメントの非推奨化"
 status: Draft
 phase: architecture
 roadmap: "docs/architecture/plans/20260204-adr007-refresh-plan.md"
-depends_on: ["T-2"]
+depends_on: ["007-T2"]
 issue_id: # 【自動追記】手動で設定しないでください
 ---
 # 旧アーキテクチャドキュメントの非推奨化
@@ -35,7 +35,7 @@ issue_id: # 【自動追記】手動で設定しないでください
 
 ## 4. ブランチ戦略 (Branching Strategy)
 - **ベースブランチ (Base Branch)**: main
-- **作業ブランチ (Feature Branch)**: feature/task-T-3-deprecate-old-docs
+- **作業ブランチ (Feature Branch)**: feature/task-007-T3-deprecate-old-docs
 
 ## 5. 検証手順・完了条件 (Verification & DoD)
 - [ ] **ファイル状態**: 全対象ファイルの冒頭に警告が正しく記載されていること。

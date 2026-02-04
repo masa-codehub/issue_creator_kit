@@ -1,12 +1,12 @@
 ---
-id: T-2
+id: 007-T2
 parent: adr-007
 type: task
 title: "新アーキテクチャ図（Structure/State）の起草"
 status: Draft
 phase: architecture
 roadmap: "docs/architecture/plans/20260204-adr007-refresh-plan.md"
-depends_on: ["T-1"]
+depends_on: ["007-T1"]
 issue_id: # 【自動追記】手動で設定しないでください
 ---
 # 新アーキテクチャ図（Structure/State）の起草
@@ -33,7 +33,7 @@ issue_id: # 【自動追記】手動で設定しないでください
 
 ## 4. ブランチ戦略 (Branching Strategy)
 - **ベースブランチ (Base Branch)**: main
-- **作業ブランチ (Feature Branch)**: feature/task-T-2-draft-new-architecture
+- **作業ブランチ (Feature Branch)**: feature/task-007-T2-draft-new-architecture
 
 ## 5. 検証手順・完了条件 (Verification & DoD)
 - [ ] **静的解析**: Mermaid 記法が正しくレンダリングされること。

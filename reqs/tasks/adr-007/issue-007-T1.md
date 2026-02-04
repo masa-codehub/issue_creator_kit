@@ -1,5 +1,5 @@
 ---
-id: T-1
+id: 007-T1
 parent: adr-007
 type: task
 title: "旧自動化ワークフローの安全停止"
@@ -35,7 +35,7 @@ issue_id: # 【自動追記】手動で設定しないでください
 
 ## 4. ブランチ戦略 (Branching Strategy)
 - **ベースブランチ (Base Branch)**: main
-- **作業ブランチ (Feature Branch)**: feature/task-T-1-disable-old-workflows
+- **作業ブランチ (Feature Branch)**: feature/task-007-T1-disable-old-workflows
 
 ## 5. 検証手順・完了条件 (Verification & DoD)
 - [ ] **静的解析**: GitHub Actions の Syntax としてエラーになっていないこと。

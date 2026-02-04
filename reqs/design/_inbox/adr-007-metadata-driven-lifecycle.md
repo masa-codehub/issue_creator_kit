@@ -40,13 +40,15 @@ date: 2026-02-04
 
 #### Task (Issue Draft)
 ```yaml
-id: T-1
+id: 007-T1                 # 形式: [ADR番号]-T[通し番号]。フェーズ（Arch/Spec/TDD）を跨いでも一貫した連番を使用。
+                           # 設計思想: ADR毎に名前空間を分けることでプロジェクト全体での一意性を保証し、
+                           # フェーズプレフィックスを排除することで依存関係（depends_on）の記述を簡素化する。
 parent: adr-007
 type: task | integration  # L2統合Issueの場合は integration、L3タスクの場合は task
 status: Draft | Ready | Completed | Cancelled
 phase: domain | infrastructure | usecase | interface | architecture | spec | tdd
 roadmap: [ROADMAP-ID]      # 同期対象のロードマップID
-depends_on: ["T-0"]        # 必須。依存先の ID (例: ["T-0"]) を記述。依存がない場合は空配列 [] を指定
+depends_on: ["007-T0"]     # 必須。依存先のタスク ID (例: ["007-T0"]) を記述。依存がない場合は空配列 [] を指定
 issue_id: 456              # 【自動追記】手動で設定しないでください
 ```
 

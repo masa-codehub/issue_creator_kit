@@ -1,12 +1,12 @@
 ---
-id: T-<TaskID> # 例: T-1
+id: 007-T1 # 形式: [ADR番号]-T[連番]
 parent: adr-<ADR-ID> # 例: adr-007
 type: task # task | integration
 title: "<Task Title>"
 status: Draft # Draft | Ready | Completed | Cancelled
 phase: domain # domain | infrastructure | usecase | interface | architecture | spec | tdd
 roadmap: "docs/architecture/plans/<Plan-File>.md"
-depends_on: [] # 必須: 依存するタスク ID (例: ["T-1"])。依存がない場合は []
+depends_on: [] # 必須: 依存するタスク ID (例: ["007-T1"])。依存がない場合は []
 issue_id: # 【自動追記】手動で設定しないでください
 ---
 # <Task Title>
