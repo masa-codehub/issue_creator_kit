@@ -1,53 +1,50 @@
-# Python環境とgemini-cliを含むDockerfile
-FROM python:3.13.3-slim-bullseye
+# 1. ベースイメージ: ubuntu:latest
+FROM ubuntu:latest
 
-# 作業ディレクトリを作成・設定
-WORKDIR /app
+# ★ uv のインストール
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 
-# RUN命令を一つにまとめることでDockerイメージのレイヤー数を削減
-RUN apt-get update && \
-    apt-get install -y git && \
-    apt-get install -y tmux && \
-    apt-get install -y gpg && \
-    apt-get install -y wget && \
-    apt-get install -y curl && \
-    apt-get install -y gnupg && \
-    apt-get install -y procps && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+# ビルド時の対話防止とPython設定
+ARG DEBIAN_FRONTEND=noninteractive
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
-# github CLIのリポジトリを追加し、GitHub CLIをインストール
-RUN apt-get update \
-    && mkdir -p -m 755 /etc/apt/keyrings \
-    && wget -qO- https://cli.github.com/packages/githubcli-archive-keyring.gpg | tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null \
-    && chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg \
-    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
-    && apt-get update \
-    && apt-get install -y gh \
-    # 最後に、インストールにのみ使用したwgetと不要なキャッシュを削除してイメージサイズを削減
-    && apt-get purge -y --auto-remove wget \
+# 2. 必須ツールと依存関係のインストール
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    curl \
+    gettext-base \
+    git \
+    gnupg \
+    jq \
+    libicu-dev \
+    libssl-dev \
+    lsb-release \
+    procps \
+    sudo \
+    tar \
+    zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# gcloud CLIのリポジトリを追加し、Google Cloud CLIをインストール
-RUN apt-get update
-RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg && apt-get update -y && apt-get install google-cloud-cli -y
-# RUN gcloud init
+# 3. GitHub CLI のインストール (wgetを使わずcurlで実行)
+RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | \
+    dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
+    && chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" > /etc/apt/sources.list.d/github-cli.list \
+    && apt-get update && apt-get install -y --no-install-recommends gh \
+    && rm -rf /var/lib/apt/lists/*    && apt-get update && apt-get install -y gh \
+    && rm -rf /var/lib/apt/lists/*
 
-# node.jsのリポジトリを追加し、Node.jsをインストール
-RUN curl -sSL https://deb.nodesource.com/setup_24.x | bash - && \
-    apt-get install -y nodejs && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+# 4. Node.js のインストールと npm のアップデート
+RUN curl -fsSL https://deb.nodesource.com/setup_current.x | bash - \
+    && apt-get install -y nodejs \
+    && npm install -g npm@latest \
+    && rm -rf /var/lib/apt/lists/*
 
-# gemini-cliをグローバルにインストール
-RUN npm update && npm install -g @google/gemini-cli@preview
+# 5. Gemini CLI のインストール (preview指定)
+RUN npm install -g @google/gemini-cli@preview
 
-# 必要なPythonパッケージのインストール
-COPY ./pyproject.toml .
-RUN pip install --upgrade pip
-RUN pip install --no-cache-dir .[dev]
+# 7. キャッシュディレクトリの確保
+ENV UV_CACHE_DIR=/root/.cache/uv
 
-# Pythonが.pycファイルを生成しないようにします。
-ENV PYTHONDONTWRITEBYTECODE=1
-# Pythonの出力がバッファリングされないようにします。
-ENV PYTHONUNBUFFERED=1
+CMD ["/bin/bash"]

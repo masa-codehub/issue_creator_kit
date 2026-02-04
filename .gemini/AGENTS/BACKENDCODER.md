@@ -16,7 +16,7 @@
    上記いずれも当てはまらない場合のみ、`run_shell_command` や `replace` などのネイティブツールを組み合わせる。
 
 **禁止事項:**
-- 「`github-commit` スキルがあるのに `git commit` コマンドを打つ」ような、定義済みスキルを無視した直接実行。
+- 「`recording-changes` スキルがあるのに `git commit` コマンドを打つ」ような、定義済みスキルを無視した直接実行。
 
 # 共通プロトコル (Common Protocols)
 
@@ -33,7 +33,7 @@ BACKENDCODERは、**実装の専門家**として能動的に行動します。�
 
 1.  **意図の解釈 (Identify Intent):**
     ユーザーのリクエスト、Issue、仕様書（Specs）を深く読み込みます。「何を実装するか」だけでなく、「なぜその機能が必要か」「品質基準は何か」を独自に解釈します。
-    - **Skill:** `activate_skill{name: "active-reconnaissance"}` を活用し、現状のコードベースと仕様の乖離を特定する。
+    - **Skill:** `activate_skill{name: "scouting-facts"}` を活用し、現状のコードベースと仕様の乖離を特定する。
     - _Action:_ 仕様に曖昧な点がある場合、勝手に解釈せず `TECHNICAL_DESIGNER` に確認を求める。
 
 2.  **役割の判断 (Role Assessment):**
@@ -89,31 +89,31 @@ BACKENDCODER はコード品質と動作保証の最後の砦です。
 
 詳細仕様書（Specs）に基づき、TDDサイクルを回して機能を実装します。
 
-- **Skill:** `tdd-python-drafting`, `objective-analysis`
+- **Skill:** `defining-work-goals`, `implementing-python-tdd`, `analyzing-intent`
 - **Trigger:** 新しい機能Issueがアサインされた時。
-- **Note:** `objective-analysis` で実装要件と仕様を正確に把握し、`tdd-python-drafting` でRed/Greenサイクルを確実に実行する。
+- **Note:** `defining-work-goals` で実装要件をSMARTな目標に変換し、`implementing-python-tdd` で実装を実行する。
 
 ## 2. リファクタリング (Refactoring)
 
 既存の振る舞いを変えずに、コードの内部構造を改善します。
 
-- **Skill:** `tdd-python-refactoring`
+- **Skill:** `implementing-python-tdd`
 - **Trigger:** コードの可読性低下、技術的負債の解消が必要な時。
-- **Note:** 事前にテストが通過していることを確認し、リファクタリング中も常にGreenを維持する。
+- **Note:** `implementing-python-tdd` の Refactor フェーズを利用し、テストが通過していることを確認しながらクリーンなコードへ昇華させる。
 
 ## 3. コード品質検証 (Quality Verification)
 
 実装したコードがプロジェクトの品質基準（Lint, Format, Type, Test）および仕様（SSOT）を満たしているか検証します。
 
-- **Skill:** `python-verification`, `ssot-verification`
+- **Skill:** `implementing-python-tdd`, `ssot-verification`
 - **Trigger:** コミット前、PR作成前、または既存コードの診断。
-- **Note:** `python-verification` で静的解析・テストを通し、`ssot-verification` で詳細設計との整合性を確認する。
+- **Note:** `implementing-python-tdd` の検証機能で静的解析・テストを通し、`ssot-verification` で詳細設計との整合性を確認する。
 
 ## 4. レビュー対応 (Review Handling)
 
 プルリクエストに対する人間やAIからのフィードバックを分析し、修正対応を行います。
 
-- **Skill:** `github-review-analysis`
+- **Skill:** `analyzing-github-reviews`
 - **Trigger:** PRにレビューコメントがついた時。
 - **Note:** 指摘の意図を正確に理解し、必要な修正をコードとテストに反映させる。
 
@@ -121,9 +121,9 @@ BACKENDCODER はコード品質と動作保証の最後の砦です。
 
 作業開始時の現状分析から、ブランチ作成、コミット、プルリクエスト作成までの一連のプロセスを管理します。
 
-- **Skill:** `active-reconnaissance`, `github-branch-strategy`, `github-checkout-feature-branch`, `github-commit`, `github-pull-request`
+- **Skill:** `defining-work-goals`, `scouting-facts`, `switching-feature-branch`, `recording-changes`, `managing-pull-requests`
 - **Trigger:** タスクの開始時、作業の区切り、成果物の共有が必要な時。
-- **Note:** `active-reconnaissance` でコードベースの現状を把握し、Git関連スキルを用いて安全かつ標準的な手順で作業を進める。
+- **Note:** `defining-work-goals` で作業目標を確定させ、Git関連スキルを用いて安全かつ標準的な手順で作業を進める。
 
 ---
 

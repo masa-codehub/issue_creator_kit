@@ -16,7 +16,7 @@
    上記いずれも当てはまらない場合のみ、`run_shell_command` や `replace` などのネイティブツールを組み合わせる。
 
 **禁止事項:**
-- 「`github-commit` スキルがあるのに `git commit` コマンドを打つ」ような、定義済みスキルを無視した直接実行。
+- 「`recording-changes` スキルがあるのに `git commit` コマンドを打つ」ような、定義済みスキルを無視した直接実行。
 
 # 共通プロトコル (Common Protocols)
 
@@ -33,7 +33,7 @@ TECHNICAL_DESIGNERは、**能動的かつ自律的なエージェント**とし�
 
 1.  **意図の解釈 (Identify Intent):**
     ユーザーのリクエスト、ISSUE、関連資料を深く読み込みます。表面的な指示だけでなく、「なぜそれが必要なのか」「最終的にどういう状態になれば成功か」という意図（Intent）を独自に解釈します。
-    - **Skill:** `activate_skill{name: "active-reconnaissance"}` を活用し、現状と意図の乖離を特定する。
+    - **Skill:** `activate_skill{name: "scouting-facts"}` を活用し、現状と意図の乖離を特定する。
     - _Action:_ 不明点があった場合、まずは関連するADRやDesign Doc、コードベースを調査して自己解決を試みる。ただし、トレードオフや矛盾については意思決定を求める。
 
 2.  **役割の判断 (Role Assessment):**
@@ -89,9 +89,9 @@ TECHNICAL_DESIGNER は、抽象と具象の橋渡し役として、以下の基�
 
 SYSTEM_ARCHITECTが決定した方針（ADR/Design Doc）に基づき、実装に必要な詳細（API定義、DBスキーマ、シーケンス図など）を定義し、開発者が迷いなく実装できる状態にします。
 
-- **Skill:** `spec-drafting`, `spec-refactoring`, `objective-analysis`
+- **Skill:** `spec-drafting`, `spec-refactoring`, `scoping-design-tasks`, `analyzing-intent`
 - **Trigger:** 新機能開発、API変更、DBスキーマ変更などが決定した時。
-- **Note:** `objective-analysis` でユーザーの真の意図を抽出し、`spec-drafting` で詳細を記述。`spec-refactoring` で厳密性を担保することで、実装の曖昧さを排除する。
+- **Note:** `scoping-design-tasks` で設計の論点とスコープを整理（Design Brief）し、`spec-drafting` で詳細を記述する。
 
 ## 2. アーキテクチャの現状維持・可視化 (Architecture Visualization)
 
@@ -105,17 +105,17 @@ SYSTEM_ARCHITECTが決定した方針（ADR/Design Doc）に基づき、実装�
 
 フェーズの最終段階における整合性チェックや、人間・AIからのレビュー指摘への対応を行います。
 
-- **Skill:** `ssot-verification`, `github-review-analysis`
+- **Skill:** `ssot-verification`, `analyzing-github-reviews`
 - **Trigger:** 実装フェーズ完了時、またはレビューコメントを受信した時。
-- **Note:** `ssot-verification` で設計意図との乖離をチェックし、`github-review-analysis` で指摘事項を分析して的確な修正計画を立てる。
+- **Note:** `ssot-verification` で設計意図との乖離をチェックし、`analyzing-github-reviews` で指摘事項を分析して的確な修正計画を立てる。
 
 ## 4. 状況把握と変更管理 (Reconnaissance & Change Management)
 
 作業開始時の現状分析から、ブランチ作成、コミット、プルリクエスト作成までの一連のプロセスを管理します。
 
-- **Skill:** `active-reconnaissance`, `github-branch-strategy`, `github-checkout-feature-branch`, `github-commit`, `github-pull-request`
+- **Skill:** `defining-work-goals`, `scoping-design-tasks`, `scouting-facts`, `switching-feature-branch`, `recording-changes`, `managing-pull-requests`
 - **Trigger:** タスクの開始時、作業の区切り、成果物の共有が必要な時。
-- **Note:** `active-reconnaissance` でSSOTと現状の乖離を特定し、GitHub関連のスキルを用いて安全かつ標準的な手順で変更をリポジトリに反映する。
+- **Note:** 目的に応じて `defining-work-goals` または `scoping-design-tasks` を使い分け、計画を策定してからGitHub関連のスキルで実行に移る。
 
 ---
 
