@@ -1,22 +1,15 @@
 ---
-title: "タスクタイトル"
-labels: # △ 推奨: タスク種別・優先度・担当ロールなど必要なラベルを設定すること（詳細は metadata-logic-spec.md 参照）
-  - "task"
-  - "P1" # Priority: P0 (Critical), P1 (High), P2 (Medium), P3 (Low)
-  - "gemini:arch" # Agent: gemini:arch (Arch), gemini:spec (Spec), gemini:tdd (TDD). Only one allowed.
-  - "BACKENDCODER" # Role: BACKENDCODER, SYSTEM_ARCHITECT, TECHNICAL_DESIGNER, etc.
-roadmap: "reqs/roadmap/active/roadmap-xxx.md" # ◯ 必須: 関連するロードマップへの相対パス（同期エンジンが使用）
-task_id: "T1-1" # ◯ 必須: ロードマップ WBS と一致するタスクID（同期エンジンが使用。例: T1-1）
-depends_on: [] # × 任意: 依存するタスクIDのリスト（例: ["T1-1"]）。Topological Sort に使用。
-next_phase_path: "" # × 任意: フェーズ最終タスクのみ記述。次フェーズの Draft パス（例: "reqs/tasks/drafts/phase-2/"）
-status: "Draft" # ◯ 必須: 初期値は "Draft"。有効な値: "Draft" または "Archived"
-# issue: # 起票後に ICK が自動追記。手動入力は不要。
+id: T-<TaskID> # 例: T-1
+parent: adr-<ADR-ID> # 例: adr-007
+type: task # task | integration
+title: "<Task Title>"
+status: Draft # Draft | Ready | Completed | Cancelled
+phase: domain # domain | infrastructure | usecase | interface | architecture | spec | tdd
+roadmap: "docs/architecture/plans/<Plan-File>.md"
+depends_on: [] # 必須: 依存するタスクファイル名 (例: ["issue-T-1.md"])
+issue_id: # 【自動追記】手動で設定しないでください
 ---
-# {{title}}
-
-## 親Issue / ロードマップ (Context)
-- **Roadmap**: {{roadmap}}
-- **Task ID**: {{task_id}}
+# <Task Title>
 
 ## 1. 目的と背景 (Goal & Context)
 <!--
@@ -62,8 +55,8 @@ status: "Draft" # ◯ 必須: 初期値は "Draft"。有効な値: "Draft" ま�
 - [ ] **削除**: 不要になったファイルがあれば指定。
 
 ## 4. ブランチ戦略 (Branching Strategy)
-- **ベースブランチ (Base Branch)**: `feature/phase-X-foundation`
-- **作業ブランチ (Feature Branch)**: `feature/task-{{task_id}}-{{title_slug}}`
+- **ベースブランチ (Base Branch)**: main
+- **作業ブランチ (Feature Branch)**: feature/task-<ID>-<title_slug>
 
 ## 5. 検証手順・完了条件 (Verification & DoD)
 - [ ] **自動テスト**: `pytest tests/unit/xxx` がパスすること。
