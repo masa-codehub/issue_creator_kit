@@ -1,54 +1,45 @@
-# Handover: Spec to TDD (Approval Flow)
+# Handover: Spec to TDD (ADR-003 Implementation)
 
-## 概要
-詳細設計フェーズ（Spec Creation）から実装フェーズ（TDD Creation）への申し送り事項をまとめる。
-実装担当者は、`docs/specs/` 配下の仕様書に加え、本ドキュメントの指針に従って実装を進めること。
+## 1. Overview
+本ドキュメントは、ADR-003（仮想キューと自己推進型ワークフロー）の詳細仕様策定フェーズから、実装フェーズ（TDD Creation / Backend Coder）へ引き継ぐための重要事項をまとめたものである。
 
-## 1. 実装の優先順位と依存関係
-以下の順序で実装することを推奨する（Slicing Strategyに基づく）。
+## 2. 実装の優先順位 (Implementation Priority)
+1.  **Core Domain**: `Document` および `Metadata` のパース・バリデーション・正規化ロジック。
+2.  **Issue Creation Logic**: 依存関係の解決（トポロジカルソート）を含む原子的な起票プロセス。
+3.  **Infrastructure Adapters**: Git/GitHub/FileSystem との具象連携。
+4.  **Workflow & CLI**: フェーズ連鎖（Auto-PR）および CLI エントリポイントの統合。
 
-1.  **Domain (`src/issue_creator_kit/domain/`)**:
-    - `Document`, `Metadata` クラス。
-    - 外部依存が一切ないため、純粋な単体テストでロジックを確定させる。
-    - 特に `Metadata` のキー正規化（小文字扱い）ロジックは、後続の全工程に関わるため念入りにテストすること。
+## 3. 重要事項と実装上のヒント (Critical Tips)
 
-2.  **Infrastructure (`src/issue_creator_kit/infrastructure/`)**:
-    - `FileSystemAdapter`, `GitHubAdapter`, `GitAdapter`。
-    - `unittest.mock` を活用し、実際のAPIを叩かずに異常系（404, 500エラー等）をシミュレートするテストを作成すること。
-    - `GitHubAdapter` の `find_or_create_issue` は、重複起票防止の要であるため、検索クエリの生成ロジックを確実に検証すること。
+### 3.1. 原子性 (Atomicity) の徹底
+- **Fail-fast Zone**: `IssueCreationUseCase` の起票ループ内で 1 件でも API エラーが発生した場合は、**即座に処理を中断すること。**
+- Git への書き戻し（Issue番号の付与）は、全件起票が成功した後の「Commit Phase」まで一切行わない。
 
-3.  **UseCase (`src/issue_creator_kit/usecase/`)**:
-    - `ApprovalUseCase`。
-    - ここでは `Infrastructure` の実体を使わず、Mock Adapter を注入してテストする。
-    - **最重要検証項目**: ロールバック処理。途中でエラーが発生した際、ファイルシステムの状態（パス、メタデータ）が「処理前」と完全に同じ状態に戻ることを保証するテストケースを書くこと。
+### 3.2. 仮想キューの検知
+- `GitAdapter.get_added_files` では、`--no-renames` オプションを必須とする。
+- これにより、`drafts/` から `archive/` へのファイル移動が「追加」として正しく検知され、起票対象となる。
 
-4.  **CLI (`src/issue_creator_kit/cli.py`)**:
-    - `run-workflow` コマンド。
-    - 引数パースと環境変数のチェックのみを責務とする。
+### 3.3. 依存関係の解決
+- `depends_on` に基づくトポロジカルソートには、Python 標準の `graphlib.TopologicalSorter` (3.9+) の使用を推奨する。
+- 循環参照（CycleError）が発生した場合のハンドリングを単体テストで網羅すること。
 
-## 2. 特に注意すべき仕様・エッジケース
+### 3.4. テストとモックの方針
+- **Adapter Layer**: 外部コマンド（git）や外部 API（GitHub）を直接叩かず、スタブまたはモックを使用して例外送出（429 Rate Limit等）をシミュレートすること。
+- **UseCase Layer**: アダプターを注入（Dependency Injection）し、ビジネスロジック（順序、原子性、メタデータ更新）の正しさを検証すること。
 
-### 2.1. メタデータの揺らぎ
-- ユーザーが書く Markdown のメタデータキーは、`Status`, `status`, `STATUS` など表記揺れがある。
-- `Domain` 層でこれを吸収し、内部的には全て小文字の `status` として扱う仕様となっている (`docs/specs/data/document_model.md`)。
-- 実装時、辞書のキー検索で `key.lower()` を忘れないようにすること。
+## 4. 重点テスト項目 (Key Test Scenarios)
+- [ ] **正常系**: 複数ファイルの移動（仮想キュー）からの一括起票と、ロードマップのリンク置換。
+- [ ] **異常系 (API)**: 起票途中の API エラーによる処理中断と、Git ファイルが未更新（番号なし）で保たれることの検証。
+- [ ] **異常系 (Cycle)**: タスク間の循環依存による起票前の停止。
+- [ ] **境界値**: メタデータが日本語キー（タイトル、ラベル等）で記述されている場合の正規化。
 
-### 2.2. ロールバックの限界
-- `ApprovalUseCase` の仕様 (`docs/specs/logic/approval_usecase.md`) にある通り、**Issue起票後のID追記失敗時** はロールバック（ファイル移動の取り消し）を行わない。
-- このケースでは、二次被害（無限ループや二重起票）を防ぐため、以下の対応を行う実装とすること。
-    1.  障害ログへの記録。
-    2.  `_approved` ディレクトリ配下に対象ファイルと同名のマーカーファイル（`*.issue_metadata_failed`）を作成する。
-    3.  例外を投げて処理を終了する。
-- 自動リトライ機能は実装しない。
+## 5. 関連ドキュメント (SSOT)
+- ADR-003: `reqs/design/_approved/adr-003-task-and-roadmap-lifecycle.md`
+- Logic Spec: `docs/specs/logic/creation_logic.md`
+- Adapter Spec: `docs/specs/components/infra_adapters.md`
 
-### 2.3. GitHub トークン
-- 環境変数名は `GITHUB_MCP_PAT` である。`GITHUB_TOKEN` ではないので注意。
-
-## 3. テスト戦略 (Test Strategy)
-- **Unit Test**: 全てのロジック分岐（特に異常系）を網羅する。
-- **Integration Test**: 実際にファイルシステムを操作するテスト（Tempディレクトリ使用）は、`FileSystemAdapter` のテストに限定する。UseCase のテストではファイル操作を行わない（Mockする）こと。
-
-## 4. 完了条件 (DoD)
-- 全ての `docs/specs/**/*.md` の要件がコード化されていること。
-- `pytest` が全件パスすること。
-- `mypy --strict` で型エラーが出ないこと。
+## 6. 完了条件 (Definition of Done)
+- [ ] 全ての `docs/specs/**/*.md` の要件がコード化されていること。
+- [ ] `pytest` が全件パスし、カバレッジ目標（未定の場合は妥当な範囲）を満たしていること。
+- [ ] `mypy --strict` で型エラーが出ないこと。
+- [ ] `ruff check .` および `ruff format .` をパスしていること。

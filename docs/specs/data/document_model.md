@@ -1,34 +1,40 @@
 # Document Domain Model Specification
 
-## 1. 概要
-ドキュメントおよびそのメタデータを表現するドメインモデルの仕様を定義する。
-本モデルは、SSOT（真実の単一ソース）としてドキュメントの状態を厳密に管理し、不正な状態のドキュメントがシステム内で流通することを防ぐ。
+## 1. 概要 (Overview)
+ADR-003 に従い、タスクライフサイクルを管理するための SSOT（Single Source of Truth）となる `Document` オブジェクトおよび `Metadata` スキーマを定義する。
+本モデルは、正規化、バリデーション、およびステータス遷移のルールをカプセル化する。
 
-## 2. 関連ドキュメント
-- ADR: `reqs/design/_archive/adr-002-document-approval-flow.md`
-- Architecture: `docs/architecture/arch-structure-issue-kit.md`
+### 1.1. 論理ステータスと物理ステータス (Logical States vs. Physical Status)
+ADR-003 では 5 つのステータス (`Draft`, `Queued`, `Processing`, `Active`, `Archived`) が定義されているが、Metadata の物理的な `status` フィールドには主要な 3 つの値のみを保持する。`Queued` と `Processing` は、ファイルの物理的な配置場所と Issue 番号の有無に基づいてシステムが判定する **論理ステータス** である。
 
-## 3. ドメインモデル (Domain Model)
+- **論理 `Queued`**: 非 main ブランチの `archive/` 配下にファイルが存在する状態。物理 `status` は通常 `Draft`。
+- **論理 `Processing`**: main ブランチの `archive/` 配下にファイルが存在するが、`issue` フィールドが未採番の状態。物理 `status` は通常 `Draft`。
 
-### 3.1. クラス構造 (Mermaid Class Diagram)
+## 2. ドメインモデル (Domain Model)
+
+### 2.1. クラス図 (Class Diagram)
 ```mermaid
 classDiagram
     class Document {
-        +FilePath path
-        +String content
+        +pathlib.Path path
+        +str content
         +Metadata metadata
         +validate() void
     }
     class Metadata {
-        +String status
-        +String date
-        +String issue_id
-        +Map extra_fields
+        +str title
+        +str status
+        +str|int issue
+        +list[str] labels
+        +list[str] depends_on
+        +str roadmap_path
+        +str next_phase_path
+        +dict extra_fields
         +validate() void
     }
     class ValidationError {
-        +String message
-        +String field
+        +str message
+        +str field
     }
 
     Document *-- Metadata : contains
@@ -36,78 +42,70 @@ classDiagram
     ValidationError <.. Metadata : throws
 ```
 
-### 3.2. Metadata クラス定義
-ドキュメントの属性情報を保持する。
-**正規化ルール**:
-- メタデータのキーは大文字小文字を区別せず、全て小文字に正規化して保持される（例: `Status` -> `status`）。
-- 特定の日本語キーは以下のように標準キーにマッピングされる（エイリアス）。
+### 2.2. Document クラス定義
+ドキュメントファイル全体を表現する。
+
+| フィールド名 | 型 | 必須 | 説明 |
+| :--- | :--- | :--- | :--- |
+| `path` | `pathlib.Path` | Yes | ファイルの物理パス。 |
+| `content` | `str` | Yes | Markdown 本文（メタデータを除く）。 |
+| `metadata` | `Metadata` | Yes | タスク属性を含むメタデータオブジェクト。 |
+
+### 2.3. Metadata スキーマ
+タスクの主要な属性を管理する。
+厳格な正規化とバリデーションルールを適用する。
+
+#### 正規化ルール (Normalization Rules)
+1.  **キーの小文字化**: 全てのキーは小文字に変換される（例: `Status` -> `status`）。
+2.  **エイリアスマッピング (日本語対応 & レガシーサポート)**:
     - `タイトル` -> `title`
     - `ラベル` -> `labels`
+    - `ステータス` -> `status`
+    - `依存` -> `depends_on`
+    - `Depends-On` -> `depends_on`
+    - `Issue` -> `issue` (大文字キーのサポート)
 
-| フィールド名 | 型 | 必須 | 説明 |
-| :--- | :--- | :--- | :--- |
-| `status` | String | Yes | ドキュメントの承認状態（例: `承認済み`, `提案中`） |
-| `date` | String | No | 最終更新日または承認日（YYYY-MM-DD形式を推奨） |
-| `issue_id` | String | No | 関連するGitHub Issue ID（例: `#123`） |
-| `extra_fields`| Map[String, Any] | No | 上記以外の任意のフィールド。解析時に未知のキーがあった場合ここに格納される。 |
+| フィールド名 | 型 | 必須 | 説明 | 制約 |
+| :--- | :--- | :--- | :--- | :--- |
+| `title` | `str` | Yes | Issue 作成時のタイトル。 | 空文字不可。 |
+| `status` | `str` | Yes | ライフサイクルステータス。 | `Draft`, `Active`, `Archived` のいずれか。 |
+| `issue` | `str` \| `int` | No | GitHub Issue 番号（例: `#123`）。 | status が `Active` または `Archived` の場合必須。 |
+| `labels` | `list[str]` | No | Issue ラベルのリスト。 | 文字列のリストであること。 |
+| `depends_on` | `list[str]` | No | 依存するファイル名のリスト。 | 文字列のリストであること。 |
+| `roadmap_path`| `str` | No | WBS 同期用ロードマップファイルのパス。 | 任意。 |
+| `next_phase_path`| `str` | No | 次フェーズのドラフト格納パス。 | フェーズ連鎖トリガーとして使用。 |
+| `extra_fields`| `dict` | No | 未知のフィールドを格納する辞書。 | |
 
-#### バリデーションルール
-- **必須チェック**: `status` フィールドが欠落している、または値が `None` や空文字列 `""` の場合は `ValidationError` を送出する。
-- **型チェック**: `status`, `date`, `issue_id` は文字列型であることを期待する。
+### 2.4. バリデーションルール (Validation Rules)
+`validate()` メソッドは以下のルールを強制する：
 
-### 3.3. Document クラス定義
-ドキュメント全体（ファイルパス、本文、メタデータ）を表現する。
+1.  **必須フィールド**: `title` と `status` が存在すること。
+2.  **ステータス整合性**:
+    - `status` が `Active` または `Archived` の場合、`issue` フィールドは有効な Issue 番号（`#` 始まりまたは数字）でなければならない。
+    - `path` が `archive/` ディレクトリにあり、かつ `issue` フィールドが存在する場合、`status` は `Active` または `Archived` でなければならない。
+3.  **型の一貫性**: `depends_on` と `labels` はリスト型でなければならない。
 
-| フィールド名 | 型 | 必須 | 説明 |
-| :--- | :--- | :--- | :--- |
-| `path` | FilePath | Yes | ドキュメントファイルの物理パス |
-| `content` | String | Yes | Markdown形式の本文（メタデータ部分を除く）。空文字列を許容する。 |
-| `metadata` | Metadata | Yes | メタデータオブジェクト |
+## 3. 解析とシリアライズ (Parsing & Serialization)
 
-#### バリデーションルール
-- 生成時および `validate()` 呼び出し時に `metadata.validate()` を実行する。
-- `path` は有効なファイルシステムパスであることを要求する。
+### 3.1. 解析ロジック (Parsing Logic)
+ハイブリッド解析をサポートする（YAML Frontmatter 優先）。
 
-### 3.4. ValidationError クラス定義
-バリデーション失敗時に送出される例外クラス。
+1.  **YAML Frontmatter**:
+    - ファイルが `---` で始まる場合、区切り文字の間のコンテンツを YAML として解析する。
+2.  **Markdown List (フォールバック)**:
+    - 正規表現 `^- \*\*([^*]+)\*\*: (.*)$` にマッチする行をスキャンする。
+    - メタデータ以外の行、または空行以外の行に遭遇するまでスキャンを続ける。パフォーマンスのため、最大行数（例: 100行）の制限を設けてもよい。
 
-| 属性名 | 型 | 説明 |
-| :--- | :--- | :--- |
-| `message` | str | エラー詳細メッセージ |
-| `field` | str (optional) | エラーが発生したフィールド名 |
+### 3.2. シリアライズロジック (Serialization Logic)
+- 保存時は常に **YAML Frontmatter** 形式でシリアライズする。
+- 元のファイルが Markdown List 形式であった場合、YAML Frontmatter に変換して保存し、コードベースを標準化する。
 
-## 4. 解析ルール (Parsing Rules)
+## 4. エッジケースとエラーハンドリング (Edge Cases & Error Handling)
 
-ドキュメントは以下の2種類の形式からのパースをサポートする。
-
-### 4.1. YAML Frontmatter 形式
-ファイル先頭が `---` で始まり、次の `---` までの間を YAML としてパースする。
-
-**例:**
-```markdown
----
-status: 承認済み
-date: 2026-01-20
-issue_id: "#123"
----
-# 本文
-...
-```
-
-### 4.2. Markdown List 形式 (埋め込みメタデータ)
-ファイル内の特定のパターン（`- **Key**: Value`）をメタデータとして抽出する。
-
-**解析ルール:**
-- 行が `- **([^*]+)**: (.*)` の正規表現にマッチする場合、メタデータとして扱う。
-- メタデータキー（`status` 等）は大文字小文字を区別せず、正規化して扱う（例: `Status` -> `status`）。
-- 最初のメタデータ行から、メタデータ以外の行（空行を除く）が出現するまでをメタデータブロックとみなす。
-- メタデータブロック以降を本文 (`content`) とする。本文冒頭の空行は削除する。
-
-## 5. 異常系ハンドリング (Error Handling)
-
-| ケース | 挙動 |
+| シナリオ | 挙動 |
 | :--- | :--- |
-| メタデータに `status` が存在しない | `ValidationError` (field="status") を送出する。 |
-| YAML 形式が不正（文法エラー等） | YAMLとしての解析を中断し、全文を対象に Markdown List 形式としての解析を試みる。 |
-| YAML/Markdown List 両方で解析不能 | `metadata` を空の状態で生成し、その後の `validate()` により `ValidationError` を送出する。 |
-| ファイルが空 | `content=""`, `metadata={}` で生成を試み、`ValidationError` を送出する。 |
+| **ステータス欠落** | `ValidationError(field="status")` を送出する。 |
+| **不正なステータス値** | `ValidationError("Invalid status: {value}. Must be Draft, Active, or Archived")` を送出する。 |
+| **Active だが Issue 番号なし** | `ValidationError("Active tasks must have an issue number")` を送出する。 |
+| **YAML 構文エラー** | YAML 解析を中断し、ドキュメント全体に対して Markdown List 形式での解析を試みる（フォールバック）。 |
+| **日本語キー** | 内部的に英語キーに正規化する。`metadata["title"]` で `タイトル` の値を取得可能にする。 |
