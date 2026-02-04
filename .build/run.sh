@@ -18,6 +18,12 @@ if [ -f "pyproject.toml" ]; then
     uv sync --all-extras
 fi
 
+# .gemini リポジトリの更新
+if [ -d ".gemini/.git" ]; then
+    echo "Updating .gemini repository..."
+    git -C .gemini pull
+fi
+
 # 2. pre-commit のインストール
 if [ -d ".git" ]; then
     echo "Installing pre-commit hooks..."
