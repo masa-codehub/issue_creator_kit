@@ -1,7 +1,7 @@
 ---
 title: "[TDD] Implement Git & FileSystem Adapters"
 labels: ["gemini:tdd"]
-roadmap: "docs/implementation/plans/adr-003/tdd-plan.md"
+roadmap: "../../../../../docs/implementation/plans/adr-003/tdd-plan.md"
 task_id: "T-2"
 depends_on: ["../phase-1-domain/issue-T-1.md"]
 status: "Draft"
@@ -16,12 +16,12 @@ status: "Draft"
 - `src/issue_creator_kit/infrastructure/` 配下の実装が不足しており、特に `--no-renames` オプション付きの差分取得ロジックが未実装。
 
 ### To-be (あるべき姿)
-- `GitAdapter.get_added_files` が移動されたファイルを「削除と追加」ではなく「追加」として正しく検知できる（仮想キューの要件）。
+- `GitAdapter.get_added_files` が移動されたファイルを、移動先での「追加」として正しく検知できる（仮想キューの要件）。
 - `FileSystemAdapter` がファイルの読み書きを安全に行える。
 
 ### Design Evidence
-- [Adapter Spec](../../../../docs/specs/components/infra_adapters.md)
-- [Handover: Virtual Queue](../../../../docs/handovers/spec-to-tdd.md)
+- [Adapter Spec](../../../../../docs/specs/components/infra_adapters.md)
+- [Handover: Virtual Queue](../../../../../docs/handovers/spec-to-tdd.md)
 
 ## 2. Input Context (資料 & 情報)
 - **Adapter Logic**: `src/issue_creator_kit/infrastructure/git_adapter.py`, `fs_adapter.py`

@@ -1,7 +1,7 @@
 ---
 title: "[TDD] Implement GitHub Adapter with Mocking Strategy"
 labels: ["gemini:tdd"]
-roadmap: "docs/implementation/plans/adr-003/tdd-plan.md"
+roadmap: "../../../../../docs/implementation/plans/adr-003/tdd-plan.md"
 task_id: "T-3"
 depends_on: ["../phase-1-domain/issue-T-1.md"]
 status: "Draft"
@@ -20,17 +20,17 @@ status: "Draft"
 - テストコードからは `MockGitHubAdapter` または `unittest.mock` を通じて振る舞いを検証できる。
 
 ### Design Evidence
-- [Adapter Spec](../../../../docs/specs/components/infra_adapters.md)
+- [Adapter Spec](../../../../../docs/specs/components/infra_adapters.md)
 
 ## 2. Input Context (資料 & 情報)
 - **Adapter Logic**: `src/issue_creator_kit/infrastructure/github_adapter.py`
-- **Spec**: `docs/specs/components/infra_adapters.md`
+- **Spec**: `../../../../../docs/specs/components/infra_adapters.md`
 
 ## 3. Implementation Steps & Constraints (How)
 
 ### 3.1. Negative Constraints (してはいけないこと)
 - テスト実行時に実際の GitHub API を叩くこと（トークン漏洩やレート制限のリスク）。
-- API レスポンスの生データをそのまま UseCase 層へ渡すこと（Domain Model に変換して渡す）。
+- API レスポンスの生データをそのまま UseCase 層へ渡さないこと（Domain Model に変換して渡す）。
 
 ### 3.2. Implementation Steps (実行手順)
 1.  **Red Phase**:

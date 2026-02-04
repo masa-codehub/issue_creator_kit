@@ -1,7 +1,7 @@
 ---
 title: "[TDD] Implement CLI Commands & Entrypoint"
 labels: ["gemini:tdd"]
-roadmap: "docs/implementation/plans/adr-003/tdd-plan.md"
+roadmap: "../../../../../docs/implementation/plans/adr-003/tdd-plan.md"
 task_id: "T-7"
 depends_on: ["../phase-3-usecase/issue-T-4.md", "../phase-3-usecase/issue-T-5.md", "../phase-3-usecase/issue-T-6.md"]
 status: "Draft"
@@ -19,7 +19,7 @@ status: "Draft"
 - `cli.py` が新しいサブコマンドをサポートし、環境変数 `GITHUB_MCP_PAT` のチェックや例外ハンドリング（終了コード制御）を適切に行う。
 
 ### Design Evidence
-- [CLI Spec](../../../../docs/specs/api/cli_commands.md)
+- [CLI Spec](../../../../../docs/specs/api/cli_commands.md)
 
 ## 2. Input Context (資料 & 情報)
 - **Interface**: `src/issue_creator_kit/cli.py`
@@ -29,7 +29,7 @@ status: "Draft"
 
 ### 3.1. Negative Constraints (してはいけないこと)
 - CLI 層にビジネスロジックを書くこと（UseCase を呼ぶだけにする）。
-- `print` でデバッグ情報を出力すること（`logging` を使う）。
+- `print` でデバッグ情報を出力しないこと（`logging` を使う）。
 
 ### 3.2. Implementation Steps (実行手順)
 1.  **Red Phase**:

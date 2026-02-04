@@ -1,7 +1,7 @@
 ---
 title: "[TDD] Implement Roadmap Sync Logic"
 labels: ["gemini:tdd"]
-roadmap: "docs/implementation/plans/adr-003/tdd-plan.md"
+roadmap: "../../../../../docs/implementation/plans/adr-003/tdd-plan.md"
 task_id: "T-5"
 depends_on: ["issue-T-4.md"]
 status: "Draft"
@@ -19,16 +19,16 @@ status: "Draft"
 - `RoadmapSyncUseCase` (または Creation UseCase の一部) が、正規表現を用いてロードマップファイルを安全に更新する。
 
 ### Design Evidence
-- [Logic Spec](../../../../docs/specs/logic/roadmap_sync_logic.md)
+- [Logic Spec](../../../../../docs/specs/logic/roadmap_sync_logic.md)
 
 ## 2. Input Context (資料 & 情報)
 - **Logic**: `src/issue_creator_kit/usecase/roadmap_sync.py`
-- **Spec**: `docs/specs/logic/roadmap_sync_logic.md`
+- **Spec**: ../../../../../docs/specs/logic/roadmap_sync_logic.md
 
 ## 3. Implementation Steps & Constraints (How)
 
 ### 3.1. Negative Constraints (してはいけないこと)
-- 単純な `str.replace` で置換すること（誤爆のリスクがあるため、Markdown リンク構文 `[text](path)` を解析すること）。
+- 単純な `str.replace` で置換しないこと（誤爆のリスクがあるため、Markdown リンク構文 `[text](path)` を解析すること）。
 
 ### 3.2. Implementation Steps (実行手順)
 1.  **Red Phase**:
@@ -36,7 +36,7 @@ status: "Draft"
     - ロードマップのサンプルテキストに対し、リンク置換と `(#123)` の追記が行われることを検証。
     - 既に置換済みの行が二重に置換されないことを検証。
 2.  **Green Phase**:
-    - 正規表現 `\[(.*?)\]\((.*drafts.*?)\)` を用いてリンクを特定し、`archive` へ置換するロジックを実装。
+    - 関連仕様書 (`roadmap_sync_logic.md`) を参考に、より堅牢な正規表現を用いてリンクを特定し、`archive` へ置換するロジックを実装。
 
 ### 3.3. Configuration Changes
 - なし

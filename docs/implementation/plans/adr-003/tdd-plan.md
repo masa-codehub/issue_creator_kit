@@ -19,7 +19,7 @@ ADR-003 で定義された「自己推進型ワークフロー」を実現する
 ### 1.2. Test Strategy
 - **Unit Test (Domain/UseCase)**:
     - `unittest.mock` を使用し、Infrastructure を完全にモック化する。
-    - ファイルシステムへのアクセスも `pathlib.Path` のモック、または `pyfakefs` を使用せず `MockAdapter` 経由で行うことを推奨する。
+    - ファイルシステムへのアクセスについては、`pathlib.Path` のモックを使用するか、`pyfakefs` の代わりに `MockAdapter` を使用することを推奨する。
 - **Integration Test (Infrastructure)**:
     - 実際に一時ディレクトリ (`tempfile`) を作成し、Git コマンドやファイル操作が正しく動作するか検証する。
     - GitHub API は `responses` や `unittest.mock` でシミュレートする（実際の API は叩かない）。

@@ -1,7 +1,7 @@
 ---
 title: "[TDD] Implement Core Document & Metadata Logic"
 labels: ["gemini:tdd"]
-roadmap: "docs/implementation/plans/adr-003/tdd-plan.md"
+roadmap: "../../../../../docs/implementation/plans/adr-003/tdd-plan.md"
 task_id: "T-1"
 depends_on: []
 status: "Draft"
@@ -22,8 +22,8 @@ status: "Draft"
 - 不正なステータス値や必須項目の欠落に対し、`ValidationError` が送出される。
 
 ### Design Evidence
-- [Document Domain Model Spec](../../../../docs/specs/data/document_model.md)
-- [TDD Plan](../../../../docs/implementation/plans/adr-003/tdd-plan.md)
+- [Document Domain Model Spec](../../../../../docs/specs/data/document_model.md)
+- [TDD Plan](../../../../../docs/implementation/plans/adr-003/tdd-plan.md)
 
 ## 2. Input Context (資料 & 情報)
 - **Domain Logic**: `src/issue_creator_kit/domain/document.py`
@@ -65,7 +65,4 @@ status: "Draft"
 ## 6. TDD Scenarios
 - **Scenario 1 (Normalization)**: `metadata = Metadata({"タイトル": "foo", "Status": "Draft"})` -> `metadata.title == "foo"`, `metadata.status == "Draft"`.
 - **Scenario 2 (Validation)**: `Metadata({"status": "Unknown"})` -> Raises `ValidationError`.
-- **Scenario 3 (Parsing)**: `Document.parse("---
-title: foo
----
-body")` -> Correctly parses YAML.
+- **Scenario 3 (Parsing)**: `Document.parse("---\ntitle: foo\n---\nbody")` -> Correctly parses YAML.

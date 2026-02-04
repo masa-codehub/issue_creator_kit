@@ -1,7 +1,7 @@
 ---
 title: "[TDD] Implement Phase Promotion Logic"
 labels: ["gemini:tdd"]
-roadmap: "docs/implementation/plans/adr-003/tdd-plan.md"
+roadmap: "../../../../../docs/implementation/plans/adr-003/tdd-plan.md"
 task_id: "T-6"
 depends_on: ["../phase-2-infra/issue-T-3.md"]
 status: "Draft"
@@ -19,7 +19,7 @@ status: "Draft"
 - マージされた PR の Body または完了したタスクのメタデータ (`next_phase_path`) を解析し、自動的に次フェーズの準備を行う。
 
 ### Design Evidence
-- [Logic Spec](../../../../docs/specs/logic/promotion_logic.md)
+- [Logic Spec](../../../../../docs/specs/logic/promotion_logic.md)
 
 ## 2. Input Context (資料 & 情報)
 - **Logic**: `src/issue_creator_kit/usecase/promotion_usecase.py`

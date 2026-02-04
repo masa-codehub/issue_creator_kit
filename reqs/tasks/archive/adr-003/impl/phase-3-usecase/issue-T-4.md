@@ -1,7 +1,7 @@
 ---
 title: "[TDD] Implement Issue Creation UseCase (Fail-fast)"
 labels: ["gemini:tdd"]
-roadmap: "docs/implementation/plans/adr-003/tdd-plan.md"
+roadmap: "../../../../../docs/implementation/plans/adr-003/tdd-plan.md"
 task_id: "T-4"
 depends_on: ["../phase-1-domain/issue-T-1.md", "../phase-2-infra/issue-T-2.md", "../phase-2-infra/issue-T-3.md"]
 status: "Draft"
@@ -20,8 +20,8 @@ status: "Draft"
 - 途中でエラーが発生した場合、Git への書き込み（Issue番号付与）を行わずに処理を中断する。
 
 ### Design Evidence
-- [Logic Spec](../../../../docs/specs/logic/creation_logic.md)
-- [ADR-003 (Fail-fast)](../../../../reqs/design/_approved/adr-003-task-and-roadmap-lifecycle.md)
+- [Logic Spec](../../../../../docs/specs/logic/creation_logic.md)
+- [ADR-003 (Fail-fast)](../../../../../reqs/design/_approved/adr-003-task-and-roadmap-lifecycle.md)
 
 ## 2. Input Context (資料 & 情報)
 - **UseCase Logic**: `src/issue_creator_kit/usecase/issue_creation_usecase.py`

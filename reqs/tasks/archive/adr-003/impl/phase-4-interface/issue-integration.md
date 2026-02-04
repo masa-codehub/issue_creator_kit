@@ -1,7 +1,7 @@
 ---
 title: "[Audit] Integration & TDD Audit for ADR-003 Implementation"
 labels: ["gemini:tdd", "gemini:audit"]
-roadmap: "docs/implementation/plans/adr-003/tdd-plan.md"
+roadmap: "../../../../../docs/implementation/plans/adr-003/tdd-plan.md"
 task_id: "T-Integration"
 depends_on: ["issue-T-7.md"]
 status: "Draft"
@@ -20,7 +20,7 @@ status: "Draft"
 - `feature/impl-adr003` ブランチが `main` にマージ可能な品質になっている。
 
 ### Design Evidence
-- [TDD Plan](../../../../docs/implementation/plans/adr-003/tdd-plan.md)
+- [TDD Plan](../../../../../docs/implementation/plans/adr-003/tdd-plan.md)
 
 ## 2. Input Context (資料 & 情報)
 - **Source Code**: `src/`
