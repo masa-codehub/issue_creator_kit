@@ -3,7 +3,7 @@ title: "[TDD] Implement Roadmap Sync Logic"
 labels: ["gemini:tdd"]
 roadmap: "../../../../../docs/implementation/plans/adr-003/tdd-plan.md"
 task_id: "T-5"
-depends_on: ["issue-T-4.md"]
+depends_on: ["./issue-T-4.md"]
 status: "Draft"
 ---
 

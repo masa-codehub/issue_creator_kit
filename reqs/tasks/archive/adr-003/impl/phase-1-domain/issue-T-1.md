@@ -65,4 +65,4 @@ status: "Draft"
 ## 6. TDD Scenarios
 - **Scenario 1 (Normalization)**: `metadata = Metadata({"タイトル": "foo", "Status": "Draft"})` -> `metadata.title == "foo"`, `metadata.status == "Draft"`.
 - **Scenario 2 (Validation)**: `Metadata({"status": "Unknown"})` -> Raises `ValidationError`.
-- **Scenario 3 (Parsing)**: `Document.parse("---\ntitle: foo\n---\nbody")` -> Correctly parses YAML.
+- **Scenario 3 (Parsing)**: `Document.parse("---\\ntitle: foo\\n---\\nbody")` -> Correctly parses YAML.

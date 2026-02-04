@@ -3,7 +3,7 @@ title: "[Audit] Integration & TDD Audit for ADR-003 Implementation"
 labels: ["gemini:tdd", "gemini:audit"]
 roadmap: "../../../../../docs/implementation/plans/adr-003/tdd-plan.md"
 task_id: "T-Integration"
-depends_on: ["issue-T-7.md"]
+depends_on: ["./issue-T-7.md"]
 status: "Draft"
 ---
 
