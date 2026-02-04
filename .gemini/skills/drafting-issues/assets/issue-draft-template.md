@@ -6,7 +6,7 @@ title: "<Task Title>"
 status: Draft # Draft | Ready | Completed | Cancelled
 phase: domain # domain | infrastructure | usecase | interface | architecture | spec | tdd
 roadmap: "docs/architecture/plans/<Plan-File>.md"
-depends_on: [] # 必須: 依存するタスクファイル名 (例: ["issue-T-1.md"])
+depends_on: [] # 必須: 依存するタスク ID (例: ["T-1"])。依存がない場合は []
 issue_id: # 【自動追記】手動で設定しないでください
 ---
 # <Task Title>

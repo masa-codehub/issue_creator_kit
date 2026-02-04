@@ -6,7 +6,7 @@ title: "旧アーキテクチャドキュメントの非推奨化"
 status: Draft
 phase: architecture
 roadmap: "docs/architecture/plans/20260204-adr007-refresh-plan.md"
-depends_on: ["issue-T-2.md"]
+depends_on: ["T-2"]
 issue_id: # 【自動追記】手動で設定しないでください
 ---
 # 旧アーキテクチャドキュメントの非推奨化
@@ -30,8 +30,8 @@ issue_id: # 【自動追記】手動で設定しないでください
 ### 3.2. 実装手順 (Changes)
 - [ ] **ファイル**: `docs/architecture/*-003-*.md`
     - **処理内容**: ファイル冒頭に以下の警告メッセージを挿入。
-      > **DEPRECATED: This document is superseded by ADR-007.**
-      > Please refer to the new architecture in `arch-structure-007-metadata.md`.
+      > **DEPRECATED: This document is based on ADR-003 and has been superseded by the new architecture defined in ADR-007.**
+      > Please refer to the new architecture documents, such as `arch-structure-007-metadata.md` and `arch-state-007-lifecycle.md`.
 
 ## 4. ブランチ戦略 (Branching Strategy)
 - **ベースブランチ (Base Branch)**: main

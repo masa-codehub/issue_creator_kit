@@ -33,13 +33,29 @@ description: Generates objective-oriented and verifiable Issue drafts based on t
 
 ### 2. メタデータ定義 (Frontmatter)
 
+
+
 **目的:** システム連携に必要な属性情報を定義する。
 
-- **labels:** `references/issue-labels.md` を参照し、タスクの内容に最適な自動化ラベル（`gemini:arch`, `gemini:spec`, `gemini:tdd`）を選択して設定する（単一選択）。
-- **title:** `[Domain] Action + Object` (例: `[Payment] Update Sequence for Async Retry`)
-- **roadmap:** 参照すべき **Common Definitions Doc のパス** (例: `docs/architecture/plans/20240101-payment.md`)。
-- **task_id:** Planning段階で振られた一意なID（例: `T-01`）。
-- **depends_on:** 依存するIssueのファイル名（なければ空配列 `[]`）。
+
+
+- **id:** Planning段階で振られた一意なID（例: `T-1`）。
+
+- **parent:** 紐づくADRの一意なID（例: `adr-007`）。
+
+- **type:** タスクの種別（`task` | `integration`）。
+
+- **title:** `[Domain] Action + Object` (例: `[Auth] Implementation of JWT Token Issuance`)
+
+- **status:** 初期値は `Draft`。
+
+- **phase:** 実施フェーズ（`domain` | `infrastructure` | `usecase` | `interface` | `architecture` | `spec` | `tdd`）。
+
+- **roadmap:** 参照すべき **刷新計画書（ロードマップ）のパス** (例: `docs/architecture/plans/20260204-adr007-refresh-plan.md`)。
+
+- **depends_on:** 依存するタスクの **ID** リスト（例: `["T-0"]`）。なければ空配列 `[]`。
+
+- **issue_id:** 【自動追記】手動で設定しないでください。
 
 ### 3. 目的と背景 (1. Goal & Context)
 

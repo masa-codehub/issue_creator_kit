@@ -6,7 +6,7 @@ title: "新アーキテクチャ図（Structure/State）の起草"
 status: Draft
 phase: architecture
 roadmap: "docs/architecture/plans/20260204-adr007-refresh-plan.md"
-depends_on: ["issue-T-1.md"]
+depends_on: ["T-1"]
 issue_id: # 【自動追記】手動で設定しないでください
 ---
 # 新アーキテクチャ図（Structure/State）の起草
