@@ -1,16 +1,17 @@
 name: Auto Approve Docs
+# DISABLED for ADR-007 migration
 
 # ADR-002: マージされた設計ドキュメントの承認処理を自動化します。
 # ロジックは YAML ではなく Python CLI (issue-kit) に集約し、テスタビリティを確保しています。
-# 実行環境 (Self-Hosted Runner) に Python 3.13 および gh cli がプリインストールされていることを前提に、
+# 実行環境 (Self-Hosted Runner) に Python 3.13 および gh cli がプリインストール されていることを前提に、
 # 冗長なセットアップステップを省略して最適化されています。
 
-on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'reqs/design/_inbox/**'
+# on:
+#   push:
+#     branches:
+#       - main
+#     paths:
+#       - 'reqs/design/_inbox/**'
 
 permissions:
   contents: write
@@ -71,7 +72,7 @@ jobs:
           echo "branch_name=$BRANCH_NAME" >> $GITHUB_OUTPUT
 
           echo "Running workflow..."
-          # Note: PATH環境変数に依存しないよう、python3 -m でモジュールを直接実行します。
+          # Note: PATH環境変数に依存しないよう、python3 -m でモジュールを直接実 行します。
           python3 -m issue_creator_kit run-workflow \
             --inbox-dir "reqs/design/_inbox" \
             --approved-dir "reqs/design/_approved" \
@@ -93,9 +94,9 @@ jobs:
         env:
           BRANCH_NAME: ${{ steps.process.outputs.branch_name }}
         run: |
-          # 自動生成された PR を作成（gh コマンドは環境にプリインストールされている前提）。
+          # 自動生成された PR を作成（gh コマンドは環境にプリインストールされて いる前提）。
           gh pr create \
             --title "docs(arch): Approve documents from inbox" \
-            --body "This PR automatically moves documents from \`reqs/design/_inbox\` to \`reqs/design/_approved\` and updates their status to 'Approved' (承認済み). Tracking issues have been created." \
+            --body "This PR automatically moves documents from \`reqs/design/_inbox\` to \`reqs/design/_approved\` and updates their status to 'Approved' (承認 済み). Tracking issues have been created." \
             --base main \
             --head "$BRANCH_NAME"

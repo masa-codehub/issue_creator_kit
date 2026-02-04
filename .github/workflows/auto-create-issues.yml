@@ -1,14 +1,15 @@
 name: Auto Create Issues
+# DISABLED for ADR-007 migration
 
-# ADR-003: マージされたタスク（archive）の Issue 起票とロードマップ同期を自動化します。
-# 仮想キュー（Virtual Queue）方式に基づき、マージ差分を検知して自動実行されます。
+# ADR-003: マージされたタスク（archive）の Issue 起票とロードマップ同期を自動化 します。
+# 仮想キュー（Virtual Queue）方式に基づき、マージ差分を検知して自動実行されます 。
 
-on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'reqs/tasks/archive/**'
+# on:
+#   push:
+#     branches:
+#       - main
+#     paths:
+#       - 'reqs/tasks/archive/**'
 
 permissions:
   contents: write
@@ -54,8 +55,8 @@ jobs:
 
           echo "Comparing $BEFORE_SHA with ${{ github.event.after }}"
 
-          # マージ差分を検知し、新規タスクの Issue 起票とロードマップ同期を実行。
-          # --use-pr を付与することで、直接 push ではなく同期用 PR を作成します。
+          # マージ差分を検知し、新規タスクの Issue 起票とロードマップ同期を実行 。
+          # --use-pr を付与することで、直接 push ではなく同期用 PR を作成します 。
           python3 -m issue_creator_kit process-diff \
             --before "$BEFORE_SHA" \
             --after "${{ github.event.after }}" \
