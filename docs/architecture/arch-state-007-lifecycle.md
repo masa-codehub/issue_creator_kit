@@ -35,6 +35,7 @@ stateDiagram-v2
 | `Ready` | 実行可能（依存タスク完了）。 | `issue_creator_kit` による依存解析。 | N/A |
 | `Archived` | GitHub Issue 起票済み。 | `process-diff` による起票成功。 | ファイルを `tasks/_archive/` へ移動。 |
 | `Completed` | 実装完了。 | GitHub Issue がマージ/クローズ。 | 次の依存タスクを `Ready` へ。 |
+| `Cancelled` | 手動でキャンセルされた状態。 | メタデータの手動変更。 | N/A |
 
 ## Invariants (不変条件)
 *   **Unique ID:** `id` メタデータは、ドメイン内（ADR単位）で一貫して一意でなければならない。

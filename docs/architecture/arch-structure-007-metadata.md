@@ -4,7 +4,7 @@
 - **Bounded Context:** Lifecycle & Task Management
 - **System Purpose:** ADR-003 での物理階層による管理の限界を克服し、メタデータ（YAML Frontmatter）によってドキュメントとタスクのライフサイクルを自律的に管理するフラットな構造を実現する。
 
-## Diagram (C4 Container)
+## Diagram (Component Flow)
 ```mermaid
 graph TD
     subgraph "reqs/ (File-based SSOT)"
@@ -27,8 +27,7 @@ graph TD
 
     D_IN -- "Draft/Approved" --> CLI
     CLI -- "Move to _approved" --> D_APP
-    CLI -- "Create L1/L2 Issues" --> ISS_L1
-    CLI -- "Create L1/L2 Issues" --> ISS_L2
+    CLI -- "Create L1/L2 Issues" --> ISS_L1 & ISS_L2
     
     T_ADR -- "Metadata: Draft/Ready" --> CLI
     CLI -- "Move to _archive & Set issue_id" --> T_ARC
