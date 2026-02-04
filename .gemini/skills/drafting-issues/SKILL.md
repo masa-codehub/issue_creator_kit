@@ -33,43 +33,19 @@ description: Generates objective-oriented and verifiable Issue drafts based on t
 
 ### 2. メタデータ定義 (Frontmatter)
 
-
-
 **目的:** システム連携に必要な属性情報を定義する。
 
 
 
-- **id:** ADR番号をプレフィックスとした一貫した通し番号（例: `007-T1`）。フェーズ（Arch/Spec/TDD）を跨いでもリセットせず、ADR内で一意な連番を振る。
+- **重要:** 記述ルールおよび詳細なスキーマについては、[references/metadata-schema.md](references/metadata-schema.md) を参照してください。
 
+- **Action:**
 
+  - `id` (例: `007-T1`), `parent` (例: `adr-007`), `type`, `phase` 等の必須フィールドを、スキーマに従って記述する。
 
-- **parent:** 紐づくADRの一意なID（例: `adr-007`）。
+  - `depends_on` には依存するタスクの **ID** リスト（例: `["007-T0"]`）を記述する。
 
-
-
-- **type:** タスクの種別（`task` | `integration`）。
-
-
-
-- **title:** `[Domain] Action + Object` (例: `[Auth] Implementation of JWT Token Issuance`)
-
-
-
-- **status:** 初期値は `Draft`。
-
-
-
-- **phase:** 実施フェーズ（`domain` | `infrastructure` | `usecase` | `interface` | `architecture` | `spec` | `tdd`）。
-
-
-
-- **roadmap:** 参照すべき **刷新計画書（ロードマップ）のパス** (例: `docs/architecture/plans/20260204-adr007-refresh-plan.md`)。
-
-
-
-- **depends_on:** 依存するタスクの **ID** リスト（例: `["007-T0"]`）。なければ空配列 `[]`。
-
-- **issue_id:** 【自動追記】手動で設定しないでください。
+  - `issue_id` は空のままにする（自動追記用）。
 
 ### 3. 目的と背景 (1. Goal & Context)
 
