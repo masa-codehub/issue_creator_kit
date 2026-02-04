@@ -1,13 +1,14 @@
 name: Auto Phase Promotion (Auto-PR)
+# DISABLED for ADR-007 migration
 
-# ADR-003: フェーズ完了（PRマージ）をトリガーとして、次フェーズのタスクを自動展開します。
+# ADR-003: フェーズ完了（PRマージ）をトリガーとして、次フェーズのタスクを自動展 開します。
 # PR 本文の "Closes #XXX" から完了したタスクを特定し、連鎖を開始します。
 
-on:
-  pull_request:
-    types: [closed]
-    branches:
-      - main
+# on:
+#   pull_request:
+#     types: [closed]
+#     branches:
+#       - main
 
 permissions:
   contents: write
@@ -44,4 +45,3 @@ jobs:
             --event-path "$GITHUB_EVENT_PATH" \
             --repo ${{ github.repository }} \
             --token ${{ secrets.GITHUB_TOKEN }}
-
