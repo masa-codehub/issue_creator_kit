@@ -1,0 +1,50 @@
+name: Gemini Review Analyzer
+
+on:
+  pull_request_review_comment:
+    types: [created]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  analyze-comment:
+    if: |
+      contains(github.event.pull_request.labels.*.name, 'gemini:arch') ||
+      contains(github.event.pull_request.labels.*.name, 'gemini:spec') ||
+      contains(github.event.pull_request.labels.*.name, 'gemini:tdd')
+    runs-on: [self-hosted]
+    concurrency:
+      group: gemini-review-analyzer-${{ github.event.pull_request.number }}
+      cancel-in-progress: false
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_MCP_PAT || secrets.GITHUB_TOKEN }}
+      AGENT_ROLE: ${{ contains(github.event.pull_request.labels.*.name, 'gemini:arch') && 'SYSTEM_ARCHITECT' || contains(github.event.pull_request.labels.*.name, 'gemini:spec') && 'TECHNICAL_DESIGNER' || contains(github.event.pull_request.labels.*.name, 'gemini:tdd') && 'BACKENDCODER' || 'SYSTEM_ARCHITECT' }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+
+      - name: Refresh Environment
+        run: |
+          echo "Refreshing environment by removing persistent artifacts..."
+          rm -rf .venv
+
+      - name: Initialize Environment
+        run: bash ./.build/run.sh
+
+      - name: Analyze Review Comment
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
+          COMMENT_ID: ${{ github.event.comment.id }}
+          COMMENT_AUTHOR: ${{ github.event.comment.user.login }}
+          COMMENT_BODY: ${{ github.event.comment.body }}
+          FILE_PATH: ${{ github.event.comment.path }}
+          LINE_NUMBER: ${{ github.event.comment.line }}
+          DIFF_HUNK: ${{ github.event.comment.diff_hunk }}
+        run: bash ./.github/workflows/script/gemini_review_analyzer.sh

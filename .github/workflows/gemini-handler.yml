@@ -1,0 +1,47 @@
+name: Gemini Issue Handler
+
+on:
+  issues:
+    types: [opened, labeled]
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  gemini-implementation:
+    # gemini:arch, gemini:spec, gemini:tdd のいずれかのラベルがついている場合のみ実行
+    if: |
+      contains(github.event.issue.labels.*.name, 'gemini:arch') ||
+      contains(github.event.issue.labels.*.name, 'gemini:spec') ||
+      contains(github.event.issue.labels.*.name, 'gemini:tdd')
+    runs-on: [self-hosted]
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_MCP_PAT || secrets.GITHUB_TOKEN }}
+      AGENT_ROLE: ${{ contains(github.event.issue.labels.*.name, 'gemini:arch') && 'SYSTEM_ARCHITECT' || contains(github.event.issue.labels.*.name, 'gemini:spec') && 'TECHNICAL_DESIGNER' || contains(github.event.issue.labels.*.name, 'gemini:tdd') && 'BACKENDCODER' || 'SYSTEM_ARCHITECT' }}
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Refresh Environment
+        run: |
+          echo "Refreshing environment by removing persistent artifacts..."
+          rm -rf .venv
+          # 必要に応じて他にもリフレッシュしたいディレクトリがあればここに追加
+
+      - name: Initialize Environment
+        run: bash ./.build/run.sh
+
+      - name: Gemini Implementer Phase
+        id: implementer
+        env:
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          # ラベル名をカンマ区切り文字列として渡す
+          ISSUE_LABELS: ${{ join(github.event.issue.labels.*.name, ',') }}
+        run: bash ./.github/workflows/script/gemini_implementer.sh
