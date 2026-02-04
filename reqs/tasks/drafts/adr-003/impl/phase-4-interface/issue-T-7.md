@@ -3,7 +3,7 @@ title: "[TDD] Implement CLI Commands & Entrypoint"
 labels: ["gemini:tdd"]
 roadmap: "docs/implementation/plans/adr-003/tdd-plan.md"
 task_id: "T-7"
-depends_on: ["issue-T-4.md", "issue-T-5.md", "issue-T-6.md"]
+depends_on: ["../phase-3-usecase/issue-T-4.md", "../phase-3-usecase/issue-T-5.md", "../phase-3-usecase/issue-T-6.md"]
 status: "Draft"
 ---
 

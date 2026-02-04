@@ -3,7 +3,7 @@ title: "[TDD] Implement Phase Promotion Logic"
 labels: ["gemini:tdd"]
 roadmap: "docs/implementation/plans/adr-003/tdd-plan.md"
 task_id: "T-6"
-depends_on: ["issue-T-3.md"]
+depends_on: ["../phase-2-infra/issue-T-3.md"]
 status: "Draft"
 ---
 

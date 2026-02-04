@@ -49,8 +49,8 @@ status: "Draft"
 - なし
 
 ## 4. Branching Strategy
-- **Base Branch**: `feature/impl-adr003`
-- **Feature Branch**: N/A (Integration Branch)
+- **Base Branch**: `main`
+- **Feature Branch**: `feature/impl-adr003`
 
 ## 5. Verification & DoD (完了条件)
 - [ ] 全テスト Green。

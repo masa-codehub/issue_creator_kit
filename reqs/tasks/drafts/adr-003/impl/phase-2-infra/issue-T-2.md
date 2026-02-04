@@ -3,7 +3,7 @@ title: "[TDD] Implement Git & FileSystem Adapters"
 labels: ["gemini:tdd"]
 roadmap: "docs/implementation/plans/adr-003/tdd-plan.md"
 task_id: "T-2"
-depends_on: ["issue-T-1.md"]
+depends_on: ["../phase-1-domain/issue-T-1.md"]
 status: "Draft"
 ---
 

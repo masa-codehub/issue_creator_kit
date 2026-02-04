@@ -3,7 +3,7 @@ title: "[TDD] Implement Issue Creation UseCase (Fail-fast)"
 labels: ["gemini:tdd"]
 roadmap: "docs/implementation/plans/adr-003/tdd-plan.md"
 task_id: "T-4"
-depends_on: ["issue-T-1.md", "issue-T-2.md", "issue-T-3.md"]
+depends_on: ["../phase-1-domain/issue-T-1.md", "../phase-2-infra/issue-T-2.md", "../phase-2-infra/issue-T-3.md"]
 status: "Draft"
 ---
 
