@@ -22,6 +22,9 @@ fi
 if [ -d ".gemini/.git" ]; then
     echo "Updating .gemini repository..."
     git -C .gemini pull
+else
+    echo "Cloning .gemini repository..."
+    git clone https://github.com/masa-codehub/gemini_context.git .gemini
 fi
 
 # 2. pre-commit のインストール
