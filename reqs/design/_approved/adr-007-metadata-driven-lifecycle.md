@@ -98,3 +98,4 @@ issue_id: 456              # 【自動追記】手動で設定しないでくだ
 
 ## 実装状況 / Implementation Status
 未着手
+issue_id: 260
