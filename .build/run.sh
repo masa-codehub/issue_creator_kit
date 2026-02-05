@@ -19,12 +19,21 @@ if [ -f "pyproject.toml" ]; then
 fi
 
 # .gemini リポジトリの更新
+# トークン（GITHUB_TOKEN または GITHUB_MCP_PAT）があれば認証付きURLを使用
+GEMINI_REPO_URL="https://github.com/masa-codehub/gemini_context.git"
+if [ -n "$GITHUB_TOKEN" ]; then
+    GEMINI_REPO_URL="https://x-access-token:${GITHUB_TOKEN}@github.com/masa-codehub/gemini_context.git"
+elif [ -n "$GITHUB_MCP_PAT" ]; then
+    GEMINI_REPO_URL="https://x-access-token:${GITHUB_MCP_PAT}@github.com/masa-codehub/gemini_context.git"
+fi
+
 if [ -d ".gemini/.git" ]; then
     echo "Updating .gemini repository..."
-    git -C .gemini pull
+    # 認証情報を考慮して pull
+    git -C .gemini pull "$GEMINI_REPO_URL"
 else
     echo "Cloning .gemini repository..."
-    git clone https://github.com/masa-codehub/gemini_context.git .gemini
+    git clone "$GEMINI_REPO_URL" .gemini
 fi
 
 # 2. pre-commit のインストール
