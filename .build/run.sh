@@ -19,21 +19,30 @@ if [ -f "pyproject.toml" ]; then
 fi
 
 # .gemini リポジトリの更新
-# トークン（GITHUB_TOKEN または GITHUB_MCP_PAT）があれば認証付きURLを使用
+# トークン（GITHUB_TOKEN, GITHUB_MCP_PAT, GH_TOKEN）があれば認証付きURLを使用
+export GIT_TERMINAL_PROMPT=0
 GEMINI_REPO_URL="https://github.com/masa-codehub/gemini_context.git"
+
 if [ -n "$GITHUB_TOKEN" ]; then
     GEMINI_REPO_URL="https://x-access-token:${GITHUB_TOKEN}@github.com/masa-codehub/gemini_context.git"
 elif [ -n "$GITHUB_MCP_PAT" ]; then
     GEMINI_REPO_URL="https://x-access-token:${GITHUB_MCP_PAT}@github.com/masa-codehub/gemini_context.git"
+elif [ -n "$GH_TOKEN" ]; then
+    GEMINI_REPO_URL="https://x-access-token:${GH_TOKEN}@github.com/masa-codehub/gemini_context.git"
 fi
 
 if [ -d ".gemini/.git" ]; then
     echo "Updating .gemini repository..."
     # 認証情報を考慮して pull
-    git -C .gemini pull "$GEMINI_REPO_URL"
+    git -C .gemini pull "$GEMINI_REPO_URL" main || echo "Warning: Failed to update .gemini repository."
 else
     echo "Cloning .gemini repository..."
-    git clone "$GEMINI_REPO_URL" .gemini
+    # 既存の空ディレクトリなどがあれば削除してクローンし直す
+    rm -rf .gemini
+    git clone "$GEMINI_REPO_URL" .gemini || {
+        echo "Error: Failed to clone .gemini repository. Please check your GITHUB_TOKEN or access rights."
+        exit 1
+    }
 fi
 
 # 2. pre-commit のインストール
