@@ -34,12 +34,13 @@
 ### 3.2. `process-diff`
 仮想キュー（Virtual Queue）の自動起票を実行するコマンド。
 
-- **概要**: `archive/` ディレクトリに新しく追加された未採番のタスクファイルを検知し、GitHub Issue を起票する。
+- **概要**: `reqs/tasks/` ディレクトリ配下を再帰的に探索し、新しく追加された未採番のタスクファイルを検知して GitHub Issue を起票する。起票されたファイルは `--archive-dir` へ移動される。
 - **必須引数**:
   - `--before`: 比較元（Base）の Git Ref。
   - `--after`: 比較先（Head）の Git Ref。
 - **オプション引数**:
-  - `--archive-dir`: タスクアーカイブのディレクトリ（デフォルト: `reqs/tasks/archive/`）
+  - `--archive-dir`: タスクアーカイブの移動先ディレクトリ（デフォルト: `reqs/tasks/_archive/`）
+  - `--adr-id`: 指定した ADR ID に紐づくタスクのみを処理対象とするフィルタリングオプション。
   - `--roadmap`: ロードマップファイルのパス。
   - `--use-pr`: 直接 Push せず、メタデータ同期用の PR を作成するフラグ。
   - `--base-branch`: メタデータ同期 PR のマージ先ブランチ（デフォルト: `main`）。
@@ -52,7 +53,7 @@
 - **オプション引数**:
   - `--pr-body`: PR の本文（文字列）。
   - `--event-path`: GitHub Event JSON ファイルのパス。
-  - `--archive-dir`: アーカイブディレクトリ（デフォルト: `reqs/tasks/archive/`）
+  - `--archive-dir`: アーカイブディレクトリ（デフォルト: `reqs/tasks/_archive/`）
 - **UseCase への委譲**: `WorkflowUseCase.promote_from_merged_pr()` を呼び出す。
 
 ### 3.4. その他のサブコマンド
@@ -77,6 +78,18 @@
 - **When**: `issue-kit run-workflow` を実行。
 - **Then**: 終了コードが `1` であること。
 
-### 5.2. ロジックの分離
+### 5.2. 引数解析とデフォルト値の検証
+- **Given**: 引数なしで `process-diff` を実行（必須引数不足）。
+- **Then**: 終了コードが `1` であり、ヘルプメッセージが表示されること。
+- **Given**: `process-diff --before HEAD~1 --after HEAD` を実行。
+- **Then**: `archive_dir` 引数にデフォルト値 `reqs/tasks/_archive/` が渡されること。
+- **Given**: `--adr-id adr-007` を指定して `process-diff` を実行。
+- **Then**: `IssueCreationUseCase` に `adr_id="adr-007"` がフィルタ引数として渡されること。
+
+### 5.3. ロジックの分離
 - CLI 層の関数（`run_workflow` 等）が、`WorkflowUseCase` のインスタンスを生成し、その `run` メソッドを呼び出すだけの構造になっていること。
 - CLI 層で直接 `requests` や `subprocess` を呼び出していないこと（Adapter を介して UseCase に渡すのは可）。
+
+## 6. 移行に関する注意 (Migration Notes)
+- **ADR-003 からの移行**: 以前の仕様では `reqs/tasks/archive/` を使用していたが、ADR-007 以降は `reqs/tasks/_archive/` (アンダースコア付き) がデフォルトとなる。既存のワークフローやスクリプトでパスをハードコードしている場合は、新仕様への追従が必要である。
+- **再帰探索の導入**: `process-diff` は `reqs/tasks/` 配下を再帰的に走査するようになったため、ディレクトリ階層によらずタスクファイルを配置可能である。
