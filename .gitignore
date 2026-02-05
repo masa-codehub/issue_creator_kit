@@ -211,3 +211,4 @@ messages/
 
 # Track package-lock.json
 !package-lock.json.gemini/todo.md
+.gemini/
