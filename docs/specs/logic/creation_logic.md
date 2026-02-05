@@ -16,13 +16,16 @@ This logic ensures metadata-driven Issue creation based on dependency resolution
 
 ## 3. Algorithm (Detailed Steps)
 
-### Step 1: ID-based Indexing (Discovery)
-1.  Scan all `.md` files in `reqs/tasks/<adr_id>/`.
-2.  For each file:
-    - Call `FileSystemAdapter.read_document(file_path)`.
-    - Extract `id`, `status`, `depends_on`, and `issue_id` from metadata.
-3.  Build an **In-Memory Index** (Map) where key is `id` and value is the document object.
-4.  **Virtual Queue Construction**: Filter documents where `status` is NOT `Issued`, `Completed`, or `Cancelled`, AND `issue_id` is empty.
+### Step 1: Git Diff-based Discovery (Virtual Queue)
+1.  **Get Target Files**:
+    - Use `GitAdapter.get_added_files(before, after, "reqs/tasks/")` to identify new files.
+    - If `adr_id` filter is provided, keep only files within `reqs/tasks/<adr_id>/`.
+2.  **Indexing**:
+    - For each identified file, call `FileSystemAdapter.read_document(file_path)`.
+    - Build an **In-Memory Index** (Map) of the target batch.
+3.  **Context Loading**:
+    - Load existing tasks from `reqs/tasks/_archive/` (optionally filtered by `adr_id`) to resolve cross-batch dependencies.
+4.  **Final Queue**: Filter documents where `status` is NOT `Issued`, `Completed`, or `Cancelled`, AND `issue_id` is empty.
 
 ### Step 2: DAG Analysis & Ready Judgment
 1.  Build a **Dependency Graph (DAG)** using the Virtual Queue and existing tasks in `reqs/tasks/_archive/`.
