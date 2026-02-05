@@ -13,21 +13,31 @@ stateDiagram-v2
     state "ADR / Design Doc" as ADR {
         [*] --> Draft_ADR : Create in reqs/design/_inbox/
         Draft_ADR --> Approved : PR Merge to main
-        Approved --> Archived_ADR : Superseded / Postponed
+        Approved --> Postponed : status: Postponed
+        Approved --> Superseded : status: Superseded
+        Postponed --> [*]
+        Superseded --> [*]
+        
+        note right of Approved
+            Side Effect: Move to _approved/
+            Create L1/L2 Issues
+        end
     }
 
     state "Task (Issue Draft)" as Task {
         [*] --> Draft_Task : Create in reqs/tasks/<ADR-ID>/
-        Draft_Task --> Ready : Optional validation
-        Ready --> Issued : 'ick' create issue
+        Draft_Task --> Ready : ick sync (valid)
+        Ready --> Issued : ick create
         Issued --> Completed : GitHub Issue closed
         Issued --> Cancelled : GitHub Issue cancelled
         Draft_Task --> Cancelled : Manual delete/archive
-    }
+        Completed --> [*]
+        Cancelled --> [*]
 
-    state "Physical Movement (ick controlled)" as Movement {
-        Approved --> L1_L2_起票 : Trigger
-        Issued --> reqs/tasks/_archive/ : Atomic Move
+        note right of Issued
+            Side Effect: Move to _archive/
+            Record issue_id
+        end
     }
 ```
 
@@ -48,6 +58,7 @@ stateDiagram-v2
 | `Ready` | 全ての `depends_on` が `Issued` (または Completed) になり、起票準備が整った状態。 | `ick sync` による依存関係チェック合格。 | なし。 |
 | `Issued` | GitHub Issue として起票され、実作業コンテキストに移行した状態。 | `ick create` コマンド実行。 | `reqs/tasks/_archive/` へ物理移動。`issue_id` をファイルに記録。 |
 | `Completed` | GitHub Issue がクローズされ、実装が完了した状態。 | GitHub Issue のステータス変更。 | ロードマップの進捗更新。後続タスクの `Ready` 化。 |
+| `Cancelled` | GitHub Issue がキャンセルされるか、Draft 段階のタスクが破棄・アーカイブされた状態。 | GitHub Issue のキャンセル、または手動でのメタデータ変更。 | 対応するタスクファイルの `_archive/` への移動。 |
 
 ## Invariants (不変条件)
 *   **Unique ID:** `id` (例: `007-T1`) はプロジェクト全域で一意でなければならない。
