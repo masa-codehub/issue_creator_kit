@@ -1,7 +1,7 @@
 # [ADR-007] メタデータ駆動型ライフサイクル管理 (Metadata-Driven Lifecycle Management)
 
-- **Status**: 提案中 (Supersedes [ADR-003](../_approved/adr-003-task-and-roadmap-lifecycle.md))
-- **Date**: 2026-02-04
+- **Status**: Approved (Supersedes [ADR-003](../_approved/adr-003-task-and-roadmap-lifecycle.md))
+- **Date**: 2026-02-05
 
 ## 状況 / Context
 本プロジェクト（Issue Creator Kit）では、これまで物理的なディレクトリ階層（`phase-1-domain` 等）によってタスクの実行順序やレイヤーを表現してきました（ADR-003）。しかし、開発が進むにつれて以下の課題が顕在化しています。
@@ -45,11 +45,12 @@ id: 007-T1                 # 形式: [ADR番号]-T[通し番号]。フェーズ�
                            # フェーズプレフィックスを排除することで依存関係（depends_on）の記述を簡素化する。
 parent: adr-007
 type: task | integration  # L2統合Issueの場合は integration、L3タスクの場合は task
-status: Draft | Ready | Completed | Cancelled
+status: Draft | Ready | Issued | Completed | Cancelled
 phase: domain | infrastructure | usecase | interface | architecture | spec | tdd
 roadmap: [ROADMAP-ID]      # 同期対象のロードマップID
 depends_on: ["007-T0"]     # 必須。依存先のタスク ID (例: ["007-T0"]) を記述。依存がない場合は空配列 [] を指定
 issue_id: 456              # 【自動追記】手動で設定しないでください
+date: 2026-02-05
 ```
 
 ### 3. ハイブリッド運用フロー（Hybrid Workflow）
@@ -68,9 +69,10 @@ issue_id: 456              # 【自動追記】手動で設定しないでくだ
 - **ADR / Design Doc**
     - **Draft -> Approved**: PRマージにより `_inbox` から `_approved` へ移動し、L1/L2 Issue を起票。
 - **Task (Issue Draft)**
-    - **Draft -> Archived (起票と同時移動)**: 
+    - **Draft -> Ready**: 依存関係解消により `Ready` 化。
+    - **Ready -> Issued (起票と同時移動)**: 
         - PRマージをトリガーに GitHub Issue を起票。
-        - **起票が成功した瞬間、ファイルを `reqs/tasks/_archive/` へ即座に移動**し、`issue_id` を記録する。
+        - **起票が成功した瞬間、ステータスを `Issued` に更新し、ファイルを `reqs/tasks/_archive/` へ即座に移動**し、`issue_id` を記録する。
         - これにより、`reqs/tasks/<ADR-ID>/` は常に「起票待ちの予約票」のみが存在するクリーンな状態に保たれる。
 
 ### 5. 抽象化された SSOT (Invisible File-based SSOT)
