@@ -87,15 +87,16 @@ echo "--- Gemini Analysis Start ---"
 
 # Gemini CLI を実行
 # --yolo: ユーザー確認なしで実行 (CI/CD用)
-cat "$PROMPT_FILE" | gemini --yolo -m "gemini-3-flash-preview" > "$RESPONSE_FILE"
+# cat "$PROMPT_FILE" | gemini --yolo -m "gemini-3-flash-preview" > "$RESPONSE_FILE"
+cat "$PROMPT_FILE" | gemini --yolo -m "gemini-3-flash-preview"
 
 echo "--- Gemini Analysis End ---"
 
-# GitHub CLI でコメントを投稿
-if [ -f "$RESPONSE_FILE" ] && [ -s "$RESPONSE_FILE" ]; then
-  echo "Posting summary comment to PR #${PR_NUMBER}..."
-  gh pr comment "$PR_NUMBER" --body-file "$RESPONSE_FILE"
-else
-  echo "Error: Gemini produced empty response."
-  exit 1
-fi
+# # GitHub CLI でコメントを投稿
+# if [ -f "$RESPONSE_FILE" ] && [ -s "$RESPONSE_FILE" ]; then
+#   echo "Posting summary comment to PR #${PR_NUMBER}..."
+#   gh pr comment "$PR_NUMBER" --body-file "$RESPONSE_FILE"
+# else
+#   echo "Error: Gemini produced empty response."
+#   exit 1
+# fi
