@@ -1,87 +1,79 @@
-# Issue Creation Logic Specification (ADR-003)
+# Issue Creation Logic Specification (ADR-007)
 
 ## 1. Overview
-Defines the detailed algorithm for `IssueCreationUseCase.create_issues_from_virtual_queue()`.
-This logic ensures atomic Issue creation from the "Virtual Queue" (newly added files in `archive/` without an issue number) and maintains SSOT integrity via a Fail-fast approach.
+Defines the detailed algorithm for `IssueCreationUseCase.create_issues()`.
+This logic ensures metadata-driven Issue creation based on dependency resolution (DAG) and maintains SSOT integrity via "Atomic Move" and "Status Transition".
 
 ## 2. Input / Output
 
 ### Input
-- `base_ref` (str): Base branch or commit SHA for diff comparison (typically `HEAD~1` or `main`).
-- `head_ref` (str): Head branch or commit SHA (typically `HEAD`).
-- `archive_dir` (str): Path to the task archive directory (default: `reqs/tasks/archive`).
+- `adr_id` (str): ADR ID to process (e.g., `adr-007`).
+- `base_dir` (str): Root directory of the project.
 
 ### Output
 - `None` (Success).
-- Raises `RuntimeError` on failure (including `CycleError` or validation errors).
+- Raises `RuntimeError` on failure (including `CycleError`, `MissingDependencyError`, or API errors).
 
 ## 3. Algorithm (Detailed Steps)
 
-### Step 1: Queue Detection
-1.  Call `GitAdapter.get_added_files(base_ref, head_ref, archive_dir)`.
-2.  For each file found:
+### Step 1: ID-based Indexing (Discovery)
+1.  Scan all `.md` files in `reqs/tasks/<adr_id>/`.
+2.  For each file:
     - Call `FileSystemAdapter.read_document(file_path)`.
-    - Filter out files that already have an `issue` field in metadata.
-3.  The remaining files constitute the **Virtual Queue**.
+    - Extract `id`, `status`, `depends_on`, and `issue_id` from metadata.
+3.  Build an **In-Memory Index** (Map) where key is `id` and value is the document object.
+4.  **Virtual Queue Construction**: Filter documents where `status` is NOT `Issued`, `Completed`, or `Cancelled`, AND `issue_id` is empty.
 
-### Step 2: Dependency Resolution
-1.  Extract `depends_on` list from each document in the queue.
-2.  Perform a **Topological Sort** to determine the creation order.
-    - If a circular dependency is detected, raise `CycleError` (or wrap it in `RuntimeError`) and abort immediately.
-3.  Ensure all dependencies (even those already processed or outside the queue) are validated:
-    - Each entry in `depends_on` MUST refer to either:
-        - a file within the same Virtual Queue batch, or
-        - an existing task file under `archive/` whose metadata status is `Active` or `Archived`.
-    - If any dependency does not satisfy the above (e.g., file not found in `archive/`, invalid path, or inconsistent metadata), **abort immediately** following the Fail-fast policy of ADR-003:
-        - Stop the process before Step 3.
-        - Raise `RuntimeError` to fail the workflow.
+### Step 2: DAG Analysis & Ready Judgment
+1.  Build a **Dependency Graph (DAG)** using the Virtual Queue and existing tasks in `reqs/tasks/_archive/`.
+2.  **Circular Dependency Check**:
+    - Perform a depth-first search or similar algorithm to detect cycles.
+    - If a cycle is detected, raise `CycleError` and abort.
+3.  **Ready Judgment Logic**:
+    - For each task in the Virtual Queue, evaluate its `Ready` criteria:
+        - A task is `Ready` if **ALL** its `depends_on` IDs satisfy one of the following:
+            - The dependency has `status: Issued` (verified via metadata or GitHub API).
+            - The dependency has `status: Completed` (verified via GitHub API).
+            - The dependency is in `reqs/tasks/_archive/` with a valid `issue_id`.
+    - If a dependency is missing from both the current ADR folder and the archive, raise `MissingDependencyError`.
+4.  **Topological Sort**:
+    - Sort the `Ready` tasks to determine the safe creation order.
 
 ### Step 3: Atomic Issue Creation (Fail-fast Zone)
-1.  Initialize an empty memory buffer `creation_results`.
-    - **Schema**: List of objects containing `{file_path: Path, issue_number: str, updated_content: str}`.
-2.  For each file in the sorted order:
+1.  Initialize `creation_results` buffer.
+2.  For each task in sorted order:
     - **A. Prepare Body**: 
-        - Replace any references to dependent files in the `content` with their actual Issue numbers (e.g., `[Task](issue-T1.md)` -> `#123`).
-        - Use the memory buffer `creation_results` for files in the same batch, or check filesystem for already-numbered files.
-    - **B. Call API**: Call `GitHubAdapter.create_issue(title, body, labels)`.
+        - Replace reference links `[Ref](ID)` with GitHub Issue numbers `#123`.
+        - Use local index for tasks in the same batch or GitHub API for already issued tasks.
+    - **B. Call API**: `GitHubAdapter.create_issue(title, body, labels)`.
     - **C. Handle Success**: 
-        - Store the returned `issue_number` (formatted as a string, e.g., `"#123"`) and the link-replaced body in the `creation_results` buffer.
+        - Update status to `Issued`.
+        - Record `issue_id` and store the link-replaced body for later write-back.
     - **D. Handle Failure**:
-        - If any API call fails (4xx/5xx/Timeout), **Stop immediately**.
-        - Note: For 403 Forbidden errors, retry only if the error is identified as a rate limit (via headers/body).
-        - Do NOT write anything back to Git.
-        - Raise `RuntimeError` to abort the workflow.
+        - Stop immediately. Raise `RuntimeError`.
 
-### Step 4: Git Write-back (Transaction Commit)
-*This step only executes if ALL issues were created successfully.*
+### Step 4: Atomic Move & Status Transition (Transaction Commit)
+*Executed only if Step 3 succeeded for all target tasks.*
 
-1.  For each entry in `creation_results`:
-    - **A. Update Metadata**: Call `FileSystemAdapter.update_metadata(file_path, {"issue": issue_number, "status": "Active"})`.
-    - **B. Update Body**: Call `FileSystemAdapter.write_file` with the `updated_content` stored in the buffer.
-2.  **Roadmap Synchronization (Best-effort, Non-fatal)**:
-    - Call `RoadmapSyncUseCase.sync_all(creation_results)`.
-    - If roadmap synchronization fails (exception or error response), **do not abort** the workflow:
-        - Log a warning (including affected files / issue numbers).
-        - Do **not** roll back metadata or file updates already applied in this step.
-        - Continue to finalize the process.
-    - Rationale: As defined in `docs/architecture/arch-behavior-003-creation.md`, roadmap sync is treated as a best-effort operation separate from the Fail-fast Zone (Step 3).
-3.  **Finalize Git**:
-    - Define `all_modified_files` as the set of all task files and roadmap files updated in this step.
-    - `GitAdapter.add(all_modified_files)`.
-    - `GitAdapter.commit("docs: create issues for virtual queue and sync links")`.
-    - `GitAdapter.push()`.
+1.  For each task successfully created:
+    - **A. Update Local File**:
+        - Write back updated metadata (`status: Issued`, `issue_id: #123`).
+        - Write back link-replaced body.
+    - **B. Atomic Move**:
+        - Move file from `reqs/tasks/<adr_id>/` to `reqs/tasks/_archive/`.
+        - Use `git mv` equivalent to preserve history.
+2.  **Roadmap Sync**: Best-effort sync as per ADR-007.
 
 ## 4. TDD Verification Criteria
 
-| Scenario | Given | When | Then (Expectation) |
+| Scenario | Given | When | Then |
 | :--- | :--- | :--- | :--- |
-| **Normal Batch** | 3 new files in `archive/` | Execute `create_issues_from_virtual_queue` | All 3 issues created. Metadata is updated with issue numbers (e.g., `#123`) and status is `Active`. |
-| **Dependency Order** | `A.md` depends on `B.md` | Execute | `B` is created first. `A`'s body (GitHub and Git) contains `#<B_No>`. |
-| **API Failure (Partial)** | `A` success, `B` fails | Execute | `A` remains on GitHub, but `A.md` on Git is **NOT** updated (no issue number). A `RuntimeError` is raised. |
-| **Redundant Run** | File in `archive/` already has `issue: #123` | Execute | File is skipped (no duplicate Issue). |
-| **Link Replacement** | Body has `[Ref](./issue-T1.md)` | Execute | Body in file and GitHub is updated to the corresponding issue number (e.g., `#123`). |
+| **Dependency Ready** | `T2` depends on `T1`. `T1` is `Issued`. | Run `ick create` | `T2` is created. |
+| **Dependency Not Ready** | `T2` depends on `T1`. `T1` is `Draft`. | Run `ick create` | `T2` is skipped (not in Ready queue). |
+| **Circular Dependency** | `A -> B -> A` | Run `ick create` | `CycleError` raised. |
+| **Atomic Move** | Issue created for `T1` | Success | `T1.md` moves to `_archive/` and has `issue_id`. |
+| **Idempotency** | `T1` has `issue_id` in file | Run `ick create` | `T1` is skipped (No duplicate Issue). |
 
-## 5. Constraints & Edge Cases
-- **Implementation Scope**: Although the trigger is typically a single task promotion (1 PR = 1 Task), the logic MUST handle multiple files if they are merged into `archive/` simultaneously.
-- **Max Batch Size**: Implementers MAY impose a limit (e.g., 50 files) to avoid GitHub API rate limits in a single run.
-- **Cycle Detection**: Circular dependencies MUST be detected during Step 2, resulting in an immediate abort.
+## 5. Constraints
+- **Scope**: Supports cross-ADR dependencies if IDs are unique.
+- **Fail-fast**: Any API error during Step 3 prevents Step 4 (Move) for the remaining batch.

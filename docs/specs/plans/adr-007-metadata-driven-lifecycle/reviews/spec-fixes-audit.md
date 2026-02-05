@@ -1,3 +1,43 @@
+# SSOT Audit Reports - ADR-007 Metadata Driven Lifecycle
+
+---
+
+# 🛡 SSOT Audit Report: Spec Fixes (PR #288)
+
+## 1. 監査概要 (Audit Overview)
+- **Target (対象):** 
+  - `docs/specs/logic/creation_logic.md`
+  - `docs/specs/logic/promotion_logic.md`
+- **Related Issue:** PR #288
+- **Date:** 2026-02-05
+- **Auditor:** SYSTEM_ARCHITECT
+
+## 2. 判定結果 (Verdict)
+- [x] **✅ PASS** (承認 - 整合性に問題なし)
+
+### 2.1. TDD Readiness (TDD適合性)
+- [x] **Concrete Inputs/Outputs:** 
+  - **根拠:** `creation_logic.md` の Step 3.C において、`creation_results` バッファに保存すべき内容（issue_id, link-replaced body）を具体化した。これにより Step 4 での書き戻しデータが明確になった。
+- [x] **Validation Rules:** 
+  - **根拠:** 既存の DAG 判定や ID 形式のバリデーションは維持されている。
+- [x] **Test Cases (Edge Cases):** 
+  - **根拠:** `creation_logic.md` の第 4 項に、依存関係やアトミック移動のシナリオが網羅されている。
+
+### 2.2. SSOT Integrity
+- [x] **Common Defs Compliance:** 
+  - **根拠:** `ick create` という最新의 コマンド用語を `promotion_logic.md` に採用した。
+- [x] **Design Alignment:** 
+  - **根拠:** ADR-007 への参照更新を行い、superseded な ADR-003 への依存を排除した。
+
+### 2.3. No Ambiguity
+- [x] **Forbidden Terms:** 
+  - **根拠:** "virtual queue" (ADR-003) などの古い用語を排除し、現在の構造に即した表現に修正した。
+
+## 3. Improvement Proposals (改善提案)
+- **Proposal 1:** 今回の修正で中間状態の保存を明記したが、将来的に `creation_results` の具体的なデータ構造を Python の `dataclass` 等で定義した Data Spec を追加するとさらに堅牢になる。
+
+---
+
 # 🛡 SSOT Audit Report: CLI Spec Fixes (PR #286)
 
 ## 1. 監査概要 (Audit Overview)
@@ -10,10 +50,6 @@
 
 ## 2. 判定結果 (Verdict)
 - [x] **✅ PASS** (承認 - 整合性に問題なし)
-- [ ] **⚠️ CONDITIONAL PASS** (条件付き承認 - 軽微な修正で対応可能)
-- [ ] **❌ FAIL** (却下 - 重大な不整合あり)
-
----
 
 ## 3. 監査チェックリスト (Audit Checklist)
 
@@ -32,8 +68,6 @@
 ### D. Logical Consistency (論理的一貫性)
 - [x] **Dependency:** UseCase 層が必要とする引数と、CLI が受け取る引数の整合性を確保。
 - [x] **Completeness:** 正常系だけでなく、バリデーションエラー時の異常系 TDD Criteria を追加。
-
----
 
 ## 4. 論理的根拠 (Reasoning)
 - **UseCase シグネチャ:** `IssueCreationUseCase.create_issues_from_virtual_queue` が `adr_id` を受け取ることを明記したため、実装者が迷わずシグネチャを修正できる状態になった。
