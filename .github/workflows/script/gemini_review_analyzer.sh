@@ -2,8 +2,8 @@
 set -e
 
 # 環境変数のチェック
-if [ -z "$PR_NUMBER" ] || [ -z "$REVIEW_ID" ]; then
-  echo "Error: Required environment variables (PR_NUMBER, REVIEW_ID) are missing."
+if [ -z "$PR_NUMBER" ] || [ -z "$GITHUB_REPOSITORY" ]; then
+  echo "Error: Required environment variables (PR_NUMBER, GITHUB_REPOSITORY) are missing."
   exit 1
 fi
 
