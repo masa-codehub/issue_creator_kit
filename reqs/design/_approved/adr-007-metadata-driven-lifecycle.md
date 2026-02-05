@@ -1,7 +1,7 @@
 # [ADR-007] メタデータ駆動型ライフサイクル管理 (Metadata-Driven Lifecycle Management)
 
-- **Status**: 提案中 (Supersedes [ADR-003](../_approved/adr-003-task-and-roadmap-lifecycle.md))
-- **Date**: 2026-02-04
+- **Status**: Approved (Supersedes [ADR-003](../_approved/adr-003-task-and-roadmap-lifecycle.md))
+- **Date**: 2026-02-05
 
 ## 状況 / Context
 本プロジェクト（Issue Creator Kit）では、これまで物理的なディレクトリ階層（`phase-1-domain` 等）によってタスクの実行順序やレイヤーを表現してきました（ADR-003）。しかし、開発が進むにつれて以下の課題が顕在化しています。
