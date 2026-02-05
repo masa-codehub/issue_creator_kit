@@ -30,7 +30,7 @@
 | `parent` | `String` | Yes | 親ADRのID | 既存のADR IDと一致すること |
 | `parent_issue` | `String` | No | 親IssueのID | `#123` 形式 |
 | `type` | `Enum` | Yes | タスク種別 | `task` (L3), `integration` (L2) |
-| `phase` | `Enum` | Yes | 工程フェーズ | `domain`, `infra`, `usecase`, `interface`, `arch`, `spec`, `tdd` |
+| `phase` | `Enum` | Yes | 工程フェーズ | `domain`, `infrastructure`, `usecase`, `interface`, `arch`, `spec`, `tdd` |
 | `depends_on` | `List[String]` | Yes | 依存タスクIDのリスト | リスト形式。依存なしは `[]` |
 | `roadmap` | `String` | No | 同期対象ロードマップID | 任意 |
 | `issue_id` | `Integer` | Auto | GitHub Issue番号 | 自動追記のみ。手動編集禁止 |
