@@ -31,7 +31,7 @@ If any tasks were promoted to `Ready`:
 1.  Create a new branch: `feat/promote-ready-tasks-<timestamp>`.
 2.  Commit the updated task files (status change).
 3.  Create a Pull Request to `main` with the title `feat: promote tasks to Ready status`.
-4.  Rationale: This alerts the team that new tasks are ready for `ick create`.
+4.  Rationale: This alerts the team that new tasks are ready for issue creation (via `ick create`).
 
 ## 4. Safety Mechanisms
 

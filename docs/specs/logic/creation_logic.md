@@ -48,7 +48,7 @@ This logic ensures metadata-driven Issue creation based on dependency resolution
     - **B. Call API**: `GitHubAdapter.create_issue(title, body, labels)`.
     - **C. Handle Success**: 
         - Update status to `Issued`.
-        - Record `issue_id`.
+        - Record `issue_id` and store the link-replaced body for later write-back.
     - **D. Handle Failure**:
         - Stop immediately. Raise `RuntimeError`.
 
@@ -62,7 +62,7 @@ This logic ensures metadata-driven Issue creation based on dependency resolution
     - **B. Atomic Move**:
         - Move file from `reqs/tasks/<adr_id>/` to `reqs/tasks/_archive/`.
         - Use `git mv` equivalent to preserve history.
-2.  **Roadmap Sync**: Best-effort sync as per ADR-003.
+2.  **Roadmap Sync**: Best-effort sync as per ADR-007.
 
 ## 4. TDD Verification Criteria
 
