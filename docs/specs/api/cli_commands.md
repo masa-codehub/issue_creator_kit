@@ -41,10 +41,12 @@
 - **オプション引数**:
   - `--archive-dir`: タスクアーカイブの移動先ディレクトリ（デフォルト: `reqs/tasks/_archive/`）
   - `--adr-id`: 指定した ADR ID に紐づくタスクのみを処理対象とするフィルタリングオプション。
+    - **形式**: `adr-` に続けて 3 桁のゼロパディング済み数字を指定する（例: `adr-001`, `adr-007`）。
+    - **バリデーション**: 上記形式に一致しない値が指定された場合、本 CLI はバリデーションエラーとして扱い、終了コード `1` を返すこと。
   - `--roadmap`: ロードマップファイルのパス。
   - `--use-pr`: 直接 Push せず、メタデータ同期用の PR を作成するフラグ。
   - `--base-branch`: メタデータ同期 PR のマージ先ブランチ（デフォルト: `main`）。
-- **UseCase への委譲**: `IssueCreationUseCase.create_issues_from_virtual_queue()` を呼び出す。
+- **UseCase への委譲**: `IssueCreationUseCase.create_issues_from_virtual_queue(adr_id=...)` を呼び出す。
 
 ### 3.3. `process-merge`
 フェーズ連鎖（Auto-PR）を実行するコマンド。
@@ -85,6 +87,8 @@
 - **Then**: `archive_dir` 引数にデフォルト値 `reqs/tasks/_archive/` が渡されること。
 - **Given**: `--adr-id adr-007` を指定して `process-diff` を実行。
 - **Then**: `IssueCreationUseCase` に `adr_id="adr-007"` がフィルタ引数として渡されること。
+- **Given**: `--adr-id invalid-format` を指定して `process-diff` を実行。
+- **Then**: 終了コードが `1` であり、バリデーションエラーメッセージが表示されること。
 
 ### 5.3. ロジックの分離
 - CLI 層の関数（`run_workflow` 等）が、`WorkflowUseCase` のインスタンスを生成し、その `run` メソッドを呼び出すだけの構造になっていること。
