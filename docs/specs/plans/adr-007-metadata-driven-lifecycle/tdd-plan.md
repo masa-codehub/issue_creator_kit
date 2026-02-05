@@ -28,13 +28,17 @@
 - **Tests**: `tests/unit/`, `tests/integration/`
 
 ## 4. Issue Slicing Strategy
-- **007-T4-01: Document & Metadata Implementation (Domain)**
-    - `Document`, `Metadata` クラスの実装。パース、正規化（日本語キー）、バリデーション。
-- **007-T4-02: Infrastructure Adapters Enhancement (Infra)**
-    - `FileSystemAdapter.find_file_by_id`, `GitHubAdapter.sync_issue` の実装。
-- **007-T4-03: Issue Creation Logic (UseCase)**
-    - Git Diff からの検知、DAG 解析（TopologicalSorter）、原子的な起票・移動ロジック。
+- **007-T4-01: [CORE] Data Model & Adapter Protocols (Domain)**
+    - `Document`, `Metadata` クラスの実装と、各 Adapter の Interface (Protocol) 定義。
+- **007-T4-02: [PARALLEL] Infrastructure Implementation (Infra)**
+    - 確定した Interface に基づく具象 Adapter の実装。
+    - *Dependency*: `007-T4-01`
+- **007-T4-03: [PARALLEL] UseCase Logic (UseCase)**
+    - Adapter を Mock して、DAG 解析や起票・移動シーケンスを実装。
+    - *Dependency*: `007-T4-01` (T4-02 の完了を待たずに並列実行可能)
 - **007-T4-04: CLI Integration (Interface)**
     - `process-diff` の引数追加と UseCase への繋ぎ込み。
+    - *Dependency*: `007-T4-03`
 - **007-T4-L2: TDD Integration Audit (L2)**
-    - 最終的なカバレッジ確認と全体の結合テスト。
+    - 実装アダプターとユースケースの結合テスト。
+    - *Dependency*: `007-T4-02`, `007-T4-04`

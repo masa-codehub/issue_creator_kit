@@ -11,7 +11,7 @@ labels:
   - "P1"
   - "SYSTEM_ARCHITECT"
 roadmap: "docs/specs/plans/adr-007-metadata-driven-lifecycle/tdd-plan.md"
-depends_on: ["007-T4-04"]
+depends_on: ["007-T4-02", "007-T4-04"]
 issue_id: 
 ---
 # [L2] ADR-007 TDD Implementation Phase Integration

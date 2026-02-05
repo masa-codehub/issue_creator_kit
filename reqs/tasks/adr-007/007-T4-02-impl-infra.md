@@ -3,7 +3,7 @@ id: 007-T4-02
 parent: adr-007
 parent_issue: 
 type: task
-title: "[TDD] Infrastructure Adapters Enhancement (Infra)"
+title: "[TDD] Infrastructure Implementation (Infra)"
 status: Draft
 phase: infrastructure
 labels:
@@ -14,23 +14,25 @@ roadmap: "docs/specs/plans/adr-007-metadata-driven-lifecycle/tdd-plan.md"
 depends_on: ["007-T4-01"]
 issue_id: 
 ---
-# [TDD] Infrastructure Adapters Enhancement (Infra)
+# [TDD] Infrastructure Implementation (Infra)
 
 ## 1. 目的と背景 (Goal & Context)
+- **Goal**: `007-T4-01` で定義されたインターフェース（Protocol）に基づき、具象クラス（FileSystem, GitHub API）の実装を完了させ、実環境での動作を保証する。
 - **As-is (現状)**: `FileSystemAdapter` には ID ベースのファイル検索ロジックがなく、`GitHubAdapter` は既存 Issue の更新（`sync_issue`）に未対応。
-- **To-be (あるべき姿)**: `_archive/` ディレクトリ配下を含めた ID 検索が可能になり、`Document` オブジェクトを直接受け取って GitHub Issue を同期（作成/更新）できるアダプターが完成している。
+- **To-be (あるべき姿)**: `interfaces.py` の契約を満たし、`_archive/` 配下を含めた ID 検索や、`Document` オブジェクトを介した GitHub Issue 同期が可能なアダプターが実装されている。
 - **Design Evidence (設計の根拠)**: 
     - `docs/specs/components/infra_adapters.md`
 
 ## 2. 参照資料・入力ファイル (Input Context)
 - [ ] `docs/specs/components/infra_adapters.md`
+- [ ] `src/issue_creator_kit/domain/interfaces.py` (T4-01成果物)
 - [ ] `src/issue_creator_kit/infrastructure/filesystem.py`
 - [ ] `src/issue_creator_kit/infrastructure/github_adapter.py`
 
 ## 3. 実装手順と制約 (Implementation Steps & Constraints)
 
 ### 3.1. 負の制約 (Negative Constraints)
-- [ ] **変更禁止**: `GitAdapter` の既存メソッド（`checkout` 等）のシグネチャ変更。
+- [ ] **変更禁止**: `interfaces.py` で定義されたメソッド名や引数（変更が必要な場合は T4-01 に戻る）。
 - [ ] **安全策**: 外部 API を直接叩かず、必ずモックテストを実施すること。
 
 ### 3.2. 実装手順 (Changes)
@@ -54,7 +56,7 @@ issue_id:
 ## 5. 検証手順・完了条件 (Verification & DoD)
 - [ ] **自動テスト**: `pytest tests/unit/infrastructure/` がパスすること。
 - [ ] **静的解析**: `ruff check .` および `mypy .` がパスすること。
-- [ ] **ファイル状態**: 戻り値の型が `pathlib.Path` であること。
+- [ ] **インターフェース適合**: 実装クラスが `interfaces.py` の Protocol を満たしていること。
 
 ## 6. 成果物 (Deliverables)
 - `src/issue_creator_kit/infrastructure/filesystem.py`

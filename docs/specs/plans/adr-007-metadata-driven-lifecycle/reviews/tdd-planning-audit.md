@@ -16,7 +16,8 @@
 - [x] **Scenario Coverage:** 正常系だけでなく、循環参照や API エラー時の一貫性保持といったエッジケースが各タスクに含まれている。
 
 ### 2.3. Task Granularity (タスク分割の妥当性)
-- [x] **Logical Slicing:** Domain -> Infra -> UseCase -> CLI という Clean Architecture のレイヤーに沿って分割されており、依存関係 (`depends_on`) が正しく設定されている。
+- [x] **Logical Slicing:** Domain (Contracts) -> [Infra || UseCase] -> CLI という並列化を意識した分割が行われている。
+- [x] **Parallelism:** T4-01 でインターフェースを確定させることで、T4-02 (Infra) と T4-03 (UseCase) が並列して着手可能になっている。
 - [x] **Small Batches:** 各タスクは 1〜2 ターンの実装作業で完結する適切なサイズに抑えられている。
 
 ### 2.4. Operational Integrity (運用上の整合性)
