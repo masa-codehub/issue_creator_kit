@@ -1,5 +1,8 @@
 # Atomic Creation Sequence (ADR-003)
 
+> **DEPRECATED: This document is based on ADR-003 and has been superseded by the new architecture defined in ADR-007.**
+> Please refer to the new architecture documents, such as `arch-structure-007-metadata.md` and `arch-state-007-lifecycle.md`.
+
 ## Scenario Overview
 ADR-003 で定義された「原子的な起票 (Atomic Execution)」と「Fail-fast」のロジックを示すシーケンスです。
 - **Goal:** 仮想キュー内の全タスクを GitHub Issue として起票し、全件成功時のみメタデータとロードマップを更新・コミットする。
