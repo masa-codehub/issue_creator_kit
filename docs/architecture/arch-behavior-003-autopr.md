@@ -1,7 +1,7 @@
 # Auto-PR (Phase Chain) Sequence (ADR-003)
 
 > **DEPRECATED: This document is based on ADR-003 and has been superseded by the new architecture defined in ADR-007.**
-> Please refer to the new architecture documents, such as `arch-structure-007-metadata.md` and `arch-state-007-lifecycle.md`.
+> Please refer to the new architecture documents, such as [`arch-structure-007-metadata.md`](./arch-structure-007-metadata.md) and [`arch-state-007-lifecycle.md`](./arch-state-007-lifecycle.md).
 
 ## Scenario Overview
 ADR-003 で定義された「フェーズ連鎖 (Phase Chain)」メカニズム、すなわち「最終タスク完了 -> 次フェーズ Draft の Archive 移動 -> PR 作成」の流れを可視化します。
