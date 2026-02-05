@@ -22,7 +22,7 @@ FileSystem (Atomic Move) および GitHub API (Issue/Status Sync) との連携�
 - 基本的な成功ケースと初期化エラーのテストのみ。APIエラー時の上位層への波及（ファイル移動の抑止）を検証するテストはない。
 
 ## 3. ギャップ分析 (Gap Analysis)
-- **FileSystem**: `id` をキーとしたファイル検索ロジックが仕様に未定義。アーカイブ移動の「原子性」の定義が曖昧（ shiltu.move だけで十分か、OSレベルの atomic rename を意識するか）。
+- **FileSystem**: `id` をキーとしたファイル検索ロジックが仕様に未定義。アーカイブ移動の「原子性」の定義が曖昧（ shutil.move だけで十分か、OSレベルの atomic rename を意識するか）。
 - **GitHub**: メタデータのどのフィールドを Issue のどの項目（Title, Body, Labels）にマッピングするかの定義が不足。`issue_id` を抽出してメタデータに書き戻す際の一貫性保証が未定義。
 
 ## 4. 参照エビデンス
