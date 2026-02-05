@@ -46,10 +46,15 @@ jobs:
         run: bash ./.build/run.sh
 
       - name: Analyze Review Comment
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 10
+          max_attempts: 3
+          retry_on: error
+          command: bash ./.github/workflows/script/gemini_review_analyzer.sh
         env:
           PR_NUMBER: ${{ github.event.pull_request.number }}
           PR_LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
           REVIEW_ID: ${{ github.event.review.id }}
           REVIEW_AUTHOR: ${{ github.event.review.user.login }}
           REVIEW_BODY: ${{ github.event.review.body }}
-        run: bash ./.github/workflows/script/gemini_review_analyzer.sh
