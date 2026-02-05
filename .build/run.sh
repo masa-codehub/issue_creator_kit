@@ -25,6 +25,9 @@ fi
 export GIT_TERMINAL_PROMPT=0
 GEMINI_REPO_URL="https://github.com/masa-codehub/gemini_context.git"
 
+TOKEN=""
+SOURCE=""
+
 if [ -n "$GITHUB_MCP_PAT" ]; then
     TOKEN="$GITHUB_MCP_PAT"
     SOURCE="GITHUB_MCP_PAT"
@@ -50,7 +53,11 @@ else
     echo "Cloning .gemini repository..."
     rm -rf .gemini
     git clone "$GEMINI_REPO_URL" .gemini || {
-        echo "Error: Failed to clone .gemini repository. Please check your $SOURCE or access rights."
+        if [ -n "$SOURCE" ]; then
+            echo "Error: Failed to clone .gemini repository. Please check your token from $SOURCE or access rights."
+        else
+            echo "Error: Failed to clone .gemini repository. Public access might be denied. Please check your access rights or set an authentication token (e.g., GITHUB_MCP_PAT, GH_TOKEN, or GITHUB_TOKEN)."
+        fi
         exit 1
     }
 fi
