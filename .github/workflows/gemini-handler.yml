@@ -38,10 +38,15 @@ jobs:
 
       - name: Gemini Implementer Phase
         id: implementer
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 20
+          max_attempts: 3
+          retry_on: error
+          command: bash ./.github/workflows/script/gemini_implementer.sh
         env:
           ISSUE_NUMBER: ${{ github.event.issue.number }}
           ISSUE_TITLE: ${{ github.event.issue.title }}
           ISSUE_BODY: ${{ github.event.issue.body }}
           # ラベル名をカンマ区切り文字列として渡す
           ISSUE_LABELS: ${{ join(github.event.issue.labels.*.name, ',') }}
-        run: bash ./.github/workflows/script/gemini_implementer.sh

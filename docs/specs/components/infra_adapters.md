@@ -55,6 +55,23 @@ GitHub API 呼び出しにおいて、以下のエラーに遭遇した場合は
 指定した Issue または PR にコメントを投稿する。
 - **例外**: `GitHubAPIError`
 
+### 3.7. `sync_issue(doc: Document) -> int`
+`Document` オブジェクトを元に、GitHub Issue を起票または更新する。
+- **マッピングルール**:
+  - **Title**: `doc.metadata.get("id")` + `": "` + (タイトル)。
+    - タイトルは `doc.metadata.get("title")` または `doc.metadata.get("タイトル")` から取得する。
+    - 例: `007-T1: Implement something`
+  - **Body**: `doc.content` + 追記情報（メタデータ一覧を Markdown テーブル形式で末尾に付与）
+    - テーブルには `id`, `status`, `phase`, `type`, `depends_on`, `parent` を含める。
+  - **Labels**: 
+    - `doc.metadata.get("phase")`, `doc.metadata.get("type")` が存在する場合、それぞれをラベルとして付与する。
+    - 上記以外のメタデータは、明示的に仕様に追加されない限り自動的にはマッピングしない。
+- **ロジック**:
+  - すでに `doc.metadata.get("issue_id")` が存在する場合は、その Issue を更新する。
+  - 存在しない場合は、タイトル検索（`3.3` 参照）を行い、見つかれば更新、見つからなければ新規作成する。
+- **戻り値**: 確定した Issue 番号（`int`）
+- **例外**: `GitHubAPIError`, `GitHubRateLimitError`
+
 ## 4. GitAdapter
 
 Git コマンドによるローカルリポジトリ操作を担当する。
@@ -125,13 +142,33 @@ Git コマンドによるローカルリポジトリ操作を担当する。
 - **戻り値**: ファイルパス（`str`）のリスト
 - **例外**: `FileSystemError`
 
-## 6. 検証手順 (Verification)
+### 5.7. `find_file_by_id(task_id: str, search_dirs: list[str]) -> Path`
+指定されたディレクトリ群の中から、メタデータの `id` が `task_id` と一致するファイルを検索し、そのパスを返す。
+- **検索ロジック**: 
+  1. 各ディレクトリ内の各ファイルを `read_document` もしくは高速なテキスト検索で走査。
+  2. Frontmatter 内の `id: {task_id}` を含む最初のファイルを特定。
+- **戻り値**: 見つかったファイルのパス（`Path`）。見つからない場合は `None` ではなく `FileSystemError` を送出する。
+- **例外**: `FileSystemError`
 
-### 6.1. エラーハンドリングの検証 (TDD Criteria)
-- GitHub API が 500 エラーを返した際、`GitHubAPIError` が送出されること。
-- Git コマンドが非ゼロの終了コードを返した際、`GitOperationError` が送出されること。
-- ファイル不在時や書き込み失敗時に `FileSystemError` が送出されること。
+## 6. 連携シーケンス: 原子的なアーカイブ移動 (Atomic Move Sequence)
 
-### 6.2. Mock 可能性
+ADR-007 に基づく、GitHub 起票から物理移動までの標準的な手順を以下に定義する。
+
+| ステップ | アクション | 失敗時の振る舞い |
+| :--- | :--- | :--- |
+| 1. GitHub Sync | `issue_id = GitHubAdapter.sync_issue(doc)` を実行。 | 処理中断。ファイルは元の位置に残り、リトライ可能。 |
+| 2. Metadata Injection | `FileSystemAdapter.update_metadata(doc.path, {"issue_id": issue_id, "status": "Issued"})` を実行。 | 処理中断。ファイルは元の位置に残り、メタデータは（不完全だが）次回再試行で上書きされる。 |
+| 3. Physical Move | `FileSystemAdapter.safe_move_file(doc.path, "_archive/")` を実行。 | `FileSystemError` 送出。ファイルは不整合状態（Issued だが元の位置）になるが、`find_file_by_id` で修復可能。 |
+
+## 7. 検証手順 (Verification)
+
+### 7.1. エラーハンドリングの検証 (TDD Criteria)
+- **APIエラー時の安全性**: `GitHubAdapter.sync_issue` が失敗した際、後続の `update_metadata` および `safe_move_file` が呼び出されないこと。
+- **検索の正確性**: 同一ディレクトリ内に複数のファイルがある場合でも、`find_file_by_id` がメタデータの `id` に基づいて正しいファイルを特定すること。
+- **GitHub API 500 エラー**: API が 500 エラーを返した際、`GitHubAPIError` が送出されること。
+- **Git コマンド失敗**: Git コマンドが非ゼロの終了コードを返した際、`GitOperationError` が送出されること。
+- **ファイル操作失敗**: ファイル不在時や書き込み失敗時に `FileSystemError` が送出されること。
+
+### 7.2. Mock 可能性
 - 全てのインターフェースが純粋な Python メソッドとして定義されており、`unittest.mock` 等で容易にスタブ/モック化できること。
 - `read_document` の戻り値が `Document` オブジェクトであり、その内部状態を Mock で検証できること。
