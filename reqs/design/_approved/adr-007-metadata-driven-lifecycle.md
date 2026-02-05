@@ -69,9 +69,10 @@ date: 2026-02-05
 - **ADR / Design Doc**
     - **Draft -> Approved**: PRマージにより `_inbox` から `_approved` へ移動し、L1/L2 Issue を起票。
 - **Task (Issue Draft)**
-    - **Draft -> Archived (起票と同時移動)**: 
+    - **Draft -> Ready**: 依存関係解消により `Ready` 化。
+    - **Ready -> Issued (起票と同時移動)**: 
         - PRマージをトリガーに GitHub Issue を起票。
-        - **起票が成功した瞬間、ファイルを `reqs/tasks/_archive/` へ即座に移動**し、`issue_id` を記録する。
+        - **起票が成功した瞬間、ステータスを `Issued` に更新し、ファイルを `reqs/tasks/_archive/` へ即座に移動**し、`issue_id` を記録する。
         - これにより、`reqs/tasks/<ADR-ID>/` は常に「起票待ちの予約票」のみが存在するクリーンな状態に保たれる。
 
 ### 5. 抽象化された SSOT (Invisible File-based SSOT)

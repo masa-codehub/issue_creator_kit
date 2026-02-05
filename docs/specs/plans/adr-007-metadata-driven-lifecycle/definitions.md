@@ -22,7 +22,7 @@
 | :--- | :--- | :--- | :--- | :--- |
 | `id` | `String` | Yes | ユニーク識別子 | `^[a-z0-9-]+$` (例: `adr-007`, `007-T1`) |
 | `status` | `Enum` | Yes | ライフサイクル状態 | 後述の Status Definitions 参照 |
-| `date` | `Date` | Yes | 作成日/更新日 | ISO 8601 (`YYYY-MM-DD`) |
+| `date` | `Date` | No | 作成日/更新日 | ISO 8601 (`YYYY-MM-DD`) |
 
 #### Task Specific Fields
 | Field Name | Type | Required | Description | Constraints |
