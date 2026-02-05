@@ -10,7 +10,7 @@
 ### 2.1. Ubiquitous Language (Naming)
 - **ADR / Design Doc:** システムの設計決定を記述したドキュメント。`reqs/design/` に配置。
 - **Task (Issue Draft):** 実装タスクの定義書。`reqs/tasks/<ADR-ID>/` に配置される。
-- **Integration Issue (L2):** フェーズ（Arch, Spec, TDD）ごとの完了責任を持つIssue。GitHub上のみに存在し物理ファイルを持たない（または事後記録のみ）。
+- **Integration Issue (L2):** フェーズ（Arch, Spec, TDD）ごとの完了責任を持つIssue。`type: integration` として物理ファイル（Draft）で管理される。
 - **DAG (Directed Acyclic Graph):** `depends_on` メタデータによって構築されるタスク間の依存関係グラフ。
 - **Invisible SSOT:** ファイルシステム（Passive）とGitHub Issues（Active）の二重管理状態。GitHub Issueが正（Active）となる。
 
