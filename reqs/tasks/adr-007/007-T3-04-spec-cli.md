@@ -5,6 +5,7 @@ parent_issue: #279
 type: task
 phase: spec
 status: Draft
+date: 2026-02-05
 depends_on: ["007-T3-01"]
 title: "Update CLI Interface Specification"
 labels:
@@ -46,7 +47,7 @@ labels:
 
 ## 4. Branching Strategy
 - **Base Branch:** `feature/spec-update-adr007`
-- **Feature Branch:** `spec/task-007-T3-03-cli`
+- **Feature Branch:** `spec/task-007-T3-04-cli`
 
 ## 5. Verification & DoD
 ### 5.1. Verification Criteria

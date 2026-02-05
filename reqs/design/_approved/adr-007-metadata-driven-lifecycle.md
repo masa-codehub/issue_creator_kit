@@ -45,11 +45,12 @@ id: 007-T1                 # 形式: [ADR番号]-T[通し番号]。フェーズ�
                            # フェーズプレフィックスを排除することで依存関係（depends_on）の記述を簡素化する。
 parent: adr-007
 type: task | integration  # L2統合Issueの場合は integration、L3タスクの場合は task
-status: Draft | Ready | Completed | Cancelled
+status: Draft | Ready | Issued | Completed | Cancelled
 phase: domain | infrastructure | usecase | interface | architecture | spec | tdd
 roadmap: [ROADMAP-ID]      # 同期対象のロードマップID
 depends_on: ["007-T0"]     # 必須。依存先のタスク ID (例: ["007-T0"]) を記述。依存がない場合は空配列 [] を指定
 issue_id: 456              # 【自動追記】手動で設定しないでください
+date: 2026-02-05
 ```
 
 ### 3. ハイブリッド運用フロー（Hybrid Workflow）

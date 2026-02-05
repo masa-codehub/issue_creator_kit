@@ -35,7 +35,7 @@
 
 ## 4. Outstanding Issues (残存課題)
 - **Issue 1:** ADR-007 ドキュメント内のメタデータ更新。
-  - **Remediation:** `status: Approved` への更新が必要。
+  - **Remediation:** `status: Approved` への更新が必要。 ※本PRで更新済み。
 - **Issue 2:** 統合Issue（L2）の欠如。
   - **Remediation:** 監査完了と同時に L2 Issue を起票し、このレポートを紐づけてクローズする。
 

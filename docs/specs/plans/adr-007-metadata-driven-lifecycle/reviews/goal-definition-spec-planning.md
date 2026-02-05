@@ -18,8 +18,9 @@
 - [ ] `docs/specs/plans/adr-007-metadata-driven-lifecycle/definitions.md` が存在すること。
 - [ ] 以下の Issue Draft が `reqs/tasks/adr-007/` (※) に作成されていること。
     - `007-T3-01-spec-model.md` (Document Model)
-    - `007-T3-02-spec-cli.md` (CLI Commands)
-    - `007-T3-03-spec-logic.md` (Lifecycle Logic)
+    - `007-T3-02-spec-logic.md` (Lifecycle Logic)
+    - `007-T3-03-spec-infra.md` (Infrastructure Adapters)
+    - `007-T3-04-spec-cli.md` (CLI Interface)
     (※ ADR-007に基づき、タスクフォルダはフラットな `reqs/tasks/<ADR-ID>/` を使用する)
 
 ### 3.2. Quality Check

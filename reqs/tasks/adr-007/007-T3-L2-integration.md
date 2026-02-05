@@ -4,14 +4,18 @@ parent: adr-007
 type: integration
 phase: spec
 status: Draft
-depends_on: []
-issue_id: 279
+depends_on:
+  - "007-T3-01"
+  - "007-T3-02"
+  - "007-T3-03"
+  - "007-T3-04"
+issue_id: 279 # NOTE: Exceptionally manual entry for retroactive linking
+date: 2026-02-05
 title: "[L2] ADR-007 Specification Phase Integration"
 labels:
   - "gemini:spec"
   - "P1" # Priority: P0 (Critical), P1 (High), P2 (Medium), P3 (Low)
   - "SYSTEM_ARCHITECT" # Role: BACKENDCODER, SYSTEM_ARCHITECT, etc.
-roadmap: "reqs/roadmap/active/adr-007-roadmap.md"
 ---
 
 # [L2] ADR-007 Specification Phase Integration
@@ -53,5 +57,6 @@ roadmap: "reqs/roadmap/active/adr-007-roadmap.md"
 ## 6. 成果物 (Deliverables)
 - `docs/specs/data/document_model.md`
 - `docs/specs/logic/creation_logic.md`
+- `docs/specs/components/infra_adapters.md`
 - `docs/specs/api/cli_commands.md`
 - `docs/specs/plans/adr-007-metadata-driven-lifecycle/spec-to-tdd.md`

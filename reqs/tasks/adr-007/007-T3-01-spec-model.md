@@ -5,6 +5,7 @@ parent_issue: #279
 type: task
 phase: spec
 status: Draft
+date: 2026-02-05
 depends_on: []
 title: "Update Document Model Specification"
 labels:

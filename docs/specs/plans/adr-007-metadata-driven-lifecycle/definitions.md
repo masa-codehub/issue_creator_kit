@@ -63,8 +63,8 @@
 - `reqs/tasks/_archive/` に同名ファイルが存在する場合、ハッシュ比較等により同一性を確認する。
 
 ## 3. Directory Structure & Naming
-- **Task Dir:** `reqs/tasks/<ADR-ID>/<Task-ID>.md`
-- **Archive Dir:** `reqs/tasks/_archive/<Task-ID>.md` (フラット構造)
+- **Task Dir:** `reqs/tasks/<ADR-ID>/<Task-ID>-<Description>.md`
+- **Archive Dir:** `reqs/tasks/_archive/<Task-ID>-<Description>.md` (フラット構造)
 
 ## 4. Issue Slicing Strategy
 並列開発を最大化するため、共通モデルを先行させ、その後各レイヤーの仕様を並列に策定する。
