@@ -23,10 +23,11 @@ classDiagram
         +str id
         +str status
         +str parent
+        +str|int parent_issue
         +str type
         +str phase
         +list[str] depends_on
-        +str|int issue_id
+        +int issue_id
         +str date
         +list[str] labels
         +str roadmap
@@ -67,11 +68,12 @@ ADR-007 に基づき、メタデータ駆動のライフサイクル管理を実
 | フィールド名 | 型 | 必須 | 説明 | 制約 |
 | :--- | :--- | :--- | :--- | :--- |
 | `parent` | `str` | Yes | 親 ADR/Design Doc の ID。 | 存在する ADR ID であること。 |
+| `parent_issue` | `str` \| `int` | No | 親となる GitHub Issue 番号。 | サブタスクの場合に設定される。 |
 | `type` | `str` | Yes | タスクの種別。 | `task` (L3) または `integration` (L2)。 |
-| `phase` | `str` | Yes | 工程フェーズ。 | `domain`, `infra`, `usecase`, `interface`, `arch`, `spec`, `tdd` のいずれか。 |
+| `phase` | `str` | Yes | 工程フェーズ。 | `domain`, `infrastructure`, `usecase`, `interface`, `arch`, `spec`, `tdd` のいずれか。 |
 | `depends_on` | `list[str]` | Yes | 依存するタスク ID のリスト。 | 依存がない場合は空配列 `[]`。 |
-| `issue_id` | `str` \| `int` | No | GitHub Issue 番号。 | `status` が `Issued` 以降の場合に自動追記される。 |
-| `labels` | `list[str]` | No | Issue ラベル의 リスト。 | |
+| `issue_id` | `int` | No | GitHub Issue 番号。 | `status` が `Issued` 以降の場合に自動追記される。 |
+| `labels` | `list[str]` | No | Issue ラベルのリスト。 | |
 | `roadmap` | `str` | No | 同期対象のロードマップ ID。 | |
 | `extra_fields`| `dict` | No | 未知のフィールドを格納する辞書。 | |
 
