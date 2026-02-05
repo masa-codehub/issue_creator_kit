@@ -1,6 +1,7 @@
 ---
 id: 007-T3-01
 parent: adr-007
+parent_issue: #279
 type: task
 phase: spec
 status: Draft
