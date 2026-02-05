@@ -67,8 +67,23 @@
 - **Archive Dir:** `reqs/tasks/_archive/<Task-ID>.md` (フラット構造)
 
 ## 4. Issue Slicing Strategy
-以下の3つのIssueに分割して詳細仕様を更新する。
+並列開発を最大化するため、共通モデルを先行させ、その後各レイヤーの仕様を並列に策定する。
 
-1.  **Document Model Spec Update:** `document_model.md` の更新。新しいメタデータスキーマとステータス定義の反映。
-2.  **Logic Spec Update:** `creation_logic.md` 等の更新。DAG解析と物理移動ロジック（Atomic Move）の定義。
-3.  **CLI Spec Update:** `cli_commands.md` の更新。新しいディレクトリ構造への対応とコマンド引数の見直し。
+1.  **Document Model Spec (007-T3-01):** [CORE] メタデータスキーマとステータス定義。すべての基礎。
+2.  **Logic Spec (007-T3-02):** [PARALLEL] DAG解析、状態遷移、Ready判定のアルゴリズム。 (Depends on T3-01)
+3.  **Infrastructure Spec (007-T3-03):** [PARALLEL] 物理移動（Atomic Move）と GitHub API 連携のインターフェース。 (Depends on T3-01)
+4.  **CLI Spec (007-T3-04):** [PARALLEL] コマンド体系、引数、ヘルプメッセージ。 (Depends on T3-01)
+
+## 5. Dependency & Parallelization Strategy (Critical)
+- **Core Tasks:** `007-T3-01` (Document Model)
+- **Parallel Tasks:** `007-T3-02`, `007-T3-03`, `007-T3-04`
+- **DAG Diagram:**
+```mermaid
+graph TD
+    T01[007-T3-01: Model] --> T02[007-T3-02: Logic]
+    T01 --> T03[007-T3-03: Infra]
+    T01 --> T04[007-T3-04: CLI]
+    T02 --> L2[007-T3-L2: Integration]
+    T03 --> L2
+    T04 --> L2
+```

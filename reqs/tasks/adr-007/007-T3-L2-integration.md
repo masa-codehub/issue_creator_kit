@@ -35,9 +35,11 @@ roadmap: "reqs/roadmap/active/adr-007-roadmap.md"
 - [ ] **ファイル**: `docs/specs/data/document_model.md`
     - **内容**: メタデータスキーマとステータス定義の反映 (007-T3-01)
 - [ ] **ファイル**: `docs/specs/logic/creation_logic.md`
-    - **内容**: DAG解析とAtomic Moveロジックの定義 (007-T3-02)
+    - **内容**: DAG解析と状態遷移ロジックの定義 (007-T3-02)
+- [ ] **ファイル**: `docs/specs/components/infra_adapters.md`
+    - **内容**: 物理移動とGitHub連携の定義 (007-T3-03)
 - [ ] **ファイル**: `docs/specs/api/cli_commands.md`
-    - **内容**: コマンド引数とデフォルトパスの更新 (007-T3-03)
+    - **内容**: コマンド引数とデフォルトパスの更新 (007-T3-04)
 
 ## 4. ブランチ戦略 (Branching Strategy)
 - **ベースブランチ (Base Branch)**: `main`

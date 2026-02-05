@@ -42,9 +42,8 @@ DAG解析ロジック、タスクのステータス遷移（Ready判定）、お
    - 「物理パスによる検索」から「IDによるインデックス検索」へロジックを変更。
    - `depends_on` 解析フローチャートの追加（トポロジカルソートまたは再帰探索）。
    - `Ready` 判定ロジック（全依存タスクの完了確認）の定義。
-   - Atomic Move の手順（API成功 -> `_archive/` 移動 -> コミット）の定義。
 2. **Promotion Logic Update (`promotion_logic.md`):**
-   - Auto-PR（フェーズ連鎖）において、メタデータ `next_phase_path` ではなく、タスク定義内の後続関係から推論、あるいは廃止するかを検討し記述を更新（今回はADR-007で明示されていないため、既存ロジックとADR-007の整合性を取る最小限の修正とする）。
+   - マージ後のフェーズ連鎖の判定基準を更新。
 
 ## 4. Branching Strategy
 - **Base Branch:** `feature/spec-update-adr007`
