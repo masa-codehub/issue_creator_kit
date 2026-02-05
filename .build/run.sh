@@ -19,11 +19,25 @@ if [ -f "pyproject.toml" ]; then
 fi
 
 # .gemini リポジトリの更新
-# トークン（GITHUB_TOKEN, GITHUB_MCP_PAT, GH_TOKEN）があれば認証付きURLを使用
+# トークンがあれば認証付きURLを使用
+# 優先順位: GITHUB_MCP_PAT > GH_TOKEN > GITHUB_TOKEN
+# (ActionsのデフォルトGITHUB_TOKENは他リポジトリへの権限がない場合があるため、明示的なトークンを優先)
 export GIT_TERMINAL_PROMPT=0
 GEMINI_REPO_URL="https://github.com/masa-codehub/gemini_context.git"
-TOKEN=${GITHUB_TOKEN:-${GITHUB_MCP_PAT:-${GH_TOKEN}}}
+
+if [ -n "$GITHUB_MCP_PAT" ]; then
+    TOKEN="$GITHUB_MCP_PAT"
+    SOURCE="GITHUB_MCP_PAT"
+elif [ -n "$GH_TOKEN" ]; then
+    TOKEN="$GH_TOKEN"
+    SOURCE="GH_TOKEN"
+elif [ -n "$GITHUB_TOKEN" ]; then
+    TOKEN="$GITHUB_TOKEN"
+    SOURCE="GITHUB_TOKEN"
+fi
+
 if [ -n "$TOKEN" ]; then
+    echo "Using authentication token from $SOURCE"
     GEMINI_REPO_URL="https://x-access-token:${TOKEN}@github.com/masa-codehub/gemini_context.git"
 fi
 
@@ -36,7 +50,7 @@ else
     echo "Cloning .gemini repository..."
     rm -rf .gemini
     git clone "$GEMINI_REPO_URL" .gemini || {
-        echo "Error: Failed to clone .gemini repository. Please check your authentication token (GITHUB_TOKEN, GITHUB_MCP_PAT, or GH_TOKEN) or access rights."
+        echo "Error: Failed to clone .gemini repository. Please check your $SOURCE or access rights."
         exit 1
     }
 fi
