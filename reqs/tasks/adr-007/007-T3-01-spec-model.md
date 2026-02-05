@@ -5,6 +5,11 @@ type: task
 phase: spec
 status: Draft
 depends_on: []
+title: "Update Document Model Specification"
+labels:
+  - "gemini:spec"
+  - "P1" # Priority: P0 (Critical), P1 (High), P2 (Medium), P3 (Low)
+  - "BACKENDCODER" # Role: BACKENDCODER, SYSTEM_ARCHITECT, etc.
 ---
 
 # Task: Update Document Model Specification

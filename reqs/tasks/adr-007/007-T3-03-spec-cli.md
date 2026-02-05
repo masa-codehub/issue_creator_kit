@@ -5,6 +5,11 @@ type: task
 phase: spec
 status: Draft
 depends_on: ["007-T3-02"]
+title: "Update CLI Interface Specification"
+labels:
+  - "gemini:spec"
+  - "P1" # Priority: P0 (Critical), P1 (High), P2 (Medium), P3 (Low)
+  - "BACKENDCODER" # Role: BACKENDCODER, SYSTEM_ARCHITECT, etc.
 ---
 
 # Task: Update CLI Interface Specification

@@ -9,8 +9,8 @@ issue_id: 279
 title: "[L2] ADR-007 Specification Phase Integration"
 labels:
   - "gemini:spec"
-  - "P1"
-  - "SYSTEM_ARCHITECT"
+  - "P1" # Priority: P0 (Critical), P1 (High), P2 (Medium), P3 (Low)
+  - "SYSTEM_ARCHITECT" # Role: BACKENDCODER, SYSTEM_ARCHITECT, etc.
 roadmap: "reqs/roadmap/active/adr-007-roadmap.md"
 ---
 
