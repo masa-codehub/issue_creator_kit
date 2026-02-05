@@ -9,6 +9,8 @@ This logic ensures metadata-driven Issue creation based on dependency resolution
 ### Input
 - `adr_id` (str): ADR ID to process (e.g., `adr-007`).
 - `base_dir` (str): Root directory of the project.
+- `before` (str): Base Git Ref for diff detection.
+- `after` (str): Head Git Ref for diff detection.
 
 ### Output
 - `None` (Success).
@@ -60,7 +62,7 @@ This logic ensures metadata-driven Issue creation based on dependency resolution
 
 1.  For each task successfully created:
     - **A. Update Local File**:
-        - Write back updated metadata (`status: Issued`, `issue_id: #123`).
+        - Write back updated metadata (`status: Issued`, `issue_id: 123`).
         - Write back link-replaced body.
     - **B. Atomic Move**:
         - Move file from `reqs/tasks/<adr_id>/` to `reqs/tasks/_archive/`.

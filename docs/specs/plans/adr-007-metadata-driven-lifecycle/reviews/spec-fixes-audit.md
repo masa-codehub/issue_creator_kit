@@ -25,7 +25,7 @@
 
 ### 2.2. SSOT Integrity
 - [x] **Common Defs Compliance:** 
-  - **根拠:** `ick create` という最新의 コマンド用語を `promotion_logic.md` に採用した。
+  - **根拠:** `ick create` という最新のコマンド用語を `promotion_logic.md` に採用した。
 - [x] **Design Alignment:** 
   - **根拠:** ADR-007 への参照更新を行い、superseded な ADR-003 への依存を排除した。
 
