@@ -28,6 +28,7 @@
 | Field Name | Type | Required | Description | Constraints |
 | :--- | :--- | :--- | :--- | :--- |
 | `parent` | `String` | Yes | 親ADRのID | 既存のADR IDと一致すること |
+| `parent_issue` | `String` | No | 親IssueのID | `#123` 形式 |
 | `type` | `Enum` | Yes | タスク種別 | `task` (L3), `integration` (L2) |
 | `phase` | `Enum` | Yes | 工程フェーズ | `domain`, `infra`, `usecase`, `interface`, `arch`, `spec`, `tdd` |
 | `depends_on` | `List[String]` | Yes | 依存タスクIDのリスト | リスト形式。依存なしは `[]` |
