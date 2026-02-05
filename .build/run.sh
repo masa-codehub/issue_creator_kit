@@ -19,21 +19,26 @@ if [ -f "pyproject.toml" ]; then
 fi
 
 # .gemini リポジトリの更新
-# トークン（GITHUB_TOKEN または GITHUB_MCP_PAT）があれば認証付きURLを使用
+# トークン（GITHUB_TOKEN, GITHUB_MCP_PAT, GH_TOKEN）があれば認証付きURLを使用
+export GIT_TERMINAL_PROMPT=0
 GEMINI_REPO_URL="https://github.com/masa-codehub/gemini_context.git"
-if [ -n "$GITHUB_TOKEN" ]; then
-    GEMINI_REPO_URL="https://x-access-token:${GITHUB_TOKEN}@github.com/masa-codehub/gemini_context.git"
-elif [ -n "$GITHUB_MCP_PAT" ]; then
-    GEMINI_REPO_URL="https://x-access-token:${GITHUB_MCP_PAT}@github.com/masa-codehub/gemini_context.git"
+TOKEN=${GITHUB_TOKEN:-${GITHUB_MCP_PAT:-${GH_TOKEN}}}
+if [ -n "$TOKEN" ]; then
+    GEMINI_REPO_URL="https://x-access-token:${TOKEN}@github.com/masa-codehub/gemini_context.git"
 fi
 
 if [ -d ".gemini/.git" ]; then
     echo "Updating .gemini repository..."
-    # 認証情報を考慮して pull
-    git -C .gemini pull "$GEMINI_REPO_URL"
+    # 認証情報を確実に適用するため remote URL を更新してから pull する
+    git -C .gemini remote set-url origin "$GEMINI_REPO_URL"
+    git -C .gemini pull origin main || echo "Warning: Failed to update .gemini repository."
 else
     echo "Cloning .gemini repository..."
-    git clone "$GEMINI_REPO_URL" .gemini
+    rm -rf .gemini
+    git clone "$GEMINI_REPO_URL" .gemini || {
+        echo "Error: Failed to clone .gemini repository. Please check your authentication token (GITHUB_TOKEN, GITHUB_MCP_PAT, or GH_TOKEN) or access rights."
+        exit 1
+    }
 fi
 
 # 2. pre-commit のインストール
@@ -49,20 +54,16 @@ fi
 
 # 仮想環境のアクティベート
 echo "Activating virtual environment..."
-
 # 設定対象のファイル
 TARGET_FILE="$HOME/.bashrc"
 # 重複チェック用のマーカー（この文字列があれば追記しない）
 MARKER="# === AUTO-ACTIVATE-VENV ==="
-
 echo "Checking $TARGET_FILE ..."
-
 # ファイル内にマーカーが存在するか検索
 if grep -qF "$MARKER" "$TARGET_FILE"; then
     echo "✅ 設定は既に $TARGET_FILE に存在します。追記をスキップしました。"
 else
     echo "✍️  $TARGET_FILE に設定を追記します..."
-
     # ファイルの末尾に追記
     cat <<EOT >> "$TARGET_FILE"
 
@@ -74,7 +75,6 @@ if [ -z "\$VIRTUAL_ENV" ]; then
     fi
 fi
 EOT
-
     echo "🎉 完了しました！"
     echo "設定を反映させるために、以下のコマンドを実行してください："
     echo "source $TARGET_FILE"
