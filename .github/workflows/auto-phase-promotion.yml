@@ -25,7 +25,7 @@ jobs:
         with:
           fetch-depth: 0 # 全ての履歴を取得（ブランチ作成に必要）
           submodules: recursive
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
 
       - name: Install Issue Creator Kit
         run: |
