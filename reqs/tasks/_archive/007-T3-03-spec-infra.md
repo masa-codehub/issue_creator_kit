@@ -4,7 +4,8 @@ parent: adr-007
 parent_issue: #279
 type: task
 phase: spec
-status: Draft
+status: Issued
+issue_id: 287
 date: 2026-02-05
 depends_on: ["007-T3-01"]
 title: "Update Infrastructure Adapter Specifications"

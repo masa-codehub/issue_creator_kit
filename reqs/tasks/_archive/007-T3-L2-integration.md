@@ -3,7 +3,7 @@ id: 007-T3-L2
 parent: adr-007
 type: integration
 phase: spec
-status: Draft
+status: Issued
 depends_on:
   - "007-T3-01"
   - "007-T3-02"
