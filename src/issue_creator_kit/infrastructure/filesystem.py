@@ -1,8 +1,11 @@
+import re
 import shutil
 from pathlib import Path
 from typing import Any
 
 from issue_creator_kit.domain.document import Document
+from issue_creator_kit.domain.exceptions import FileSystemError
+from issue_creator_kit.domain.interfaces import IFileSystemAdapter
 
 try:
     import fcntl
@@ -12,7 +15,7 @@ except ImportError:
     HAS_FCNTL = False
 
 
-class FileSystemAdapter:
+class FileSystemAdapter(IFileSystemAdapter):
     def read_document(self, file_path: Path | str) -> Document:
         file_path = Path(file_path)
         if not file_path.exists():
@@ -75,11 +78,11 @@ class FileSystemAdapter:
         shutil.move(str(src_path), str(dst_path))
         return str(dst_path)
 
-    def list_files(self, dir_path: Path | str) -> list[str]:
+    def list_files(self, dir_path: Path | str, pattern: str = "*") -> list[Path]:
         dir_path = Path(dir_path)
         if not dir_path.exists():
             return []
-        return [str(f) for f in dir_path.iterdir() if f.is_file()]
+        return [f for f in dir_path.glob(pattern) if f.is_file()]
 
     def read_file(self, path: Path | str) -> str:
         return Path(path).read_text(encoding="utf-8")
@@ -88,17 +91,30 @@ class FileSystemAdapter:
         Path(path).write_text(content, encoding="utf-8")
 
     def find_file_by_id(self, task_id: str, search_dirs: list[str]) -> Path:
+        """
+        Find a file by its ID in the specified directories.
+        Uses a regex-based search for better performance.
+        """
+        # Optimized regex-based search for ID in frontmatter
+        # Matches: id: task_id (case insensitive and flexible with quotes/whitespace)
+        id_pattern = re.compile(
+            rf'^\s*id\s*:\s*["\']?{re.escape(task_id)}["\']?\s*$',
+            re.IGNORECASE | re.MULTILINE,
+        )
+
         for d in search_dirs:
             p = Path(d)
             if not p.exists():
                 continue
             for f in p.glob("*.md"):
                 try:
-                    doc = self.read_document(f)
-                    if doc.metadata.id == task_id:
+                    # Frontmatter is typically at the beginning of the file.
+                    # Read only the first 2048 bytes for performance.
+                    with f.open("r", encoding="utf-8", errors="ignore") as fh:
+                        content = fh.read(2048)
+                    if id_pattern.search(content):
                         return f
                 except Exception:
                     continue
-        from issue_creator_kit.domain.exceptions import FileSystemError
 
         raise FileSystemError(f"File with id '{task_id}' not found in {search_dirs}")
