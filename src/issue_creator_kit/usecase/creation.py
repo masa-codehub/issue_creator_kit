@@ -1,13 +1,13 @@
 # ruff: noqa: T201
-import re
-import time
 from graphlib import CycleError, TopologicalSorter
 from pathlib import Path
 
 from issue_creator_kit.domain.document import Document
-from issue_creator_kit.infrastructure.filesystem import FileSystemAdapter
-from issue_creator_kit.infrastructure.git_adapter import GitAdapter
-from issue_creator_kit.infrastructure.github_adapter import GitHubAdapter
+from issue_creator_kit.domain.interfaces import (
+    IFileSystemAdapter,
+    IGitAdapter,
+    IGitHubAdapter,
+)
 from issue_creator_kit.usecase.roadmap_sync import RoadmapSyncUseCase
 from issue_creator_kit.usecase.workflow import WorkflowUseCase
 
@@ -19,9 +19,9 @@ class IssueCreationUseCase:
 
     def __init__(
         self,
-        fs_adapter: FileSystemAdapter,
-        github_adapter: GitHubAdapter,
-        git_adapter: GitAdapter | None = None,
+        fs_adapter: IFileSystemAdapter,
+        github_adapter: IGitHubAdapter,
+        git_adapter: IGitAdapter | None = None,
         roadmap_sync: RoadmapSyncUseCase | None = None,
         workflow_usecase: WorkflowUseCase | None = None,
     ):
@@ -32,272 +32,123 @@ class IssueCreationUseCase:
         self.workflow = workflow_usecase
 
     def _parse_dependencies(self, doc: Document) -> set[str]:
-        """Parse dependencies from document metadata and return a set of filenames."""
-        depends_on = doc.metadata.get("depends_on") or doc.metadata.get("Depends-On")
-        deps: set[str] = set()
-        if not depends_on:
-            return deps
+        """Parse dependencies from document metadata."""
+        depends_on = (
+            doc.metadata.get("depends_on") or doc.metadata.get("Depends-On") or []
+        )
+        if isinstance(depends_on, str):
+            if depends_on.lower() == "(none)":
+                return set()
+            depends_on = [d.strip() for d in depends_on.split(",")]
+        return {str(d) for d in depends_on}
 
-        if isinstance(depends_on, list):
-            for dep in depends_on:
-                if isinstance(dep, str) and dep.endswith(".md"):
-                    deps.add(Path(dep).name)
-        elif isinstance(depends_on, str) and depends_on.lower() != "(none)":
-            cleaned = depends_on.replace("(", "").replace(")", "")
-            for dep in cleaned.split(","):
-                dep = dep.strip()
-                if dep and dep.endswith(".md"):
-                    deps.add(Path(dep).name)
-        return deps
-
-    def _get_dependencies(
-        self, files: list[Path]
-    ) -> tuple[dict[str, set[str]], dict[str, Path]]:
-        """Analyze dependencies between files and return a graph and file mapping."""
-        graph = {}
-        file_map = {}
-
-        for file_path in files:
-            filename = file_path.name
-            file_map[filename] = file_path
-
-            try:
-                doc = self.fs.read_document(file_path)
-                graph[filename] = self._parse_dependencies(doc)
-            except (FileNotFoundError, PermissionError) as e:
-                print(f"Error: Failed to access {file_path}: {e}")
-                continue
-            except Exception as e:
-                print(f"Warning: Failed to parse {filename}: {e}")
-                continue
-
-        return graph, file_map
-
-    def create_issues_from_virtual_queue(
+    def create_issues(
         self,
-        base_ref: str,
-        head_ref: str,
-        archive_path: str = "reqs/tasks/archive/",
-        roadmap_path: str | None = None,
-        use_pr: bool = False,
-        base_branch: str = "main",
+        before: str,
+        after: str,
+        adr_id: str | None = None,
+        archive_path: str = "reqs/tasks/_archive/",
     ) -> None:
         """
-        Detect added files in the archive path via git diff-tree, create GitHub issues,
-        update file metadata with issue numbers, and optionally sync the roadmap.
-
-        Flow:
-        1. Detect added .md files in the virtual queue (archive_path).
-        2. Resolve dependencies between tasks using Topological Sort.
-        3. Create GitHub Issues in order, replacing task-ID placeholders with #IssueNo.
-        4. If all issues are created successfully, update file metadata.
-        5. Synchronize the roadmap WBS links if roadmap_path is provided.
-        6. Commit and push the changes to Git (either directly or via PR).
-
-        Args:
-            base_ref (str): The base commit/branch for comparison.
-            head_ref (str): The head commit/branch for comparison.
-            archive_path (str): The directory path to monitor for new tasks.
-            roadmap_path (str, optional): Path to the roadmap file to synchronize.
-            use_pr (bool): If True, create a new branch and PR for metadata updates.
-            base_branch (str): The base branch for the metadata sync PR (default: main).
-
-        Raises:
-            RuntimeError: If GitAdapter is missing or if issue creation fails.
-            ValueError: If task dependencies contain cycles.
+        Implementation of ADR-007 Issue Creation Logic.
         """
         if not self.git:
-            raise RuntimeError("GitAdapter is required for virtual queue.")
+            raise RuntimeError("GitAdapter is required.")
 
-        # 1. Detect added files in archive/
-        added_files = self.git.get_added_files(base_ref, head_ref, archive_path)
-        print(f"Detected {len(added_files)} added files in {archive_path}")
+        # Step 1: Discovery
+        search_path = f"reqs/tasks/{adr_id}/" if adr_id else "reqs/tasks/"
+        added_files = self.git.get_added_files(before, after, search_path)
 
-        # 2. Filter .md files and check issue metadata (DifferenceDetector)
-        target_docs = {}  # {Path: Document}
-        for file_str in added_files:
-            if not file_str.endswith(".md"):
+        batch_docs: dict[str, Document] = {}
+        path_map: dict[str, str] = {}
+
+        for file_path in added_files:
+            if not file_path.endswith(".md"):
                 continue
-            path = Path(file_str)
-            try:
-                doc = self.fs.read_document(path)
-                # Defensive: Handle docs that might not have mandatory fields during transition
-                if not hasattr(doc.metadata, "id") or not hasattr(
-                    doc.metadata, "status"
-                ):
-                    print(
-                        f"Warning: Skipping {file_str} due to missing mandatory metadata (id/status)"
-                    )
-                    continue
-                if not doc.metadata.get("issue_id") and not doc.metadata.get("issue"):
-                    target_docs[path] = doc
-            except (FileNotFoundError, PermissionError) as e:
-                # Fatal: Cannot proceed if we can't access files we know exist in git
-                print(f"Error: Failed to access {file_str}: {e}")
-                raise
-            except Exception as e:
-                # Non-fatal: Skip malformed files but log warning
-                print(f"Warning: Failed to parse {file_str}: {e}")
+            doc = self.fs.read_document(Path(file_path))
+            doc_id = doc.metadata.get("id")
+            if doc_id:
+                batch_docs[doc_id] = doc
+                path_map[doc_id] = file_path
 
-        if not target_docs:
-            print("No new tasks to process.")
+        if not batch_docs:
             return
 
-        print(f"Processing {len(target_docs)} new tasks.")
+        # Step 2: DAG & Ready Judgment
+        graph: dict[str, set[str]] = {}
+        ready_tasks: dict[str, Document] = {}
 
-        # 3. Dependency resolution
-        graph = {}
-        file_map = {}  # {filename: Path}
-        doc_map = {}  # {filename: Document}
+        # Load archived tasks for dependency checking
+        archived_docs: dict[str, Document] = {}
+        for arch_file in self.fs.list_files(Path(archive_path), "*.md"):
+            try:
+                a_doc = self.fs.read_document(arch_file)
+                a_id = a_doc.metadata.get("id")
+                if a_id:
+                    archived_docs[a_id] = a_doc
+            except Exception:
+                continue
 
-        for path, doc in target_docs.items():
-            filename = path.name
-            file_map[filename] = path
-            doc_map[filename] = doc
-            graph[filename] = self._parse_dependencies(doc)
+        def is_ready(doc: Document) -> bool:
+            deps = self._parse_dependencies(doc)
+            for d_id in deps:
+                # 1. Check if dependency is in the current batch
+                if d_id in batch_docs:
+                    continue
+                # 2. Check if dependency is in archive
+                if d_id in archived_docs:
+                    a_doc = archived_docs[d_id]
+                    if a_doc.metadata.get("status") in ["Issued", "Completed"]:
+                        continue
+                # 3. Check if it's already issued
+                return False
+            return True
+
+        for doc_id, doc in batch_docs.items():
+            if is_ready(doc):
+                ready_tasks[doc_id] = doc
+                deps = self._parse_dependencies(doc)
+                graph[doc_id] = {d for d in deps if d in batch_docs}
+
+        if not ready_tasks:
+            print("No tasks are Ready for creation.")
+            return
 
         ts = TopologicalSorter(graph)
         try:
             create_order = list(ts.static_order())
         except CycleError as e:
-            raise ValueError(
-                f"Error resolving dependencies (cycle detected): {e}"
-            ) from e
+            raise CycleError(f"Circular dependency detected: {e}") from e
 
-        # 4. Atomic Batch Creation
-        results = []
-        issue_map: dict[str, int] = {}  # {filename: issue_number}
+        # Step 3: Atomic Issue Creation (Fail-fast)
+        issued_tasks: list[tuple[str, int, Document]] = []
         try:
-            for filename in create_order:
-                if filename not in file_map:
-                    continue
-                path = file_map[filename]
-                doc = doc_map[filename]
+            for doc_id in create_order:
+                doc = batch_docs[doc_id]
 
-                title = doc.metadata.get("title") or path.stem
+                title = doc.metadata.get("title") or doc_id
                 body = doc.content
-                # Replace placeholders for dependencies using regex with word boundaries
-                # to avoid accidental partial matches.
-                for dep_filename, issue_num in issue_map.items():
-                    # Replace 'task-ID.md' with '#IssueNo'
-                    pattern = rf"\b{re.escape(dep_filename)}\b"
-                    body = re.sub(pattern, f"#{issue_num}", body)
-
                 labels = doc.metadata.get("labels", [])
                 if isinstance(labels, str):
                     labels = [label.strip() for label in labels.split(",")]
 
-                print(f"Creating issue for: {title}")
-                issue_number = self.github.create_issue(title, body, labels)
-                print(f"Created issue #{issue_number}")
-                results.append((path, issue_number))
-                issue_map[filename] = issue_number
-        except RuntimeError as e:
-            print(
-                f"Error during issue creation (fail-fast, aborting without writing back to Git): {e}"
-            )
-            raise
+                issue_id = self.github.create_issue(title, body, labels)
 
-        # 5. Success: Write back
-        processed_paths = []
-        for path, issue_number in results:
-            self.fs.update_metadata(path, {"issue": f"#{issue_number}"})
-            processed_paths.append(str(path))
+                # Update metadata in memory
+                doc.metadata.update({"status": "Issued", "issue_id": issue_id})
 
-        # 6. Roadmap Sync (Dynamic)
-        roadmap_groups: dict[str, list[tuple[Path, int]]] = {}
-        if roadmap_path:
-            roadmap_groups[roadmap_path] = []
+                issued_tasks.append((doc_id, issue_id, doc))
+        except Exception as e:
+            # Step 3 Failure: abort before Step 4
+            raise RuntimeError(f"Issue creation failed: {e}") from e
 
-        for path, issue_number in results:
-            target_doc = doc_map.get(path.name)
-            if not target_doc:
-                continue
+        # Step 4: Atomic Move & Status Transition
+        for doc_id, _, doc in issued_tasks:
+            src_path = path_map[doc_id]
+            dst_path = f"{archive_path}{Path(src_path).name}"
 
-            # Roadmap Grouping
-            r_path = target_doc.metadata.get("roadmap_path")
-            if r_path:
-                if r_path not in roadmap_groups:
-                    roadmap_groups[r_path] = []
-                roadmap_groups[r_path].append((path, issue_number))
-            elif roadmap_path:
-                roadmap_groups[roadmap_path].append((path, issue_number))
+            # Update local file before move
+            self.fs.save_document(Path(src_path), doc)
 
-        if self.roadmap_sync:
-            for r_path, r_results in roadmap_groups.items():
-                if not r_results:
-                    continue
-                try:
-                    self.roadmap_sync.sync(r_path, r_results)
-                    processed_paths.append(r_path)
-                except Exception as e:
-                    print(f"Warning: Failed to sync roadmap at {r_path}: {e}")
-
-        # 7. Git Commit
-        if processed_paths:
-            try:
-                if use_pr:
-                    sync_branch = None
-                    # Retry logic to ensure unique branch name
-                    for attempt in range(3):
-                        timestamp = time.time_ns()
-                        candidate = f"chore/metadata-sync-{timestamp}"
-                        if attempt > 0:
-                            candidate = f"{candidate}-{attempt}"
-                        print(f"Creating metadata sync branch: {candidate}")
-                        try:
-                            # Ensure base branch is up to date
-                            try:
-                                self.git.fetch(remote="origin")
-                            except RuntimeError as e:
-                                print(
-                                    f"Warning: git fetch failed: {e}. Attempting to proceed without fresh fetch."
-                                )
-
-                            self.git.checkout(
-                                candidate, create=True, base=f"origin/{base_branch}"
-                            )
-                            sync_branch = candidate
-                            break
-                        except Exception as e:
-                            message = str(e)
-                            # Retry only if branch already exists
-                            if "already exists" in message or "exists" in message:
-                                print(
-                                    f"Warning: Branch '{candidate}' already exists. "
-                                    "Retrying with a different name..."
-                                )
-                                continue
-                            raise
-
-                    if sync_branch is None:
-                        raise RuntimeError(
-                            "Failed to create a unique metadata sync branch after multiple attempts."
-                        )
-
-                    self.git.add(processed_paths)
-                    self.git.commit("docs: update issue numbers and sync roadmap")
-                    self.git.push(remote="origin", branch=sync_branch)
-
-                    title = "chore: sync metadata for new issues"
-                    body = "Automatic metadata update (issue numbers and roadmap sync) for newly created issues."
-                    pr_url, pr_number = self.github.create_pull_request(
-                        title, body, head=sync_branch, base=base_branch
-                    )
-                    # Add 'metadata' label to the PR
-                    try:
-                        self.github.add_labels(pr_number, ["metadata"])
-                    except Exception as e:
-                        print(f"Warning: Failed to add label to PR #{pr_number}: {e}")
-
-                    print(
-                        f"Successfully created metadata sync PR #{pr_number}: {pr_url}"
-                    )
-                else:
-                    current_branch = self.git.get_current_branch()
-                    self.git.add(processed_paths)
-                    self.git.commit("docs: update issue numbers and sync roadmap")
-                    self.git.push(remote="origin", branch=current_branch)
-            except Exception as e:
-                print(f"Error during git commit/push: {e}")
-                raise
+            # Atomic Move via git mv
+            self.git.move_file(src_path, dst_path)

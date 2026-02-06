@@ -1,63 +1,43 @@
+from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Any, Protocol, runtime_checkable
+from typing import Any
 
 from issue_creator_kit.domain.document import Document
 
 
-@runtime_checkable
-class IGitHubAdapter(Protocol):
+class IFileSystemAdapter(ABC):
+    @abstractmethod
+    def read_document(self, file_path: Path) -> Document:
+        pass
+
+    @abstractmethod
+    def save_document(
+        self, file_path: Path, document: Document, use_frontmatter: bool = True
+    ) -> None:
+        pass
+
+    @abstractmethod
+    def update_metadata(self, file_path: Path, updates: dict[str, Any]) -> None:
+        pass
+
+    @abstractmethod
+    def list_files(self, dir_path: Path, pattern: str = "*") -> list[Path]:
+        pass
+
+
+class IGitAdapter(ABC):
+    @abstractmethod
+    def get_added_files(self, base_ref: str, head_ref: str, path: str) -> list[str]:
+        pass
+
+    @abstractmethod
+    def move_file(self, src: str, dst: str) -> None:
+        pass
+
+
+class IGitHubAdapter(ABC):
+    @abstractmethod
     def create_issue(
         self, title: str, body: str, labels: list[str] | None = None
-    ) -> int: ...
-
-    def find_or_create_issue(
-        self, title: str, body: str, labels: list[str] | None = None
-    ) -> int: ...
-
-    def create_pull_request(
-        self, title: str, body: str, head: str, base: str
-    ) -> tuple[str, int]: ...
-
-    def add_labels(self, issue_number: int, labels: list[str]) -> None: ...
-
-    def add_comment(self, issue_number: int, body: str) -> None: ...
-
-    def sync_issue(self, doc: Document) -> int: ...
-
-
-@runtime_checkable
-class IGitAdapter(Protocol):
-    def get_added_files(self, base_ref: str, head_ref: str, path: str) -> list[str]: ...
-
-    def checkout(
-        self, branch: str, create: bool = False, base: str | None = None
-    ) -> None: ...
-
-    def add(self, paths: list[str]) -> None: ...
-
-    def commit(self, message: str) -> None: ...
-
-    def push(
-        self, remote: str = "origin", branch: str = "main", set_upstream: bool = False
-    ) -> None: ...
-
-    def move_file(self, src: str, dst: str) -> None: ...
-
-
-@runtime_checkable
-class IFileSystemAdapter(Protocol):
-    def read_document(self, path: Path | str) -> Document: ...
-
-    def update_metadata(self, path: Path | str, metadata: dict[str, Any]) -> None: ...
-
-    def safe_move_file(
-        self, src_path: Path | str, dst_dir: Path | str, overwrite: bool = False
-    ) -> str: ...
-
-    def read_file(self, path: Path | str) -> str: ...
-
-    def write_file(self, path: Path | str, content: str) -> None: ...
-
-    def list_files(self, dir_path: Path | str) -> list[str]: ...
-
-    def find_file_by_id(self, task_id: str, search_dirs: list[str]) -> Path: ...
+    ) -> int:
+        pass
