@@ -14,6 +14,9 @@ try:
 except ImportError:
     HAS_FCNTL = False
 
+# Constants
+FRONTMATTER_SEARCH_LIMIT = 2048
+
 
 class FileSystemAdapter(IFileSystemAdapter):
     def read_document(self, file_path: Path | str) -> Document:
@@ -109,9 +112,9 @@ class FileSystemAdapter(IFileSystemAdapter):
             for f in p.glob("*.md"):
                 try:
                     # Frontmatter is typically at the beginning of the file.
-                    # Read only the first 2048 bytes for performance.
-                    with f.open("r", encoding="utf-8", errors="ignore") as fh:
-                        content = fh.read(2048)
+                    # Read only a limited amount of bytes for performance.
+                    with f.open("r", encoding="utf-8", errors="replace") as fh:
+                        content = fh.read(FRONTMATTER_SEARCH_LIMIT)
                     if id_pattern.search(content):
                         return f
                 except Exception:

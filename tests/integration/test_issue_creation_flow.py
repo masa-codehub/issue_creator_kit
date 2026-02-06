@@ -14,7 +14,7 @@ class TestIssueCreationIntegration:
     def setup_env(self, tmp_path):
         # Setup directory structure
         tasks_dir = tmp_path / "reqs" / "tasks" / "adr-007"
-        archive_dir = tmp_path / "reqs" / "tasks" / "_archive"
+        archive_dir = tmp_path / "reqs" / "tasks" / "archive"
         tasks_dir.mkdir(parents=True)
         archive_dir.mkdir(parents=True)
 
@@ -74,7 +74,7 @@ Body of t1""")
 
         # 1. Verify File Movement (git mv should be called)
         mock_git.move_file.assert_called_once_with(
-            "reqs/tasks/adr-007/t1.md", "reqs/tasks/_archive/t1.md"
+            "reqs/tasks/adr-007/t1.md", "reqs/tasks/archive/t1.md"
         )
 
         # 2. Verify File Metadata Update (in the archive)
@@ -90,7 +90,7 @@ Body of t1""")
 
         # 3. Verify Roadmap Sync
         roadmap_content = setup_env["roadmap_path"].read_text()
-        assert "archive/adr-007/t1.md" in roadmap_content
+        assert "reqs/tasks/archive/adr-007/t1.md" in roadmap_content
         assert "(#123)" in roadmap_content
 
         # 4. Verify Git Commit & Push
@@ -99,7 +99,7 @@ Body of t1""")
         all_added = []
         for call_args in mock_git.add.call_args_list:
             all_added.extend(call_args[0][0])
-        assert "reqs/tasks/_archive/t1.md" in all_added
+        assert "reqs/tasks/archive/t1.md" in all_added
         assert "roadmap.md" in all_added
 
         mock_git.commit.assert_called_with(

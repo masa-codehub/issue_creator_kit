@@ -48,7 +48,7 @@ class IssueCreationUseCase:
         before: str,
         after: str,
         adr_id: str | None = None,
-        archive_path: str = "reqs/tasks/_archive/",
+        archive_path: str = "reqs/tasks/archive/",
         roadmap_path: str | None = None,
         use_pr: bool = False,
         base_branch: str = "main",

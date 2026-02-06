@@ -30,7 +30,6 @@ def mock_github():
 
 @pytest.fixture
 def usecase(mock_fs, mock_git, mock_github):
-    # Note: UseCase might need to be updated to accept these interfaces
     return IssueCreationUseCase(
         fs_adapter=mock_fs, github_adapter=mock_github, git_adapter=mock_git
     )
@@ -74,8 +73,8 @@ def test_create_issues_ordered_by_dependency(usecase, mock_fs, mock_git, mock_gi
     # Verify move
     mock_git.move_file.assert_has_calls(
         [
-            call("reqs/tasks/adr-007/t1.md", "reqs/tasks/_archive/t1.md"),
-            call("reqs/tasks/adr-007/t2.md", "reqs/tasks/_archive/t2.md"),
+            call("reqs/tasks/adr-007/t1.md", "reqs/tasks/archive/t1.md"),
+            call("reqs/tasks/adr-007/t2.md", "reqs/tasks/archive/t2.md"),
         ],
         any_order=True,
     )
@@ -106,9 +105,9 @@ def test_create_issues_with_roadmap_sync(usecase, mock_fs, mock_git, mock_github
 
 
 def test_create_issues_with_archive_dependency(usecase, mock_fs, mock_git, mock_github):
-    # t2 depends on t1. t1 is already in _archive/
+    # t2 depends on t1. t1 is already in archive/
     mock_git.get_added_files.return_value = ["reqs/tasks/adr-007/t2.md"]
-    mock_fs.list_files.return_value = [Path("reqs/tasks/_archive/t1.md")]
+    mock_fs.list_files.return_value = [Path("reqs/tasks/archive/t1.md")]
 
     doc1 = Document(
         "content1",
@@ -131,7 +130,7 @@ def test_create_issues_with_archive_dependency(usecase, mock_fs, mock_git, mock_
 
     mock_github.create_issue.assert_called_once()
     mock_git.move_file.assert_called_with(
-        "reqs/tasks/adr-007/t2.md", "reqs/tasks/_archive/t2.md"
+        "reqs/tasks/adr-007/t2.md", "reqs/tasks/archive/t2.md"
     )
 
 

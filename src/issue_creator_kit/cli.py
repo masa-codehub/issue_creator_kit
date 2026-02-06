@@ -18,6 +18,9 @@ from issue_creator_kit.usecase.workflow import WorkflowUseCase
 PACKAGE_ROOT = Path(__file__).parent
 PROJECT_TEMPLATE_DIR = PACKAGE_ROOT / "assets" / "project_template"
 
+# Constants
+ADR_ID_PATTERN = r"^adr-\d{3}$"
+
 
 def init_project(args):
     """Deploy project template to the current directory."""
@@ -48,7 +51,7 @@ def init_project(args):
 
 def adr_id_type(value: str) -> str:
     """Validate ADR ID format (adr-XXX)."""
-    if not re.match(r"^adr-\d{3}$", value):
+    if not re.match(ADR_ID_PATTERN, value):
         raise argparse.ArgumentTypeError(
             f"Invalid --adr-id format: {value}. Expected adr-XXX (e.g., adr-001)."
         )

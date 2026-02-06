@@ -17,6 +17,7 @@ except ImportError:
 class Metadata(BaseModel):
     model_config = ConfigDict(extra="allow")
 
+    # IDs must contain only lowercase letters, numbers, and hyphens.
     id: str = Field(..., pattern=r"^[a-z0-9-]+$")
     status: str
     date: str | None = None
@@ -92,13 +93,19 @@ class Metadata(BaseModel):
         # Task specific validation
         if self.type in ("task", "integration"):
             if not self.parent:
-                raise ValueError("Tasks must have a 'parent' field")
+                raise ValidationError(
+                    f"Document '{self.id}': Tasks must have a 'parent' field"
+                )
             if not self.phase:
-                raise ValueError("Tasks must have a 'phase' field")
+                raise ValidationError(
+                    f"Document '{self.id}': Tasks must have a 'phase' field"
+                )
 
         # Issued/Completed must have issue_id
         if self.status in ("Issued", "Completed") and self.issue_id is None:
-            raise ValueError(f"Status '{self.status}' requires an 'issue_id'")
+            raise ValidationError(
+                f"Document '{self.id}': Status '{self.status}' requires an 'issue_id'"
+            )
 
         return self
 
