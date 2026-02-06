@@ -19,13 +19,13 @@ jobs:
     # main へのマージ時のみ実行
     if: github.event.pull_request.merged == true
     runs-on: self-hosted
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0 # 全ての履歴を取得（ブランチ作成に必要）
+          submodules: recursive
+          token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
 
       - name: Install Issue Creator Kit
         run: |

@@ -13,7 +13,7 @@ jobs:
   analyze-comment:
     if: >
       (
-        github.event.review.user.login == 'copilot-pull-request-reviewer[bot]' ||
+        startsWith(github.event.review.user.login, 'copilot') ||
         github.event.review.user.login == 'masa-codehub'
       ) && (
         contains(github.event.pull_request.labels.*.name, 'gemini:arch') ||
@@ -25,7 +25,7 @@ jobs:
       group: gemini-review-analyzer-${{ github.event.pull_request.number }}
       cancel-in-progress: false
     env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_MCP_PAT || secrets.GITHUB_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
       AGENT_ROLE: ${{ contains(github.event.pull_request.labels.*.name, 'gemini:arch') && 'SYSTEM_ARCHITECT' || contains(github.event.pull_request.labels.*.name, 'gemini:spec') && 'TECHNICAL_DESIGNER' || contains(github.event.pull_request.labels.*.name, 'gemini:tdd') && 'BACKENDCODER' || 'SYSTEM_ARCHITECT' }}
     steps:
       - name: Checkout Code
@@ -33,6 +33,8 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.ref }}
           repository: ${{ github.event.pull_request.head.repo.full_name }}
+          submodules: recursive
+          token: ${{ env.GITHUB_TOKEN }}
 
       - name: Refresh Environment
         run: |
