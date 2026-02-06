@@ -1,6 +1,8 @@
 # ruff: noqa: T201
 import argparse
+import json
 import os
+import re
 import shutil
 import sys
 from pathlib import Path
@@ -44,6 +46,15 @@ def init_project(args):
     print("\nInitialization complete.")
 
 
+def adr_id_type(value: str) -> str:
+    """Validate ADR ID format (adr-XXX)."""
+    if not re.match(r"^adr-\d{3}$", value):
+        raise argparse.ArgumentTypeError(
+            f"Invalid --adr-id format: {value}. Expected adr-XXX (e.g., adr-001)."
+        )
+    return value
+
+
 def run_automation(args):
     """Run the issue creation automation (Virtual Queue)."""
     print("Running issue automation (Virtual Queue)...")
@@ -63,13 +74,12 @@ def run_automation(args):
     )
 
     try:
-        usecase.create_issues_from_virtual_queue(
-            base_ref=args.before,
-            head_ref=args.after,
+        # ADR-007 compliant UseCase call
+        usecase.create_issues(
+            before=args.before,
+            after=args.after,
+            adr_id=args.adr_id,
             archive_path=args.archive_dir,
-            roadmap_path=args.roadmap,
-            use_pr=args.use_pr,
-            base_branch=args.base_branch,
         )
     except Exception as e:
         print(f"Automation failed: {e}", file=sys.stderr)
@@ -92,8 +102,6 @@ def run_merge_workflow(args):
 
     pr_body = args.pr_body
     if args.event_path:
-        import json
-
         try:
             with open(args.event_path, encoding="utf-8") as f:
                 event = json.load(f)
@@ -203,8 +211,13 @@ def main():
         "--after", required=True, help="Head ref/SHA for comparison"
     )
     diff_parser.add_argument(
+        "--adr-id",
+        type=adr_id_type,
+        help="ADR ID to filter tasks (format: adr-XXX)",
+    )
+    diff_parser.add_argument(
         "--archive-dir",
-        default="reqs/tasks/archive/",
+        default="reqs/tasks/_archive/",
         help="Directory to check for added task files",
     )
     diff_parser.add_argument(
@@ -241,7 +254,7 @@ def main():
     )
     merge_parser.add_argument(
         "--archive-dir",
-        default="reqs/tasks/archive/",
+        default="reqs/tasks/_archive/",
         help="Directory to check for completed task files",
     )
     merge_parser.add_argument(
