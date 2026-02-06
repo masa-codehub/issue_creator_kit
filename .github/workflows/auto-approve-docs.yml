@@ -26,6 +26,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       # [環境依存のセットアップ]
       # 実行環境に Python 3.13 がない場合は、以下のステップを追加してください。
