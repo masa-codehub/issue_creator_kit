@@ -12,9 +12,6 @@ permissions:
 jobs:
   analyze-comment:
     if: >
-      # Allow this workflow to run only when the review is submitted either by
-      # the GitHub Copilot pull request reviewer bot or by the authorized
-      # maintainer account 'masa-codehub'.
       (
         github.event.review.user.login == 'copilot-pull-request-reviewer[bot]' ||
         github.event.review.user.login == 'masa-codehub'
