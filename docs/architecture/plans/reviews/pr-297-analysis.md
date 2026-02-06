@@ -59,8 +59,10 @@
     - Remove `env: GITHUB_TOKEN` (or `GH_TOKEN`) definitions where they just map to `secrets.GITHUB_TOKEN`.
     - Update `steps` to use `${{ secrets.GITHUB_TOKEN }}` directly.
 3.  **Refine `gemini-reviewer.yml`**:
-    - Update the `if` condition to use `contains(github.event.review.user.login, 'copilot')` instead of a hardcoded bot ID. This ensures the workflow triggers even if the bot's display name or ID slightly fluctuates.
-4.  **Keep Token Logic in `gemini-*.yml`**:
-    - `gemini-reviewer.yml` and `gemini-handler.yml` keep the current structure for PAT fallback support.
+    - Update the `if` condition to use `startsWith(github.event.review.user.login, 'copilot')` instead of `contains`. This reduces the risk of false positives from users who happen to have 'copilot' in their username but are not official bots.
+4.  **Secure `.build/run.sh`**:
+    - Update the submodule update logic to use `GIT_CONFIG_COUNT`, `GIT_CONFIG_KEY_0`, and `GIT_CONFIG_VALUE_0` environment variables. This prevents the token from being exposed in the command line arguments, which could be visible in process listings (e.g., via `ps`).
+5.  **Revert/Consolidate Token Logic in `gemini-*.yml`**:
+    - `gemini-reviewer.yml` and `gemini-handler.yml` keep the current structure for PAT fallback support, using `GH_PAT`.
     - Reply to the review comment explaining this rationale.
 

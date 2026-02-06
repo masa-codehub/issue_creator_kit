@@ -31,9 +31,11 @@ fi
 
 if [ -n "$TOKEN" ]; then
     echo "Updating submodules using provided token..."
-    # -c を使うことで、このコマンド実行時のみ一時的に設定を適用する（グローバル設定を汚さない）
-    git -c url."https://x-access-token:${TOKEN}@github.com/".insteadOf "https://github.com/" \
-        submodule update --init --recursive || echo "Warning: Failed to update submodules. Continuing anyway..."
+    # トークンがプロセス一覧（ps等）に露出しないよう、環境変数経由で git 設定を渡す
+    GIT_CONFIG_COUNT=1 \
+    GIT_CONFIG_KEY_0='url."https://x-access-token:'${TOKEN}'@github.com/".insteadOf' \
+    GIT_CONFIG_VALUE_0='https://github.com/' \
+        git submodule update --init --recursive || echo "Warning: Failed to update submodules. Continuing anyway..."
 else
     echo "Updating submodules..."
     git submodule update --init --recursive || echo "Warning: Failed to update submodules. Continuing anyway..."

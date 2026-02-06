@@ -13,7 +13,7 @@ jobs:
   analyze-comment:
     if: >
       (
-        contains(github.event.review.user.login, 'copilot') ||
+        startsWith(github.event.review.user.login, 'copilot') ||
         github.event.review.user.login == 'masa-codehub'
       ) && (
         contains(github.event.pull_request.labels.*.name, 'gemini:arch') ||
