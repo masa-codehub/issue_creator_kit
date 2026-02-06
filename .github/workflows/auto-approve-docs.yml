@@ -21,8 +21,6 @@ permissions:
 jobs:
   approve-and-move:
     runs-on: self-hosted
-    env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -96,6 +94,7 @@ jobs:
         if: steps.process.outputs.has_changes == 'true'
         env:
           BRANCH_NAME: ${{ steps.process.outputs.branch_name }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # 自動生成された PR を作成（gh コマンドは環境にプリインストールされて いる前提）。
           gh pr create \
