@@ -1,40 +1,33 @@
-# 振り返りレポート (YWT): Physical State Lifecycle Update
+# 振り返りレポート (YWT) - Issue #306: Update Architecture Lifecycle
 
 ## 1. Y (やったこと)
 - **作業の実施内容:**
-    - `activate_skill{name: "drafting-architecture"}` を実行し、アーキテクチャ更新プロセスを開始。
-    - `docs/architecture/arch-state-007-lifecycle.md` を更新し、ADR-007 (Metadata-driven) から ADR-008 (Physical State) への移行を反映。
-    - 状態を `Draft (Inbox)`, `Approved`, `Done (Archive)` の3つに集約。
-    - トリガーを「Manual PR Merge」と「Task Completion」に整理。
-    - 物理ディレクトリ (`_inbox`, `_approved`, `_archive`) との状態対応を明文化。
+    - `docs/architecture/arch-state-007-lifecycle.md` を更新。
+    - `docs/architecture/plans/adr-008-automation-cleanup/definitions.md` を参照。
+    - 状態遷移トリガーから「将来的な自動化」の文言を削除し、「物理移動を含む PR マージ」に統一。
+    - Mermaid ダイアグラムを更新し、各状態に対応する物理パス（`_inbox`, `_approved`, `_archive`）を明記。
 - **事象の観測:**
-    - ADR-007 の旧定義には、`ick sync` や `ick create` などの CLI ツールに依存した自動遷移が多く含まれていたが、ADR-008 の方針によりこれらを「人間による物理的な移動（マージ）」という単純なルールに置き換えることができた。
+    - 調査段階で、既存の `arch-state-007-lifecycle.md` が既に一部 ADR-008 の用語を取り入れていたが、「マージ後 ... 物理移動」という非同期な記述が残っており、物理状態が SSOT である原則とタイミングがずれるリスクを発見した。
 - **分析情報の集約:**
-    - `docs/architecture/plans/adr-008-automation-cleanup/definitions.md` (Physical State Scanner の定義)
-    - `docs/architecture/arch-state-007-lifecycle.md` (編集対象)
+    - `definitions.md`: "No automated script shall perform this move." / "Physical location ... is the Single Source of Truth."
+    - `arch-state-007-lifecycle.md` (As-is): "物理移動（手動または将来的な自動化）"
 
 ## 2. W (わかったこと)
 - **結果の確認:**
-    - 物理的な位置を SSOT とすることで、ドキュメントの状態管理が Git の標準的なワークフロー（PR とマージ）に統合され、認知負荷が大幅に下がることがわかった。
-    - 以前の「Ready」や「Issued」といった中間状態は、物理的には `_approved` の中に含まれる「属性」に過ぎず、ライフサイクル全体としては `Approved` という一つの大きな状態で管理するのが妥当であると結論付けた。
+    - 物理配置を SSOT とする設計思想（ADR-008）においては、状態遷移（Draft -> Approved）は「マージ」という論理的操作ではなく、「移動を伴うマージ」という物理的変更として定義されなければならない。
+    - 記述から「自動化」への依存や期待を排除することで、人間の責務（PR で `mv` を行うこと）が明確になった。
 
 ### ギャップ分析
-- **理想 (To-Be):**
-    - ライフサイクルが「物理ディレクトリ」と「手動承認」のみに基づき、自動化スクリプトによる状態遷移を含まない状態。
-- **現状 (As-Is):**
-    - 更新前のファイルは、古い CLI ツールの動作を前提とした複雑な遷移（Ready, Issued）を記述していた。
-- **ギャップ:**
-    - 物理ディレクトリとの対応関係が不明確で、状態遷移のトリガーが分散していた。
-- **要因 (Root Cause):**
-    - ADR-007 の時点では、ツールの自動化によって状態を管理する設計だったが、その後の運用で「物理的な位置が真実である」という ADR-008 の方針が採用されたため、不整合が生じていた。
+- **理想 (To-Be):** 物理的な配置が即座に状態を表し、遷移は PR マージ（人間の意思決定）と完全に同期している。
+- **現状 (As-Is):** ドキュメント上でマージと移動のタイミングが分離しているかのような記述があった。
+- **ギャップ:** マージ直後（かつ移動前）の「宙ぶらりんな状態」が存在しうる定義になっていた。
+- **要因 (Root Cause):** 以前の `run-workflow` による自動移動のイメージがドキュメントの記述に残存していたため。
 
 ## 3. T (次やること / 仮説立案)
-- **実証的仮説:**
-    - 今回定義した物理状態に基づき、スキャナー (`src/issue_creator_kit/domain/services/scanner.py`) を実装することで、ドキュメントの現状を正確に把握できるようになる。
-- **飛躍的仮説:**
-    - `_approved` にあるファイルがいつまでも放置されないよう、マージからの経過時間を監視する「滞留検知」のガードレールをスキャナーに追加することで、プロジェクトの停滞を自動で検知できる。
-- **逆説的仮説:**
-    - そもそも `_inbox` や `_approved` といったディレクトリ移動自体を人間が行うのではなく、GitHub Label の付与に連動して Git 側でファイルを物理移動させる Bot を導入することで、人間の操作を最小限にしつつ物理的 SSOT を維持できるのではないか。
+- **実証的仮説:** 物理パスを状態名の一部として扱う（例: `Draft (Inbox)`) ことで、認知負荷を下げ、誤操作を防げる。
+- **飛躍的仮説:** PR 作成時に「対象ファイルが適切なディレクトリに移動されているか」を CI でチェックする（Guardrails の一環）ことで、ドキュメントに頼らずとも物理状態の整合性を保てる。
+- **逆説的仮説:** `Status: Approved` などのメタデータ自体を完全に廃止し、スキャナーが物理パスのみを読み取るようにすることで、ドキュメントと実態の不整合を物理的に不可能にする。
 
 ### 検証アクション
-- [ ] スキャナーの実装タスク (#305) において、今回定義した `_inbox`, `_approved`, `_archive` のマッピングが正しく動作するかテストコードで検証する。
+- [x] `arch-state-007-lifecycle.md` の修正と DoD 1-3 の達成確認。
+- [ ] 今後、他のライフサイクルドキュメント（`arch-state-doc-lifecycle.md` 等）も同様に物理状態ベースへ統一するタスクを検討する。

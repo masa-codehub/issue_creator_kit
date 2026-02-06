@@ -1,30 +1,30 @@
-# Reconnaissance Report: Update Architecture Lifecycle
+# Reconnaissance Report - Issue #306: Update Architecture Lifecycle
 
-## 1. Context Analysis
-- **Goal**: Update `docs/architecture/arch-state-007-lifecycle.md` to reflect Physical State Scanner (ADR-008).
-- **As-is**:
-    - ADR states: Draft, Approved, Postponed, Superseded.
-    - Task states: Draft, Ready, Issued, Completed, Cancelled.
-    - Triggers include `ick sync`, `ick create`, and automated side effects.
-- **To-be**:
-    - Simplified states: Draft (Inbox), Approved, Done (Archive).
-    - Triggers limited to "Manual PR Merge" and "Task Completion".
-    - Removal of automated script triggers for movement.
+## 1. 調査対象 (Scope)
+- `docs/architecture/arch-state-007-lifecycle.md` (Target)
+- `docs/architecture/plans/adr-008-automation-cleanup/definitions.md` (Reference)
+- `docs/architecture/arch-state-doc-lifecycle.md` (Comparison)
 
-## 2. Key Evidence
-- **ADR-008 Definitions**:
-    - `_inbox/`: Draft state.
-    - `_approved/`: Approved state.
-    - `_archive/`: Processed/Done state.
-    - SSOT: The file system IS the truth.
-- **Target File**: `docs/architecture/arch-state-007-lifecycle.md`.
+## 2. 現在の状況 (Current State)
+- `arch-state-007-lifecycle.md` は既に "Physical State Lifecycle (ADR-008)" というタイトルで更新されているように見える (Commit `2712c2d` による)。
+- しかし、以下の点で改善の余地がある、または ADR-008 との不整合がある可能性がある：
+    - 「物理移動（手動または将来的な自動化）」という表現が残っており、「Auto-script による遷移を削除」という方針と矛盾する可能性がある。
+    - 遷移トリガーが「Manual PR Merge」となっているが、ファイル移動（`mv`）が PR に含まれるべきか、マージ後に行われるべきかが曖昧。
+- `arch-state-doc-lifecycle.md` は依然として古い `issue-creator-kit run-workflow` に依存した定義を保持しているが、今回の修正対象は `arch-state-007-lifecycle.md` である。
 
-## 3. Findings
-- The current lifecycle (ADR-007) relies heavily on internal metadata (`status`) and CLI commands (`ick sync`, `ick create`) for state transitions.
-- The new model (ADR-008) prioritizes physical location in the file system.
-- Transition from `Draft` to `Approved` is explicitly "Manual PR Merge".
-- Transition to `Archive` happens when a task is "Completed".
+## 3. 事実の断片 (Evidence)
+- **arch-state-007-lifecycle.md**:
+    - States: `Draft (Inbox)`, `Approved`, `Done (Archive)`.
+    - Mapping: `_inbox/`, `_approved/`, `_archive/`.
+    - Trigger (Draft -> Approved): `_inbox/` から `main` ブランチへの Pull Request マージ。
+    - Side Effect: 「スキャナーによる検知」。
+- **definitions.md**:
+    - "No automated script shall perform this move (from _inbox to _approved)."
+    - "The physical location in the file system is the Single Source of Truth (SSOT)."
 
-## 4. Risks & Obstacles
-- Need to ensure the Mermaid diagram accurately reflects these simplified physical states.
-- Must ensure that "Invariants" section is also updated to align with ADR-008's "Domain Guardrails".
+## 4. 懸念事項 (Risks/Concerns)
+- 「将来的な自動化」という言葉が、ADR-008 の「自動化の排除」の意図と混同される可能性がある。
+- 物理的な位置が SSOT であるなら、マージされただけでは不十分で、`_approved/` に配置されていることが Approved の定義である。PR 自体で移動を行うべきであることを明記する必要がある。
+
+## 5. 次のステップ (Next Steps)
+- `analyzing-intent` にて、上記懸念事項に基づき、修正が必要な箇所の特定と方針の策定を行う。

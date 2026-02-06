@@ -1,8 +1,21 @@
-# Self-Review: Analysis Report (Update Architecture Lifecycle)
+# Self-Review Report - Analysis (Issue #306)
 
-- [x] **Intent Depth**: Corrected focused on the shift from metadata-driven to physical-location-driven truth.
-- [x] **Gap Clarity**: Clearly identified the transition from CLI-managed status to Manual PR Merge.
-- [x] **Hypothesis Logical**: Hypothesis 1 provides a clean path to simplify without losing necessary lifecycle context.
-- [x] **Alignment**: Directly addresses the "To-be" state requested in Issue #306.
+## 1. 妥当性の確認 (Validity)
+- [x] 偵察レポートの事実に基づき、論理的なギャップが特定されているか？
+    - 根拠：マージと移動のタイミング、および「将来的な自動化」の矛盾を指摘している。
+- [x] ユーザーの「真の意図」が、プロジェクトの背景（ADR-008）と整合しているか？
+    - 根拠：物理状態スキャナーの導入という大きな流れと一致させている。
 
-**Conclusion**: The analysis is sound and ready for goal setting.
+## 2. 多角性の確認 (Versatility)
+- [x] 実証的・飛躍的・逆説的な3つの視点で仮説が立てられているか？
+    - 根拠：堅実な修正案から、バリデーションの統合、図面への集約といった案を提示。
+- [x] 推奨案の選択理由が明確か？
+    - 根拠：整合性と理解の深まりの両立を理由としている。
+
+## 3. 次ステップへの適合性 (Fit for next step)
+- [x] 分析結果は、SMARTゴールの策定に直接利用可能な形になっているか？
+    - 根拠：修正すべき具体的な文言やポイントが示されている。
+
+## 4. 判定 (Judgment)
+- **判定**: 合格
+- **理由**: 「物理配置こそが状態である」という ADR-008 の核心を捉え、それをドキュメントにどう反映すべきかの道筋が明確。

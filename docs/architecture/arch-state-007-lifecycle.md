@@ -16,9 +16,9 @@ stateDiagram-v2
     state "Done (Archive)" as Done
 
     [*] --> Draft : Create in _inbox/
-    Draft --> Approved : Manual PR Merge to main
-    Approved --> Done : Task Completion / Superseded
-    Draft --> Done : Cancellation / Deletion
+    Draft --> Approved : Manual PR Merge (including physical move)
+    Approved --> Done : Task Completion / Superseded (Move to _archive/)
+    Draft --> Done : Cancellation / Deletion (Move to _archive/)
     Done --> [*]
 
     note right of Draft
@@ -34,23 +34,23 @@ stateDiagram-v2
 | Physical State | Meaning | Transition Trigger | Side Effects |
 | :--- | :--- | :--- | :--- |
 | `Draft (Inbox)` | 起草・レビュー中。提案段階の設計またはタスク。 | ファイルの新規作成、または `_inbox/` への配置。 | なし。 |
-| `Approved` | 承認済み。システムの正解（SSOT）または実行待ちのタスク。 | `_inbox/` から `main` ブランチへの Pull Request マージ。 | スキャナーによる検知。タスクの場合は起票対象となる。 |
-| `Done (Archive)` | 完了またはアーカイブ。実装完了、廃止、またはキャンセルされたもの。 | タスクの完了、設計の有効期限切れ、または明示的な破棄。 | スキャナーが「完了済み」としてマーク。 |
+| `Approved` | 承認済み。システムの正解（SSOT）または実行待ちのタスク。 | `_inbox/` から `_approved/` への物理移動を含む PR マージ。 | スキャナーによる検知。タスクの場合は起票対象となる。 |
+| `Done (Archive)` | 完了またはアーカイブ。実装完了、廃止、またはキャンセルされたもの。 | `_archive/` への物理移動（タスク完了、廃止、破棄）。 | スキャナーが「完了済み」としてマーク。 |
 
 ## Mapping by Object Type
 
 ### ADR / Design Doc
 - **Draft**: `reqs/design/_inbox/` に配置。
-- **Approved**: マージ後、`reqs/design/_approved/` へ物理移動（手動または将来的な自動化）。
-- **Done**: 後続ADRによる上書き（Superseded）や廃止時、`reqs/design/_archive/` へ移動。
+- **Approved**: 物理移動（`_inbox/` -> `_approved/`）を含む Pull Request のマージ。
+- **Done**: 後続ADRによる上書き（Superseded）や廃止時、`reqs/design/_archive/` へ物理移動。
 
 ### Task (Issue Draft)
 - **Draft**: `reqs/tasks/_inbox/` (または `reqs/tasks/<ADR-ID>/` 内の未承認フォルダ) に配置。
-- **Approved**: マージ後、`reqs/tasks/_approved/` に配置され、起票可能な状態。
-- **Done**: GitHub Issue のクローズやキャンセル時、`reqs/tasks/_archive/` へ移動。
+- **Approved**: 物理移動（`_approved/` 配下への配置）を含む Pull Request のマージ。
+- **Done**: GitHub Issue のクローズやキャンセル時、`reqs/tasks/_archive/` へ物理移動。
 
 ## Invariants (不変条件)
 *   **Physical Truth:** ファイルの物理的な位置がその状態を決定する。メタデータ（`status`）と不整合がある場合、物理的な位置が優先される。
-*   **Manual Gate:** `Draft` から `Approved` への遷移は、必ず人間によるコードレビューと PR マージを介さなければならない。
+*   **Manual Gate:** `Draft` から `Approved` への遷移は、必ず人間によるコードレビューと「物理移動を含む」PR マージを介さなければならない。
 *   **Domain Guardrails:** 全てのファイルは `id` (例: `adr-008`) を持ち、ディレクトリ位置に応じたバリデーション（ID形式、依存関係の循環チェック等）をパスしなければならない。
 *   **Atomic Move:** 状態の遷移は、ファイルシステムの `mv` 操作（または Git による移動）として表現される。

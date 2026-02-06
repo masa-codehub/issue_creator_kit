@@ -1,8 +1,17 @@
-# Self-Review: Goal Definition (Update Architecture Lifecycle)
+# Self-Review Report - Goal Setting (Issue #306)
 
-- [x] **Specific**: Target file and specific changes are identified.
-- [x] **Measurable**: Explicitly mentions reduction in Mermaid states and trigger updates.
-- [x] **Achievable**: Actions (editing a markdown file) are within scope.
-- [x] **Verifiable**: DoD includes specific checks for terminology and structure.
+## 1. 具体性の確認 (Specific)
+- [x] 「何を」「どこまで」やるかが、誰が読んでも一意に決まるか？
+    - 根拠：修正対象ファイルと、削除・追加すべき概念が明確。
 
-**Conclusion**: The goals are clear and actionable.
+## 2. 計測可能性の確認 (Measurable)
+- [x] 完了したことを客観的に証明する手段（検証コマンド等）があるか？
+    - 根拠：`grep` による禁止文言のチェックと、記述内容の目視確認項目を設定。
+
+## 3. 実現可能性の確認 (Achievable)
+- [x] 現在の権限、リソース、技術力で達成可能な範囲か？
+    - 根拠：ドキュメントの編集作業であり、十分可能。
+
+## 4. 判定 (Judgment)
+- **判定**: 合格
+- **理由**: 実行部隊が「何を消し、何を書き、どう確認すればいいか」が明確に定義されている。

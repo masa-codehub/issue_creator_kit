@@ -1,30 +1,35 @@
-# Analysis Report: Physical State Lifecycle Transition
+# Analysis Report - Issue #306: Update Architecture Lifecycle
 
-## 1. Intent Analysis (Why)
-- **Problem**: The current metadata-driven lifecycle (ADR-007) is complex and depends on CLI tools (`ick sync`, `ick create`) to manage states, which can be brittle and hard to verify physically.
-- **Outcome**: A simplified, highly visible lifecycle where the physical location of a file (`_inbox`, `_approved`, `_archive`) is the Single Source of Truth for its state. This aligns with the "Physical State Scanner" concept in ADR-008.
+## 1. 意図の深掘り (Analyze Intent)
+- **Why (なぜ)**: 自動化スクリプトによる状態管理 (`run-workflow` 等) を廃止し、ファイルの物理的な場所（Inbox/Approved/Archive）を Single Source of Truth (SSOT) とする ADR-008 の方針をアーキテクチャ定義に完全に反映させるため。
+- **What (何を)**: `docs/architecture/arch-state-007-lifecycle.md` の記述を整理し、誤解を招く自動化の記述を削除し、マニュアルプロセスを明文化する。
+- **Outcome (期待される結果)**: 開発者が「ファイルを移動し、PRをマージする」という物理的な操作だけで状態が確定することを理解でき、システムもそれに基づいて動作（スキャン）できる状態。
 
-## 2. Gap Analysis
-- **Metadata vs. Physics**: ADR-007 uses `status` metadata. ADR-008 uses directory structure.
-- **Automation vs. Manual**: ADR-007 implies automated moves via CLI. ADR-008 mandates "Manual PR Merge" for approval.
-- **State Bloat**: ADR-007 has 5 states for tasks. ADR-008 suggests 3 physical states (Draft, Approved, Done).
+## 2. ギャップ分析 (Gap Analysis)
+- **現状 (Facts)**:
+    - ファイルには既に `Draft`, `Approved`, `Done` の状態が定義されている。
+    - しかし、「マージ後...物理移動」や「将来的な自動化」といった、ADR-008 の「物理配置 = 状態」かつ「マニュアル承認」という原則を弱める表現が含まれている。
+- **理想 (To-be)**:
+    - `Approved` 状態への遷移は「`_approved/` への移動を含む PR のマージ」であることを明記する。
+    - 「将来的な自動化」への含みを消し、現在の「手動承認フロー」に集中した定義にする。
 
-## 3. Hypotheses
+## 3. 仮説の立案 (Formulate Hypotheses)
 
-### Hypothesis 1: Grounded (Physical State Mapping)
-- **Strategy**: Map the current 5 task states into the 3 physical buckets.
-  - Draft -> `_inbox/`
-  - Ready/Issued -> `_approved/` (Ready to be processed or already issued but not finished)
-  - Completed/Cancelled -> `_archive/`
-- **Verification**: Mermaid diagram shows only 3 physical states and transitions based on physical moves (Manual PR Merge, Task Completion).
+### 3.1 実証的仮説 (Grounded Hypothesis)
+- **アプローチ**: `arch-state-007-lifecycle.md` を全面的にリファインする。
+    - 「将来的な自動化」の言及を削除。
+    - 遷移トリガーを「PRにおける物理移動とマージ」として再定義。
+    - Mermaid 図面を、物理パスと状態の対応がより直感的に伝わるように微調整する。
+- **メリット**: ADR-008 との完全な整合性が確保され、迷いがなくなる。
 
-### Hypothesis 2: Leap (Guardrail-Centric)
-- **Strategy**: Completely remove `status` metadata from the documentation and focus entirely on "Physical Location + Domain Guardrails".
-- **Outcome**: The lifecycle is no longer about "Status Updates" but about "Location Shifts and Invariant Checks".
+### 3.2 飛躍的仮説 (Leap Hypothesis)
+- **アプローチ**: 物理状態の遷移に伴う「ドメイン・ガードレール（ID形式、依存関係）」のバリデーション内容をライフサイクル表に具体的に組み込む。
+- **メリット**: 設計者が「承認されるために満たすべき物理的条件」をライフサイクル図から直接理解できるようになる。
 
-### Hypothesis 3: Paradoxical (Hybrid Truth)
-- **Strategy**: Keep the internal `status` as a "cache" but explicitly state it is NOT the SSOT.
-- **Risk**: Potential confusion between metadata and physical location.
+### 3.3 逆説的仮説 (Paradoxical Hypothesis)
+- **アプローチ**: 状態遷移の「表」を廃止し、Mermaid 図面と「ディレクトリ構造の説明」のみにする。
+- **メリット**: 言葉による二重定義を避け、物理的な事実（ディレクトリ）のみに集中させることで認知負荷を極限まで下げる。
 
-## 4. Proposed Approach (Grounded)
-I will adopt Hypothesis 1. I will update `arch-state-007-lifecycle.md` to define 3 core states: `Draft (Inbox)`, `Approved`, and `Done (Archive)`. Transitions will be defined as Physical Movements triggered by Manual PR Merge or Task Completion.
+## 4. 推奨案 (Recommended Approach)
+- **実証的仮説 (3.1)** をベースとしつつ、**飛躍的仮説 (3.2)** のエッセンス（ガードレールへの言及）を取り入れる。
+- 具体的には、`Transition Trigger` カラムに「物理移動 + PR Merge + ガードレール通過」というニュアンスを込める。

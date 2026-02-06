@@ -1,20 +1,18 @@
-# Final Audit Report: Update Architecture Lifecycle Goals
+# Final Audit Report - Goal Setting (Issue #306)
 
 ## 1. ドキュメントの要件 (Requirements for Documentation)
-- [x] **アウトプット定義:** `docs/architecture/arch-state-007-lifecycle.md` を更新することが明確。
-  - **根拠**: Goal Definition Section 1.
-- [x] **記述の観点:** Physical State Scanner (ADR-008) への移行、状態の整理 (Inbox, Approved, Archive)、トリガーの更新。
-  - **根拠**: Goal Definition Section 1 and 2.
+- [x] **アウトプット定義:** 作成すべきドキュメントの種類とファイル名が明確か？
+  - **根拠:** `docs/architecture/arch-state-007-lifecycle.md` の更新。
+- [x] **記述の観点:** ドキュメントに含めるべき主要な論点や決定事項がリストアップされているか？
+  - **根拠:** 3つの物理状態（Inbox/Approved/Archive）への整理、手動PRマージによる遷移、自動化の排除。
 
 ## 2. 整合性と品質 (Consistency & Quality)
-- [x] **SSOT整合性:** ADR-008 "Scanner Foundation" およびその定義ファイルと完全に一致している。
-  - **根拠**: Reconnaissance Report Findings.
-- [x] **テンプレート:** `drafting-architecture` スキルの `assets/arch-state.md` を参考にするよう示唆されている。
-  - **根拠**: drafting-architecture skill instructions.
+- [x] **SSOT整合性:** 上位の設計や既存のADRと矛盾する内容を書こうとしていないか？
+  - **根拠:** ADR-008 "Scanner Foundation" および `definitions.md` の定義と完全に整合させている。
+- [x] **テンプレート:** 使用すべきテンプレートが指定されているか？
+  - **根拠:** `drafting-architecture` スキルの `arch-state.md` テンプレートを参照する。
 
 ## 3. 改善提案 (Improvement Proposals)
-- **Mermaidの視覚化:**
-  - **現状の問題:** ADR-007の図は複雑。
-  - **改善案:** 物理ディレクトリ (`_inbox`, `_approved`, `_archive`) を明示的にノード名またはラベルに含め、移動を「マージ」や「完了」という物理イベントとして表現する。
-
-**Overall Result: PASS**
+- **[遷移トリガーの具体化]:**
+  - **現状の問題:** 既存のドキュメントでは「マージ後」に移動が起きるようなニュアンスがあり、物理状態が SSOT である原則とタイミングがずれる。
+  - **改善案:** 「物理的な移動を含む PR のマージ」をトリガーとし、マージ＝状態確定となるように記述を統一する。
