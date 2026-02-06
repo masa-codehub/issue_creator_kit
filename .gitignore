@@ -211,3 +211,9 @@ messages/
 
 # Track package-lock.json
 !package-lock.json
+
+# Gemini Agent artifacts
+prompt.md
+.gemini/todo.md
+
+
