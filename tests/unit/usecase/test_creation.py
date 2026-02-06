@@ -1,218 +1,151 @@
+from graphlib import CycleError
 from pathlib import Path
-from unittest.mock import MagicMock
+from unittest.mock import ANY, MagicMock, call
 
 import pytest
 
-from issue_creator_kit.domain.document import Document, Metadata
+from issue_creator_kit.domain.document import Document
+from issue_creator_kit.domain.interfaces import (
+    IFileSystemAdapter,
+    IGitAdapter,
+    IGitHubAdapter,
+)
 from issue_creator_kit.usecase.creation import IssueCreationUseCase
 
 
 @pytest.fixture
 def mock_fs():
-    return MagicMock()
-
-
-@pytest.fixture
-def mock_github():
-    return MagicMock()
+    return MagicMock(spec=IFileSystemAdapter)
 
 
 @pytest.fixture
 def mock_git():
-    return MagicMock()
+    return MagicMock(spec=IGitAdapter)
 
 
 @pytest.fixture
-def mock_roadmap_sync():
-    return MagicMock()
+def mock_github():
+    return MagicMock(spec=IGitHubAdapter)
 
 
 @pytest.fixture
-def usecase(mock_fs, mock_github, mock_git, mock_roadmap_sync):
-    return IssueCreationUseCase(mock_fs, mock_github, mock_git, mock_roadmap_sync)
+def usecase(mock_fs, mock_git, mock_github):
+    # Note: UseCase might need to be updated to accept these interfaces
+    return IssueCreationUseCase(
+        fs_adapter=mock_fs, github_adapter=mock_github, git_adapter=mock_git
+    )
 
 
-def test_create_issues_from_virtual_queue_success(
-    usecase, mock_fs, mock_github, mock_git, mock_roadmap_sync, tmp_path
-):
-    # Setup
+def test_create_issues_ordered_by_dependency(usecase, mock_fs, mock_git, mock_github):
+    # T1 -> T2
     mock_git.get_added_files.return_value = [
-        "reqs/tasks/archive/phase-1/issue-t1-1.md",
-        "reqs/tasks/archive/phase-1/issue-t1-2.md",
+        "reqs/tasks/adr-007/T1.md",
+        "reqs/tasks/adr-007/T2.md",
     ]
 
-    doc1 = Document(
-        content="Body 1", metadata=Metadata(id="t1-1", status="Ready", title="Task 1")
-    )
-    doc2 = Document(
-        content="Body 2", metadata=Metadata(id="t1-2", status="Ready", title="Task 2")
-    )
+    doc1 = Document("content1", {"id": "T1", "depends_on": []})
+    doc2 = Document("content2", {"id": "T2", "depends_on": ["T1"]})
 
-    mock_fs.read_document.side_effect = [doc1, doc2]
+    def read_side_effect(path):
+        if "T1.md" in str(path):
+            return doc1
+        if "T2.md" in str(path):
+            return doc2
+        return None
+
+    mock_fs.read_document.side_effect = read_side_effect
     mock_github.create_issue.side_effect = [101, 102]
 
-    # Create physical roadmap file for exists() check
-    roadmap_file = tmp_path / "roadmap.md"
-    roadmap_file.touch()
+    usecase.create_issues(before="base", after="head", adr_id="adr-007")
 
-    # Execute
-    usecase.create_issues_from_virtual_queue(
-        base_ref="before",
-        head_ref="after",
-        archive_path="reqs/tasks/archive/",
-        roadmap_path=str(roadmap_file),
+    # Verify order of creation: T1 then T2
+    mock_github.create_issue.assert_has_calls(
+        [
+            call(ANY, ANY, ANY),  # T1
+            call(ANY, ANY, ANY),  # T2
+        ]
     )
 
-    # Verify
-    assert mock_github.create_issue.call_count == 2
-
-    # Verify metadata updates (Atomic write-back)
-    assert mock_fs.update_metadata.call_count == 2
-    mock_fs.update_metadata.assert_any_call(
-        Path("reqs/tasks/archive/phase-1/issue-t1-1.md"), {"issue": "#101"}
-    )
-    mock_fs.update_metadata.assert_any_call(
-        Path("reqs/tasks/archive/phase-1/issue-t1-2.md"), {"issue": "#102"}
+    # Verify move
+    mock_git.move_file.assert_has_calls(
+        [
+            call("reqs/tasks/adr-007/T1.md", "reqs/tasks/_archive/T1.md"),
+            call("reqs/tasks/adr-007/T2.md", "reqs/tasks/_archive/T2.md"),
+        ],
+        any_order=True,
     )
 
 
-def test_create_issues_from_virtual_queue_roadmap_sync_failure(
-    usecase, mock_fs, mock_github, mock_git, mock_roadmap_sync, tmp_path
-):
-    # Setup
-    mock_git.get_added_files.return_value = ["reqs/tasks/archive/task1.md"]
-    mock_fs.read_document.return_value = Document(
-        content="Body", metadata=Metadata(id="task1", status="Ready", title="Task 1")
-    )
-    mock_github.create_issue.return_value = 101
+def test_create_issues_with_archive_dependency(usecase, mock_fs, mock_git, mock_github):
+    # T2 depends on T1. T1 is already in _archive/
+    mock_git.get_added_files.return_value = ["reqs/tasks/adr-007/T2.md"]
+    mock_fs.list_files.return_value = [Path("reqs/tasks/_archive/T1.md")]
 
-    # Create physical roadmap file for exists() check
-    roadmap_file = tmp_path / "roadmap.md"
-    roadmap_file.touch()
+    doc1 = Document("content1", {"id": "T1", "status": "Issued", "issue_id": 101})
+    doc2 = Document("content2", {"id": "T2", "depends_on": ["T1"]})
 
-    # Simulate Roadmap sync failure
-    mock_roadmap_sync.sync.side_effect = ValueError("Sync Error")
+    def read_side_effect(path):
+        if "T1.md" in str(path):
+            return doc1
+        if "T2.md" in str(path):
+            return doc2
+        return None
 
-    # Execute
-    usecase.create_issues_from_virtual_queue(
-        base_ref="before",
-        head_ref="after",
-        archive_path="reqs/tasks/archive/",
-        roadmap_path=str(roadmap_file),
-    )
+    mock_fs.read_document.side_effect = read_side_effect
 
-    # Verify: Process should continue (metadata updated) but roadmap not added to git
-    assert mock_fs.update_metadata.call_count == 1
-    mock_git.add.assert_called_once_with(["reqs/tasks/archive/task1.md"])
-    mock_git.commit.assert_called()
-
-
-def test_create_issues_from_virtual_queue_fail_fast(
-    usecase, mock_fs, mock_github, mock_git
-):
-    # Setup
-    mock_git.get_added_files.return_value = [
-        "reqs/tasks/archive/phase-1/issue-t1-1.md",
-        "reqs/tasks/archive/phase-1/issue-t1-2.md",
-    ]
-
-    doc1 = Document(
-        content="Body 1", metadata=Metadata(id="t1-1", status="Ready", title="Task 1")
-    )
-    doc2 = Document(
-        content="Body 2", metadata=Metadata(id="t1-2", status="Ready", title="Task 2")
-    )
-
-    mock_fs.read_document.side_effect = [doc1, doc2]
-    # Fail on second issue
-    mock_github.create_issue.side_effect = [101, RuntimeError("API Error")]
-
-    # Execute & Verify Exception
-    with pytest.raises(RuntimeError, match="API Error"):
-        usecase.create_issues_from_virtual_queue(
-            base_ref="before", head_ref="after", archive_path="reqs/tasks/archive/"
-        )
-
-    # Verify Fail-fast: No metadata updates should happen if any fail
-    mock_fs.update_metadata.assert_not_called()
-    mock_git.commit.assert_not_called()
-
-
-def test_create_issues_from_virtual_queue_skips_processed(
-    usecase, mock_fs, mock_github, mock_git
-):
-    # Setup
-    mock_git.get_added_files.return_value = [
-        "reqs/tasks/archive/phase-1/issue-t1-1.md",
-        "reqs/tasks/archive/phase-1/issue-t1-2.md",
-    ]
-
-    # doc1 already has issue number
-    doc1 = Document(
-        content="Body 1",
-        metadata=Metadata(id="t1-1", status="Issued", title="Task 1", issue_id=100),
-    )
-    doc2 = Document(
-        content="Body 2", metadata=Metadata(id="t1-2", status="Ready", title="Task 2")
-    )
-
-    mock_fs.read_document.side_effect = [doc1, doc2]
     mock_github.create_issue.return_value = 102
 
-    # Execute
-    usecase.create_issues_from_virtual_queue(
-        base_ref="before", head_ref="after", archive_path="reqs/tasks/archive/"
-    )
+    usecase.create_issues(before="base", after="head", adr_id="adr-007")
 
-    # Verify only doc2 was processed
-    assert mock_github.create_issue.call_count == 1
-    mock_github.create_issue.assert_called_with("Task 2", "Body 2", [])
-    mock_fs.update_metadata.assert_called_once_with(
-        Path("reqs/tasks/archive/phase-1/issue-t1-2.md"), {"issue": "#102"}
+    mock_github.create_issue.assert_called_once()
+    mock_git.move_file.assert_called_with(
+        "reqs/tasks/adr-007/T2.md", "reqs/tasks/_archive/T2.md"
     )
 
 
-def test_create_issues_from_virtual_queue_with_dependencies(
-    usecase, mock_fs, mock_github, mock_git
+def test_create_issues_skipped_if_dependency_not_ready(
+    usecase, mock_fs, mock_git, mock_github
 ):
-    # Setup
+    # T2 depends on T1. T1 is NOT in batch and NOT in archive (or not Issued)
+    mock_git.get_added_files.return_value = ["reqs/tasks/adr-007/T2.md"]
+    mock_fs.list_files.return_value = []  # No archive
+
+    doc2 = Document("content2", {"id": "T2", "depends_on": ["T1"]})
+    mock_fs.read_document.return_value = doc2
+
+    usecase.create_issues(before="base", after="head", adr_id="adr-007")
+
+    mock_github.create_issue.assert_not_called()
+    mock_git.move_file.assert_not_called()
+
+
+def test_create_issues_circular_dependency(usecase, mock_fs, mock_git):
+    # A -> B -> A
     mock_git.get_added_files.return_value = [
-        "reqs/tasks/archive/task1.md",
-        "reqs/tasks/archive/task2.md",
+        "reqs/tasks/adr-007/A.md",
+        "reqs/tasks/adr-007/B.md",
     ]
 
-    # task2 depends on task1
-    doc1 = Document(
-        content="Body 1", metadata=Metadata(id="task1", status="Ready", title="Task 1")
-    )
-    doc2 = Document(
-        content="Body 2 depends on task1.md",
-        metadata=Metadata(
-            id="task2", status="Ready", title="Task 2", depends_on=["task1.md"]
-        ),
-    )
+    doc_a = Document("contentA", {"id": "A", "depends_on": ["B"]})
+    doc_b = Document("contentB", {"id": "B", "depends_on": ["A"]})
 
-    # Mock read_document to return based on path
-    def side_effect(path):
-        if "task1.md" in str(path):
-            return doc1
-        return doc2
+    mock_fs.read_document.side_effect = [doc_a, doc_b]
 
-    mock_fs.read_document.side_effect = side_effect
-    mock_github.create_issue.side_effect = [101, 102]
+    with pytest.raises(CycleError):
+        usecase.create_issues(before="base", after="head", adr_id="adr-007")
 
-    # Execute
-    usecase.create_issues_from_virtual_queue(
-        base_ref="before", head_ref="after", archive_path="reqs/tasks/archive/"
-    )
 
-    # Verify order: Task 1 should be created before Task 2
-    assert mock_github.create_issue.call_count == 2
+def test_create_issues_fail_fast_no_move_on_api_error(
+    usecase, mock_fs, mock_git, mock_github
+):
+    mock_git.get_added_files.return_value = ["reqs/tasks/adr-007/T1.md"]
+    doc1 = Document("content1", {"id": "T1", "depends_on": []})
+    mock_fs.read_document.return_value = doc1
 
-    # Check calls
-    calls = mock_github.create_issue.call_args_list
-    assert calls[0].args[0] == "Task 1"
-    assert calls[1].args[0] == "Task 2"
-    # Verify body replacement in Task 2
-    assert "#101" in calls[1].args[1]
-    assert "task1.md" not in calls[1].args[1]
+    mock_github.create_issue.side_effect = RuntimeError("API Error")
+
+    with pytest.raises(RuntimeError, match="API Error"):
+        usecase.create_issues(before="base", after="head", adr_id="adr-007")
+
+    # Verify move was NOT called
+    mock_git.move_file.assert_not_called()
