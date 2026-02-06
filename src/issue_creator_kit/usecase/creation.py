@@ -121,7 +121,15 @@ class IssueCreationUseCase:
             path = Path(file_str)
             try:
                 doc = self.fs.read_document(path)
-                if not doc.metadata.get("issue"):
+                # Defensive: Handle docs that might not have mandatory fields during transition
+                if not hasattr(doc.metadata, "id") or not hasattr(
+                    doc.metadata, "status"
+                ):
+                    print(
+                        f"Warning: Skipping {file_str} due to missing mandatory metadata (id/status)"
+                    )
+                    continue
+                if not doc.metadata.get("issue_id") and not doc.metadata.get("issue"):
                     target_docs[path] = doc
             except (FileNotFoundError, PermissionError) as e:
                 # Fatal: Cannot proceed if we can't access files we know exist in git

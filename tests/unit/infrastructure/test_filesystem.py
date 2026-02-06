@@ -1,6 +1,8 @@
+from pathlib import Path
+
 import pytest
 
-from issue_creator_kit.domain.document import Document
+from issue_creator_kit.domain.document import Document, Metadata
 from issue_creator_kit.infrastructure.filesystem import FileSystemAdapter
 
 
@@ -12,48 +14,56 @@ class TestFileSystemAdapter:
     def test_read_document_success(self, adapter, tmp_path):
         # F-1: Read document with correct separation
         file_path = tmp_path / "test.md"
-        file_path.write_text("---\ntitle: Test\n---\n# Content", encoding="utf-8")
+        file_path.write_text(
+            "---\nid: test-doc\nstatus: Draft\ntitle: Test\n---\n# Content",
+            encoding="utf-8",
+        )
 
         doc = adapter.read_document(file_path)
-        assert doc.metadata["title"] == "Test"
+        assert doc.metadata["id"] == "test-doc"
+        assert doc.metadata["status"] == "Draft"
         assert doc.content == "# Content"
 
     def test_read_document_parse_error(self, adapter, tmp_path):
         # F-2: Parse error (Document.parse behavior)
-        # Document.parse catches YAML errors and falls back to plain text/markdown list
+        # Invalid YAML that results in ValidationError because required fields missing
         file_path = tmp_path / "bad.md"
         file_path.write_text("---\ntitle: : bad\n---\nContent", encoding="utf-8")
 
-        doc = adapter.read_document(file_path)
+        from issue_creator_kit.domain.exceptions import ValidationError
 
-        # Expectation: YAML parse fails, metadata empty, content contains raw text
-        assert doc.metadata == {}
-        assert "title: : bad" in doc.content
+        with pytest.raises(ValidationError):
+            adapter.read_document(file_path)
 
     def test_save_document_new(self, adapter, tmp_path):
         # F-3: Save new document
         file_path = tmp_path / "new.md"
-        doc = Document(metadata={"title": "New"}, content="Body")
+        metadata = Metadata(id="new-doc", status="Draft", title="New")
+        doc = Document(metadata=metadata, content="Body")
         adapter.save_document(file_path, doc)
 
         assert file_path.exists()
         content = file_path.read_text(encoding="utf-8")
-        assert "title: New" in content
+        assert "id: new-doc" in content
+        assert "status: Draft" in content
         assert "Body" in content
 
     def test_update_metadata_preserves_content(self, adapter, tmp_path):
         # F-4: Update metadata only
         file_path = tmp_path / "update.md"
-        file_path.write_text("---\nstatus: old\n---\nBody", encoding="utf-8")
+        file_path.write_text(
+            "---\nid: update-doc\nstatus: Draft\n---\nBody", encoding="utf-8"
+        )
 
-        adapter.update_metadata(file_path, {"status": "new", "added": 1})
+        # In update_metadata, we pass a dict of updates
+        adapter.update_metadata(file_path, {"status": "Ready", "added": 1})
 
         content = file_path.read_text(encoding="utf-8")
-        assert "status: new" in content
+        assert "id: update-doc" in content
+        assert "status: Ready" in content
         assert "added: 1" in content
         assert "Body" in content
-        # Ensure 'old' status is gone
-        assert "status: old" not in content
+        assert "status: Draft" not in content
 
     def test_safe_move_file_success(self, adapter, tmp_path):
         # F-5: Move file success
@@ -61,7 +71,8 @@ class TestFileSystemAdapter:
         src.touch()
         dst_dir = tmp_path / "dst"
 
-        new_path = adapter.safe_move_file(src, dst_dir)
+        new_path_str = adapter.safe_move_file(src, dst_dir)
+        new_path = Path(new_path_str)
 
         assert not src.exists()
         assert new_path.exists()
