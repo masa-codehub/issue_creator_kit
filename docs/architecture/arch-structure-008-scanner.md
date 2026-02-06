@@ -26,13 +26,47 @@ graph TD
     end
 
     CLI --> FS
+    CLI --> Visualizer
     FS --> OS
     FS --> Parser
+    FS --> Builder
     Parser --> Model
-    Parser --> Builder
     Builder --> Model
-    CLI --> Visualizer
     Visualizer --> Builder
+```
+
+## Diagram (Data/Class View)
+
+```mermaid
+classDiagram
+    class Task {
+        +str id
+        +str title
+        +str status
+        +List~str~ depends_on
+        +Path path
+    }
+    class ADR {
+        +str id
+        +str title
+        +str status
+        +List~str~ depends_on
+        +Path path
+    }
+    class TaskGraph {
+        +Dict~str, TaskNode~ nodes
+        +add_task(task)
+        +get_execution_order() List~str~
+    }
+    class TaskNode {
+        +Task task
+        +List~TaskNode~ dependencies
+        +List~TaskNode~ dependents
+    }
+
+    Task <|-- ADR
+    TaskGraph "1" *-- "many" TaskNode
+    TaskNode "1" o-- "1" Task
 ```
 
 ## Element Definitions (SSOT)
@@ -44,13 +78,13 @@ graph TD
 - **Layer (Clean Arch):** Use Cases / Domain Services
 - **Dependencies:**
   - **Upstream:** `cli.py`
-  - **Downstream:** `OS File System`, `TaskParser`
+  - **Downstream:** `OS File System`, `TaskParser`, `GraphBuilder`
 - **Tech Stack:** Python 3.12, `pathlib`
 - **Data Reliability:** Sync. Physical file state is the SSOT.
 
 ### TaskParser
 - **Type:** `Component`
-- **Code Mapping:** `src/issue_creator_kit/domain/models/` (Validation logic)
+- **Code Mapping:** `src/issue_creator_kit/domain/services/parser.py`
 - **Role (Domain-Centric):** Markdown ファイルのメタデータを解析し、Pydantic モデルに変換する。
 - **Layer (Clean Arch):** Entities / Domain Models
 - **Dependencies:**
@@ -61,23 +95,23 @@ graph TD
 
 ### GraphBuilder
 - **Type:** `Component`
-- **Code Mapping:** `src/issue_creator_kit/domain/services/scanner.py`
+- **Code Mapping:** `src/issue_creator_kit/domain/services/builder.py`
 - **Role (Domain-Centric):** `depends_on` メタデータに基づき、タスク間の依存関係をグラフ（DAG）として構築する。
 - **Layer (Clean Arch):** Domain Services
 - **Dependencies:**
-  - **Upstream:** `FileSystemScanner`, `Visualizer`
-  - **Downstream:** `Task/ADR Models`
+  - **Upstream:** `FileSystemScanner`
+  - **Downstream:** `Task/ADR Models`, `Visualizer`
 - **Tech Stack:** Python 3.12
 - **Data Reliability:** 循環参照や自己参照を検知しエラーとする。
 
 ### Visualizer
 - **Type:** `Component`
-- **Code Mapping:** `src/issue_creator_kit/domain/services/scanner.py`
+- **Code Mapping:** `src/issue_creator_kit/domain/services/visualizer.py`
 - **Role (Domain-Centric):** 構築された DAG から Mermaid 形式のテキストを生成する。
 - **Layer (Clean Arch):** Interface Adapters / Domain Services
 - **Dependencies:**
-  - **Upstream:** `cli.py`
-  - **Downstream:** `GraphBuilder`
+  - **Upstream:** `cli.py`, `GraphBuilder`
+  - **Downstream:** N/A
 - **Tech Stack:** Python 3.12 (Mermaid String generation)
 - **Data Reliability:** N/A (Read-only visualization)
 
@@ -95,6 +129,10 @@ graph TD
 ### Data Reliability
 - **SSOT:** The Physical File System is the primary source of truth. The scanner must not rely on Git metadata (like `mtime` or `diff-tree`).
 - **Idempotency:** Re-running the scanner on the same file system state must yield identical Graph objects.
+
+### Scalability & Performance
+- **Parallelism:** 大規模なファイルセット（1000ファイル超）を扱う場合、`asyncio` による非同期 I/O およびパースの並列化を検討する。
+- **Memory Footprint:** グラフ構築時はメタデータのみをメモリに保持し、本文などの大きなデータは必要時以外ロードしない。
 
 ---
 
