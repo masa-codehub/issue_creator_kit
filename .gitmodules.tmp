@@ -1,3 +1,0 @@
-[submodule ".gemini"]
-	path = .gemini
-	url = ../gemini_context.git
