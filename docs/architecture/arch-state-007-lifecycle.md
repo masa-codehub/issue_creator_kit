@@ -1,67 +1,59 @@
-# Metadata-Driven Lifecycle (ADR-007)
+# Physical State Lifecycle (ADR-008)
 
 ## Subject Definition
-- **Target Objects:** ADR / Design Doc, Task (Issue Draft)
-- **Persistence:** File System (`reqs/`) and GitHub Issues
-- **Concurrency Strategy:** Git Merge (Physical files) and GitHub API (Status sync)
+- **Target Objects:** ADR (Architecture Decision Record), Design Doc, Task (Issue Draft)
+- **Persistence:** File System (`reqs/`), GitHub Issues
+- **Concurrency Strategy:** Git Merge (Physical directory movement)
+- **Truth Source:** The physical location in the file system is the Single Source of Truth (SSOT).
 
 ## Diagram (State Transition)
 ```mermaid
 stateDiagram-v2
-    title Document & Task Lifecycle (ADR-007)
+    title Physical State Lifecycle (Scanner Foundation)
 
-    state "ADR / Design Doc" as ADR {
-        [*] --> Draft_ADR : Create in reqs/design/_inbox/
-        Draft_ADR --> Approved : PR Merge to main
-        Approved --> Postponed : status: Postponed
-        Approved --> Superseded : status: Superseded
-        Postponed --> [*]
-        Superseded --> [*]
-        
-        note right of Approved
-            Side Effect: Move to _approved/
-            Create L1/L2 Issues
-        end
-    }
+    state "Draft (Inbox)" as Draft
+    state "Approved" as Approved
+    state "Done (Archive)" as Done
 
-    state "Task (Issue Draft)" as Task {
-        [*] --> Draft_Task : Create in reqs/tasks/<ADR-ID>/
-        Draft_Task --> Ready : ick sync (valid)
-        Ready --> Issued : ick create
-        Issued --> Completed : GitHub Issue closed
-        Issued --> Cancelled : GitHub Issue cancelled
-        Draft_Task --> Cancelled : Manual delete/archive
-        Completed --> [*]
-        Cancelled --> [*]
+    [*] --> Draft : Create in _inbox/
+    Draft --> Approved : Manual PR Merge (including physical move)
+    Approved --> Done : Task Completion / Superseded (Move to _archive/)
+    Draft --> Done : Cancellation / Deletion (Move to _archive/)
+    Done --> [*]
 
-        note right of Issued
-            Side Effect: Move to _archive/
-            Record issue_id
-        end
-    }
+    note right of Draft
+        Location: reqs/**/_inbox/
+    end note
+    note right of Approved
+        Location: reqs/**/_approved/
+    end note
+    note right of Done
+        Location: reqs/**/_archive/
+    end note
 ```
 
 ## State Definitions & Transitions
 
-### ADR / Design Doc
-| State | Definition | Trigger (Transition) | Side Effects |
+| Physical State | Meaning | Transition Trigger | Side Effects |
 | :--- | :--- | :--- | :--- |
-| `Draft` | 起草・レビュー中。`_inbox/` に配置される。 | ファイル作成。 | なし。 |
-| `Approved` | 承認済み。システムの正解（SSOT）。`_approved/` に配置される。 | `_inbox/` からのマージ PR がクローズ。 | `_approved/` へ物理移動。L1 ADR Issue と L2 統合 Issue が起票される。 |
-| `Postponed` | 実装を先送りした設計。`_archive/` に配置される。 | メタデータ `status: Postponed` への更新。 | `_archive/` へ物理移動。紐づくタスクの保留。 |
-| `Superseded` | 新しい設計に置き換えられた旧版。`_archive/` に配置される。 | 後続 ADR による `Supersedes` 宣言。 | `_archive/` へ物理移動。 |
+| `Draft (Inbox)` | 起草・レビュー中。提案段階の設計またはタスク。 | ファイルの新規作成、または `_inbox/` への配置。 | なし。 |
+| `Approved` | 承認済み。システムの正解（SSOT）または実行待ちのタスク。 | `_inbox/` から `_approved/` への物理移動を含む PR マージ。 | スキャナーによる検知。タスクの場合は起票対象となる。 |
+| `Done (Archive)` | 完了またはアーカイブ。実装完了、廃止、またはキャンセルされたもの。 | `_archive/` への物理移動（タスク完了、廃止、破棄）。 | スキャナーが「完了済み」としてマーク。 |
+
+## Mapping by Object Type
+
+### ADR / Design Doc
+- **Draft**: `reqs/design/_inbox/` に配置。
+- **Approved**: 物理移動（`_inbox/` -> `_approved/`）を含む Pull Request のマージ。
+- **Done**: 後続ADRによる上書き（Superseded）や廃止時、`reqs/design/_archive/` へ物理移動。
 
 ### Task (Issue Draft)
-| State | Definition | Trigger (Transition) | Side Effects |
-| :--- | :--- | :--- | :--- |
-| `Draft` | 実装タスク案。`reqs/tasks/<ADR-ID>/` に配置される。 | ファイル作成。 | なし。 |
-| `Ready` | 全ての `depends_on` が `Issued` (または Completed) になり、起票準備が整った状態。 | `ick sync` による依存関係チェック合格。 | なし。 |
-| `Issued` | GitHub Issue として起票され、実作業コンテキストに移行した状態。 | `ick create` コマンド実行。 | `reqs/tasks/_archive/` へ物理移動。`issue_id` をファイルに記録。 |
-| `Completed` | GitHub Issue がクローズされ、実装が完了した状態。 | GitHub Issue のステータス変更。 | ロードマップの進捗更新。後続タスクの `Ready` 化。 |
-| `Cancelled` | GitHub Issue がキャンセルされるか、Draft 段階のタスクが破棄・アーカイブされた状態。 | GitHub Issue のキャンセル、または手動でのメタデータ変更。 | 対応するタスクファイルの `_archive/` への移動。 |
+- **Draft**: `reqs/tasks/<ADR-ID>/` 直下（例: `reqs/tasks/adr-008/`）に配置。
+- **Approved**: 物理移動（`_approved/` 配下への配置）を含む Pull Request のマージ。
+- **Done**: GitHub Issue のクローズやキャンセル時、`reqs/tasks/_archive/` へ物理移動。
 
 ## Invariants (不変条件)
-*   **Unique ID:** `id` (例: `007-T1`) はプロジェクト全域で一意でなければならない。
-*   **Strict Dependency:** `depends_on` に指定されたタスクが `Issued` になるまで、そのタスクは起票されてはならない。
-*   **Atomic Issue Creation:** GitHub Issue が正常に作成されない限り、ファイルは `_archive/` へ移動してはならない。
-*   **Hierarchy Priority:** L3 タスクは必ず親となる L1/L2 Issue が存在（または同時作成）されていなければならない。
+*   **Physical Truth:** ファイルの物理的な位置がその状態を決定する。メタデータ（`status`）と不整合がある場合、物理的な位置が優先される。
+*   **Manual Gate:** `Draft` から `Approved` への遷移は、必ず人間によるコードレビューと「物理移動を含む」PR マージを介さなければならない。
+*   **Domain Guardrails:** 全てのファイルは `id` (例: ADR: `adr-008-physical-state-lifecycle`, Task: `task-008-01`) を持ち、ディレクトリ位置に応じたバリデーション（ID形式、依存関係の循環チェック等）をパスしなければならない。
+*   **Atomic Move:** 状態の遷移は、ファイルシステムの `mv` 操作（または Git による移動）として表現される。
