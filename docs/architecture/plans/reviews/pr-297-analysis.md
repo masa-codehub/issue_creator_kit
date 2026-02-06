@@ -61,7 +61,8 @@
 3.  **Refine `gemini-reviewer.yml`**:
     - Update the `if` condition to use `startsWith(github.event.review.user.login, 'copilot')` instead of `contains`. This reduces the risk of false positives from users who happen to have 'copilot' in their username but are not official bots.
 4.  **Secure `.build/run.sh`**:
-    - Update the submodule update logic to use `GIT_CONFIG_COUNT`, `GIT_CONFIG_KEY_0`, and `GIT_CONFIG_VALUE_0` environment variables. This prevents the token from being exposed in the command line arguments, which could be visible in process listings (e.g., via `ps`).
+    - Update the submodule update logic to use a temporary git config file (`mktemp`). This prevents the token from being exposed in process listings through shell expansion of environment variables (e.g., `GIT_CONFIG_KEY_0`).
+    - Added a `trap` to ensure the temporary file is deleted upon script exit.
 5.  **Revert/Consolidate Token Logic in `gemini-*.yml`**:
     - `gemini-reviewer.yml` and `gemini-handler.yml` keep the current structure for PAT fallback support, using `GH_PAT`.
     - Reply to the review comment explaining this rationale.

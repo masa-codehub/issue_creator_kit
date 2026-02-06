@@ -31,11 +31,15 @@ fi
 
 if [ -n "$TOKEN" ]; then
     echo "Updating submodules using provided token..."
-    # トークンがプロセス一覧（ps等）に露出しないよう、環境変数経由で git 設定を渡す
-    GIT_CONFIG_COUNT=1 \
-    GIT_CONFIG_KEY_0='url."https://x-access-token:'${TOKEN}'@github.com/".insteadOf' \
-    GIT_CONFIG_VALUE_0='https://github.com/' \
-        git submodule update --init --recursive || echo "Warning: Failed to update submodules. Continuing anyway..."
+    # トークンがプロセス一覧（ps等）に露出しないよう、一時的な git 設定ファイルを使用する
+    tmp_gitconfig="$(mktemp)"
+    # スクリプト終了時に一時ファイルを削除
+    trap 'rm -f "$tmp_gitconfig"' EXIT
+    cat > "$tmp_gitconfig" <<EOF
+[url "https://x-access-token:${TOKEN}@github.com/"]
+    insteadOf = https://github.com/
+EOF
+    git -c include.path="$tmp_gitconfig" submodule update --init --recursive || echo "Warning: Failed to update submodules. Continuing anyway..."
 else
     echo "Updating submodules..."
     git submodule update --init --recursive || echo "Warning: Failed to update submodules. Continuing anyway..."
