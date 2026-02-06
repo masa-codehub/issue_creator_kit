@@ -4,7 +4,6 @@ import pytest
 
 from issue_creator_kit.domain.document import Document, Metadata
 from issue_creator_kit.domain.exceptions import FileSystemError
-from issue_creator_kit.domain.interfaces import IFileSystemAdapter
 from issue_creator_kit.infrastructure.filesystem import FileSystemAdapter
 
 
@@ -14,7 +13,16 @@ class TestFileSystemAdapter:
         return FileSystemAdapter()
 
     def test_protocol_conformance(self, adapter):
-        assert isinstance(adapter, IFileSystemAdapter)
+        # Verify that the adapter implements the required methods from IFileSystemAdapter
+        required_methods = (
+            "read_document",
+            "save_document",
+            "update_metadata",
+            "list_files",
+            "find_file_by_id",
+        )
+        for name in required_methods:
+            assert hasattr(adapter, name)
 
     def test_read_document_success(self, adapter, tmp_path):
         # F-1: Read document with correct separation
@@ -108,35 +116,76 @@ class TestFileSystemAdapter:
 
         assert dst.read_text() == "new"
 
-    def test_find_file_by_id_success(self, adapter, fs):
+    def test_find_file_by_id_success(self, adapter, tmp_path):
         # Setup mock files in multiple dirs
-        fs.create_file(
-            "dir1/task1.md",
-            contents="---\nid: task-001\nstatus: Draft\ntitle: Task 1\n---\nBody 1",
+        dir1 = tmp_path / "dir1"
+        dir1.mkdir()
+        dir2 = tmp_path / "dir2"
+        dir2.mkdir()
+
+        f1 = dir1 / "task1.md"
+        f1.write_text(
+            "---\nid: task-001\nstatus: Draft\ntitle: Task 1\n---\nBody 1",
+            encoding="utf-8",
         )
-        fs.create_file(
-            "dir2/task2.md",
-            contents="---\nid: task-002\nstatus: Draft\ntitle: Task 2\n---\nBody 2",
+        f2 = dir2 / "task2.md"
+        f2.write_text(
+            "---\n  id  :   task-002  \nstatus: Draft\ntitle: Task 2\n---\nBody 2",
+            encoding="utf-8",
         )
-        fs.create_file(
-            "dir2/other.md",
-            contents="---\nid: task-003\nstatus: Draft\ntitle: Other\n---\nBody 3",
+        f3 = dir2 / "other.md"
+        f3.write_text(
+            "---\nid: 'task-003'\nstatus: Draft\ntitle: Other\n---\nBody 3",
+            encoding="utf-8",
         )
 
         # Search in dir2
-        path = adapter.find_file_by_id("task-002", ["dir1", "dir2"])
-        assert path == Path("dir2/task2.md")
+        path = adapter.find_file_by_id("task-002", [str(dir1), str(dir2)])
+        assert path.resolve() == f2.resolve()
 
         # Search in dir1
-        path = adapter.find_file_by_id("task-001", ["dir1", "dir2"])
-        assert path == Path("dir1/task1.md")
+        path = adapter.find_file_by_id("task-001", [str(dir1), str(dir2)])
+        assert path.resolve() == f1.resolve()
 
-    def test_find_file_by_id_not_found(self, adapter, fs):
-        fs.create_file(
-            "dir1/task1.md",
-            contents="---\nid: task-001\nstatus: Draft\ntitle: Task 1\n---\nBody 1",
-        )
+        # Search with quotes
+        path = adapter.find_file_by_id("task-003", [str(dir2)])
+        assert path.resolve() == f3.resolve()
+
+    def test_find_file_by_id_edge_cases(self, adapter, tmp_path):
+        # 1. Special characters in ID
+        dir1 = tmp_path / "dir1"
+        dir1.mkdir()
+        f1 = dir1 / "special.md"
+        f1.write_text("---\nid: task-special(draft)\n---\nBody", encoding="utf-8")
+
+        path = adapter.find_file_by_id("task-special(draft)", [str(dir1)])
+        assert path.resolve() == f1.resolve()
+
+        # 2. Empty search_dirs
+        with pytest.raises(FileSystemError):
+            adapter.find_file_by_id("any", [])
+
+        # 3. Multiple files with same ID (returns first found)
+        dir2 = tmp_path / "dir2"
+        dir2.mkdir()
+        f2 = dir2 / "task_dup.md"
+        f2.write_text("---\nid: task-dup\n---\nBody", encoding="utf-8")
+        f3 = dir1 / "task_dup_other.md"
+        f3.write_text("---\nid: task-dup\n---\nBody", encoding="utf-8")
+
+        # In dir1, dir2 order -> finds f3
+        path = adapter.find_file_by_id("task-dup", [str(dir1), str(dir2)])
+        assert path.resolve() == f3.resolve()
+
+        # In dir2, dir1 order -> finds f2
+        path = adapter.find_file_by_id("task-dup", [str(dir2), str(dir1)])
+        assert path.resolve() == f2.resolve()
+
+    def test_find_file_by_id_not_found(self, adapter, tmp_path):
+        dir1 = tmp_path / "dir1"
+        dir1.mkdir()
+        (dir1 / "task1.md").write_text("---\nid: task-001\n---\nBody", encoding="utf-8")
 
         with pytest.raises(FileSystemError) as excinfo:
-            adapter.find_file_by_id("task-999", ["dir1"])
+            adapter.find_file_by_id("task-999", [str(dir1)])
         assert "task-999" in str(excinfo.value)

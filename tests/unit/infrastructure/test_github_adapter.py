@@ -5,7 +5,6 @@ import pytest
 
 from issue_creator_kit.domain.document import Document, Metadata
 from issue_creator_kit.domain.exceptions import GitHubAPIError, GitHubRateLimitError
-from issue_creator_kit.domain.interfaces import IGitHubAdapter
 from issue_creator_kit.infrastructure.github_adapter import GitHubAdapter
 
 
@@ -15,7 +14,10 @@ class TestGitHubAdapter:
         return GitHubAdapter(repo="test/repo", token="ghp_test")
 
     def test_protocol_conformance(self, adapter):
-        assert isinstance(adapter, IGitHubAdapter)
+        # Verify that the adapter implements the required methods from IGitHubAdapter
+        required_methods = ("create_issue",)
+        for name in required_methods:
+            assert hasattr(adapter, name)
 
     def test_init_raises_if_no_token(self):
         # Clear env to ensure no token
@@ -83,14 +85,18 @@ class TestGitHubAdapter:
 
     @patch("requests.post")
     def test_create_issue_rate_limit(self, mock_post, adapter):
-        # Setup
+        # Case 1: Status 403 with header 0
         mock_response = MagicMock()
         mock_response.status_code = 403
         mock_response.headers = {"X-RateLimit-Remaining": "0"}
         mock_response.text = "Rate limit exceeded"
         mock_post.return_value = mock_response
 
-        # Execute & Verify
+        with pytest.raises(GitHubRateLimitError):
+            adapter.create_issue("Title", "Body")
+
+        # Case 2: Status 429
+        mock_response.status_code = 429
         with pytest.raises(GitHubRateLimitError):
             adapter.create_issue("Title", "Body")
 
@@ -110,7 +116,11 @@ class TestGitHubAdapter:
 
         doc = Document(
             metadata=Metadata(
-                id="task-001", title="Initial Task", phase="domain", status="Draft"
+                id="task-001",
+                title="Initial Task",
+                phase="domain",
+                status="Draft",
+                depends_on=["task-000"],
             ),
             content="Task body",
         )
@@ -122,8 +132,15 @@ class TestGitHubAdapter:
         assert issue_id == 123
         mock_post.assert_called_once()
         kwargs = mock_post.call_args.kwargs
-        assert "task-001: Initial Task" in kwargs["json"]["title"]
+        assert kwargs["json"]["title"] == "task-001: Initial Task"
         assert "domain" in kwargs["json"]["labels"]
+
+        # Verify body contains metadata table and formatted values
+        body = kwargs["json"]["body"]
+        assert "Task body" in body
+        assert "| Key | Value |" in body
+        assert "| id | task-001 |" in body
+        assert '| depends_on | ["task-000"] |' in body
 
     @patch("requests.patch")
     def test_sync_issue_update_existing_by_id(self, mock_patch, adapter):
@@ -155,14 +172,22 @@ class TestGitHubAdapter:
         mock_res.status_code = 200
         mock_res.json.return_value = {
             "total_count": 1,
-            "items": [{"number": 789, "title": "task-001: Task"}],
+            "items": [
+                {
+                    "number": 789,
+                    "title": "task-001: Task",
+                    "created_at": "2026-01-01T00:00:00Z",
+                }
+            ],
         }
         mock_get.return_value = mock_res
 
+        title = "task-001: Task"
         # Execute
-        issue_id = adapter.find_or_create_issue("task-001: Task", "Body")
+        issue_id = adapter.find_or_create_issue(title, "Body")
 
         # Verify
         assert issue_id == 789
         mock_get.assert_called_once()
-        assert "task-001: Task" in mock_get.call_args.kwargs["params"]["q"]
+        query = mock_get.call_args.kwargs["params"]["q"]
+        assert query == 'is:issue is:open in:title "task-001\\: Task" repo:test/repo'
