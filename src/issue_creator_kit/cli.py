@@ -46,17 +46,18 @@ def init_project(args):
     print("\nInitialization complete.")
 
 
+def adr_id_type(value: str) -> str:
+    """Validate ADR ID format (adr-XXX)."""
+    if not re.match(r"^adr-\d{3}$", value):
+        raise argparse.ArgumentTypeError(
+            f"Invalid --adr-id format: {value}. Expected adr-XXX (e.g., adr-001)."
+        )
+    return value
+
+
 def run_automation(args):
     """Run the issue creation automation (Virtual Queue)."""
     print("Running issue automation (Virtual Queue)...")
-
-    # Validation for adr-id format
-    if args.adr_id and not re.match(r"^adr-\d{3}$", args.adr_id):
-        print(
-            f"Error: Invalid --adr-id format: {args.adr_id}. Expected adr-XXX (e.g., adr-001).",
-            file=sys.stderr,
-        )
-        sys.exit(1)
 
     fs = FileSystemAdapter()
     gh = GitHubAdapter(repo=args.repo, token=args.token)
@@ -211,6 +212,7 @@ def main():
     )
     diff_parser.add_argument(
         "--adr-id",
+        type=adr_id_type,
         help="ADR ID to filter tasks (format: adr-XXX)",
     )
     diff_parser.add_argument(
