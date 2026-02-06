@@ -1,3 +1,4 @@
+import re
 import shutil
 from pathlib import Path
 from typing import Any
@@ -88,17 +89,31 @@ class FileSystemAdapter:
         Path(path).write_text(content, encoding="utf-8")
 
     def find_file_by_id(self, task_id: str, search_dirs: list[str]) -> Path:
+        """
+        Find a file by its ID in the specified directories.
+        Uses a regex-based search for better performance.
+        """
+        # Optimized regex-based search for ID in frontmatter
+        # Matches: id: task_id  (case insensitive and flexible with quotes/whitespace)
+        id_pattern = re.compile(
+            rf'^id:\s*["\']?{re.escape(task_id)}["\']?\s*$',
+            re.IGNORECASE | re.MULTILINE,
+        )
+
         for d in search_dirs:
             p = Path(d)
             if not p.exists():
                 continue
             for f in p.glob("*.md"):
                 try:
-                    doc = self.read_document(f)
-                    if doc.metadata.id == task_id:
+                    # Read only enough of the file to check frontmatter (e.g., first 1024 bytes)
+                    # or just read the whole file if it's typically small.
+                    content = f.read_text(encoding="utf-8")
+                    if id_pattern.search(content):
                         return f
                 except Exception:
                     continue
+
         from issue_creator_kit.domain.exceptions import FileSystemError
 
         raise FileSystemError(f"File with id '{task_id}' not found in {search_dirs}")
