@@ -58,7 +58,9 @@
     - **Target:** `ci.yml`, `auto-phase-promotion.yml`, `auto-create-issues.yml`, `auto-approve-docs.yml`
     - Remove `env: GITHUB_TOKEN` (or `GH_TOKEN`) definitions where they just map to `secrets.GITHUB_TOKEN`.
     - Update `steps` to use `${{ secrets.GITHUB_TOKEN }}` directly.
-3.  **Keep `gemini-*.yml`**:
+3.  **Refine `gemini-reviewer.yml`**:
+    - Update the `if` condition to use `contains(github.event.review.user.login, 'copilot')` instead of a hardcoded bot ID. This ensures the workflow triggers even if the bot's display name or ID slightly fluctuates.
+4.  **Keep Token Logic in `gemini-*.yml`**:
     - `gemini-reviewer.yml` and `gemini-handler.yml` keep the current structure for PAT fallback support.
     - Reply to the review comment explaining this rationale.
 
