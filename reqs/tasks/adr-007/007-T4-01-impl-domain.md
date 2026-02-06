@@ -1,18 +1,17 @@
 ---
 id: 007-T4-01
 parent: adr-007
-parent_issue: 
 type: task
 title: "[TDD] Data Model & Adapter Protocols (Domain)"
 status: Draft
 phase: domain
+date: 2026-02-05
 labels:
   - "gemini:tdd"
   - "P1"
   - "BACKENDCODER"
 roadmap: "docs/specs/plans/adr-007-metadata-driven-lifecycle/tdd-plan.md"
 depends_on: []
-issue_id: 
 ---
 # [TDD] Data Model & Adapter Protocols (Domain)
 

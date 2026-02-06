@@ -1,18 +1,17 @@
 ---
 id: 007-T4-04
 parent: adr-007
-parent_issue: 
 type: task
 title: "[TDD] CLI Integration (Interface)"
 status: Draft
 phase: interface
+date: 2026-02-05
 labels:
   - "gemini:tdd"
   - "P1"
   - "BACKENDCODER"
 roadmap: "docs/specs/plans/adr-007-metadata-driven-lifecycle/tdd-plan.md"
 depends_on: ["007-T4-03"]
-issue_id: 
 ---
 # [TDD] CLI Integration (Interface)
 

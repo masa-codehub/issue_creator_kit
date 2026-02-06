@@ -1,18 +1,17 @@
 ---
 id: 007-T4-03
 parent: adr-007
-parent_issue: 
 type: task
 title: "[TDD] Issue Creation Logic (UseCase)"
 status: Draft
 phase: usecase
+date: 2026-02-05
 labels:
   - "gemini:tdd"
   - "P1"
   - "BACKENDCODER"
 roadmap: "docs/specs/plans/adr-007-metadata-driven-lifecycle/tdd-plan.md"
 depends_on: ["007-T4-01"]
-issue_id: 
 ---
 # [TDD] Issue Creation Logic (UseCase)
 

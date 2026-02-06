@@ -4,7 +4,6 @@ parent: adr-007
 type: integration
 phase: spec
 status: Issued
-issue_id: 279
 depends_on:
   - "007-T3-01"
   - "007-T3-02"
