@@ -218,28 +218,17 @@ graph LR
 
 
 
-## Metadata Field Definitions & Guardrails (ADer-008)
-
-
+## Metadata Field Definitions & Guardrails (ADR-008)
 
 本セクションでは、ドキュメントの整合性を担保するための「ドメイン・ガードレール（バリデーション規則）」を定義します。これらの規則は、`src/issue_creator_kit/domain/models/` (現状は `document.py` 内の `Metadata` モデル) において Pydantic Validator として実装されます。
 
-
-
 ### Field Validation Rules
 
-
-
 | Field | Description | Type | Validation Rules (Guardrails) |
-
 | :--- | :--- | :--- | :--- |
-
 | `id` | ユニーク識別子 | String | Regex: `adr-\d{3}-.*` (ADR) or `task-\d{3}-\d{2,}` (Task) |
-
 | `status` | ライフサイクル状態 | Enum | ADR: `Draft`, `Approved`, `Postponed`, `Superseded` / Task: `Draft`, `Ready`, `Issued`, `Completed`, `Cancelled` |
-
-| `depends_on` | 依存先IDリスト | List[Str]| Graph Integrity: 対象IDの存在確認、自己参照禁止、循環参照禁止 (No Cycles) |
-
+| `depends_on` | 依存先IDリスト | String (List) | Graph Integrity: 対象IDの存在確認、自己参照禁止、循環参照禁止 (No Cycles) |
 | `issue_id` | GitHub Issue番号 | Integer | Conditional: `status` が `Issued` または `Completed` の場合に必須 |
 
 
