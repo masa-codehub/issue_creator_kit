@@ -188,7 +188,7 @@ class WorkflowUseCase:
 
         # 2. Scan archive/ to find matching task files and build a lookup map (O(N+M))
         archive_path = Path(archive_dir)
-        all_task_files = self.fs.list_files(archive_path, "**/*.md")
+        all_task_files = self.fs.list_files(archive_path)
 
         issue_to_phase_map: dict[str, str] = {}
         for task_file in all_task_files:

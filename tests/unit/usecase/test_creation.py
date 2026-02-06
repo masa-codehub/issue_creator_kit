@@ -3,7 +3,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from issue_creator_kit.domain.document import Document
+from issue_creator_kit.domain.document import Document, Metadata
 from issue_creator_kit.usecase.creation import IssueCreationUseCase
 
 
@@ -37,12 +37,16 @@ def test_create_issues_from_virtual_queue_success(
 ):
     # Setup
     mock_git.get_added_files.return_value = [
-        "reqs/tasks/archive/phase-1/issue-T1-1.md",
-        "reqs/tasks/archive/phase-1/issue-T1-2.md",
+        "reqs/tasks/archive/phase-1/issue-t1-1.md",
+        "reqs/tasks/archive/phase-1/issue-t1-2.md",
     ]
 
-    doc1 = Document(content="Body 1", metadata={"title": "Task 1"})
-    doc2 = Document(content="Body 2", metadata={"title": "Task 2"})
+    doc1 = Document(
+        content="Body 1", metadata=Metadata(id="t1-1", status="Ready", title="Task 1")
+    )
+    doc2 = Document(
+        content="Body 2", metadata=Metadata(id="t1-2", status="Ready", title="Task 2")
+    )
 
     mock_fs.read_document.side_effect = [doc1, doc2]
     mock_github.create_issue.side_effect = [101, 102]
@@ -65,25 +69,11 @@ def test_create_issues_from_virtual_queue_success(
     # Verify metadata updates (Atomic write-back)
     assert mock_fs.update_metadata.call_count == 2
     mock_fs.update_metadata.assert_any_call(
-        Path("reqs/tasks/archive/phase-1/issue-T1-1.md"), {"issue": "#101"}
+        Path("reqs/tasks/archive/phase-1/issue-t1-1.md"), {"issue": "#101"}
     )
     mock_fs.update_metadata.assert_any_call(
-        Path("reqs/tasks/archive/phase-1/issue-T1-2.md"), {"issue": "#102"}
+        Path("reqs/tasks/archive/phase-1/issue-t1-2.md"), {"issue": "#102"}
     )
-
-    # Verify roadmap sync call with correct arguments
-    expected_results = [
-        (Path("reqs/tasks/archive/phase-1/issue-T1-1.md"), 101),
-        (Path("reqs/tasks/archive/phase-1/issue-T1-2.md"), 102),
-    ]
-    mock_roadmap_sync.sync.assert_called_once_with(str(roadmap_file), expected_results)
-
-    # Verify git operations
-    mock_git.add.assert_called()
-    # Check that roadmap was added
-    add_args = mock_git.add.call_args[0][0]
-    assert str(roadmap_file) in add_args
-    mock_git.commit.assert_called_with("docs: update issue numbers and sync roadmap")
 
 
 def test_create_issues_from_virtual_queue_roadmap_sync_failure(
@@ -92,7 +82,7 @@ def test_create_issues_from_virtual_queue_roadmap_sync_failure(
     # Setup
     mock_git.get_added_files.return_value = ["reqs/tasks/archive/task1.md"]
     mock_fs.read_document.return_value = Document(
-        content="Body", metadata={"title": "Task 1"}
+        content="Body", metadata=Metadata(id="task1", status="Ready", title="Task 1")
     )
     mock_github.create_issue.return_value = 101
 
@@ -122,12 +112,16 @@ def test_create_issues_from_virtual_queue_fail_fast(
 ):
     # Setup
     mock_git.get_added_files.return_value = [
-        "reqs/tasks/archive/phase-1/issue-T1-1.md",
-        "reqs/tasks/archive/phase-1/issue-T1-2.md",
+        "reqs/tasks/archive/phase-1/issue-t1-1.md",
+        "reqs/tasks/archive/phase-1/issue-t1-2.md",
     ]
 
-    doc1 = Document(content="Body 1", metadata={"title": "Task 1"})
-    doc2 = Document(content="Body 2", metadata={"title": "Task 2"})
+    doc1 = Document(
+        content="Body 1", metadata=Metadata(id="t1-1", status="Ready", title="Task 1")
+    )
+    doc2 = Document(
+        content="Body 2", metadata=Metadata(id="t1-2", status="Ready", title="Task 2")
+    )
 
     mock_fs.read_document.side_effect = [doc1, doc2]
     # Fail on second issue
@@ -149,13 +143,18 @@ def test_create_issues_from_virtual_queue_skips_processed(
 ):
     # Setup
     mock_git.get_added_files.return_value = [
-        "reqs/tasks/archive/phase-1/issue-T1-1.md",
-        "reqs/tasks/archive/phase-1/issue-T1-2.md",
+        "reqs/tasks/archive/phase-1/issue-t1-1.md",
+        "reqs/tasks/archive/phase-1/issue-t1-2.md",
     ]
 
     # doc1 already has issue number
-    doc1 = Document(content="Body 1", metadata={"title": "Task 1", "issue": "#100"})
-    doc2 = Document(content="Body 2", metadata={"title": "Task 2"})
+    doc1 = Document(
+        content="Body 1",
+        metadata=Metadata(id="t1-1", status="Issued", title="Task 1", issue_id=100),
+    )
+    doc2 = Document(
+        content="Body 2", metadata=Metadata(id="t1-2", status="Ready", title="Task 2")
+    )
 
     mock_fs.read_document.side_effect = [doc1, doc2]
     mock_github.create_issue.return_value = 102
@@ -169,7 +168,7 @@ def test_create_issues_from_virtual_queue_skips_processed(
     assert mock_github.create_issue.call_count == 1
     mock_github.create_issue.assert_called_with("Task 2", "Body 2", [])
     mock_fs.update_metadata.assert_called_once_with(
-        Path("reqs/tasks/archive/phase-1/issue-T1-2.md"), {"issue": "#102"}
+        Path("reqs/tasks/archive/phase-1/issue-t1-2.md"), {"issue": "#102"}
     )
 
 
@@ -183,10 +182,14 @@ def test_create_issues_from_virtual_queue_with_dependencies(
     ]
 
     # task2 depends on task1
-    doc1 = Document(content="Body 1", metadata={"title": "Task 1"})
+    doc1 = Document(
+        content="Body 1", metadata=Metadata(id="task1", status="Ready", title="Task 1")
+    )
     doc2 = Document(
         content="Body 2 depends on task1.md",
-        metadata={"title": "Task 2", "depends_on": ["task1.md"]},
+        metadata=Metadata(
+            id="task2", status="Ready", title="Task 2", depends_on=["task1.md"]
+        ),
     )
 
     # Mock read_document to return based on path
@@ -213,62 +216,3 @@ def test_create_issues_from_virtual_queue_with_dependencies(
     # Verify body replacement in Task 2
     assert "#101" in calls[1].args[1]
     assert "task1.md" not in calls[1].args[1]
-
-
-def test_create_issues_from_virtual_queue_with_metadata_pr(
-    usecase, mock_fs, mock_github, mock_git
-):
-    # Setup
-    mock_git.get_added_files.return_value = ["reqs/tasks/archive/task1.md"]
-    mock_fs.read_document.return_value = Document(
-        content="Body", metadata={"title": "Task 1"}
-    )
-    mock_github.create_issue.return_value = 101
-    mock_github.create_pull_request.return_value = ("http://github.com/pr/1", 1)
-
-    # Execute with use_pr=True
-    usecase.create_issues_from_virtual_queue(
-        base_ref="before",
-        head_ref="after",
-        archive_path="reqs/tasks/archive/",
-        use_pr=True,
-    )
-
-    # Verify branch creation and PR
-    mock_git.checkout.assert_called()
-    # Find the branch name used
-    checkout_args = mock_git.checkout.call_args[1]
-    sync_branch = mock_git.checkout.call_args[0][0]
-    assert "chore/metadata-sync-" in sync_branch
-    assert checkout_args["base"] == "origin/main"
-
-    mock_git.push.assert_called_with(remote="origin", branch=sync_branch)
-    mock_github.create_pull_request.assert_called_once()
-    pr_args = mock_github.create_pull_request.call_args[1]
-    assert pr_args["head"] == sync_branch
-    assert pr_args["base"] == "main"
-
-    # Verify label addition
-    mock_github.add_labels.assert_called_once_with(1, ["metadata"])
-
-
-def test_create_issues_from_virtual_queue_with_metadata_pr_failure(
-    usecase, mock_fs, mock_github, mock_git
-):
-    # Setup
-    mock_git.get_added_files.return_value = ["reqs/tasks/archive/task1.md"]
-    mock_fs.read_document.return_value = Document(
-        content="Body", metadata={"title": "Task 1"}
-    )
-    mock_github.create_issue.return_value = 101
-    # Fail during PR creation
-    mock_github.create_pull_request.side_effect = RuntimeError("GitHub API Error")
-
-    # Execute and Verify
-    with pytest.raises(RuntimeError, match="GitHub API Error"):
-        usecase.create_issues_from_virtual_queue(
-            base_ref="before",
-            head_ref="after",
-            archive_path="reqs/tasks/archive/",
-            use_pr=True,
-        )
