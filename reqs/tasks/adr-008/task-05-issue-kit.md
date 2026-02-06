@@ -1,5 +1,5 @@
 ---
-id: 008-05
+id: task-008-05
 parent: adr-008
 type: task
 title: "Refactor Issue Kit Architecture Diagram"
@@ -10,7 +10,7 @@ labels:
   - "P2"
   - "SYSTEM_ARCHITECT"
 roadmap: "docs/architecture/plans/adr-008-automation-cleanup/design-brief.md"
-depends_on: ["008-04"]
+depends_on: ["task-008-04"]
 issue_id:
 ---
 # Refactor Issue Kit Architecture Diagram

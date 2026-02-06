@@ -21,7 +21,7 @@
 ## 3. Verification Methods (DoD)
 - **File Existence**:
   - `ls docs/architecture/plans/adr-008-automation-cleanup/definitions.md` returns success.
-  - `ls .gemini/tmp/issues/*.json` (or similar) confirms draft generation.
+  - `ls reqs/tasks/adr-008/*.md` confirms draft generation.
 - **Content Check**:
   - `grep "Physical State" docs/architecture/plans/adr-008-automation-cleanup/definitions.md`
 - **Integration**:

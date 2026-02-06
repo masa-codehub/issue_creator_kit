@@ -8,7 +8,7 @@
   - `_inbox/`: Draft state.
   - `_approved/`: Approved state (ready for processing).
   - `_archive/`: Processed/Done state.
-  - **Scanning Strategy**: Recursively walk `reqs/` directory. Ignore `_archive` initially? No, check if file exists in `_archive` to determine "Done".
+  - **Scanning Strategy**: Recursively walk the `reqs/` directory and determine the "Done" state by checking whether each file has a corresponding entry in `_archive/`.
   - **SSOT**: The file system IS the truth.
 
 ### Manual Approval Flow (手動承認フロー)
@@ -19,7 +19,7 @@
 ### Domain Guardrails (ドメイン・ガードレール)
 - **Definition**: Invariant checks implemented in the Domain Layer (Pydantic Models) to prevent invalid states.
 - **Checks**:
-  - **ID Format**: Must match `adr-\d{3}-.*` or `task-\d{3}-.*`.
+  - **ID Format**: Must match `adr-\d{3}-.*` for ADRs, or `task-\d{3}-\d{2,}` for Tasks (e.g., `task-008-01`).
   - **Dependency**: `depends_on` must reference valid IDs. No self-reference. No cycles.
 - **Scope**: Applied during scanning and CLI execution.
 

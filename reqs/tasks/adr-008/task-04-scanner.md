@@ -1,5 +1,5 @@
 ---
-id: 008-04
+id: task-008-04
 parent: adr-008
 type: task
 title: "Define Scanner Foundation Architecture"

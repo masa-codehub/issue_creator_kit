@@ -1,5 +1,5 @@
 ---
-id: 008-integrate
+id: task-008-integrate
 parent: adr-008
 type: integration
 title: "[Arch Integration] ADR-008 Architecture Refactoring"
@@ -10,7 +10,7 @@ labels:
   - "P1"
   - "SYSTEM_ARCHITECT"
 roadmap: "docs/architecture/plans/adr-008-automation-cleanup/design-brief.md"
-depends_on: ["008-01", "008-02", "008-03", "008-04", "008-05"]
+depends_on: ["task-008-01", "task-008-02", "task-008-03", "task-008-04", "task-008-05"]
 issue_id:
 ---
 # [Arch Integration] ADR-008 Architecture Refactoring
@@ -26,7 +26,7 @@ issue_id:
 ## 3. 統合手順 (Integration Steps)
 
 ### 3.1. マージと競合解決
-- [ ] 各Feature Branch (`task-008-01` ~ `05`) を `feature/arch-update-adr008` にマージ。
+- [ ] 各Feature Branch (`feature/task-008-01-archive-docs` ~ `feature/task-008-05-issue-kit`) を `feature/arch-update-adr008` にマージ。
 - [ ] 競合が発生した場合は、`definitions.md` および ADR-008 の記述を優先して解決。
 
 ### 3.2. 全体監査 (Auditing)

@@ -1,5 +1,5 @@
 ---
-id: 008-01
+id: task-008-01
 parent: adr-008
 type: task
 title: "Archive Obsolete Architecture Docs (ADR-003)"

@@ -22,7 +22,7 @@
     - `arch-behavior-003-creation.md` (Archive)
     - `arch-state-003-task-lifecycle.md` (Archive)
     - `arch-structure-003-vqueue.md` (Archive)
-    - *Note: Move to `docs/architecture/archive/` or delete if consistent with project policy.*
+    - *Note: Move all obsolete files to `docs/architecture/archive/` for historical preservation.*
 
 ### 3.2. スキャナー基盤の設計 (Scanner Foundation)
 - **Documentation Update:**
@@ -38,7 +38,7 @@
 - **Documentation Update:**
     - `arch-structure-007-metadata.md`: Pydantic Validator による不変条件（ID形式、循環参照禁止）の記述追加。
 - **System Logic:**
-    - **Pydantic モデル**: `id` 形式 (`adr-xxx`, `task-slug`), `depends_on` の整合性（自己参照、循環参照禁止）を検証するバリデーターの実装方針。
+    - **Pydantic モデル**: `id` 形式 (ADRは `adr-\d{3}-.*`、タスクは `task-\d{3}-\d{2,}`), `depends_on` の整合性（自己参照、循環参照禁止）を検証するバリデーターの実装方針。
     - **共通化**: CLI と将来の Actions で同じバリデーションロジックを利用するための設計。
 
 ## 4. 制約と評価基準 (Constraints & Evaluation)

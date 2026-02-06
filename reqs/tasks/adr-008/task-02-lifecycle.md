@@ -1,5 +1,5 @@
 ---
-id: 008-02
+id: task-008-02
 parent: adr-008
 type: task
 title: "Update Architecture Lifecycle to Physical State"
@@ -10,7 +10,7 @@ labels:
   - "P1"
   - "SYSTEM_ARCHITECT"
 roadmap: "docs/architecture/plans/adr-008-automation-cleanup/design-brief.md"
-depends_on: ["008-01"]
+depends_on: ["task-008-01"]
 issue_id:
 ---
 # Update Architecture Lifecycle to Physical State

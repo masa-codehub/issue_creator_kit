@@ -1,5 +1,5 @@
 ---
-id: 008-03
+id: task-008-03
 parent: adr-008
 type: task
 title: "Update Architecture Metadata for Domain Guardrails"
@@ -10,7 +10,7 @@ labels:
   - "P1"
   - "SYSTEM_ARCHITECT"
 roadmap: "docs/architecture/plans/adr-008-automation-cleanup/design-brief.md"
-depends_on: []
+depends_on: ["task-008-04"]
 issue_id:
 ---
 # Update Architecture Metadata for Domain Guardrails
