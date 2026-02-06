@@ -21,11 +21,12 @@ permissions:
 jobs:
   approve-and-move:
     runs-on: self-hosted
-    env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
 
       # [環境依存のセットアップ]
       # 実行環境に Python 3.13 がない場合は、以下のステップを追加してください。
@@ -93,6 +94,7 @@ jobs:
         if: steps.process.outputs.has_changes == 'true'
         env:
           BRANCH_NAME: ${{ steps.process.outputs.branch_name }}
+          GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
         run: |
           # 自動生成された PR を作成（gh コマンドは環境にプリインストールされて いる前提）。
           gh pr create \

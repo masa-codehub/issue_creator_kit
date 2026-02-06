@@ -18,7 +18,7 @@ jobs:
       contains(github.event.issue.labels.*.name, 'gemini:tdd')
     runs-on: [self-hosted]
     env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_MCP_PAT || secrets.GITHUB_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
       AGENT_ROLE: ${{ contains(github.event.issue.labels.*.name, 'gemini:arch') && 'SYSTEM_ARCHITECT' || contains(github.event.issue.labels.*.name, 'gemini:spec') && 'TECHNICAL_DESIGNER' || contains(github.event.issue.labels.*.name, 'gemini:tdd') && 'BACKENDCODER' || 'SYSTEM_ARCHITECT' }}
 
     steps:
@@ -26,6 +26,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          submodules: recursive
+          token: ${{ env.GITHUB_TOKEN }}
 
       - name: Refresh Environment
         run: |

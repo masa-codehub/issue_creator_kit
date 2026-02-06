@@ -18,48 +18,31 @@ if [ -f "pyproject.toml" ]; then
     uv sync --all-extras
 fi
 
-# .gemini リポジトリの更新
-# トークンがあれば認証付きURLを使用
+# .gemini サブモジュールの更新
 # 優先順位: GITHUB_MCP_PAT > GH_TOKEN > GITHUB_TOKEN
-# (ActionsのデフォルトGITHUB_TOKENは他リポジトリへの権限がない場合があるため、明示的なトークンを優先)
-export GIT_TERMINAL_PROMPT=0
-GEMINI_REPO_URL="https://github.com/masa-codehub/gemini_context.git"
-
 TOKEN=""
-SOURCE=""
-
 if [ -n "$GITHUB_MCP_PAT" ]; then
     TOKEN="$GITHUB_MCP_PAT"
-    SOURCE="GITHUB_MCP_PAT"
 elif [ -n "$GH_TOKEN" ]; then
     TOKEN="$GH_TOKEN"
-    SOURCE="GH_TOKEN"
 elif [ -n "$GITHUB_TOKEN" ]; then
     TOKEN="$GITHUB_TOKEN"
-    SOURCE="GITHUB_TOKEN"
 fi
 
 if [ -n "$TOKEN" ]; then
-    echo "Using authentication token from $SOURCE"
-    GEMINI_REPO_URL="https://x-access-token:${TOKEN}@github.com/masa-codehub/gemini_context.git"
-fi
-
-if [ -d ".gemini/.git" ]; then
-    echo "Updating .gemini repository..."
-    # 認証情報を確実に適用するため remote URL を更新してから pull する
-    git -C .gemini remote set-url origin "$GEMINI_REPO_URL"
-    git -C .gemini pull origin main || echo "Warning: Failed to update .gemini repository."
+    echo "Updating submodules using provided token..."
+    # トークンがプロセス一覧（ps等）に露出しないよう、一時的な git 設定ファイルを使用する
+    tmp_gitconfig="$(mktemp)"
+    # スクリプト終了時に一時ファイルを削除
+    trap 'rm -f "$tmp_gitconfig"' EXIT
+    cat > "$tmp_gitconfig" <<EOF
+[url "https://x-access-token:${TOKEN}@github.com/"]
+    insteadOf = https://github.com/
+EOF
+    git -c include.path="$tmp_gitconfig" submodule update --init --recursive || echo "Warning: Failed to update submodules. Continuing anyway..."
 else
-    echo "Cloning .gemini repository..."
-    rm -rf .gemini
-    git clone "$GEMINI_REPO_URL" .gemini || {
-        if [ -n "$SOURCE" ]; then
-            echo "Error: Failed to clone .gemini repository. Please check your token from $SOURCE or access rights."
-        else
-            echo "Error: Failed to clone .gemini repository. Public access might be denied. Please check your access rights or set an authentication token (e.g., GITHUB_MCP_PAT, GH_TOKEN, or GITHUB_TOKEN)."
-        fi
-        exit 1
-    }
+    echo "Updating submodules..."
+    git submodule update --init --recursive || echo "Warning: Failed to update submodules. Continuing anyway..."
 fi
 
 # 2. pre-commit のインストール

@@ -12,10 +12,11 @@ permissions:
 jobs:
   build:
     runs-on: self-hosted
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
 
       - name: Install dependencies
         run: bash .build/run.sh
