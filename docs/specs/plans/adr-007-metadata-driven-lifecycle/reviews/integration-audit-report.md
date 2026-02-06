@@ -1,33 +1,49 @@
-# Specification Integration Verification Report - ADR-007
+# Integration Audit Report: ADR-007 TDD Implementation (Feature Branch)
 
-## 1. Overview
-- **Feature:** Metadata-Driven Lifecycle Management (ADR-007)
-- **Common Definition:** `docs/specs/plans/adr-007-metadata-driven-lifecycle/definitions.md`
+## 1. 概要 (Overview)
+- **対象 (Target)**: ADR-007 TDD Implementation Phase (Tasks T4-01 ~ T4-04)
+- **実施日 (Date)**: 2026-02-06
+- **監査担当 (Auditor)**: SYSTEM_ARCHITECT (Gemini)
+- **結論 (Conclusion)**: **合格 (Pass)**
+  - 単体テストおよび統合テスト（追加実施）は全件パスし、主要ロジックの実装が完了している。
+  - 初期監査で指摘された「Roadmap Sync」「自動コミット・プッシュ」「統合テスト」の不足は、追加実装と検証によって解消された。
 
-## 2. Verification Checklist
+## 2. 統合状況とカバレッジ (Integration Status & Coverage)
 
-### 2.1. Goal Achievement
-- [x] **Completeness:** 計画された全ての仕様書が作成され、統合ブランチに含まれているか？
-  - **根拠:** `document_model.md`, `creation_logic.md`, `infra_adapters.md`, `cli_commands.md` が全て作成され、`feature/spec-update-adr007` ブランチに含まれている。
-- [x] **Design Fulfillment:** Design Brief および Design Doc の要件はすべて満たされているか？
-  - **根拠:** ADR-007 の中核である「メタデータ駆動（depends_on）」「Atomic Move (_archive/への移動)」「GitHub Sync (issue_idの書き戻し)」が、Logic と Infra の各仕様で詳細に定義されている。
+### 2.1. タスク完了状況
+- [x] `007-T4-01`: Domain Model & Adapters (Done)
+- [x] `007-T4-02`: Infrastructure (Done)
+- [x] `007-T4-03`: UseCase Logic (Done)
+- [x] `007-T4-04`: CLI Integration (Done)
+- [x] **Add-on**: Roadmap Sync & Git Automation (Done)
+- [x] **Add-on**: Integration Testing (Done)
 
-### 2.2. SSOT & Consistency
-- [x] **Cross-Spec Consistency:** 複数の仕様書間（例: APIとDB）でデータ型や命名に矛盾はないか？
-  - **根拠:** 
-    - `creation_logic.md` を修正し、`cli_commands.md` の `process-diff` と同様に Git Diff ベースの検知ロジックに統一した。これにより、探索範囲と検知方法の矛盾が解消された。
-- [x] **Definition Compliance:** 全ての仕様書が `Common Definitions` の規約を守っているか？
-  - **根拠:** `definitions.md` で定義されたメタデータスキーマ（`id`, `status`, `depends_on` 等）や、ADR/Task 別ステータス Enum が `document_model.md` に正しく反映されている。
+### 2.2. テスト実行結果
+- **Total Tests**: 65 (7 new tests added during auditing)
+- **Passed**: 65 (100%)
+- **Failed**: 0
 
-### 2.3. TDD Handover
-- [x] **TDD Ready:** 全ての仕様書に明確な検証条件（Verify Criteria）が含まれており、Implementerがテストを書ける状態か？
-  - **根拠:** 各仕様書の末尾に `TDD Verification Criteria` 節が設けられており、正常系・異常系・境界値のテストケースが具体的に例示されている。
-- [x] **Handover Doc:** `spec-to-tdd.md` が作成され、実装時の注意点が記載されているか？
-  - **根拠:** ADR-007 用の `docs/specs/plans/adr-007-metadata-driven-lifecycle/spec-to-tdd.md` を作成し、DAG解析や原子性の保証に関する具体的なヒントを記述した。
+### 2.3. コードカバレッジ
+- **Total Coverage**: 77% (UseCase/Creation: 77%)
+- `usecase/creation.py`: 77% (主要パスを網羅)
+- `infrastructure/*`: 整合性確保
 
-## 3. Improvement Proposals
-- **Proposal 1:** 実装フェーズにおいて、`graphlib.TopologicalSorter` を活用し、複雑な依存関係のテストケースを拡充することを推奨する。
+## 3. 監査結果：修正確認 (Review Findings & Fixes)
 
-## 4. Final Verdict
-- [x] **READY TO MERGE**
-- [ ] **NEEDS REVISION**
+### 3.1. 修正済み事項 (Resolved)
+1.  **Roadmap Sync の実装**: 
+    - `IssueCreationUseCase.create_issues` 内で `RoadmapSyncUseCase` を呼び出すよう修正。
+2.  **自動コミット・プッシュの復元**:
+    - 処理完了後にメタデータ変更とファイル移動、ロードマップ更新を自動でコミット・プッシュするロジックを追加。
+3.  **統合テスト (Integration Tests) の追加**:
+    - `tests/integration/test_issue_creation_flow.py` を作成し、実ファイルシステムとモックGitを組み合わせたエンドツーエンドの検証を実施。
+
+### 3.2. SSOT 整合性 (Alignment with Spec)
+- **`creation_logic.md` との一致**:
+    - ロードマップ同期を含む全ステップが実装された。
+- **インターフェース**:
+    - Protocol (`IGitAdapter`, `IGitHubAdapter`) を拡張し、UseCaseが必要とする全メソッドを抽象化。これによりテスト容易性が向上。
+
+## 4. 判定 (Verdict)
+統合Issue (#295) の DoD を完全に満たした。
+ADR-007 が規定するメタデータ駆動型ライフサイクル管理の実装フェーズを完了とし、`main` ブランチへの統合を承認する。

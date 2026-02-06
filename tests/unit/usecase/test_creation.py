@@ -39,78 +39,103 @@ def usecase(mock_fs, mock_git, mock_github):
 def test_create_issues_ordered_by_dependency(usecase, mock_fs, mock_git, mock_github):
     # T1 -> T2
     mock_git.get_added_files.return_value = [
-        "reqs/tasks/adr-007/T1.md",
-        "reqs/tasks/adr-007/T2.md",
+        "reqs/tasks/adr-007/t1.md",
+        "reqs/tasks/adr-007/t2.md",
     ]
 
-    doc1 = Document("content1", {"id": "T1", "depends_on": []})
-    doc2 = Document("content2", {"id": "T2", "depends_on": ["T1"]})
+    doc1 = Document("content1", {"id": "t1", "status": "Ready"})
+    doc2 = Document("content2", {"id": "t2", "status": "Ready", "depends_on": ["t1"]})
 
     def read_side_effect(path):
-        if "T1.md" in str(path):
+        if "t1.md" in str(path):
             return doc1
-        if "T2.md" in str(path):
+        if "t2.md" in str(path):
             return doc2
         return None
 
     mock_fs.read_document.side_effect = read_side_effect
     mock_github.create_issue.side_effect = [101, 102]
+    mock_git.get_current_branch.return_value = "main"
 
     usecase.create_issues(before="base", after="head", adr_id="adr-007")
 
-    # Verify order of creation: T1 then T2
+    # Verify order of creation: t1 then t2
     mock_github.create_issue.assert_has_calls(
         [
-            call(ANY, ANY, ANY),  # T1
-            call(ANY, ANY, ANY),  # T2
+            call(ANY, ANY, ANY),  # t1
+            call(ANY, ANY, ANY),  # t2
         ]
     )
 
     # Verify move
     mock_git.move_file.assert_has_calls(
         [
-            call("reqs/tasks/adr-007/T1.md", "reqs/tasks/_archive/T1.md"),
-            call("reqs/tasks/adr-007/T2.md", "reqs/tasks/_archive/T2.md"),
+            call("reqs/tasks/adr-007/t1.md", "reqs/tasks/_archive/t1.md"),
+            call("reqs/tasks/adr-007/t2.md", "reqs/tasks/_archive/t2.md"),
         ],
         any_order=True,
     )
 
+    # Verify commit
+    mock_git.commit.assert_called_with("docs: update issue numbers and sync roadmap")
+
+
+def test_create_issues_with_roadmap_sync(usecase, mock_fs, mock_git, mock_github):
+    mock_git.get_added_files.return_value = ["reqs/tasks/adr-007/t1.md"]
+    doc1 = Document("content1", {"id": "t1", "status": "Ready"})
+    mock_fs.read_document.return_value = doc1
+    mock_github.create_issue.return_value = 101
+    mock_git.get_current_branch.return_value = "main"
+
+    # UseCase should have roadmap_sync mocked via fixture
+    usecase.roadmap_sync = MagicMock()
+
+    usecase.create_issues(
+        before="base", after="head", adr_id="adr-007", roadmap_path="roadmap.md"
+    )
+
+    usecase.roadmap_sync.sync.assert_called_once()
+    # Check if roadmap.md was added to git
+    mock_git.add.assert_called()
+    added_files = mock_git.add.call_args[0][0]
+    assert "roadmap.md" in added_files
+
 
 def test_create_issues_with_archive_dependency(usecase, mock_fs, mock_git, mock_github):
-    # T2 depends on T1. T1 is already in _archive/
-    mock_git.get_added_files.return_value = ["reqs/tasks/adr-007/T2.md"]
-    mock_fs.list_files.return_value = [Path("reqs/tasks/_archive/T1.md")]
+    # t2 depends on t1. t1 is already in _archive/
+    mock_git.get_added_files.return_value = ["reqs/tasks/adr-007/t2.md"]
+    mock_fs.list_files.return_value = [Path("reqs/tasks/_archive/t1.md")]
 
-    doc1 = Document("content1", {"id": "T1", "status": "Issued", "issue_id": 101})
-    doc2 = Document("content2", {"id": "T2", "depends_on": ["T1"]})
+    doc1 = Document("content1", {"id": "t1", "status": "Issued", "issue_id": 101})
+    doc2 = Document("content2", {"id": "t2", "status": "Ready", "depends_on": ["t1"]})
 
     def read_side_effect(path):
-        if "T1.md" in str(path):
+        if "t1.md" in str(path):
             return doc1
-        if "T2.md" in str(path):
+        if "t2.md" in str(path):
             return doc2
         return None
 
     mock_fs.read_document.side_effect = read_side_effect
-
     mock_github.create_issue.return_value = 102
+    mock_git.get_current_branch.return_value = "main"
 
     usecase.create_issues(before="base", after="head", adr_id="adr-007")
 
     mock_github.create_issue.assert_called_once()
     mock_git.move_file.assert_called_with(
-        "reqs/tasks/adr-007/T2.md", "reqs/tasks/_archive/T2.md"
+        "reqs/tasks/adr-007/t2.md", "reqs/tasks/_archive/t2.md"
     )
 
 
 def test_create_issues_skipped_if_dependency_not_ready(
     usecase, mock_fs, mock_git, mock_github
 ):
-    # T2 depends on T1. T1 is NOT in batch and NOT in archive (or not Issued)
-    mock_git.get_added_files.return_value = ["reqs/tasks/adr-007/T2.md"]
+    # t2 depends on t1. t1 is NOT in batch and NOT in archive (or not Issued)
+    mock_git.get_added_files.return_value = ["reqs/tasks/adr-007/t2.md"]
     mock_fs.list_files.return_value = []  # No archive
 
-    doc2 = Document("content2", {"id": "T2", "depends_on": ["T1"]})
+    doc2 = Document("content2", {"id": "t2", "status": "Ready", "depends_on": ["t1"]})
     mock_fs.read_document.return_value = doc2
 
     usecase.create_issues(before="base", after="head", adr_id="adr-007")
@@ -120,14 +145,14 @@ def test_create_issues_skipped_if_dependency_not_ready(
 
 
 def test_create_issues_circular_dependency(usecase, mock_fs, mock_git):
-    # A -> B -> A
+    # a -> b -> a
     mock_git.get_added_files.return_value = [
-        "reqs/tasks/adr-007/A.md",
-        "reqs/tasks/adr-007/B.md",
+        "reqs/tasks/adr-007/a.md",
+        "reqs/tasks/adr-007/b.md",
     ]
 
-    doc_a = Document("contentA", {"id": "A", "depends_on": ["B"]})
-    doc_b = Document("contentB", {"id": "B", "depends_on": ["A"]})
+    doc_a = Document("contentA", {"id": "a", "status": "Ready", "depends_on": ["b"]})
+    doc_b = Document("contentB", {"id": "b", "status": "Ready", "depends_on": ["a"]})
 
     mock_fs.read_document.side_effect = [doc_a, doc_b]
 
@@ -138,8 +163,8 @@ def test_create_issues_circular_dependency(usecase, mock_fs, mock_git):
 def test_create_issues_fail_fast_no_move_on_api_error(
     usecase, mock_fs, mock_git, mock_github
 ):
-    mock_git.get_added_files.return_value = ["reqs/tasks/adr-007/T1.md"]
-    doc1 = Document("content1", {"id": "T1", "depends_on": []})
+    mock_git.get_added_files.return_value = ["reqs/tasks/adr-007/t1.md"]
+    doc1 = Document("content1", {"id": "t1", "status": "Ready", "depends_on": []})
     mock_fs.read_document.return_value = doc1
 
     mock_github.create_issue.side_effect = RuntimeError("API Error")

@@ -48,6 +48,9 @@ class IssueCreationUseCase:
         after: str,
         adr_id: str | None = None,
         archive_path: str = "reqs/tasks/_archive/",
+        roadmap_path: str | None = None,
+        use_pr: bool = False,
+        base_branch: str = "main",
     ) -> None:
         """
         Implementation of ADR-007 Issue Creation Logic.
@@ -124,6 +127,8 @@ class IssueCreationUseCase:
         issued_tasks: list[tuple[str, int, Document]] = []
         try:
             for doc_id in create_order:
+                if doc_id not in ready_tasks:
+                    continue
                 doc = batch_docs[doc_id]
 
                 title = doc.metadata.get("title") or doc_id
@@ -143,7 +148,9 @@ class IssueCreationUseCase:
             raise RuntimeError(f"Issue creation failed: {e}") from e
 
         # Step 4: Atomic Move & Status Transition
-        for doc_id, _, doc in issued_tasks:
+        processed_paths = []
+        sync_results: list[tuple[Path, int]] = []
+        for doc_id, issue_id, doc in issued_tasks:
             src_path = path_map[doc_id]
             dst_path = f"{archive_path}{Path(src_path).name}"
 
@@ -152,3 +159,47 @@ class IssueCreationUseCase:
 
             # Atomic Move via git mv
             self.git.move_file(src_path, dst_path)
+            processed_paths.append(dst_path)
+            sync_results.append((Path(dst_path), issue_id))
+
+        # Step 5: Roadmap Sync
+        if self.roadmap_sync and roadmap_path:
+            try:
+                self.roadmap_sync.sync(roadmap_path, sync_results)
+                processed_paths.append(roadmap_path)
+            except Exception as e:
+                print(f"Warning: Roadmap sync failed: {e}")
+
+        # Step 6: Git Commit & Push
+        if processed_paths:
+            try:
+                if use_pr:
+                    import time
+
+                    timestamp = int(time.time())
+                    sync_branch = f"chore/metadata-sync-{timestamp}"
+                    print(f"Creating metadata sync branch: {sync_branch}")
+
+                    self.git.fetch(remote="origin")
+                    self.git.checkout(
+                        sync_branch, create=True, base=f"origin/{base_branch}"
+                    )
+                    self.git.add(processed_paths)
+                    self.git.commit("docs: update issue numbers and sync roadmap")
+                    self.git.push(remote="origin", branch=sync_branch)
+
+                    title = "chore: sync metadata for new issues"
+                    body = "Automatic metadata update (issue numbers and roadmap sync) for newly created issues."
+                    pr_url, pr_number = self.github.create_pull_request(
+                        title, body, head=sync_branch, base=base_branch
+                    )
+                    self.github.add_labels(pr_number, ["metadata"])
+                    print(f"Created metadata sync PR: {pr_url}")
+                else:
+                    current_branch = self.git.get_current_branch()
+                    self.git.add(processed_paths)
+                    self.git.commit("docs: update issue numbers and sync roadmap")
+                    self.git.push(remote="origin", branch=current_branch)
+            except Exception as e:
+                print(f"Git operations failed: {e}")
+                raise RuntimeError(f"Failed to record metadata changes: {e}") from e

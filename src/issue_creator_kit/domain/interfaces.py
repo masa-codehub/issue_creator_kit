@@ -34,10 +34,48 @@ class IGitAdapter(ABC):
     def move_file(self, src: str, dst: str) -> None:
         pass
 
+    @abstractmethod
+    def get_current_branch(self) -> str:
+        pass
+
+    @abstractmethod
+    def checkout(
+        self, branch: str, create: bool = False, base: str | None = None
+    ) -> None:
+        pass
+
+    @abstractmethod
+    def add(self, paths: list[str]) -> None:
+        pass
+
+    @abstractmethod
+    def commit(self, message: str) -> None:
+        pass
+
+    @abstractmethod
+    def push(
+        self, remote: str = "origin", branch: str = "main", set_upstream: bool = False
+    ) -> None:
+        pass
+
+    @abstractmethod
+    def fetch(self, remote: str = "origin", prune: bool = False) -> None:
+        pass
+
 
 class IGitHubAdapter(ABC):
     @abstractmethod
     def create_issue(
         self, title: str, body: str, labels: list[str] | None = None
     ) -> int:
+        pass
+
+    @abstractmethod
+    def create_pull_request(
+        self, title: str, body: str, head: str, base: str
+    ) -> tuple[str, int]:
+        pass
+
+    @abstractmethod
+    def add_labels(self, issue_number: int, labels: list[str]) -> None:
         pass
