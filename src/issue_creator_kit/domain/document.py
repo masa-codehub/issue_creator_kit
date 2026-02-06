@@ -116,11 +116,14 @@ class Metadata(BaseModel):
 
     def update(self, updates: dict[str, Any]) -> None:
         # Re-validate after update by creating a new instance
+        # model_copy does not validate and cannot add new extra fields
         data = self.model_dump()
         data.update(updates)
         new_obj = Metadata(**data)
-        for key, value in new_obj.model_dump().items():
-            setattr(self, key, value)
+        self.__dict__.update(new_obj.__dict__)
+        # Ensure extra fields are copied for Pydantic v2
+        if hasattr(new_obj, "__pydantic_extra__"):
+            object.__setattr__(self, "__pydantic_extra__", new_obj.__pydantic_extra__)
 
 
 class Document:
@@ -151,7 +154,7 @@ class Document:
                         if body.startswith("\n"):
                             body = body[1:]
                         content = body
-            except Exception:
+            except yaml.YAMLError:
                 # Fallback to list parsing? Usually YAML errors should be reported
                 pass
         else:

@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock
+from unittest.mock import ANY, MagicMock
 
 import pytest
 
@@ -36,7 +36,12 @@ class TestApprovalUseCase:
         # Verify
         mock_fs.read_document.assert_called_once_with(file_path)
         # Verify metadata update (Status and Date)
-        assert mock_fs.update_metadata.call_count >= 2
+        mock_fs.update_metadata.assert_any_call(
+            file_path, {"status": "Approved", "date": ANY}
+        )
+        mock_fs.update_metadata.assert_any_call(
+            approved_dir / "test.md", {"issue_id": 123}
+        )
         mock_github.create_issue.assert_called_once()
         assert mock_github.create_issue.call_args[1]["title"] == "Test Title"
 

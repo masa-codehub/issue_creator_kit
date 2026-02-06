@@ -1,4 +1,5 @@
 # ruff: noqa: T201
+import time
 from graphlib import CycleError, TopologicalSorter
 from pathlib import Path
 
@@ -104,7 +105,9 @@ class IssueCreationUseCase:
                     if a_doc.metadata.get("status") in ["Issued", "Completed"]:
                         continue
                 # 3. Check if it's already issued
-                return False
+                raise RuntimeError(
+                    f"Missing dependency: {d_id} for task {doc.metadata.id}"
+                )
             return True
 
         for doc_id, doc in batch_docs.items():
@@ -174,8 +177,6 @@ class IssueCreationUseCase:
         if processed_paths:
             try:
                 if use_pr:
-                    import time
-
                     timestamp = int(time.time())
                     sync_branch = f"chore/metadata-sync-{timestamp}"
                     print(f"Creating metadata sync branch: {sync_branch}")
