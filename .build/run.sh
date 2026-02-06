@@ -30,14 +30,14 @@ elif [ -n "$GITHUB_TOKEN" ]; then
 fi
 
 if [ -n "$TOKEN" ]; then
-    echo "Configuring git to use token for submodule updates..."
-    # サブモジュールのURLを動的にトークン付きに変更する代わりに、git config の insteadOf を使用
-    # これにより .gitmodules のURLを汚さずに認証を通せる
-    git config --global url."https://x-access-token:${TOKEN}@github.com/".insteadOf "https://github.com/"
+    echo "Updating submodules using provided token..."
+    # -c を使うことで、このコマンド実行時のみ一時的に設定を適用する（グローバル設定を汚さない）
+    git -c url."https://x-access-token:${TOKEN}@github.com/".insteadOf "https://github.com/" \
+        submodule update --init --recursive || echo "Warning: Failed to update submodules. Continuing anyway..."
+else
+    echo "Updating submodules..."
+    git submodule update --init --recursive || echo "Warning: Failed to update submodules. Continuing anyway..."
 fi
-
-echo "Updating submodules..."
-git submodule update --init --recursive || echo "Warning: Failed to update submodules. Continuing anyway..."
 
 # 2. pre-commit のインストール
 if [ -d ".git" ]; then
