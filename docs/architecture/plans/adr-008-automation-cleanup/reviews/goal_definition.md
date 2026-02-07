@@ -1,32 +1,25 @@
-# Goal Definition: Architecture Refactoring Plan for ADR-008
+# Goal Definition - Issue #315: Architecture Fix for ADR-008
 
-## 1. Objective (Outcome)
-- **Goal**: Establish a concrete execution plan for updating the architecture documentation to reflect ADR-008 (Cleanup & Scanner Foundation).
-- **Scope**:
-  - Archive/Remove obsolete ADR-003 documents.
-  - Update ADR-007 documents to match the new "Manual Approval" and "Physical State" model.
-  - Define new architecture components (Scanner, Visualizer) in documentation.
-  - Generate GitHub Issues to delegate the actual drafting/updating work.
+## 1. 達成すべき目標 (SMART Goals)
+- **Specific**: `arch-structure-issue-kit.md` と `arch-structure-007-metadata.md` を更新し、ADR-008 (Scanner Foundation) の構造と制約を正しく記述する。
+- **Measurable**:
+  - `arch-structure-issue-kit.md` から `WorkflowUseCase`, `ApprovalUseCase` の記述が消え、`Scanner Foundation` の記述が追加されていること。
+  - `arch-structure-007-metadata.md` に `## Invariants` セクションが追加され、ID形式と依存関係の制約が明文化されていること。
+  - Mermaid 図面が正しくレンダリングされ、依存関係の方向が Clean Architecture に準拠していること。
+- **Achievable**: `scouting-facts` で必要な情報をすべて収集済みであり、参照ドキュメントも特定されているため達成可能。
+- **Relevant**: プロジェクトの SSOT を最新化し、実装の不整合を防ぐために不可欠。
+- **Time-bound**: 本セッション中に完了させる。
 
-## 2. Deliverables
-1.  **Design Brief Update**: `docs/architecture/plans/adr-008-automation-cleanup/design-brief.md` updated with specific doc refactoring scope.
-2.  **Common Definitions**: `docs/architecture/plans/adr-008-automation-cleanup/definitions.md` defining "Physical State Scanner", "Domain Guardrails", etc.
-3.  **Issue Drafts**: A set of JSON/Markdown drafts for:
-    - Archiving 4 obsolete docs.
-    - Updating 4 existing docs.
-    - Creating 1 new doc (`arch-structure-008-scanner.md`).
-    - 1 Integration Issue.
-4.  **Pull Request**: A PR containing the above plan artifacts.
+## 2. 完了条件 (Definition of Done)
+- [ ] `docs/architecture/arch-structure-issue-kit.md` が更新され、旧コンポーネントが削除されている。
+- [ ] `docs/architecture/arch-structure-issue-kit.md` に `Scanner Foundation` (FileSystemScanner, TaskParser, GraphBuilder) が追加されている。
+- [ ] `docs/architecture/arch-structure-007-metadata.md` に `Invariants` セクションが追加されている。
+- [ ] すべての Mermaid 図面が構文エラーなく、依存の方向が正しい。
+- [ ] 自己監査レポート（`drafting-audit-template.md` ベース）を作成し、合格している。
 
-## 3. Verification Methods (DoD)
-- **File Existence**:
-  - `ls docs/architecture/plans/adr-008-automation-cleanup/definitions.md` returns success.
-  - `ls reqs/tasks/adr-008/*.md` confirms draft generation.
-- **Content Check**:
-  - `grep "Physical State" docs/architecture/plans/adr-008-automation-cleanup/definitions.md`
-- **Integration**:
-  - The Integration Issue draft lists all other generated issue drafts as dependencies.
-
-## 4. Constraints
-- **SSOT**: Strictly follow `reqs/design/_approved/adr-008-automation-cleanup.md`.
-- **No Direct Editing**: I am *planning* the changes, not making the final edits to the architecture docs themselves (except the plan files).
+## 3. 検証方法 (Verification Methods)
+- **ファイル存在・内容確認**: `grep` で削除・追加キーワードを確認。
+  - `grep "WorkflowUseCase" docs/architecture/arch-structure-issue-kit.md` -> 0件
+  - `grep "Scanner Foundation" docs/architecture/arch-structure-issue-kit.md` -> 1件以上
+  - `grep "## Invariants" docs/architecture/arch-structure-007-metadata.md` -> 1件以上
+- **構造整合性**: `arch-structure-issue-kit.md` が `arch-structure-008-scanner.md` と矛盾していないことを目視（および自己監査）で確認。

@@ -23,8 +23,13 @@ graph TB
                 CLI[CLI Entrypoint]
             end
 
-            subgraph "Layer: Domain (Core)"
-                SVC_SCAN[ScannerService]
+            subgraph "Layer: Domain (Core / Scanner Foundation)"
+                direction TB
+                subgraph "Scanner Foundation"
+                    SVC_SCAN[ScannerService]
+                    Parser[TaskParser]
+                    Builder[GraphBuilder]
+                end
                 DOM_DOC[Document Entity]
             end
         end
@@ -38,6 +43,8 @@ graph TB
 
     %% Dependencies (Solid: Source Code Dependency, Dotted: Runtime Flow/DI)
     CLI --> SVC_SCAN
+    SVC_SCAN --> Parser
+    SVC_SCAN --> Builder
     
     %% Dependency Injection
     CLI -.-> INF_GH
@@ -45,7 +52,8 @@ graph TB
     CLI -.-> INF_FS
 
     %% Service dependencies
-    SVC_SCAN --> DOM_DOC
+    Parser --> DOM_DOC
+    Builder --> DOM_DOC
     
     %% Infrastructure Dependencies (Inversion of Control)
     SVC_SCAN -.-> INF_GH
@@ -62,7 +70,7 @@ graph TB
     classDef infra fill:#f9f9f9,stroke:#333
 
     class CLI cli
-    class SVC_SCAN,DOM_DOC domain
+    class SVC_SCAN,Parser,Builder,DOM_DOC domain
     class INF_GH,INF_GIT,INF_FS infra
 ```
 
@@ -78,14 +86,18 @@ graph TB
 - **Tech Stack:** Python, Click/Argparse
 - **Data Reliability:** Stateless
 
-### ScannerService
-- **Type:** Component
-- **Code Mapping:** `src/issue_creator_kit/domain/services/scanner.py`
-- **Role (Domain-Centric):** 物理ファイルシステムの走査（FileSystemScanner）、Markdown解析（TaskParser）、依存関係グラフ（DAG）の構築（GraphBuilder）、および可視化（Visualizer）を統括する。
-- **Layer (Clean Arch):** Domain Services
+### Scanner Foundation
+- **Type:** Module / Service Group
+- **Reference:** [Scanner Foundation Structure (ADR-008)](arch-structure-008-scanner.md)
+- **Role (Domain-Centric):** 物理ファイルシステムの走査、Markdown解析、依存関係グラフ（DAG）の構築を統括する。
+- **Components:**
+    - **FileSystemScanner**: `reqs/` を走査し、未処理ファイルを抽出する。
+    - **TaskParser**: Markdown のメタデータをパースし、Domain Entity へ変換する。
+    - **GraphBuilder**: `depends_on` に基づき DAG を構築する。
+- **Layer (Clean Arch):** Domain Services / Use Cases
 - **Dependencies:**
     - **Upstream:** CLI
-    - **Downstream:** Domain Entity, Infrastructure (Adapters)
+    - **Downstream:** Document Entity, Infrastructure (Adapters)
 - **Tech Stack:** Python 3.12, Pydantic v2
 - **Data Reliability:** Strong Consistency (物理ファイルの状態を正とする)。
 

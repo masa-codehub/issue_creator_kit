@@ -218,57 +218,43 @@ graph LR
 
 
 
-## Metadata Field Definitions & Guardrails (ADR-008)
+## Invariants (Validation Rules)
 
-本セクションでは、ドキュメントの整合性を担保するための「ドメイン・ガードレール（バリデーション規則）」を定義します。これらの規則は、`src/issue_creator_kit/domain/models/` (現状は `document.py` 内の `Metadata` モデル) において Pydantic Validator として実装されます。
+本セクションでは、ドキュメントの整合性を担保するための「不変条件（バリデーション規則）」を集約して定義します。これらは `Scanner Foundation` における Pydantic モデルおよび `GraphBuilder` によって厳格に検証されます。
 
-### Field Validation Rules
+### 1. Structural Invariants (構造的制約)
 
-| Field | Description | Type | Validation Rules (Guardrails) |
-| :--- | :--- | :--- | :--- |
-| `id` | ユニーク識別子 | String | Regex: `adr-\d{3}-.*` (ADR) or `task-\d{3}-\d{2,}` (Task) |
-| `status` | ライフサイクル状態 | Enum | ADR: `Draft`, `Approved`, `Postponed`, `Superseded` / Task: `Draft`, `Ready`, `Issued`, `Completed`, `Cancelled` |
-| `depends_on` | 依存先IDリスト | String (List) | Graph Integrity: 対象IDの存在確認、自己参照禁止、循環参照禁止 (No Cycles) |
-| `issue_id` | GitHub Issue番号 | Integer | Conditional: `status` が `Issued` または `Completed` の場合に必須 |
+| Rule | Description | Implementation Target |
+| :--- | :--- | :--- |
+| **Unique ID** | `id` はプロジェクト全域で一意でなければならない。 | `TaskParser` |
+| **ID Format** | ADR は `adr-\d{3}-.*`、Task は `task-\d{3}-\d{2,}` (例: `task-008-01`) に合致すること。 | `TaskParser` (Regex) |
+| **Existence** | `depends_on` に指定された ID は、現在のスキャン範囲内または `_archive/` 内に実在すること。 | `GraphBuilder` |
+| **No Self-Reference** | `id` が自分自身の ID を `depends_on` に含めてはならない。 | `GraphBuilder` |
+| **No Cycles** | 依存関係がループ（循環参照）を形成してはならない。 | `GraphBuilder` (DAG Check) |
 
+### 2. Lifecycle Invariants (ライフサイクル制約)
 
+参照: [Metadata-Driven Lifecycle (ADR-007)](arch-state-007-lifecycle.md)
 
-### Graph Integrity (DAG Validation)
+| Rule | Description | Implementation Target |
+| :--- | :--- | :--- |
+| **Strict Dependency** | 全ての `depends_on` 対象が `Issued` または `Completed` 状態になるまで、自身の `status` は `Ready` に移行できない。 | `ick CLI / Sync Logic` |
+| **Atomic Issue Creation** | GitHub Issue が正常に作成されない限り、物理ファイルは `_archive/` へ移動してはならない。 | `ick CLI / Create Logic` |
+| **Hierarchy Priority** | L3 タスクは、親となる L1 (ADR) および L2 (統合タスク) が `Issued` 以上であることを要する。 | `ick CLI / Validation` |
 
+### 3. Visualizing Invariants (DAG Validation)
 
-
-`depends_on` フィールドによる依存関係は、常に有向非巡回グラフ (DAG) を形成しなければなりません。バリデーションエンジンは、以下のパターンを「ガードレール違反」として拒絶します。
-
-
+`depends_on` フィールドによる依存関係は、常に有向非巡回グラフ (DAG) を形成しなければなりません。
 
 ```mermaid
-
 graph TD
-
     subgraph Illegal_Patterns [Illegal Dependency Patterns]
-
         A[Task A] --> A
-
         style A fill:#ff9999
 
-
-
         B[Task B] --> C[Task C]
-
         C --> B
-
         style B fill:#ff9999
-
         style C fill:#ff9999
-
     end
-
 ```
-
-
-
-- **Self-Reference:** ファイル A が自分自身の ID を `depends_on` に含めること。
-
-- **Circular Dependency:** A -> B -> A のように、依存関係がループすること。
-
-- **Orphan Reference:** 存在しない ID を `depends_on` に含めること（スキャン範囲内での解決が必要）。
