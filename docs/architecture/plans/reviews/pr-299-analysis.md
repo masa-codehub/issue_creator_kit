@@ -1,6 +1,7 @@
 # Review Analysis Report: PR #299
 
 ## 1. Summary
+
 - **Total Comments:** 4
 - **Accept (修正受諾):** 4
 - **Discuss (議論/確認):** 0
@@ -9,6 +10,7 @@
 ## 2. Analysis Details
 
 ### [Accept] src/issue_creator_kit/cli.py (L59)
+
 - **Reviewer's Comment:**
   - "このバリデーションロジックは、argparseのtype引数にカスタム型関数を渡すことで、より綺麗に実装できます。..."
 - **Context Analysis:**
@@ -19,6 +21,7 @@
   - `pytest tests/unit/test_cli.py` を実行し、既存の正常系・異常系テストがパスすることを確認。
 
 ### [Accept] tests/unit/test_cli.py (L133)
+
 - **Reviewer's Comment:**
   - "このテストケースでは、--adr-idのバリデーションが失敗して早期にsys.exit(1)が呼ばれることを検証しています。... これらのパッチは不要なので、削除することでテストの意図がより明確になります。"
 - **Context Analysis:**
@@ -29,6 +32,7 @@
   - `pytest tests/unit/test_cli.py` でテストがパスすることを確認。
 
 ### [Accept] tests/unit/test_cli.py (L115)
+
 - **Reviewer's Comment:**
   - "The test verifies that adr_id and archive_path are passed correctly, but it doesn't verify the before and after parameters. ..."
 - **Context Analysis:**
@@ -39,6 +43,7 @@
   - `pytest tests/unit/test_cli.py`
 
 ### [Accept] tests/unit/test_cli.py (L116)
+
 - **Reviewer's Comment:**
   - "--adr-id 引数が省略された場合（None の場合）のテストケースがありません。..."
 - **Context Analysis:**
@@ -51,6 +56,7 @@
 ---
 
 ## 3. Execution Plan
+
 - [ ] `src/issue_creator_kit/cli.py` に `adr_id_type` を実装し、バリデーションロジックをリファクタリング
 - [ ] `tests/unit/test_cli.py` の `test_process_diff_invalid_adr_id` から不要なパッチを削除
 - [ ] `tests/unit/test_cli.py` の `test_process_diff_command_with_adr_id` にアサーションを追加

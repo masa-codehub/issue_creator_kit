@@ -1,6 +1,7 @@
 # Review Analysis Report: PR #296
 
 ## 1. Summary
+
 - **Total Comments:** 13
 - **Accept (修正受諾):** 12
 - **Discuss (議論/確認):** 1
@@ -9,6 +10,7 @@
 ## 2. Analysis Details
 
 ### [Accept] src/issue_creator_kit/infrastructure/filesystem.py (L82)
+
 - **Reviewer's Comment:**
   - "`list_files`メソッドの実装が変更され、globパターンを受け取れなくなり、再帰的な検索も行えなくなりました。... `IFileSystemAdapter`プロトコルとこの実装の両方で`pattern`引数を復活させ、`glob`を使った柔軟なファイル検索機能を維持することを強く推奨します。"
 - **Context Analysis:**
@@ -19,6 +21,7 @@
   - `pytest tests/unit/infrastructure/test_filesystem.py` (新規テスト追加)
 
 ### [Accept] tests/unit/usecase/test_creation.py (L274)
+
 - **Reviewer's Comment:**
   - "`use_pr=True`の場合の機能...のテストが削除されていますが、`IssueCreationUseCase`内の対応するコードは残っています。これらのテストを復活させてください。"
 - **Context Analysis:**
@@ -29,6 +32,7 @@
   - `pytest tests/unit/usecase/test_creation.py`
 
 ### [Accept] src/issue_creator_kit/domain/document.py (L123, L125)
+
 - **Reviewer's Comment:**
   - "`update`メソッドの実装は正しいですが、よりPydanticらしい簡潔な方法で実装できます。... `model_copy(update=...)` メソッドを使用することを検討してください。"
 - **Context Analysis:**
@@ -39,6 +43,7 @@
   - `pytest tests/unit/domain/test_document.py`
 
 ### [Accept] src/issue_creator_kit/domain/document.py (L155)
+
 - **Reviewer's Comment:**
   - "このコメント `# Fallback to list parsing? Usually YAML errors should be reported` は、現在のコードの動作と一致していません。削除するか、実際の動作に合わせて修正することをお勧めします。"
 - **Context Analysis:**
@@ -49,6 +54,7 @@
   - 目視確認。
 
 ### [Accept] src/issue_creator_kit/infrastructure/filesystem.py (L100, L101)
+
 - **Reviewer's Comment:**
   - "`except Exception:`のように広範な例外をキャッチすると、予期しないエラーが隠蔽されます。`ValidationError`のような、より具体的な例外をキャッチする方が堅牢です。"
 - **Context Analysis:**
@@ -59,6 +65,7 @@
   - `pytest tests/unit/infrastructure/test_filesystem.py`
 
 ### [Accept] src/issue_creator_kit/usecase/approval.py (L63)
+
 - **Reviewer's Comment:**
   - "`labels`フィールドが`list[str]`であることが保証されているため、ここのラベル解析ロジックは大幅に簡略化できます。"
 - **Context Analysis:**
@@ -69,6 +76,7 @@
   - `pytest tests/unit/usecase/test_approval.py`
 
 ### [Accept] tests/unit/usecase/test_approval.py (L41)
+
 - **Reviewer's Comment:**
   - "アサーションが以前より弱くなっています。...より具体的なアサーションを復活させることを検討してください。"
 - **Context Analysis:**
@@ -79,12 +87,14 @@
   - `pytest tests/unit/usecase/test_approval.py`
 
 ### [Accept] src/issue_creator_kit/domain/document.py (L19)
+
 - **Reviewer's Comment:**
   - "`id` field pattern only allows lowercase letters, numbers, and hyphens. Consider documenting this constraint..."
 - **Proposed Action:**
   - `Metadata.id` フィールドに docstring またはコメントを追加し、制約を明文化する。
 
 ### [Discuss] src/issue_creator_kit/domain/document.py (L103)
+
 - **Reviewer's Comment:**
   - "The validation logic references 'depends_on' ... but doesn't validate it. If 'depends_on' is required for tasks, add validation..."
 - **Context Analysis:**
@@ -93,18 +103,21 @@
   - ユーザーへ確認: `depends_on` が空リストであることを許容するか、あるいは少なくとも1つの依存関係（または `(none)` 等の明示的な指定）を強制するか。現状は「依存なし」を許容する設計。
 
 ### [Accept] src/issue_creator_kit/usecase/creation.py (L131)
+
 - **Reviewer's Comment:**
   - "The warning message uses `print()` instead of proper logging."
 - **Proposed Action:**
   - `logging.getLogger(__name__).warning()` に置き換える。
 
 ### [Accept] src/issue_creator_kit/infrastructure/filesystem.py (L104)
+
 - **Reviewer's Comment:**
   - "Move [import of FileSystemError] to the top of the file..."
 - **Proposed Action:**
   - ローカルインポートを廃止し、ファイル上部へ移動。
 
 ## 3. Execution Plan
+
 - [ ] 1. `infrastructure/filesystem.py` の修正 (`list_files` 復元, 例外処理, インポート位置)
 - [ ] 2. `domain/document.py` の修正 (`Metadata.update` 高速化, `id` コメント追加, YAMLコメント削除)
 - [ ] 3. `usecase/` 配下の簡略化とロギング対応 (`approval.py`, `creation.py`)
