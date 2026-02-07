@@ -1,6 +1,7 @@
 # Metadata-Driven Architecture Structure (ADR-007)
 
 ## Context
+
 - **Bounded Context:** Task Lifecycle Management
 - **System Purpose:** ADR-007 で導入された「メタデータ駆動型ライフサイクル」を実現するための、フラットなファイル構造と論理的な依存関係（DAG）の定義。物理的な階層構造を排除し、認知負荷を最小化しつつ 、自動化ツールによる精密な制御を可能にする。
 
@@ -64,8 +65,6 @@ C4Container
 
 ```
 
-
-
 ### Logical Dependency (DAG) Conceptual View
 
 ```mermaid
@@ -90,13 +89,9 @@ graph TD
 
 ```
 
-
-
 ## Invisible SSOT: File vs Issue Mapping
 
 本プロジェクトの核心的な設計思想である「不可視のファイルベースSSOT」を以下の図で定義します。
-
-
 
 ```mermaid
 
@@ -126,13 +121,13 @@ graph LR
 
     I1 -- "Execution (Active SSOT)" --> I1
 
-    
+
 
     F2 -- "Depends on" --> I1
 
     F2 -- "Issuance" --> I2
 
-    
+
 
     linkStyle 0,3 stroke:#336699,stroke-width:4px;
 
@@ -142,11 +137,7 @@ graph LR
 
 - **GitHub Issues:** 実作業における「唯一の正解（Active SSOT）」。
 
-
-
 ## Element Definitions (SSOT)
-
-
 
 ### reqs/design/ (Design Storage)
 
@@ -170,8 +161,6 @@ graph LR
 
 - **Trade-off:** 物理フォルダを `_inbox`, `_approved`, `_archive` の3つに限定することで、検索性を高める代わりに、詳細なカテゴリ分け はメタデータ（`tags` 等）に委ねている。
 
-
-
 ### reqs/tasks/ (Task Reservoir)
 
 - **Type:** `Container`
@@ -194,8 +183,6 @@ graph LR
 
 - **Trade-off:** 物理ファイルをアーカイブとして残すことで、GitHub がダウンしても設計意図とタスクの履歴を Git 上で追跡可能にしている 。
 
-
-
 ### ick CLI (Lifecycle Engine)
 
 - **Type:** `Container`
@@ -216,8 +203,6 @@ graph LR
 
 - **Data Reliability:** 冪等性を担保。起票成功時のみ物理ファイルを `_archive/` へ移動させる。
 
-
-
 ## Metadata Field Definitions & Guardrails (ADR-008)
 
 参照: [Physical State Lifecycle (ADR-008)](arch-state-007-lifecycle.md)
@@ -226,23 +211,23 @@ graph LR
 
 ### 1. Structural Invariants (構造的制約)
 
-| Rule | Description | Implementation Target |
-| :--- | :--- | :--- |
-| **Unique ID** | `id` はプロジェクト全域で一意でなければならない 。 | `TaskParser` |
-| **ID Format** | ADR は `adr-\d{3}-.*`、Task は `task-\d{3}-\d{2,}` (例: `task-008-01`) に合致すること。 | `TaskParser` (Regex) |
-| **Existence** | `depends_on` に指定された ID は、現在のスキャン 範囲内または `_archive/` 内に実在すること。 | `GraphBuilder` |
-| **No Self-Reference** | `id` が自分自身の ID を `depends_on` に 含めてはならない。 | `GraphBuilder` |
-| **No Cycles** | 依存関係がループ（循環参照）を形成してはならない。 | `GraphBuilder` (DAG Check) |
+| Rule                  | Description                                                                                 | Implementation Target      |
+| :-------------------- | :------------------------------------------------------------------------------------------ | :------------------------- |
+| **Unique ID**         | `id` はプロジェクト全域で一意でなければならない 。                                          | `TaskParser`               |
+| **ID Format**         | ADR は `adr-\d{3}-.*`、Task は `task-\d{3}-\d{2,}` (例: `task-008-01`) に合致すること。     | `TaskParser` (Regex)       |
+| **Existence**         | `depends_on` に指定された ID は、現在のスキャン 範囲内または `_archive/` 内に実在すること。 | `GraphBuilder`             |
+| **No Self-Reference** | `id` が自分自身の ID を `depends_on` に 含めてはならない。                                  | `GraphBuilder`             |
+| **No Cycles**         | 依存関係がループ（循環参照）を形成してはならない。                                          | `GraphBuilder` (DAG Check) |
 
 ### 2. Lifecycle Invariants (ライフサイクル制約)
 
 参照: [Physical State Lifecycle (ADR-008)](arch-state-007-lifecycle.md)
 
-| Rule | Description | Implementation Target |
-| :--- | :--- | :--- |
-| **Strict Dependency** | 全ての `depends_on` 対象が `Issued` または `Completed` 状態になるまで、自身の `status` は `Ready` に移行できない。 | `ick CLI / Sync Logic` |
-| **Atomic Issue Creation** | GitHub Issue が正常に作成されない限 り、物理ファイルは `_archive/` へ移動してはならない。 | `ick CLI / Create Logic` |
-| **Hierarchy Priority** | L3 タスクは、親となる L1 (ADR) および L2 (統合タスク) が `Issued` 以上であることを要する。 | `ick CLI / Validation` |
+| Rule                      | Description                                                                                                        | Implementation Target    |
+| :------------------------ | :----------------------------------------------------------------------------------------------------------------- | :----------------------- |
+| **Strict Dependency**     | 全ての `depends_on` 対象が `Issued` または `Completed` 状態になるまで、自身の `status` は `Ready` に移行できない。 | `ick CLI / Sync Logic`   |
+| **Atomic Issue Creation** | GitHub Issue が正常に作成されない限 り、物理ファイルは `_archive/` へ移動してはならない。                          | `ick CLI / Create Logic` |
+| **Hierarchy Priority**    | L3 タスクは、親となる L1 (ADR) および L2 (統合タスク) が `Issued` 以上であることを要する。                         | `ick CLI / Validation`   |
 
 ### 3. Visualizing Invariants (DAG Validation)
 

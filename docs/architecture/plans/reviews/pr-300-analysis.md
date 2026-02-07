@@ -1,6 +1,7 @@
 # Review Analysis Report: PR #300
 
 ## 1. Summary
+
 - **Total Comments:** 19
 - **Accept (修正受諾):** 19
 - **Discuss (議論/確認):** 0
@@ -9,6 +10,7 @@
 ## 2. Analysis Details
 
 ### [Accept] src/issue_creator_kit/infrastructure/filesystem.py
+
 - **Comments:** インポート位置の修正(001)、ID検索正規表現の改善(011)、frontmatter検索の堅牢化(008)、部分読み込みによるパフォーマンス改善(016)。
 - **Proposed Action:**
   - `FileSystemError` をファイル先頭でインポート。
@@ -17,6 +19,7 @@
 - **Verification:** `pytest tests/unit/infrastructure/test_filesystem.py`
 
 ### [Accept] src/issue_creator_kit/infrastructure/github_adapter.py
+
 - **Comments:** メタデータキーの正規化(002)、メタデータテーブルのフォーマット(004)、docstring追加(005)、検索結果の完全一致検証(009)、検索クエリのエスケープ(013)、Rate Limitエラーハンドリング強化(017)、テーブル値のエスケープ(018)。
 - **Proposed Action:**
   - `doc.metadata.get("title")` を優先使用。
@@ -27,6 +30,7 @@
 - **Verification:** `pytest tests/unit/infrastructure/test_github_adapter.py`
 
 ### [Accept] tests/unit/infrastructure/
+
 - **Comments:** ABC継承漏れによるisinstance失敗の修正(003, 012)、メタデータテーブルの検証追加(006)、エッジケーステストの追加(007, 015)、Rate Limitテストの更新(010)、検索クエリの厳密な検証(019)、pyfakefsのfsフィクスチャ確認(014)。
 - **Proposed Action:**
   - `FileSystemAdapter` と `GitHubAdapter` に ABC 継承を追加（実装側で対応）。
@@ -38,6 +42,7 @@
 ---
 
 ## 3. Execution Plan
+
 - [ ] `src/issue_creator_kit/infrastructure/filesystem.py` の修正
 - [ ] `src/issue_creator_kit/infrastructure/github_adapter.py` の修正
 - [ ] `src/issue_creator_kit/domain/interfaces.py` の調整（ABC継承のため）

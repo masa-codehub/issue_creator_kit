@@ -1,33 +1,38 @@
 # 振り返りレポート (YWT) - Issue #306: Update Architecture Lifecycle
 
 ## 1. Y (やったこと)
+
 - **作業の実施内容:**
-    - `docs/architecture/arch-state-007-lifecycle.md` を更新。
-    - `docs/architecture/plans/adr-008-automation-cleanup/definitions.md` を参照。
-    - 状態遷移トリガーから「将来的な自動化」の文言を削除し、「物理移動を含む PR マージ」に統一。
-    - Mermaid ダイアグラムを更新し、各状態に対応する物理パス（`_inbox`, `_approved`, `_archive`）を明記。
+  - `docs/architecture/arch-state-007-lifecycle.md` を更新。
+  - `docs/architecture/plans/adr-008-automation-cleanup/definitions.md` を参照。
+  - 状態遷移トリガーから「将来的な自動化」の文言を削除し、「物理移動を含む PR マージ」に統一。
+  - Mermaid ダイアグラムを更新し、各状態に対応する物理パス（`_inbox`, `_approved`, `_archive`）を明記。
 - **事象の観測:**
-    - 調査段階で、既存の `arch-state-007-lifecycle.md` が既に一部 ADR-008 の用語を取り入れていたが、「マージ後 ... 物理移動」という非同期な記述が残っており、物理状態が SSOT である原則とタイミングがずれるリスクを発見した。
+  - 調査段階で、既存の `arch-state-007-lifecycle.md` が既に一部 ADR-008 の用語を取り入れていたが、「マージ後 ... 物理移動」という非同期な記述が残っており、物理状態が SSOT である原則とタイミングがずれるリスクを発見した。
 - **分析情報の集約:**
-    - `definitions.md`: "No automated script shall perform this move." / "Physical location ... is the Single Source of Truth."
-    - `arch-state-007-lifecycle.md` (As-is): "物理移動（手動または将来的な自動化）"
+  - `definitions.md`: "No automated script shall perform this move." / "Physical location ... is the Single Source of Truth."
+  - `arch-state-007-lifecycle.md` (As-is): "物理移動（手動または将来的な自動化）"
 
 ## 2. W (わかったこと)
+
 - **結果の確認:**
-    - 物理配置を SSOT とする設計思想（ADR-008）においては、状態遷移（Draft -> Approved）は「マージ」という論理的操作ではなく、「移動を伴うマージ」という物理的変更として定義されなければならない。
-    - 記述から「自動化」への依存や期待を排除することで、人間の責務（PR で `mv` を行うこと）が明確になった。
+  - 物理配置を SSOT とする設計思想（ADR-008）においては、状態遷移（Draft -> Approved）は「マージ」という論理的操作ではなく、「移動を伴うマージ」という物理的変更として定義されなければならない。
+  - 記述から「自動化」への依存や期待を排除することで、人間の責務（PR で `mv` を行うこと）が明確になった。
 
 ### ギャップ分析
+
 - **理想 (To-Be):** 物理的な配置が即座に状態を表し、遷移は PR マージ（人間の意思決定）と完全に同期している。
 - **現状 (As-Is):** ドキュメント上でマージと移動のタイミングが分離しているかのような記述があった。
 - **ギャップ:** マージ直後（かつ移動前）の「宙ぶらりんな状態」が存在しうる定義になっていた。
 - **要因 (Root Cause):** 以前の `run-workflow` による自動移動のイメージがドキュメントの記述に残存していたため。
 
 ## 3. T (次やること / 仮説立案)
+
 - **実証的仮説:** 物理パスを状態名の一部として扱う（例: `Draft (Inbox)`) ことで、認知負荷を下げ、誤操作を防げる。
 - **飛躍的仮説:** PR 作成時に「対象ファイルが適切なディレクトリに移動されているか」を CI でチェックする（Guardrails の一環）ことで、ドキュメントに頼らずとも物理状態の整合性を保てる。
 - **逆説的仮説:** `Status: Approved` などのメタデータ自体を完全に廃止し、スキャナーが物理パスのみを読み取るようにすることで、ドキュメントと実態の不整合を物理的に不可能にする。
 
 ### 検証アクション
+
 - [x] `arch-state-007-lifecycle.md` の修正と DoD 1-3 の達成確認。
 - [ ] 今後、他のライフサイクルドキュメント（`arch-state-doc-lifecycle.md` 等）も同様に物理状態ベースへ統一するタスクを検討する。

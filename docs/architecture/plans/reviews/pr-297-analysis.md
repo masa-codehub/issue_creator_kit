@@ -1,6 +1,7 @@
 # Review Analysis Report: PR #297
 
 ## 1. 概要 (Summary)
+
 **PR:** [fix(git): resolve submodule mapping error in GitHub Actions](https://github.com/masa-codehub/issue_creator_kit/pull/297)
 **Target:** `.gitmodules`, `.github/workflows/*.yml`
 **Reviewer:** gemini-code-assist, copilot-pull-request-reviewer
@@ -10,6 +11,7 @@
 ## 2. Review Comments Analysis
 
 ### 2.1 .gitmodules: Relative Path
+
 - **Comment:** `url = ../gemini_context.git` (Use relative path)
 - **Status:** **Accept**
 - **Analysis:**
@@ -18,6 +20,7 @@
   - これは Git サブモジュールのベストプラクティスに合致する。
 
 ### 2.2 Workflows: Token Context (env vs secrets)
+
 - **Comment:** "The token reference uses `env.GITHUB_TOKEN` but should use `secrets.GITHUB_TOKEN`."
 - **Target Files:**
   - `gemini-reviewer.yml`
@@ -40,14 +43,17 @@
 ## 3. Root Cause Analysis (Retrospective: YWT)
 
 ### Y (やったこと)
+
 - サブモジュール化に伴い `.gitmodules` を追加した。
 - 既存のワークフロー（`gemini-handler.yml`）の実装パターン（`env.GITHUB_TOKEN`）を、他のワークフローにも横展開した。
 
 ### W (分かったこと)
+
 - **サブモジュールのパス:** GitHub 上の同一ユーザー/組織内のサブモジュールは相対パスで記述すべきである。
 - **ワークフローのコンテキスト:** 目的（PATへのフォールバック）がない限り、`env` 経由で Secret を渡す必要はない。コピー＆ペーストによる実装の横展開が、不要なパターンの拡散を招いた。
 
 ### T (次やること)
+
 - `.gitmodules` を相対パスに修正。
 - `ci.yml` 等の不要な `env` 定義を削除し、標準的な `secrets` 参照に戻す。
 
@@ -66,4 +72,3 @@
 5.  **Revert/Consolidate Token Logic in `gemini-*.yml`**:
     - `gemini-reviewer.yml` and `gemini-handler.yml` keep the current structure for PAT fallback support, using `GH_PAT`.
     - Reply to the review comment explaining this rationale.
-

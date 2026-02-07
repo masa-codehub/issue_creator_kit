@@ -1,6 +1,7 @@
 # Review Analysis Report: PR #286
 
 ## 1. Summary
+
 - **Total Comments:** 2
 - **Accept (修正受諾):** 2
 - **Discuss (議論/確認):** 0
@@ -9,6 +10,7 @@
 ## 2. Analysis Details
 
 ### [Accept] docs/specs/api/cli_commands.md (L87)
+
 - **Reviewer's Comment:**
   - "TDD Criteria で `IssueCreationUseCase` に `adr_id` 引数を渡すことを検証するとしているが、現在の `IssueCreationUseCase.create_issues_from_virtual_queue()` メソッドのシグネチャには `adr_id` パラメータが存在しない。"
 - **Context Analysis:**
@@ -19,6 +21,7 @@
   - `docs/specs/api/cli_commands.md` の修正後、`auditing-ssot` スキルで整合性を再確認する。
 
 ### [Accept] docs/specs/api/cli_commands.md (L43)
+
 - **Reviewer's Comment:**
   - "仕様書では `--adr-id` オプションが... 定義されているが、このオプションがどのような値を受け取るべきか... 形式が明確に定義されていない。入力値の形式とバリデーションルールを明記することを推奨する。"
 - **Context Analysis:**
@@ -31,6 +34,7 @@
 ---
 
 ## 3. Execution Plan
+
 - [x] レビュー指摘の分析と分類の完了
 - [ ] `docs/specs/api/cli_commands.md` の修正（`adr_id` パラメータの追加、フォーマット定義の追加）
 - [ ] 修正後の `auditing-ssot` 実行
