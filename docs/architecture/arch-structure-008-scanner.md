@@ -73,7 +73,7 @@ classDiagram
 
 ### FileSystemScanner
 - **Type:** `Component`
-- **Code Mapping:** `src/issue_creator_kit/domain/services/scanner.py`
+- **Code Mapping:** `src/issue_creator_kit/domain/services/scanner.py` (Planned)
 - **Role (Domain-Centric):** 物理ファイルシステム上の `reqs/` ディレクトリを走査し、処理対象（`_approved/` にあり `_archive/` にないもの）を抽出する。
 - **Layer (Clean Arch):** Use Cases / Domain Services
 - **Dependencies:**
@@ -84,7 +84,7 @@ classDiagram
 
 ### TaskParser
 - **Type:** `Component`
-- **Code Mapping:** `src/issue_creator_kit/domain/services/parser.py`
+- **Code Mapping:** `src/issue_creator_kit/domain/services/parser.py` (Planned)
 - **Role (Domain-Centric):** Markdown ファイルのメタデータを解析し、Pydantic モデルに変換する。
 - **Layer (Clean Arch):** Entities / Domain Models
 - **Dependencies:**
@@ -95,23 +95,23 @@ classDiagram
 
 ### GraphBuilder
 - **Type:** `Component`
-- **Code Mapping:** `src/issue_creator_kit/domain/services/builder.py`
+- **Code Mapping:** `src/issue_creator_kit/domain/services/builder.py` (Planned)
 - **Role (Domain-Centric):** `depends_on` メタデータに基づき、タスク間の依存関係をグラフ（DAG）として構築する。
 - **Layer (Clean Arch):** Domain Services
 - **Dependencies:**
-  - **Upstream:** `FileSystemScanner`
-  - **Downstream:** `Task/ADR Models`, `Visualizer`
+  - **Upstream:** `FileSystemScanner`, `Visualizer`
+  - **Downstream:** `Task/ADR Models`
 - **Tech Stack:** Python 3.12
 - **Data Reliability:** 循環参照や自己参照を検知しエラーとする。
 
 ### Visualizer
 - **Type:** `Component`
-- **Code Mapping:** `src/issue_creator_kit/domain/services/visualizer.py`
+- **Code Mapping:** `src/issue_creator_kit/domain/services/visualizer.py` (Planned)
 - **Role (Domain-Centric):** 構築された DAG から Mermaid 形式のテキストを生成する。
 - **Layer (Clean Arch):** Interface Adapters / Domain Services
 - **Dependencies:**
-  - **Upstream:** `cli.py`, `GraphBuilder`
-  - **Downstream:** N/A
+  - **Upstream:** `cli.py`
+  - **Downstream:** `GraphBuilder`
 - **Tech Stack:** Python 3.12 (Mermaid String generation)
 - **Data Reliability:** N/A (Read-only visualization)
 

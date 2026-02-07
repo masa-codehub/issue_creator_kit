@@ -262,4 +262,3 @@ graph TD
 - **Self-Reference (自己参照):** `depends_on` に自分自身の ID を含めてはならない。
 - **Circular Dependency (循環参照):** 依存関係がループを形成してはならない（例: A -> B -> A）。
 - **Orphan Reference (不実在参照):** `depends_on` に指定された ID が実在しなければならない（※上図には未掲載だが検証対象）。
-
