@@ -22,10 +22,11 @@ ADR（Architecture Decision Record）のメタデータを表現する。
 
 | Field | Type | Required | Description | Constraints |
 | :--- | :--- | :--- | :--- | :--- |
-| `id` | `ADRID` | Yes | ユニーク識別子 | `adr-\d{3}-.*` |
+| `id` | `ADRID` | Yes | ユニーク識別子 | `^adr-\d{3}-[a-z0-9-]+$` |
 | `title` | `str` | Yes | ADR のタイトル | |
 | `status` | `str` | Yes | ステータス | `Draft`, `Approved`, `Postponed`, `Superseded` |
 | `date` | `str` | No | 作成日 | ISO 8601 (`YYYY-MM-DD`) |
+| `depends_on` | `List[TaskID | ADRID]` | Yes | 依存するタスクまたは ADR の ID | |
 
 ### Task Model
 タスク（Issue Draft）のメタデータを表現する。
@@ -37,7 +38,7 @@ ADR（Architecture Decision Record）のメタデータを表現する。
 | `status` | `str` | Yes | ステータス | `Draft`, `Ready`, `Issued`, `Completed`, `Cancelled` |
 | `parent` | `ADRID` | Yes | 親 ADR の ID | 有効な ADRID 形式であること |
 | `depends_on` | `List[TaskID]` | Yes | 依存するタスク ID | |
-| `issue_id` | `int` | No | GitHub Issue 番号 | `status` が `Issued` 以上で必須 |
+| `issue_id` | `int` | No | GitHub Issue 番号 | `status` が `Issued` または `Completed` で必須 |
 
 ## Verify Criteria (TDD)
 
@@ -57,5 +58,4 @@ ADR（Architecture Decision Record）のメタデータを表現する。
 | `adr-008_test` | ValidationError | Underscore not allowed |
 
 ### Business Logic Guardrails
-- `status='Issued'` かつ `issue_id=None` の場合、`ValidationError` を送出すること。
-- `parent` に自分自身の ID を指定した場合（自己参照）、`ValidationError` を送出すること。
+- `status` が `Issued` または `Completed` かつ `issue_id=None` の場合、`ValidationError` を送出すること。

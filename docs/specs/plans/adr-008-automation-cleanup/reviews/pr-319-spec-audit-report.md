@@ -24,6 +24,6 @@
 - [x] **Forbidden Terms:** 
   - **根拠:** `grep` によるスキャンで "TBD", "Pending", "Any" が存在しないことを確認。
 
-## 4. Final Verdict
+## 3. Final Verdict
 - [x] **PASS**
 - **コメント:** 実装者が Pydantic モデルとグラフ構築ロジックを迷いなく実装できるレベルに達している。

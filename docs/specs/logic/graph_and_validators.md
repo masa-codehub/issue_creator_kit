@@ -12,15 +12,15 @@ ADR-008 において、走査されたタスク間の依存関係をグラフ構
 | Property | Type | Description |
 | :--- | :--- | :--- |
 | `task` | `Task | ADR` | 保持するモデルオブジェクト |
-| `dependencies` | `Set[TaskNode]` | このノードが依存しているノード群 (Upstream) |
-| `dependents` | `Set[TaskNode]` | このノードに依存しているノード群 (Downstream) |
+| `dependencies` | `List[TaskNode]` | このノードが依存しているノード群 (Upstream) |
+| `dependents` | `List[TaskNode]` | このノードに依存しているノード群 (Downstream) |
 
 ### TaskGraph
 ノードの集合を管理し、グラフ全体の操作を行う。
 
 | Method | Return Type | Description |
 | :--- | :--- | :--- |
-| `add_node(task)` | `None` | タスクをノードとして追加する |
+| `add_task(task)` | `None` | タスクをノードとして追加する |
 | `add_edge(from_id, to_id)` | `None` | `from_id` が `to_id` に依存するエッジを張る |
 | `validate()` | `None` | グラフの整合性（循環参照等）を検証する |
 | `get_execution_order()` | `List[str]` | トポロジカルソートされた ID リストを返す |
@@ -28,7 +28,7 @@ ADR-008 において、走査されたタスク間の依存関係をグラフ構
 ## Algorithm / Flow
 
 ### 1. グラフ構築 (Graph Construction)
-1.  走査されたすべての `Task` / `ADR` を `TaskGraph.add_node()` で登録する。
+1.  走査されたすべての `Task` / `ADR` を `TaskGraph.add_task()` で登録する。
 2.  各タスクの `depends_on` リストをループし、`add_edge(task.id, dep_id)` を実行する。
 3.  `to_id` (依存先) がノードリストに存在しない場合、`ORPHAN_DEPENDENCY` エラーを準備する。
 
@@ -50,7 +50,7 @@ Kahn's Algorithm または DFS ベースのソートを使用し、依存関係�
 
 ### Error Path (Self-Reference)
 - **Input**: A(depends_on=[A])
-- **Expected**: `ValidationError` or `GraphError` (Self-reference detected for 'A')
+- **Expected**: `GraphError: SELF_REFERENCE 'A' depends on itself`
 
 ### Error Path (Circular Dependency)
 - **Input**: A -> B, B -> C, C -> A
@@ -62,4 +62,4 @@ Kahn's Algorithm または DFS ベースのソートを使用し、依存関係�
 
 ## Edge Cases
 - グラフが空の場合、空リストを返す。
-- 完全に独立したタスクが複数ある場合、ID の昇順などで決定論的な順序を返す。
+- 完全に独立したタスクが複数ある場合、ID の昇順で決定論的な順序を返す。
