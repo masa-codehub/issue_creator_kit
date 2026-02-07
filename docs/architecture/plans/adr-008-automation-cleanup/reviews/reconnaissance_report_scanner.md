@@ -8,7 +8,7 @@ Investigate the current state and requirements for the "Scanner Foundation" arch
 
 ## 2. Evidence Gathered
 
-### 2.1 ADR-008 ([reqs/design/_approved/adr-008-automation-cleanup.md](reqs/design/_approved/adr-008-automation-cleanup.md))
+### 2.1 ADR-008 ([reqs/design/_approved/adr-008-automation-cleanup.md](/reqs/design/_approved/adr-008-automation-cleanup.md))
 - **Key Decision**: Transition from Git-diff based detection to Physical File-system scanning.
 - **Core Components**:
     - **Physical State Scanner**: Walks `reqs/` directory.
@@ -16,7 +16,7 @@ Investigate the current state and requirements for the "Scanner Foundation" arch
     - **Visualization**: Output dependency graph (DAG) in Mermaid format.
 - **Guardrails**: Validation logic moved to Domain layer (Pydantic models).
 
-### 2.2 Common Definitions ([docs/architecture/plans/adr-008-automation-cleanup/definitions.md](docs/architecture/plans/adr-008-automation-cleanup/definitions.md))
+### 2.2 Common Definitions ([docs/architecture/plans/adr-008-automation-cleanup/definitions.md](/docs/architecture/plans/adr-008-automation-cleanup/definitions.md))
 - **Concepts**:
     - **Physical State Scanner**: Determines state by physical location (`_inbox`, `_approved`, `_archive`).
     - **DAG Visualization**: Uses `depends_on` to create Mermaid JS output.
