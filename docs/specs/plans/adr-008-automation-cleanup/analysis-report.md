@@ -1,46 +1,41 @@
-# 目的分析レポート (Analysis Report)
+# Analysis Report: CLI Integration with Scanner Foundation (ADR-008)
 
-## 1. 意図の深掘り (Intent & Context)
-- **ユーザーの真の目的 (Outcome):** メンテナンス性の向上と、新アーキテクチャ（ADR-008 Scannerベース）への完全移行を確実にするため、不要になった古い自動化ロジックを完全に排除する。
-- **背景と文脈 (Why):** 旧来の `WorkflowUseCase` や `ApprovalUseCase` は Git 差分や GitHub API に強く依存していたが、新アーキテクチャではファイルシステムの物理構造（Scanner）に基づくライフサイクル管理に移行するため、これら旧ロジックが残っていると混乱や誤動作の原因となる。
-- **制約条件 (Constraints):** 
-    - 新しい Scanner ロジックの実装には着手しない（削除のみ）。
-    - 既存の CLI のビルドや主要コマンドの動作を壊さないように、参照箇所を適切に「無効化」または「削除」する必要がある。
+## 1. 意図の深掘り (Analyze Intent)
+- **Why (目的)**: Git の差分に依存する旧来の自動化ロジック（ADR-003）は、同期漏れや複雑な状態管理が課題であった。ADR-008 では物理ファイルの状態を唯一のソース（Physical State Scanner）とすることで、この複雑さを解消し、信頼性の高いタスク管理を実現する。
+- **What (成果物)**: 新しい `FileSystemScanner` および `GraphBuilder` を利用して動作する CLI コマンド（`process`, `visualize`）の実装。
+- **How (手段)**: `cli.py` に新しいサブコマンドを追加し、Domain Services をインスタンス化して処理を委譲する。また、旧 UseCase への依存を整理する。
 
 ## 2. ギャップ分析 (Gap Analysis)
-- **現状 (As-Is):** 主要3ファイルに加え、`cli.py`, `creation.py`, および多数の単体テストがこれらレガシーコードに依存している。
-- **理想 (To-Be):** 
-    - 物理ファイル（3つ）が削除されている。
-    - `cli.py` から `approve`, `approve-all`, `process-merge` コマンドが削除（または無効化）されている。
-    - 関連する単体テストも削除または整理され、`pytest` がパスする。
-- **特定されたギャップ:** `definitions.md` には主要3ファイルのみが削除対象として挙げられているが、実際には `tests/unit/usecase/test_workflow.py` などの付随するテストコードも削除しないと、インポートエラー等でビルドが通らなくなる。
+- **現状**: `cli.py` は Git 差分前提の UseCase (`IssueCreationUseCase`, `RoadmapSyncUseCase`) に依存しており、`init`, `process-diff` コマンドが実装されている。
+- **理想**: `cli.py` が `ScannerService` (あるいはその構成要素) を利用し、ファイルシステムの状態から直接タスクを検出し、依存関係グラフに基づいて処理できること。
+- **乖離**: 
+    - `ScannerService` という統合サービスが未定義（`scanner.py`, `builder.py`, `visualizer.py` は個別）。
+    - 既存の `process-diff` コマンドと新しい `process` コマンドの役割分担が不明確。
+    - `cli.py` におけるレガシーコマンド（`process-diff`）の Cleanup 方針が未確定。
 
-## 3. 仮説オプション (Hypothesis Options)
+## 3. 仮説の立案 (Formulate Hypotheses)
 
-### 案A: 実証的仮説 (Grounded) - 本命案
-*(物理削除と最小限の参照修正)*
-- **アプローチ:** 
-    1. 指定された3ファイル、およびそれらに直接依存するテストファイル（`test_workflow.py`, `test_approval.py`）を物理削除する。
-    2. `cli.py` から該当コマンドの定義、パーサー、ディスパッチ処理、およびインポートを削除する。
-    3. `creation.py` の `WorkflowUseCase` インポートと型ヒントを削除する。
-- **メリット/デメリット:** 
-    - メリット: 最もクリーン。ADR-008の意図に忠実。
-    - デメリット: 削除範囲が広く、予期せぬ依存関係でビルドエラーが起きるリスクがある。
-- **リスク (4大リスク):** `cli.py` での削除漏れによる `ImportError` または実行時の `NameError`。
-- **検証の視点:** `pytest` および `ick --help` で旧コマンドが表示されないことの確認。
+### 3.1. 実証的仮説 (Grounded Hypothesis) - 本命案
+- **アプローチ**: 既存の `cli.py` に `process` および `visualize` コマンドを追加し、`process-diff` は Deprecated とする。
+- **詳細**:
+    - `process` コマンドは `--dry-run` オプションを必須とし、`FileSystemScanner` -> `GraphBuilder` を実行して、実行順序を標準出力に表示する（実際の起票処理は今後のタスク）。
+    - `visualize` コマンドは `FileSystemScanner` -> `GraphBuilder` -> `Visualizer` を実行し、Mermaid 形式を標準出力に出力する。
+    - 既存の `process-diff` は削除せず、「Deprecated」として実行時にエラーと移行案内を表示する。
+- **メリット**: 既存機能への影響を最小限にしつつ、新機能を提供できる。
 
-### 案B: 飛躍的仮説 (Leap) - 理想案
-*(段階的な無効化と警告の導入)*
-- **アプローチ:** ファイルは削除せず、中身を `DeprecationWarning` を出すスタブに置き換える。CLIからは隠すが、内部的なインポートは維持する。
-- **メリット/デメリット:** 破壊的変更を抑えられるが、本来の目的である「クリーンアップ」が達成されない。
-- **リスク:** 負債が残存し続ける。
+### 3.2. 飛躍的仮説 (Leap Hypothesis) - 理想案
+- **アプローチ**: `cli.py` を完全に刷新し、ADR-008 準拠の新しいエントリポイントとする。
+- **詳細**:
+    - 旧コマンドをすべて削除し、`init`, `process`, `visualize` のみに絞る。
+    - `ScannerService` という Facade を Domain Layer に導入し、CLI からの呼び出しを極限までシンプルにする。
+- **メリット**: コードが極めてクリーンになり、ADR-008 の意図（Cleanup）を最大限に反映できる。
 
-### 案C: 逆説的仮説 (Paradoxical) - 代替案
-*(新旧共存期間を設ける)*
-- **アプローチ:** 現状維持とし、新しい Scanner 実装が完了してから一括削除する。
-- **メリット/デメリット:** 安全だが、Issue #320 の「今すぐクリーンアップする」という指示に反する。
+### 3.3. 逆説的仮説 (Paradoxical Hypothesis) - 最小構成案
+- **アプローチ**: 新しい CLI コマンドを `cli.py` ではなく、別のスクリプト（例: `scanner_cli.py`）として実験的に実装する。
+- **詳細**:
+    - `ick-scanner` のような別コマンドとして提供し、十分な検証の後に `ick` コマンドへ統合する。
+- **メリット**: 既存の安定した（？）自動化パイプラインを壊さずに、新しい基盤の検証が可能。
 
-## 4. 推奨される方針 (Recommendation)
-- **推奨案:** 案A (Grounded)
-- **理由:** ADR-008 では明確に廃止が決定されており、物理削除が求められている。テストコードも含めた完全な削除を行うことが、長期的な健全性につながる。
-- **残存する不確実性 (Unknowns):** `creation.py` 内で `workflow_usecase` が実際に実行されている箇所があるか（grepでは型定義のみ見つかったが、動的な呼び出しがないか再確認が必要）。
+## 4. 推奨案 (Recommendation)
+- **仮説 3.1 (Grounded)** をベースに、仕様を策定する。
+- 理由: 本タスク（Task-008-05）の Issue 記述には `src/issue_creator_kit/cli.py` の更新が含まれており、完全な刷新や別ファイルの作成はスコープを逸脱する可能性があるため。ただし、旧 UseCase への依存コードは ADR-008 の "Cleanup" の一環としてコメントアウトまたは削除を検討する。
