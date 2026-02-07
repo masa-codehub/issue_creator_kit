@@ -230,9 +230,6 @@ graph LR
 | `status` | ライフサイクル状態 | Enum | ADR: `Draft`, `Approved`, `Postponed`, `Superseded` / Task: `Draft`, `Ready`, `Issued`, `Completed`, `Cancelled` |
 | `depends_on` | 依存先IDリスト | String (List) | Graph Integrity: 対象IDの存在確認、自己参照禁止、循環参照禁止 (No Cycles) |
 | `issue_id` | GitHub Issue番号 | Integer | Conditional: `status` が `Issued` または `Completed` の場合に必須 |
-
-
-
 ### Graph Integrity (DAG Validation)
 
 
