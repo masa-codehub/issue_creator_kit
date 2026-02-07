@@ -79,7 +79,7 @@ classDiagram
 - **Dependencies:**
   - **Upstream:** `cli.py`
   - **Downstream:** `OS File System`, `TaskParser`, `GraphBuilder`
-- **Tech Stack:** Python 3.12, `pathlib`
+- **Tech Stack:** Python 3.13, `pathlib`
 - **Data Reliability:** Sync. Physical file state is the SSOT.
 
 ### TaskParser

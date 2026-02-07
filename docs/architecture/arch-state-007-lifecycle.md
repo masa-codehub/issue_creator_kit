@@ -58,6 +58,6 @@ stateDiagram-v2
 
 *   **Manual Gate:** `Draft` から `Approved` への遷移は、必ず人間によるコードレビューと「物理移動を含む」PR マージを介さなければならない。
 
-*   **Domain Guardrails:** 全てのファイルは `id` を持ち、ID形式や依存関係の整合性チェックをパスしなければならない。具体的な構造的制約については [Metadata Structure (Invariants)](arch-structure-007-metadata.md#invariants-validation-rules) を参照。
+*   **Domain Guardrails:** 全てのファイルは `id` を持ち、ID形式や依存関係の整合性チェックをパスしなければならない。具体的な構造的制約については [Metadata Field Definitions & Guardrails (ADR-008)](arch-structure-007-metadata.md#metadata-field-definitions--guardrails-adr-008) を参照。
 
 *   **Atomic Move:** 状態の遷移は、ファイルシステムの `mv` 操作（または Git による移動）として表現される。
