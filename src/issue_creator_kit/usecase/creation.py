@@ -10,7 +10,6 @@ from issue_creator_kit.domain.interfaces import (
     IGitHubAdapter,
 )
 from issue_creator_kit.usecase.roadmap_sync import RoadmapSyncUseCase
-from issue_creator_kit.usecase.workflow import WorkflowUseCase
 
 
 class IssueCreationUseCase:
@@ -24,13 +23,11 @@ class IssueCreationUseCase:
         github_adapter: IGitHubAdapter,
         git_adapter: IGitAdapter | None = None,
         roadmap_sync: RoadmapSyncUseCase | None = None,
-        workflow_usecase: WorkflowUseCase | None = None,
     ):
         self.fs = fs_adapter
         self.github = github_adapter
         self.git = git_adapter
         self.roadmap_sync = roadmap_sync
-        self.workflow = workflow_usecase
 
     def _parse_dependencies(self, doc: Document) -> set[str]:
         """Parse dependencies from document metadata."""
