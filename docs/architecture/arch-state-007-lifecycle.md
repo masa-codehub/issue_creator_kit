@@ -48,8 +48,8 @@ stateDiagram-v2
 - **Done**: 後続ADRによる上書き（Superseded）や廃止時、`reqs/design/_archive/` へ物理移動。
 
 ### Task (Issue Draft)
-- **Draft**: `reqs/tasks/<ADR-ID>/_inbox/` 配下（例: `reqs/tasks/adr-008/_inbox/`）に配置。
-- **Approved**: 物理移動（`reqs/tasks/<ADR-ID>/_approved/` への配置）を含む Pull Request のマージ。
+- **Draft**: `reqs/tasks/<ADR-ID>/` 直下（例: `reqs/tasks/adr-008/`）に配置。**注記:** Task は `_inbox` を使用しない。
+- **Approved**: 物理移動（`reqs/tasks/<ADR-ID>/_approved/` への配置）を含む Pull Request のマージ（※将来的な拡張用。現在は直下配置でReadyとみなす運用も許容）。
 - **Done**: GitHub Issue のクローズやキャンセル時、`reqs/tasks/_archive/` へ物理移動。
 
 ## Invariants (不変条件)
