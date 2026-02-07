@@ -2,7 +2,7 @@
 
 ## 1. Y (やったこと)
 - **作業の実施内容:**
-  - ADR-008 に基づき、`FileSystemScanner` の詳細仕様書 (`docs/specs/logic/scanner-logic.md`) を作成。
+  - ADR-008 に基づき、`FileSystemScanner` の詳細仕様書 (`docs/specs/logic/scanner_logic.md`) を作成。
   - `reqs/` ディレクトリ配下の物理構造を調査し、`_approved` と `_archive` の関係性を確認。
   - YAML メタデータの `id` 重複に関するギャップを特定し、スキャナーロジックにガードレールを追加。
 - **事象の観測:**
@@ -35,5 +35,5 @@
   - ID の重複は許容し、`parent (ADR)` ID と `Task` ID の組み合わせ、あるいはファイルハッシュをキーとして状態を管理する。
 
 ### 検証アクション
-- [x] `docs/specs/logic/scanner-logic.md` に ID 重複検知ロジックを明記し、TDD 基準に反映した。
+- [x] `docs/specs/logic/scanner_logic.md` に ID 重複検知ロジックを明記し、TDD 基準に反映した。
 - [ ] 実装フェーズにおいて、重複 ID を持つテスト用ディレクトリ構造を作成し、スキャナーが期待通りエラーを出すか検証する。
