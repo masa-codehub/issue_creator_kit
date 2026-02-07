@@ -26,7 +26,7 @@
 - [x] **Parallelization Strategy:** 依存関係が整理され、可能な限りタスクが並列化されているか？（ボトルネックとなるコアタスクが先行しているか）
   - **根拠:** `Task-01` (Domain) と `Task-02` (Cleanup) を先行させ、`Task-03` (Scanner) と `Task-04` (Graph) を並列可能な構造にしている（`definitions.md` の DAG 参照）。
 - [x] **Integration Issue:** 全タスクを束ねる統合Issueが定義され、最終監査の手順が含まれているか？
-  - **根拠:** `task-008-integration.md` が作成されている。
+  - **根拠:** `reqs/tasks/adr-008/_inbox/task-08-integration.md` が作成されている。
 
 ## 3. Improvement Proposals (改善提案)
 - **提案 1:** 将来的には `ScannerService` 自体の単体テストだけでなく、実際のファイルシステムを使った統合テスト（E2Eに近いもの）も計画に含めるべきかもしれない（今回はCLIテストでカバー）。
