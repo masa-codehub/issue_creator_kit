@@ -15,9 +15,9 @@ graph TD
 
     subgraph "Domain Layer (Scanner Foundation)"
         FS[FileSystemScanner]
-        Parser[TaskParser]
+        Parser[DocumentParser]
         Builder[GraphBuilder]
-        Model[Task/ADR Models]
+        Model[Document Models]
         Visualizer[Visualizer]
     end
 
@@ -39,34 +39,26 @@ graph TD
 
 ```mermaid
 classDiagram
-    class Task {
+    class Document {
         +str id
-        +str title
         +str status
         +List~str~ depends_on
         +Path path
-    }
-    class ADR {
-        +str id
-        +str title
-        +str status
-        +List~str~ depends_on
-        +Path path
+        +Metadata metadata
     }
     class TaskGraph {
-        +Dict~str, TaskNode~ nodes
-        +add_task(task)
+        +Dict~str, DocumentNode~ nodes
+        +add_document(doc)
         +get_execution_order() List~str~
     }
-    class TaskNode {
-        +Task task
-        +List~TaskNode~ dependencies
-        +List~TaskNode~ dependents
+    class DocumentNode {
+        +Document document
+        +List~DocumentNode~ dependencies
+        +List~DocumentNode~ dependents
     }
 
-    Task <|-- ADR
-    TaskGraph "1" *-- "many" TaskNode
-    TaskNode "1" o-- "1" Task
+    TaskGraph "1" *-- "many" DocumentNode
+    DocumentNode "1" o-- "1" Document
 ```
 
 ## Element Definitions (SSOT)
@@ -78,29 +70,29 @@ classDiagram
 - **Layer (Clean Arch):** Use Cases / Domain Services
 - **Dependencies:**
   - **Upstream:** `cli.py`
-  - **Downstream:** `OS File System`, `TaskParser`, `GraphBuilder`
+  - **Downstream:** `OS File System`, `DocumentParser`, `GraphBuilder`
 - **Tech Stack:** Python 3.13, `pathlib`
 - **Data Reliability:** Sync. Physical file state is the SSOT.
 
-### TaskParser
+### DocumentParser
 - **Type:** `Component`
 - **Code Mapping:** `src/issue_creator_kit/domain/services/parser.py` (Planned)
 - **Role (Domain-Centric):** Markdown ファイルのメタデータを解析し、Pydantic モデルに変換する。
 - **Layer (Clean Arch):** Entities / Domain Models
 - **Dependencies:**
   - **Upstream:** `FileSystemScanner`
-  - **Downstream:** `Task/ADR Models`
+  - **Downstream:** `Document Models`
 - **Tech Stack:** Pydantic v2
 - **Data Reliability:** Fail-fast on validation (Domain Guardrails).
 
 ### GraphBuilder
 - **Type:** `Component`
 - **Code Mapping:** `src/issue_creator_kit/domain/services/builder.py` (Planned)
-- **Role (Domain-Centric):** `depends_on` メタデータに基づき、タスク間の依存関係をグラフ（DAG）として構築する。
+- **Role (Domain-Centric):** `depends_on` メタデータに基づき、ドキュメント間の依存関係をグラフ（DAG）として構築する。
 - **Layer (Clean Arch):** Domain Services
 - **Dependencies:**
   - **Upstream:** `FileSystemScanner`, `Visualizer`
-  - **Downstream:** `Task/ADR Models`
+  - **Downstream:** `Document Models`
 - **Tech Stack:** Python 3.12
 - **Data Reliability:** 循環参照や自己参照を検知しエラーとする。
 
@@ -157,7 +149,7 @@ sequenceDiagram
     autonumber
     participant U as User/CLI
     participant S as FileSystemScanner
-    participant P as TaskParser
+    participant P as DocumentParser
     participant B as GraphBuilder
     participant OS as File System
 
@@ -169,13 +161,14 @@ sequenceDiagram
         P->>OS: read content
         OS-->>P: text
         P->>P: validate with Pydantic
-        P-->>S: Task object
+        P-->>S: Document object
     end
-    S->>B: build_graph(tasks)
+    S->>B: build_graph(documents, archived_ids)
     B->>B: detect cycles/self-references
     B-->>S: Graph object
     S-->>U: Graph object
 ```
+
 
 ## Reliability & Failure Handling
 - **Consistency Model:** Strong Consistency (Physical file state is the source of truth).
