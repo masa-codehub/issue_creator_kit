@@ -24,6 +24,7 @@
 | Error Code | Exception Class | Description |
 | :--- | :--- | :--- |
 | *INVALID_METADATA* | *ValidationError* | ID format or required fields missing |
+| *DUPLICATE_ID* | *ValidationError* | Same ID found in multiple files (including archive) |
 | *CYCLE_DETECTED* | *GraphError* | Circular dependency found in DAG |
 | *ORPHAN_DEPENDENCY* | *GraphError* | `depends_on` ID not found in scan scope |
 
