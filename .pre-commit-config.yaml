@@ -8,16 +8,14 @@ repos:
         args: [--fix]
       - id: ruff-format
 
-  # 2. Markdown & Mermaid Formatting (Prettier)
+  # 2. Markdown Formatting (Prettier)
   # ⚠️ 注意: mirrors-prettier はアーカイブされたため、v3.1.0 で固定して使います。
-  # autoupdate で v4.0.0-alpha 系に上がると動かなくなるので注意してください。
+  #     現在の設定では Markdown のみ整形対象であり、Mermaid の整形（prettier-plugin-mermaid 等）は行いません。
   - repo: https://github.com/pre-commit/mirrors-prettier
     rev: v3.1.0
     hooks:
       - id: prettier
         types: [markdown]
-        additional_dependencies:
-          - prettier@3.1.0
 
   # 3. Markdown Linting (markdownlint)
   - repo: https://github.com/DavidAnson/markdownlint-cli2
