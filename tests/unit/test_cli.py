@@ -41,6 +41,53 @@ def test_process_diff_command_with_adr_id():
         assert call_kwargs["archive_path"] == "reqs/tasks/_archive/"
 
 
+def test_process_diff_command_full_options():
+    """Test 'process-diff' command with all options."""
+    with (
+        patch("issue_creator_kit.cli.FileSystemAdapter"),
+        patch("issue_creator_kit.cli.GitHubAdapter"),
+        patch("issue_creator_kit.cli.GitAdapter"),
+        patch("issue_creator_kit.cli.RoadmapSyncUseCase"),
+        patch("issue_creator_kit.cli.IssueCreationUseCase") as mock_creation,
+    ):
+        before = "HEAD~2"
+        after = "HEAD"
+        adr_id = "adr-008"
+        archive_dir = "custom/archive/"
+        roadmap = "docs/roadmap.md"
+        base_branch = "develop"
+
+        test_args = [
+            "process-diff",
+            "--before",
+            before,
+            "--after",
+            after,
+            "--adr-id",
+            adr_id,
+            "--archive-dir",
+            archive_dir,
+            "--roadmap",
+            roadmap,
+            "--use-pr",
+            "--base-branch",
+            base_branch,
+        ]
+
+        with patch.object(sys, "argv", ["issue-kit"] + test_args):
+            cli.main()
+
+        mock_creation.return_value.create_issues.assert_called_once_with(
+            before=before,
+            after=after,
+            adr_id=adr_id,
+            archive_path=archive_dir,
+            roadmap_path=roadmap,
+            use_pr=True,
+            base_branch=base_branch,
+        )
+
+
 def test_process_diff_command_without_adr_id():
     """Test 'process-diff' command without --adr-id."""
     with (

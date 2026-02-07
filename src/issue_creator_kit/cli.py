@@ -72,6 +72,9 @@ def run_automation(args):
             after=args.after,
             adr_id=args.adr_id,
             archive_path=args.archive_dir,
+            roadmap_path=args.roadmap,
+            use_pr=args.use_pr,
+            base_branch=args.base_branch,
         )
     except Exception as e:
         print(f"Automation failed: {e}", file=sys.stderr)
