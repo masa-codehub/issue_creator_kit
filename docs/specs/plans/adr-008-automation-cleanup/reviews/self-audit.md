@@ -18,7 +18,7 @@
 - [x] **Design Doc Fulfillment:** ソースとなるDesign Docの要件を全てカバーしているか？
   - **根拠:** `adr-008-automation-cleanup.md` の要件（Cleanup, Scanner, Guardrails, Visualization）が `Task-01` ~ `05` に網羅的に割り当てられている。
 - [x] **Arch Plan Alignment:** アーキテクチャ計画（`docs/architecture/plans/`）で定義された物理構造と矛盾していないか？
-  - **根拠:** `definitions.md` の "Directory Mapping" とタスク定義の "Output Path" が `arch-structure-008-scanner.md` と一致している。
+  - **根拠:** `definitions.md` の "3. Directory Structure & Naming" とタスク定義の "Output Path" が `arch-structure-008-scanner.md` と一致している。
 
 ### 2.3. Task Strategy
 - [x] **TDD Criteria:** 各Issue案に、実装者がTDDを行うための「検証条件（Happy/Error/Boundary）」を記述するよう指示があるか？
