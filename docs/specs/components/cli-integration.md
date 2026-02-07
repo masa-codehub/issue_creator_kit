@@ -86,8 +86,9 @@ ADR-008 の「Cleanup」フェーズに基づき、以下の既存コマンド�
 
 **実装上の注意**:
 
-- `process-diff` (**Deprecated**) は `cli.py` 上のエントリポイントを残しつつ、実行時には常にエラー終了とし、"This command is deprecated and no longer supported. Use `ick process` instead." というメッセージを表示する（終了コード `1`）。
-- その他 (**Remove**) は `cli.py` から完全に削除（または既になければ定義しない）し、以降は CLI から利用できないものとする。
+- `process-diff` (**Deprecated**) は、**本 ADR-008 に基づく新 CLI リリース以降**、後方互換性のために `cli.py` 上のエントリポイントおよび `--help` の一覧には残しつつ、実行時には常にエラー終了とし、"This command is deprecated and no longer supported. Use `ick process` instead." というメッセージを表示する（終了コード `1`）。成功するコマンドとしてはもはやサポートしない。
+- 上記の deprecated 仕様は、`docs/specs/api/cli_commands.md` を含む CLI 仕様ドキュメント群にも反映し、`process-diff` を「現役コマンド」としては記載しないこと（必要であれば「廃止予定／エラー専用コマンド」である旨を明記する）。
+- その他 (**Remove**) のコマンドは、本 ADR-008 に基づく新 CLI リリースのタイミングで `cli.py` から完全に削除（または既に存在しなければ定義しない）し、`--help` 等の出力にも表示しない。関連ドキュメントからも削除するか、「廃止済み」であることを明示し、新たな利用を誘導しないものとする。
 
 ## 補足・制約事項
 

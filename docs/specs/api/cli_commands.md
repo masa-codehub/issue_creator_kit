@@ -24,25 +24,33 @@
 
 ## 3. コマンド定義
 
-### 3.1. `process-diff`
+### 3.1. `process`
 
-仮想キュー（Virtual Queue）の自動起票を実行するコマンド。
+物理ファイルシステムを走査し、未処理のタスクおよび ADR を処理するメインコマンド。
 
-- **概要**: `reqs/tasks/` ディレクトリ配下を再帰的に探索し、新しく追加された未採番のタスクファイルを検知して GitHub Issue を起票する。起票されたファイルは `--archive-dir` へ移動される。
-- **必須引数**:
-  - `--before`: 比較元（Base）の Git Ref。
-  - `--after`: 比較先（Head）の Git Ref。
+- **概要**: `reqs/` ディレクトリ配下を走査し、依存関係を考慮してタスクを処理する。
 - **オプション引数**:
-  - `--archive-dir`: タスクアーカイブの移動先ディレクトリ（デフォルト: `reqs/tasks/_archive/`）
-  - `--adr-id`: 指定した ADR ID に紐づくタスクのみを処理対象とするフィルタリングオプション。
-    - **形式**: `adr-` に続けて 3 桁のゼロパディング済み数字を指定する（例: `adr-001`, `adr-007`）。
-    - **バリデーション**: 上記形式に一致しない値が指定された場合、本 CLI はバリデーションエラーとして扱い、終了コード `2` を返すこと。
-  - `--roadmap`: ロードマップファイルのパス。
-  - `--use-pr`: 直接 Push せず、メタデータ同期用の PR を作成するフラグ。
-  - `--base-branch`: メタデータ同期 PR のマージ先ブランチ（デフォルト: `main`）。
-- **UseCase への委譲**: `IssueCreationUseCase.create_issues(before=..., after=..., adr_id=..., archive_path=..., roadmap_path=..., use_pr=..., base_branch=...)` を呼び出す。
+  - `--root`: 走査対象のベースディレクトリ（デフォルト: `reqs/`）
+  - `--dry-run`: 実際のアクション（GitHub 起票等）を行わず、検出されたファイルと実行順序を表示する。
+- **UseCase への委譲**: `ScannerService` (または各 Domain Service) を介して処理を実行する。
 
-### 3.2. その他のサブコマンド
+### 3.2. `visualize`
+
+タスクの依存関係を Mermaid 形式で可視化するコマンド。
+
+- **概要**: 現在のタスク依存関係を DAG として構築し、Mermaid 記法のテキストを出力する。
+- **オプション引数**:
+  - `--root`: 走査対象のベースディレクトリ（デフォルト: `reqs/`）
+- **UseCase への委譲**: `Visualizer.to_mermaid()` を呼び出す。
+
+### 3.3. `process-diff` (Deprecated)
+
+仮想キュー（Virtual Queue）の自動起票を実行するレガシーコマンド。
+
+- **概要**: **本 ADR-008 に基づく新 CLI リリース以降、非推奨（Deprecated）とする。** 後方互換性のためにエントリポイントは維持するが、実行時には常にエラー終了し、新コマンドへの移行を促すメッセージを表示する。
+- **振る舞い**: 実行時に "This command is deprecated and no longer supported. Use `ick process` instead." を表示し、終了コード `1` で終了する。
+
+### 3.4. その他のサブコマンド
 
 既存の `cli.py` に実装されている以下のコマンドは、必要に応じて利用される。
 

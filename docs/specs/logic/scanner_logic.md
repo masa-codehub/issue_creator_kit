@@ -14,9 +14,9 @@ Git の差分情報に依存せず、ディレクトリ構造（`_approved`, `_a
 
 ## Output
 
-| Type                     | Description                                           |
-| :----------------------- | :---------------------------------------------------- |
-| `List[Union[Task, ADR]]` | 検出された未処理タスクおよび ADR オブジェクトのリスト |
+| Type                              | Description                                                                                          |
+| :-------------------------------- | :--------------------------------------------------------------------------------------------------- |
+| `Tuple[List[Document], Set[str]]` | 検出された未処理ドキュメントリストと、アーカイブ済みIDセット (`documents`, `processed_ids`) のタプル |
 
 ## Algorithm / Flow
 
@@ -28,7 +28,7 @@ Git の差分情報に依存せず、ディレクトリ構造（`_approved`, `_a
 2.  見つかった `_archive/*.md` ファイルをすべて読み込む。
 3.  各ファイルの YAML ヘッダーから `id` を抽出する。
 4.  抽出した ID を `processed_ids` セットに追加する。
-    - **注意**: アーカイブ内での ID 重複は許容される（履歴のため）が、読み込みエラーは無視せず報告する。
+    - **注意**: アーカイブ内であっても、同一 `id` を持つ複数ファイルが検出された場合は `ValidationError` (DUPLICATE_ID) を送出し、スキャンを中断する (Fail-fast)。読み込みエラーも無視せず報告する。
 
 ### 2. 未処理ファイルの走査 (Scan Unprocessed Files)
 
@@ -38,7 +38,7 @@ Git の差分情報に依存せず、ディレクトリ構造（`_approved`, `_a
     - `design/_approved/`
     - `tasks/*/` (ただし `_archive/` ディレクトリは除外)
 2.  見つかった `*.md` ファイルのうち、`exclude_patterns` に一致しないものを対象とする。
-3.  対象ファイルを `TaskParser` を用いてパースし、`Task` または `ADR` モデルに変換する。
+3.  対象ファイルを `DocumentParser` を用いてパースし、`Document` (`Task` または `ADR`) モデルに変換する。
 4.  **グローバル ID 重複チェック (Fail-fast)**:
     - 抽出した `id` が既に `processed_ids` に存在する場合、`ValidationError` (DUPLICATE_ID) を送出する。
     - 現在のスキャン対象リスト内で ID が重複している場合も、`ValidationError` (DUPLICATE_ID) を送出する。
@@ -48,7 +48,7 @@ Git の差分情報に依存せず、ディレクトリ構造（`_approved`, `_a
 
 ### 3. モデル変換とバリデーション (Model Conversion)
 
-1.  `TaskParser` は Pydantic モデルを用いてメタデータの型と形式を検証する。
+1.  `DocumentParser` は Pydantic モデルを用いてメタデータの型と形式を検証する。
 2.  不正なメタデータを持つファイルが見つかった場合、即座に `ValidationError` を送出し中断する (Fail-fast)。
 
 ## Edge Cases

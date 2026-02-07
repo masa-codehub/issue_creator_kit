@@ -20,6 +20,12 @@ ADR-008「Scanner Foundation」において使用されるドメインモデル�
 
 ## Schema Definition
 
+### Document (Union Type)
+
+スキャナーが物理ファイルから読み取るドメインモデルの総称。
+
+実装上は `Union[Task, ADR]` として定義され、共通の基底クラス（または Pydantic の `Discriminated Unions`）を通じて ID や依存関係を透過的に扱えるようにする。
+
 ### ADR Model
 
 ADR（Architecture Decision Record）のメタデータを表現する。

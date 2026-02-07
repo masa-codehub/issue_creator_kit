@@ -31,6 +31,7 @@
 ### 3.3. Pydantic v2 の活用
 
 - **Validation**: ドメインモデルのバリデーションには Pydantic v2 の機能を最大限活用し、手動での `if` 分岐によるバリデーションを避けること。
+- **Document Model**: 実装上、`Document` は `Union[Task, ADR]` (または共通基底クラスを持つ構造) として扱い、スキャナーやグラフビルダーがこれらを透過的に処理できるようにすること。詳細は `docs/specs/data/domain_models_adr008.md` を参照。
 
 ## 4. テスト戦略 (Test Strategy)
 
