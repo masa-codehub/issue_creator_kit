@@ -48,7 +48,8 @@ fi
 # 2. pre-commit のインストール
 if [ -d ".git" ]; then
     echo "Installing pre-commit hooks..."
-    uv run pre-commit install
+    # ★ Windows資格情報マネージャーへの自動保存を防止 (Dev Container環境用)
+    GIT_CONFIG_PARAMETERS="'credential.helper='" uv run pre-commit install
 fi
 
 # コンテキスト更新など

@@ -1,6 +1,7 @@
 # Goal Definition: CLI Spec Fixes (PR #286 Review Response)
 
 ## 1. 達成目標 (SMART Goal)
+
 PR #286 のレビュー指摘に基づき、`docs/specs/api/cli_commands.md` を修正し、仕様の欠落（UseCase シグネチャ）と曖昧さ（引数フォーマット）を解消する。
 
 - **Specific:** `IssueCreationUseCase` のメソッド名と引数 (`adr_id`) を明記し、`--adr-id` のバリデーションルールを追加する。
@@ -10,12 +11,14 @@ PR #286 のレビュー指摘に基づき、`docs/specs/api/cli_commands.md` を
 - **Time-bound:** 本セッション内で完了させる。
 
 ## 2. 完了条件 (Definition of Done)
+
 - [ ] `docs/specs/api/cli_commands.md` に `IssueCreationUseCase.create_issues_from_virtual_queue(..., adr_id=...)` の記述が追加されている。
 - [ ] `docs/specs/api/cli_commands.md` に `--adr-id` のフォーマット（`adr-` + 3桁の数字）とバリデーション（失敗時終了コード 1）が追記されている。
 - [ ] `docs/specs/api/cli_commands.md` の TDD Criteria に、不正な `--adr-id` 指定時のテストケースが追加されている。
 - [ ] 自己レビューおよび `auditing-ssot` をパスしている。
 
 ## 3. 検証方法 (Verification Methods)
+
 - **静的検証:**
   - `grep "adr_id" docs/specs/api/cli_commands.md` で追加箇所を確認。
   - `grep "adr-" docs/specs/api/cli_commands.md` でフォーマット定義を確認。

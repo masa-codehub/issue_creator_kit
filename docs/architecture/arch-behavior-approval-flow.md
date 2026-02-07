@@ -1,27 +1,31 @@
 # Document Approval Flow Sequence
 
 ## Scenario Overview
+
 - **Goal:** 自動化されたフローにより、設計ドキュメントの承認（メタデータ更新、移動）、トラッキングIssueの起票、およびGitコミットを行う。
 - **Trigger:** GitHub Actions (Merge to main or Manual Dispatch) -> `issue-kit` CLI execution.
 - **Type:** Batch / Sync (CLI実行中は同期的)
 
 ## Contracts (Pre/Post)
+
 - **Pre-conditions (前提):**
-    - `reqs/design/_inbox/` に承認対象のマークダウンファイルが存在する。
-    - GitHub Actions ランナー上で `gh` コマンドまたは `GITHUB_TOKEN` が利用可能である。
+  - `reqs/design/_inbox/` に承認対象のマークダウンファイルが存在する。
+  - GitHub Actions ランナー上で `gh` コマンドまたは `GITHUB_TOKEN` が利用可能である。
 - **Post-conditions (保証):**
-    - 対象ファイルが `reqs/design/_approved/` に移動されている。
-    - ファイル内の `Status` が `承認済み` に、`Date` が実行日に更新されている。
-    - GitHub Issue が起票（または特定）され、そのIDがファイルに記載されている。
-    - 変更がGitコミットされている（Pushは呼び出し元が行う想定、またはAdapterが行う）。
+  - 対象ファイルが `reqs/design/_approved/` に移動されている。
+  - ファイル内の `Status` が `承認済み` に、`Date` が実行日に更新されている。
+  - GitHub Issue が起票（または特定）され、そのIDがファイルに記載されている。
+  - 変更がGitコミットされている（Pushは呼び出し元が行う想定、またはAdapterが行う）。
 
 ## Related Structures
-*   `src/issue_creator_kit/cli.py`
-*   `src/issue_creator_kit/usecase/approval.py`
-*   `src/issue_creator_kit/infrastructure/git_adapter.py`
-*   `src/issue_creator_kit/infrastructure/github_adapter.py`
+
+- `src/issue_creator_kit/cli.py`
+- `src/issue_creator_kit/usecase/approval.py`
+- `src/issue_creator_kit/infrastructure/git_adapter.py`
+- `src/issue_creator_kit/infrastructure/github_adapter.py`
 
 ## Diagram (Sequence)
+
 ```mermaid
 sequenceDiagram
     autonumber
@@ -70,7 +74,7 @@ sequenceDiagram
         activate INF_GH
         INF_GH-->>UC: issue_number
         deactivate INF_GH
-        
+
         Note right of UC: 4. Update Approved File with Issue ID
         UC->>INF_FS: update_metadata(new_path, issue_id=issue_number)
     end
@@ -79,7 +83,7 @@ sequenceDiagram
     UC->>INF_GIT: add(".")
     UC->>INF_GIT: commit("Approve design documents")
     activate INF_GIT
-    
+
     alt Commit Success
         INF_GIT-->>UC: success
         Note right of UC: (optional) Push to remote
@@ -97,7 +101,8 @@ sequenceDiagram
 ```
 
 ## Reliability & Failure Handling
+
 - **Consistency Model:** Eventual Consistency (File system updates -> Git commit -> Push)
 - **Failure Scenarios:**
-    - *GitHub API Error:* Issue起票は、(1) メタデータ更新の永続化（`write_file`）、(2) ファイルの移動、(3) Issue起票 の順に行われる。Issue起票に失敗した場合は、直前に行ったファイル移動およびメタデータ更新をロールバックして元の状態に戻し、エラーログを出力した上で次のファイルの処理へ移行する。これにより、最終的にメタデータとIssueの不整合が残らないようにする（短いトランザクション＋ロールバック戦略）。
-    - *Git Commit Error:* ローカルでのコミットに失敗した場合、後続のPushも失敗するため、CLIは非ゼロの終了コードを返却し、CIを失敗させる。
+  - _GitHub API Error:_ Issue起票は、(1) メタデータ更新の永続化（`write_file`）、(2) ファイルの移動、(3) Issue起票 の順に行われる。Issue起票に失敗した場合は、直前に行ったファイル移動およびメタデータ更新をロールバックして元の状態に戻し、エラーログを出力した上で次のファイルの処理へ移行する。これにより、最終的にメタデータとIssueの不整合が残らないようにする（短いトランザクション＋ロールバック戦略）。
+  - _Git Commit Error:_ ローカルでのコミットに失敗した場合、後続のPushも失敗するため、CLIは非ゼロの終了コードを返却し、CIを失敗させる。

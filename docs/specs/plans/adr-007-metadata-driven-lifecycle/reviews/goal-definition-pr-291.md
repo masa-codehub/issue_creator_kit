@@ -1,8 +1,9 @@
 # Goal Definition - Data Model & Adapter Protocols
 
 ## 1. 達成目標 (SMART Goals)
+
 - **Specific**: ADR-007 準拠の `Metadata` モデル (Pydantic) を実装し、`Document` クラスをリファクタリングして統合する。また、`IFileSystemAdapter`, `IGitHubAdapter`, `IGitAdapter` の Protocol を `interfaces.py` に定義する。
-- **Measurable**: 
+- **Measurable**:
   - `pytest tests/unit/domain/test_document.py` が 100% パスする。
   - `mypy src/issue_creator_kit/domain/` がエラーなしでパスする。
   - `interfaces.py` に 3 つの Protocol が定義されていることを `grep` で確認。
@@ -11,12 +12,14 @@
 - **Time-bound**: 本セッション中に実装・検証を完了し、PR を作成する。
 
 ## 2. 成果物 (Deliverables)
+
 - `src/issue_creator_kit/domain/exceptions.py`: インフラ例外クラス
 - `src/issue_creator_kit/domain/interfaces.py`: Adapter Protocol 定義
 - `src/issue_creator_kit/domain/document.py`: `Metadata` モデル導入と `Document` リファクタリング
 - `tests/unit/domain/test_document.py`: バリデーションと正規化の網羅テスト
 
 ## 3. 検証手順 (Verification)
+
 1. **ドメインモデル検証**:
    - `pytest tests/unit/domain/test_document.py`
    - 不正な ID, ステータス, 型、必須フィールド欠落時に Pydantic の `ValidationError` (またはそれをラップした独自例外) が発生することを確認。
@@ -29,6 +32,7 @@
    - `mypy src/issue_creator_kit/domain/`
 
 ## 4. 実行計画 (Action Plan)
+
 1. `exceptions.py` の作成。
 2. `interfaces.py` の作成。
 3. `test_document.py` に失敗するテストを追加 (Red)。

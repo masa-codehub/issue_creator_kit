@@ -29,11 +29,14 @@
 ## 3. 改善提案 (Improvement Proposals)
 
 ### 優先度 1: 重要 (Critical - Must Fix)
+
 1. 修正: `GitHubAdapter.create_pull_request` の `base` 引数のデフォルト値を削除（`IGitHubAdapter` Protocol との完全一致）。
 
 ### 優先度 2: 品質 (Quality - Should Fix)
+
 1. リファクタリング: `FileSystemAdapter.find_file_by_id` の Docstring 追加。
 2. リファクタリング: `GitHubAdapter` の新規メソッドに Docstring 追加。
 
 ### 優先度 3: 洗練 (Polish - Nice to Have)
+
 1. 追加: `FileSystemAdapter` の `update_metadata` におけるロック処理 (`fcntl`) のテスト強化（現在はモックが不十分）。

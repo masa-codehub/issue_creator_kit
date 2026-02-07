@@ -81,6 +81,7 @@ pre-commit install
 アプリケーションは環境変数から設定を読み込みます。サンプルファイルをコピーして、独自の設定ファイルを作成してください。
 
 1.  `.env.sample` を `.env` にコピーします。
+
     ```bash
     cp .build/context/.env.sample .build/context/.env
     ```

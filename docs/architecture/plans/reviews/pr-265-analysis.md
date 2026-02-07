@@ -1,6 +1,7 @@
 # Review Analysis Report: PR #265
 
 ## 1. Summary
+
 - **Total Comments:** 1
 - **Accept (修正受諾):** 1
 - **Discuss (議論/確認):** 0
@@ -9,6 +10,7 @@
 ## 2. Analysis Details
 
 ### [Accept] docs/architecture/arch-state-003-task-lifecycle.md (L7)
+
 - **Reviewer's Comment:**
   - "不自然なスペースが挿入されています。「タスク ドキュメント」となっていますが、元は「タスクドキュメント」でした。廃止警告の追加以外の変更は不要です。"
 - **Context Analysis:**
@@ -21,6 +23,7 @@
 ---
 
 ## 3. Execution Plan
+
 - [x] Accept項目の修正案作成（分析完了）
 - [ ] docs/architecture/arch-state-003-task-lifecycle.md の修正適用
 - [ ] 修正後のセルフレビュー

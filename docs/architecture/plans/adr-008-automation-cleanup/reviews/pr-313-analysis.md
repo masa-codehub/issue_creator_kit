@@ -1,6 +1,7 @@
 # Review Analysis Report: PR #313
 
 ## 1. Summary
+
 - **Total Comments:** 7
 - **Accept (修正受諾):** 7
 - **Discuss (議論/確認):** 0
@@ -9,6 +10,7 @@
 ## 2. Analysis Details
 
 ### [Accept] docs/architecture/arch-state-007-lifecycle.md (L5, L29, L48, L55)
+
 - **Reviewer's Comments:**
   - L5: Persistence に GitHub Issues が不足している。
   - L29: Mermaid の `note` ブロックが `end note` で閉じられていない。
@@ -26,6 +28,7 @@
   - 各定義が `definitions.md` と完全に一致しているか再確認。
 
 ### [Accept] docs/architecture/plans/adr-008-automation-cleanup/reviews/reconnaissance-self-review.md (L1)
+
 - **Reviewer's Comment:**
   - `reconnaissance-self-review.md` と `reconnaissance-report-self-review.md` が重複している。
 - **Context Analysis:**
@@ -36,6 +39,7 @@
   - 統合後のファイルに全てのチェック項目が含まれていることを確認。
 
 ### [Accept] docs/architecture/plans/adr-008-automation-cleanup/reviews/reconnaissance-report.md (L13)
+
 - **Reviewer's Comment:**
   - 推測的な表現（「〜に見える」「〜可能性がある」）が含まれている。
 - **Context Analysis:**
@@ -48,6 +52,7 @@
 ---
 
 ## 3. Execution Plan
+
 - [x] 分析レポートの作成
 - [ ] `arch-state-007-lifecycle.md` の修正 (Suggestions 適用)
 - [ ] `reconnaissance-report.md` の表現修正

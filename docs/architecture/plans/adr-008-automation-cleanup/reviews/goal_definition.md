@@ -1,6 +1,7 @@
 # Goal Definition - Issue #315: Architecture Fix for ADR-008
 
 ## 1. 達成すべき目標 (SMART Goals)
+
 - **Specific**: `arch-structure-issue-kit.md` と `arch-structure-007-metadata.md` を更新し、ADR-008 (Scanner Foundation) の構造と制約を正しく記述する。
 - **Measurable**:
   - `arch-structure-issue-kit.md` から `WorkflowUseCase`, `ApprovalUseCase` の記述が消え、`Scanner Foundation` の記述が追加されていること。
@@ -11,6 +12,7 @@
 - **Time-bound**: 本セッション中に完了させる。
 
 ## 2. 完了条件 (Definition of Done)
+
 - [ ] `docs/architecture/arch-structure-issue-kit.md` が更新され、旧コンポーネントが削除されている。
 - [ ] `docs/architecture/arch-structure-issue-kit.md` に `Scanner Foundation` (FileSystemScanner, TaskParser, GraphBuilder) が追加されている。
 - [ ] `docs/architecture/arch-structure-007-metadata.md` に `Invariants` セクションが追加されている。
@@ -18,6 +20,7 @@
 - [ ] 自己監査レポート（`drafting-audit-template.md` ベース）を作成し、合格している。
 
 ## 3. 検証方法 (Verification Methods)
+
 - **ファイル存在・内容確認**: `grep` で削除・追加キーワードを確認。
   - `grep "WorkflowUseCase" docs/architecture/arch-structure-issue-kit.md` -> 0件
   - `grep "Scanner Foundation" docs/architecture/arch-structure-issue-kit.md` -> 1件以上
