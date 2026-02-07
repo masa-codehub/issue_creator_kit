@@ -1,96 +1,60 @@
 #!/bin/bash
+set -e
 
 echo "=== Environment Setup ==="
 
-# ★ 追加設定: uv の暴走（リソース食いつぶし）を防ぐ
-# 並列数を 4 程度に制限（デフォルトはCPU全開なので、Dockerだと落ちやすい）
-export UV_CONCURRENT_DOWNLOADS=4
-export UV_CONCURRENT_BUILDS=2
-export UV_CONCURRENT_INSTALLS=4
+# 0. Global Git Safety (Prevent credential leakage on self-hosted runners)
+if [ -d ".git" ]; then
+    echo "Disabling local credential helper to prevent token leakage..."
+    # リポジトリローカルの設定でヘルパーを空文字に上書きする
+    # これにより、システム/グローバルの認証情報保存機能がこのリポジトリに対して無効化される
+    git config --local credential.helper ""
+fi
 
-# ★ 追加設定: 警告が出ていたハードリンク問題を明示的に解決
+# uv settings
+export UV_CONCURRENT_DOWNLOADS=4
 export UV_LINK_MODE=copy
 
-# 1. 依存関係の同期
+# 1. Sync dependencies
 if [ -f "pyproject.toml" ]; then
     echo "Syncing dependencies..."
-    # --all-extras: dev依存なども含めて全部入れる
     uv sync --all-extras
 fi
 
-# .gemini サブモジュールの更新
-# 優先順位: GITHUB_MCP_PAT > GH_TOKEN > GITHUB_TOKEN
-TOKEN=""
-if [ -n "$GITHUB_MCP_PAT" ]; then
-    TOKEN="$GITHUB_MCP_PAT"
-elif [ -n "$GH_TOKEN" ]; then
-    TOKEN="$GH_TOKEN"
-elif [ -n "$GITHUB_TOKEN" ]; then
-    TOKEN="$GITHUB_TOKEN"
-fi
+# 2. Update submodules (Securely)
+TOKEN="${GITHUB_MCP_PAT:-${GH_TOKEN:-$GITHUB_TOKEN}}"
 
 if [ -n "$TOKEN" ]; then
-    echo "Updating submodules using provided token..."
-    # トークンがプロセス一覧（ps等）に露出しないよう、一時的な git 設定ファイルを使用する
-    tmp_gitconfig="$(mktemp)"
-    # スクリプト終了時に一時ファイルを削除
-    trap 'rm -f "$tmp_gitconfig"' EXIT
-    cat > "$tmp_gitconfig" <<EOF
-[url "https://x-access-token:${TOKEN}@github.com/"]
-    insteadOf = https://github.com/
-EOF
-    git -c include.path="$tmp_gitconfig" submodule update --init --recursive || echo "Warning: Failed to update submodules. Continuing anyway..."
+    echo "Updating submodules with token (Storage disabled)..."
+    # Inject token on the fly and disable credential helper for this command
+    git -c "url.https://x-access-token:${TOKEN}@github.com/.insteadOf=https://github.com/" \
+        -c credential.helper= \
+        submodule update --init --recursive || (echo "Fallback to standard update..." && git submodule update --init --recursive)
 else
     echo "Updating submodules..."
-    git submodule update --init --recursive || echo "Warning: Failed to update submodules. Continuing anyway..."
+    git submodule update --init --recursive
 fi
 
-# 2. pre-commit のインストール
+# 3. Install pre-commit
 if [ -d ".git" ]; then
-    echo "Installing pre-commit hooks..."
-    # ★ Windows資格情報マネージャーへの自動保存を防止 (Dev Container環境用)
+    # pre-commit自体の実行時も認証キャッシュを使わないよう徹底
     GIT_CONFIG_PARAMETERS="'credential.helper='" uv run pre-commit install
 fi
 
-# コンテキスト更新など
+# 4. Update context
 if [ -f ".build/update_gemini_context.sh" ]; then
     bash .build/update_gemini_context.sh
 fi
 
-# 仮想環境のアクティベート
-echo "Activating virtual environment..."
-# 設定対象のファイル
-TARGET_FILE="$HOME/.bashrc"
-# 重複チェック用のマーカー（この文字列があれば追記しない）
+# 5. Bashrc auto-activate
 MARKER="# === AUTO-ACTIVATE-VENV ==="
-echo "Checking $TARGET_FILE ..."
-# ファイル内にマーカーが存在するか検索
-if grep -qF "$MARKER" "$TARGET_FILE"; then
-    echo "✅ 設定は既に $TARGET_FILE に存在します。追記をスキップしました。"
-else
-    echo "✍️  $TARGET_FILE に設定を追記します..."
-    # ファイルの末尾に追記
-    cat <<EOT >> "$TARGET_FILE"
-
-$MARKER
-# カレントディレクトリに .venv があれば自動で activate する
-if [ -z "\$VIRTUAL_ENV" ]; then
-    if [ -d ".venv" ] && [ -f ".venv/bin/activate" ]; then
-        source .venv/bin/activate
-    fi
-fi
-EOT
-    echo "🎉 完了しました！"
-    echo "設定を反映させるために、以下のコマンドを実行してください："
-    echo "source $TARGET_FILE"
+TARGET="$HOME/.bashrc"
+if [ -f "$TARGET" ] && ! grep -qF "$MARKER" "$TARGET"; then
+    echo "Adding auto-activate to $TARGET"
+    printf "\n%s\nif [ -z \"\$VIRTUAL_ENV\" ] && [ -f \".venv/bin/activate\" ]; then source .venv/bin/activate; fi\n" "$MARKER" >> "$TARGET"
 fi
 
-# 仮想環境をアクティベート（このスクリプト内での実行用）
-if [ -f ".venv/bin/activate" ]; then
-    source .venv/bin/activate
-fi
-
-# Gemini拡張機能のインストール
-gemini extensions install https://github.com/github/github-mcp-server --consent --auto-update
+# 6. Gemini extension
+gemini extensions install https://github.com/github/github-mcp-server --consent --auto-update 2>/dev/null || true
 
 echo "=== Setup Complete ==="
