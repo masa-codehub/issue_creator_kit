@@ -1,43 +1,37 @@
-# 能動的偵察レポート (Reconnaissance Report)
+# Reconnaissance Report: CLI Integration with Scanner Foundation (ADR-008)
 
-## 1. 調査対象と意図 (Scope & Context)
-- **ユーザー依頼のキーワード:** `ADR-008`, `Cleanup Legacy Automation Code`, `WorkflowUseCase`, `ApprovalUseCase`, `auto-approve-docs.yml`
-- **調査の目的:** ADR-008で廃止が決定したレガシーな自動化コードの現状と、その影響範囲（依存関係）を特定し、物理削除および参照の整理（CLI等）に向けた事実情報を収集する。
-- **調査時のブランチ (Branch Context):** `main`
+## 1. 調査の目的 (Purpose)
+ADR-008 に基づく Scanner Foundation の CLI への統合（Task-008-05）に向け、現状の `cli.py` および関連する仕様・設計ドキュメントの状態を把握し、詳細仕様策定のインプットとする。
 
-## 2. 収集された事実 (Evidence)
+## 2. 調査結果 (Findings)
 
-### A. ドキュメント上の規定 (SSOT)
-- **[Source]:** `docs/specs/plans/adr-008-automation-cleanup/definitions.md`
-  - **事実・規定:** "2.4. Cleanup Targets (Legacy Code)" として以下の3ファイルが明記されている。
-  - **引用:**
-    > - `src/issue_creator_kit/usecase/workflow.py`
-    > - `src/issue_creator_kit/usecase/approval.py`
-    > - `.github/workflows/auto-approve-docs.yml`
+### 2.1. 既存の CLI 実装 (`src/issue_creator_kit/cli.py`)
+- **現状のコマンド**: `init`, `process-diff`, `process-merge`, `run-workflow`, `approve`, `approve-all` が実装されている。
+- **依存 UseCase**: `IssueCreationUseCase`, `ApprovalUseCase`, `RoadmapSyncUseCase`, `WorkflowUseCase` に依存している。
+- **問題点**: これらは ADR-003/007 に基づく Git 差分ベースのロジックであり、ADR-008 で非推奨（Deprecate）とされている。
 
-### B. 実装の現状 (Codebase Reality)
-- **[File]:** `.github/workflows/auto-approve-docs.yml` (存在確認)
-- **[File]:** `src/issue_creator_kit/usecase/approval.py` (存在確認, `ApprovalUseCase`)
-- **[File]:** `src/issue_creator_kit/usecase/workflow.py` (存在確認, `WorkflowUseCase`)
+### 2.2. 新しいドメインサービスの状態
+- **FileSystemScanner**: `src/issue_creator_kit/domain/services/scanner.py` (Planned/Implemented in Task-03)
+- **GraphBuilder**: `src/issue_creator_kit/domain/services/builder.py` (Planned/Implemented in Task-04)
+- **Visualizer**: `src/issue_creator_kit/domain/services/visualizer.py` (Planned/Implemented in Task-04)
+- **仕様**: `docs/specs/logic/scanner_logic.md` および `docs/specs/logic/graph_and_validators.md` に定義済み。
 
-### C. 物理構造と依存関係 (Structure & Dependencies)
-- **[File]:** `src/issue_creator_kit/cli.py`
-  - **インポート:** `ApprovalUseCase` (L13), `WorkflowUseCase` (L16)
-  - **初期化:** L70-72, L99, L134-136, L164, L180
-  - **コマンド定義:** `process-merge`, `approve`, `approve-all`
-- **[File]:** `src/issue_creator_kit/usecase/creation.py`
-  - **インポート:** `WorkflowUseCase` (L13)
-  - **使用:** `workflow_usecase: WorkflowUseCase | None = None` (L27)
-- **[Test Files] (関連テスト):**
-  - `tests/unit/usecase/test_workflow.py` (WorkflowUseCaseのテスト)
-  - `tests/unit/usecase/test_approval.py` (ApprovalUseCaseのテスト)
-  - `tests/unit/test_cli.py` (CLIの各コマンドでのモック使用)
+### 2.3. アーキテクチャ設計 (`docs/architecture/arch-structure-008-scanner.md`)
+- **CLI の役割**: `cli.py` は `FileSystemScanner` および `Visualizer` を直接呼び出す構造。
+- **プロセルフロー**: 
+    1. `CLI` -> `FileSystemScanner.scan()` -> `GraphBuilder.build_graph()`
+    2. `visualize` コマンドの場合はさらに `Visualizer.to_mermaid()` を呼び出す。
 
-## 3. 発見された制約と矛盾 (Constraints & Contradictions)
-- **制約事項:** 
-    - `cli.py` だけでなく `usecase/creation.py` にも `WorkflowUseCase` への参照が存在する。
-    - 単体テスト（`tests/unit/` 配下）に削除対象のユースケースを直接テストするもの、およびCLIテストでモックとして使用しているものが複数存在する。
-- **SSOTとの乖離:** `definitions.md` には主要な3ファイルのみがリストアップされているが、実際には付随するテストファイルや他ユースケースからの参照も整理が必要。
+### 2.4. 仕様策定計画 (`docs/specs/plans/adr-008-automation-cleanup/definitions.md`)
+- **用語定義**: `Physical State Scanner`, `Domain Guardrails`, `DAG Visualization` が定義されている。
+- **依存関係**: `Graph --> CLI` となっており、CLI 統合はグラフ構築ロジックの完成後に実施される。
 
-## 4. 補足・未調査事項 (Notes & Unknowns)
-- `tests/integration/test_issue_creation_flow.py` 等の統合テストにおいて、これらのレガシーコードに依存した挙動がないか。
+## 3. 証拠 (Evidence)
+- `src/issue_creator_kit/cli.py`: 旧 UseCase への依存を確認。
+- `docs/specs/logic/scanner_logic.md`: 新しい走査ロジックの仕様を確認。
+- `docs/specs/logic/graph_and_validators.md`: グラフ構築と可視化の仕様を確認。
+- `docs/architecture/arch-structure-008-scanner.md`: CLI と各コンポーネントの依存関係図を確認。
+
+## 4. 懸念点・未解決事項 (Concerns/Issues)
+- **既存コマンドの扱い**: `process-diff` 等の旧コマンドを完全に削除するのか、共存させるのか。ADR-008 は "Deprecates" としているが、移行期間が必要か。
+- **依存性注入**: `ScannerService` (あるいは `FileSystemScanner`) のインスタンス化に必要な引数（`root_path` 等）を CLI がどのように管理・提供するか。
