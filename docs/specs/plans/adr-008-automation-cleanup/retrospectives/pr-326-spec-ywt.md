@@ -1,6 +1,7 @@
 # 振り返りレポート (YWT): PR #326 仕様策定レビュー分析
 
 ## 1. Y (やったこと)
+
 - **作業の実施内容:**
   - ADR-008「Scanner Foundation」の仕様ドラフト（PR #326）に対するレビューコメント 7 件の分析を実施。
   - `analyzing-github-reviews` スキルをアクティベートし、コメントを「Accept」として分類。
@@ -12,11 +13,13 @@
   - 参照 SSOT: `docs/architecture/arch-structure-008-scanner.md`, `docs/specs/plans/adr-008-automation-cleanup/definitions.md`
 
 ## 2. W (わかったこと)
+
 - **結果の確認:**
   - ドラフト作成時に「上位設計（Arch）との逐次的な同期確認」が不足していたことが原因で、クラス定義やメソッド名の乖離が発生した。
   - Pydantic モデルのガードレール定義において、エッジケース（status=Completed 時の issue_id）や論理的な冗長性（異なる ID 型同士の自己参照チェック）への考慮が甘かった。
 
 ### ギャップ分析
+
 - **理想 (To-Be):**
   - 詳細仕様（Spec）がアーキテクチャ設計（Arch）および共通定義（Definitions）と完全に一致し、TDD の期待値が曖昧さなく定義されている状態。
 - **現状 (As-Is):**
@@ -27,6 +30,7 @@
   - 仕様執筆時のチェックリストに「上位ドキュメントとの一貫性チェック」が明示されておらず、単独ファイル内での整合性に終始してしまった。
 
 ## 3. T (次やること / 仮説立案)
+
 - **実証的仮説:**
   - 指摘された 7 項目を仕様書に反映し、SSOT との完全な同期を図れば、実装時の迷いや手戻りを排除できる。
 - **飛躍的仮説:**
@@ -35,6 +39,7 @@
   - Arch 図と Spec の不整合を許容し、Spec を「実装時の最新真実」として優先させる運用も考えられるが、現状のプロジェクト規模では SSOT の分散を招くため、Arch 側へのフィードバックもセットで必要。
 
 ### 検証アクション
+
 - [ ] `docs/specs/data/domain_models_adr008.md` および `docs/specs/logic/graph_and_validators.md` を修正し、レビュー指摘をすべて反映する。
 - [ ] 修正後の Spec が Arch 図と一致していることを `auditing-ssot` で再検証する。
 - [ ] `docs/specs/plans/adr-008-automation-cleanup/reviews/pr-319-spec-audit-report.md` の番号ミスを修正する。

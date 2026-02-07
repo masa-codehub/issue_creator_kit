@@ -1,6 +1,7 @@
 # Review Analysis Report: PR #327
 
 ## 1. Summary
+
 - **Total Comments:** 7
 - **Accept (修正受諾):** 7
 - **Discuss (議論/確認):** 0
@@ -9,6 +10,7 @@
 ## 2. Analysis Details
 
 ### [Accept] docs/specs/logic/scanner-logic.md (L32, L32)
+
 - **Reviewer's Comment:**
   - `root_path` からの相対パスとして定義するのが明確
   - `root_path` 配下という説明と矛盾する表記を修正
@@ -20,6 +22,7 @@
   - 修正後の仕様が `root_path` 起点の相対パスで一貫しているか目視確認。
 
 ### [Accept] docs/specs/logic/scanner-logic.md (L12, L33)
+
 - **Reviewer's Comment:**
   - `exclude_patterns` がどのように使用されるか記載されていない
 - **Context Analysis:**
@@ -30,6 +33,7 @@
   - TDD 基準に `exclude_patterns` による除外のケース（Boundary Path）を追加する。
 
 ### [Accept] docs/specs/logic/scanner-logic.md (L52)
+
 - **Reviewer's Comment:**
   - アーカイブと承認済み両方に存在する場合の Fail-fast ガードレール
 - **Context Analysis:**
@@ -40,6 +44,7 @@
   - TDD 基準の ID重複ケースに、アーカイブとの衝突シナリオを追加。
 
 ### [Accept] docs/specs/logic/scanner-logic.md (L37)
+
 - **Reviewer's Comment:**
   - `DUPLICATE_ID` が共通定義（definitions.md）に存在しない
 - **Context Analysis:**
@@ -50,6 +55,7 @@
   - `definitions.md` の更新を確認。
 
 ### [Accept] docs/specs/logic/scanner-logic.md (L79)
+
 - **Reviewer's Comment:**
   - TDD の入力ファイル例を実ディレクトリ名に合わせる
 - **Context Analysis:**
@@ -60,6 +66,7 @@
   - 修正後の TDD 表が物理構造と一致しているか確認。
 
 ### [Accept] docs/specs/logic/scanner-logic.md (L1)
+
 - **Reviewer's Comment:**
   - ファイル名の命名規則（ハイフン vs アンダーバー）
 - **Context Analysis:**
@@ -70,6 +77,7 @@
   - `ls docs/specs/logic/` でリネームを確認。
 
 ## 3. Execution Plan
+
 - [ ] `scanner-logic.md` を `scanner_logic.md` にリネーム。
 - [ ] `scanner_logic.md` のパス表記、除外ロジック、重複判定（Fail-fast）、TDD基準を修正。
 - [ ] `definitions.md` に `DUPLICATE_ID` を追加。

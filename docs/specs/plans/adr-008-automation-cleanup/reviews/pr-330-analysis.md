@@ -1,6 +1,7 @@
 # Review Analysis Report: PR #330
 
 ## 1. Fact Gathering (指摘とコンテキストの収集)
+
 - **対象 PR:** #330 (CLI Integration with Scanner Foundation)
 - **レビュアー:** Copilot, gemini-code-assist[bot]
 - **主な指摘事項:**
@@ -12,17 +13,18 @@
 
 ## 2. Categorization & Analysis (分類と真因分析)
 
-| ID | 指摘内容 | 分類 | 真因 |
-| :--- | :--- | :--- | :--- |
-| 1 | `archived_ids` の取得元不明 | **Accept** | 仕様定義（Spec）における入出力の定義不足。 |
-| 2 | 偵察/分析レポートの事実誤認 | **Accept** | コードベースの物理的な確認（`ls`, `read_file`）を行わず、推測や旧仕様に基づき起草したことによる。 |
-| 3 | `domain/services/` 未作成の指摘 | **Accept** | 計画（Planned）と実装済み（Implemented）の混同。 |
-| 4 | レガシーコマンド cleanup 方針の曖昧さ | **Accept** | 移行期における挙動の決定（仕様の確定）を避けたことによる。 |
-| 5 | `--dry-run` 仕様の曖昧さ | **Accept** | ユーザーの利便性と安全性のトレードオフの検討不足。 |
+| ID  | 指摘内容                              | 分類       | 真因                                                                                              |
+| :-- | :------------------------------------ | :--------- | :------------------------------------------------------------------------------------------------ |
+| 1   | `archived_ids` の取得元不明           | **Accept** | 仕様定義（Spec）における入出力の定義不足。                                                        |
+| 2   | 偵察/分析レポートの事実誤認           | **Accept** | コードベースの物理的な確認（`ls`, `read_file`）を行わず、推測や旧仕様に基づき起草したことによる。 |
+| 3   | `domain/services/` 未作成の指摘       | **Accept** | 計画（Planned）と実装済み（Implemented）の混同。                                                  |
+| 4   | レガシーコマンド cleanup 方針の曖昧さ | **Accept** | 移行期における挙動の決定（仕様の確定）を避けたことによる。                                        |
+| 5   | `--dry-run` 仕様の曖昧さ              | **Accept** | ユーザーの利便性と安全性のトレードオフの検討不足。                                                |
 
 ## 3. Retrospective for Assetization (資産化に向けた振り返り)
 
 ### YWT (やったこと・わかったこと・つぎやること)
+
 - **やったこと:** ADR-008 CLI統合仕様の策定とドキュメント化。
 - **わかったこと:**
   - 偵察（Reconnaissance）段階での「事実の裏取り」が不足すると、後続の分析や仕様が砂上の楼閣になる。
@@ -34,6 +36,7 @@
 ## 4. Final Report & Feedback (分析結果と対応方針)
 
 ### 対応方針案
+
 1. **仕様の明確化 (`cli-integration.md`):**
    - `FileSystemScanner.scan` が `(documents, archived_ids)` を返すように定義を修正する。
    - `ick process` の `--dry-run` は、Task-008-05 のスコープにおいては **必須（指定がない場合はエラーまたは警告を表示して終了）** とする。安全性を最優先する。
@@ -45,6 +48,7 @@
    - 「プロセルフロー」→「プロセスフロー」
 
 ### 次のアクション
+
 - [ ] `docs/specs/components/cli-integration.md` の修正。
 - [ ] `docs/specs/plans/adr-008-automation-cleanup/reconnaissance-report.md` の修正。
 - [ ] `docs/specs/plans/adr-008-automation-cleanup/analysis-report.md` の修正。
