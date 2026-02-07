@@ -6,19 +6,19 @@ ADR-008 に基づく Scanner Foundation の CLI への統合（Task-008-05）に
 ## 2. 調査結果 (Findings)
 
 ### 2.1. 既存の CLI 実装 (`src/issue_creator_kit/cli.py`)
-- **現状のコマンド**: `init`, `process-diff`, `process-merge`, `run-workflow`, `approve`, `approve-all` が実装されている。
-- **依存 UseCase**: `IssueCreationUseCase`, `ApprovalUseCase`, `RoadmapSyncUseCase`, `WorkflowUseCase` に依存している。
-- **問題点**: これらは ADR-003/007 に基づく Git 差分ベースのロジックであり、ADR-008 で非推奨（Deprecate）とされている。
+- **現状のコマンド**: `init`, `process-diff` が実装されている。
+- **依存 UseCase**: `IssueCreationUseCase`, `RoadmapSyncUseCase` に依存している。
+- **問題点**: これらは ADR-007 に基づく Git 差分ベースのロジックであり、ADR-008 で非推奨（Deprecate）とされている。旧実装で存在した `process-merge`, `run-workflow`, `approve`, `approve-all` などのコマンドは、現行ブランチの `cli.py` には存在しない。
 
 ### 2.2. 新しいドメインサービスの状態
-- **FileSystemScanner**: `src/issue_creator_kit/domain/services/scanner.py` (Planned/Implemented in Task-03)
-- **GraphBuilder**: `src/issue_creator_kit/domain/services/builder.py` (Planned/Implemented in Task-04)
-- **Visualizer**: `src/issue_creator_kit/domain/services/visualizer.py` (Planned/Implemented in Task-04)
+- **FileSystemScanner**: `src/issue_creator_kit/domain/services/scanner.py` (Planned: Task-03／未実装・`domain/services/` ディレクトリ未作成)
+- **GraphBuilder**: `src/issue_creator_kit/domain/services/builder.py` (Planned: Task-04／未実装・`domain/services/` ディレクトリ未作成)
+- **Visualizer**: `src/issue_creator_kit/domain/services/visualizer.py` (Planned: Task-04／未実装・`domain/services/` ディレクトリ未作成)
 - **仕様**: `docs/specs/logic/scanner_logic.md` および `docs/specs/logic/graph_and_validators.md` に定義済み。
 
 ### 2.3. アーキテクチャ設計 (`docs/architecture/arch-structure-008-scanner.md`)
 - **CLI の役割**: `cli.py` は `FileSystemScanner` および `Visualizer` を直接呼び出す構造。
-- **プロセルフロー**: 
+- **プロセスフロー**: 
     1. `CLI` -> `FileSystemScanner.scan()` -> `GraphBuilder.build_graph()`
     2. `visualize` コマンドの場合はさらに `Visualizer.to_mermaid()` を呼び出す。
 
@@ -27,7 +27,7 @@ ADR-008 に基づく Scanner Foundation の CLI への統合（Task-008-05）に
 - **依存関係**: `Graph --> CLI` となっており、CLI 統合はグラフ構築ロジックの完成後に実施される。
 
 ## 3. 証拠 (Evidence)
-- `src/issue_creator_kit/cli.py`: 旧 UseCase への依存を確認。
+- `src/issue_creator_kit/cli.py`: `IssueCreationUseCase`, `RoadmapSyncUseCase` への依存を確認。
 - `docs/specs/logic/scanner_logic.md`: 新しい走査ロジックの仕様を確認。
 - `docs/specs/logic/graph_and_validators.md`: グラフ構築と可視化の仕様を確認。
 - `docs/architecture/arch-structure-008-scanner.md`: CLI と各コンポーネントの依存関係図を確認。

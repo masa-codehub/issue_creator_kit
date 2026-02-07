@@ -6,21 +6,21 @@
 - **How (手段)**: `cli.py` に新しいサブコマンドを追加し、Domain Services をインスタンス化して処理を委譲する。また、旧 UseCase への依存を整理する。
 
 ## 2. ギャップ分析 (Gap Analysis)
-- **現状**: `cli.py` は Git 差分前提の UseCase に深く依存している。
+- **現状**: `cli.py` は Git 差分前提の UseCase (`IssueCreationUseCase`, `RoadmapSyncUseCase`) に依存しており、`init`, `process-diff` コマンドが実装されている。
 - **理想**: `cli.py` が `ScannerService` (あるいはその構成要素) を利用し、ファイルシステムの状態から直接タスクを検出し、依存関係グラフに基づいて処理できること。
 - **乖離**: 
     - `ScannerService` という統合サービスが未定義（`scanner.py`, `builder.py`, `visualizer.py` は個別）。
     - 既存の `process-diff` コマンドと新しい `process` コマンドの役割分担が不明確。
-    - `cli.py` に既存のコマンドが多数残っており、これらを削除・整理する「Cleanup」のタイミングが本タスクに含まれるか。
+    - `cli.py` におけるレガシーコマンド（`process-diff`）の Cleanup 方針が未確定。
 
 ## 3. 仮説の立案 (Formulate Hypotheses)
 
 ### 3.1. 実証的仮説 (Grounded Hypothesis) - 本命案
-- **アプローチ**: 既存の `cli.py` に `process` および `visualize` コマンドを追加する。
+- **アプローチ**: 既存の `cli.py` に `process` および `visualize` コマンドを追加し、`process-diff` は Deprecated とする。
 - **詳細**:
-    - `process` コマンドは `--dry-run` オプションを必須またはデフォルトとし、`FileSystemScanner` -> `GraphBuilder` を実行して、実行順序を標準出力に表示する（実際の起票処理は今後のタスク）。
+    - `process` コマンドは `--dry-run` オプションを必須とし、`FileSystemScanner` -> `GraphBuilder` を実行して、実行順序を標準出力に表示する（実際の起票処理は今後のタスク）。
     - `visualize` コマンドは `FileSystemScanner` -> `GraphBuilder` -> `Visualizer` を実行し、Mermaid 形式を標準出力に出力する。
-    - 既存の旧コマンドは削除せず、コメントアウトまたは「Deprecated」の警告を表示するに留める（リスク回避）。
+    - 既存の `process-diff` は削除せず、「Deprecated」として実行時にエラーと移行案内を表示する。
 - **メリット**: 既存機能への影響を最小限にしつつ、新機能を提供できる。
 
 ### 3.2. 飛躍的仮説 (Leap Hypothesis) - 理想案
