@@ -215,3 +215,60 @@ graph LR
 - **Tech Stack:** Python, `uv`, `PyYAML`
 
 - **Data Reliability:** 冪等性を担保。起票成功時のみ物理ファイルを `_archive/` へ移動させる。
+
+
+
+## Metadata Field Definitions & Guardrails (ADR-008)
+
+本セクションでは、ドキュメントの整合性を担保するための「ドメイン・ガードレール（バリデーション規則）」を定義します。これらの規則は、`src/issue_creator_kit/domain/models/` (現状は `document.py` 内の `Metadata` モデル) において Pydantic Validator として実装されます。
+
+### Field Validation Rules
+
+| Field | Description | Type | Validation Rules (Guardrails) |
+| :--- | :--- | :--- | :--- |
+| `id` | ユニーク識別子 | String | Regex: `adr-\d{3}-.*` (ADR) or `task-\d{3}-\d{2,}` (Task) |
+| `status` | ライフサイクル状態 | Enum | ADR: `Draft`, `Approved`, `Postponed`, `Superseded` / Task: `Draft`, `Ready`, `Issued`, `Completed`, `Cancelled` |
+| `depends_on` | 依存先IDリスト | String (List) | Graph Integrity: 対象IDの存在確認、自己参照禁止、循環参照禁止 (No Cycles) |
+| `issue_id` | GitHub Issue番号 | Integer | Conditional: `status` が `Issued` または `Completed` の場合に必須 |
+
+
+
+### Graph Integrity (DAG Validation)
+
+
+
+`depends_on` フィールドによる依存関係は、常に有向非巡回グラフ (DAG) を形成しなければなりません。バリデーションエンジンは、以下のパターンを「ガードレール違反」として拒絶します。
+
+
+
+```mermaid
+
+graph TD
+
+    subgraph Illegal_Patterns [Illegal Dependency Patterns]
+
+        A[Task A] --> A
+
+        style A fill:#ff9999
+
+
+
+        B[Task B] --> C[Task C]
+
+        C --> B
+
+        style B fill:#ff9999
+
+        style C fill:#ff9999
+
+    end
+
+```
+
+
+
+- **Self-Reference:** ファイル A が自分自身の ID を `depends_on` に含めること。
+
+- **Circular Dependency:** A -> B -> A のように、依存関係がループすること。
+
+- **Orphan Reference:** 存在しない ID を `depends_on` に含めること（スキャン範囲内での解決が必要）。
