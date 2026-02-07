@@ -23,8 +23,13 @@ graph TB
                 CLI[CLI Entrypoint]
             end
 
-            subgraph "Layer: Domain (Core)"
-                SVC_SCAN[ScannerService]
+            subgraph "Layer: Domain (Core / Scanner Foundation)"
+                direction TB
+                subgraph "Scanner Foundation"
+                    FSS[FileSystemScanner]
+                    Parser[TaskParser]
+                    Builder[GraphBuilder]
+                end
                 DOM_DOC[Document Entity]
             end
         end
@@ -37,7 +42,9 @@ graph TB
     end
 
     %% Dependencies (Solid: Source Code Dependency, Dotted: Runtime Flow/DI)
-    CLI --> SVC_SCAN
+    CLI --> FSS
+    FSS --> Parser
+    FSS --> Builder
     
     %% Dependency Injection
     CLI -.-> INF_GH
@@ -45,11 +52,12 @@ graph TB
     CLI -.-> INF_FS
 
     %% Service dependencies
-    SVC_SCAN --> DOM_DOC
+    Parser --> DOM_DOC
+    Builder --> DOM_DOC
     
     %% Infrastructure Dependencies (Inversion of Control)
-    SVC_SCAN -.-> INF_GH
-    SVC_SCAN -.-> INF_FS
+    FSS -.-> INF_GH
+    FSS -.-> INF_FS
     
     %% Infra Implementation
     INF_GH --> GH
@@ -62,7 +70,7 @@ graph TB
     classDef infra fill:#f9f9f9,stroke:#333
 
     class CLI cli
-    class SVC_SCAN,DOM_DOC domain
+    class SVC_SCAN,Parser,Builder,DOM_DOC domain
     class INF_GH,INF_GIT,INF_FS infra
 ```
 
@@ -71,21 +79,27 @@ graph TB
 ### CLI Entrypoint
 - **Type:** Component
 - **Code Mapping:** `src/issue_creator_kit/cli.py`
-- **Role (Domain-Centric):** ユーザー（GitHub Actions）からの実行指示（`visualize` 等）を受け取り、必要なAdapterを選択して ScannerService を起動する。
+- **Role (Domain-Centric):** ユーザー（GitHub Actions）からの実行指示（`visualize` 等）を受け取り、必要なAdapterを選択して FileSystemScanner を起動する。
 - **Layer (Clean Arch):** Interface (Controller)
 - **Dependencies:**
-    - **Downstream:** ScannerService, Infrastructure (for DI)
+    - **Downstream:** FileSystemScanner, Infrastructure (for DI)
 - **Tech Stack:** Python, Click/Argparse
 - **Data Reliability:** Stateless
 
-### ScannerService
-- **Type:** Component
-- **Code Mapping:** `src/issue_creator_kit/domain/services/scanner.py`
-- **Role (Domain-Centric):** 物理ファイルシステムの走査（FileSystemScanner）、Markdown解析（TaskParser）、依存関係グラフ（DAG）の構築（GraphBuilder）、および可視化（Visualizer）を統括する。
-- **Layer (Clean Arch):** Domain Services
+### Scanner Foundation
+- **Type:** Module / Service Group
+- **Reference:** [Scanner Foundation Structure (ADR-008)](arch-structure-008-scanner.md)
+- **Role (Domain-Centric):** 物理ファイルシステムの走査、Markdown解析、依存関係グラフ（DAG）の構築を統括する。
+- **Components:**
+    - **FileSystemScanner**: `reqs/` を走査し、未処理ファイルを抽出する。
+    - **TaskParser**: Markdown のメタデータをパースし、Domain Entity へ変換する。
+    - **GraphBuilder**: `depends_on` に基づき DAG を構築する。
+- **Layer (Clean Arch):** Domain Services / Use Cases
 - **Dependencies:**
     - **Upstream:** CLI
-    - **Downstream:** Domain Entity, Infrastructure (Adapters)
+    - **Downstream:**
+        - **Document Entity**: Parser および Builder が依存。
+        - **Infrastructure (Adapters)**: FileSystemScanner が物理 I/O のために依存。
 - **Tech Stack:** Python 3.12, Pydantic v2
 - **Data Reliability:** Strong Consistency (物理ファイルの状態を正とする)。
 
@@ -95,7 +109,7 @@ graph TB
 - **Role (Domain-Centric):** ドキュメントの構造（メタデータと本文）を表現し、テキストとの相互変換（解析・シリアライズ）ロジックを持つ。
 - **Layer (Clean Arch):** Entities (Domain)
 - **Dependencies:**
-    - **Upstream:** ScannerService
+    - **Upstream:** Scanner Foundation (Parser/Builder)
     - **Downstream:** None
 - **Tech Stack:** Python, PyYAML
 
@@ -105,7 +119,7 @@ graph TB
 - **Role (Domain-Centric):** 外部世界（GitHub, Git, ファイルシステム）との具体的な通信・操作を実行する。
 - **Layer (Clean Arch):** Infrastructure
 - **Dependencies:**
-    - **Upstream:** CLI (Instantiation), ScannerService (Call)
+    - **Upstream:** CLI (Instantiation), FileSystemScanner (Call)
     - **Downstream:** External Systems
 - **Tech Stack:** requests, Subprocess
 - **Data Reliability:** Fail-Fast (APIエラー時は即座に例外送出)

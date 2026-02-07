@@ -53,7 +53,11 @@ stateDiagram-v2
 - **Done**: GitHub Issue のクローズやキャンセル時、`reqs/tasks/_archive/` へ物理移動。
 
 ## Invariants (不変条件)
+
 *   **Physical Truth:** ファイルの物理的な位置がその状態を決定する。メタデータ（`status`）と不整合がある場合、物理的な位置が優先される。
+
 *   **Manual Gate:** `Draft` から `Approved` への遷移は、必ず人間によるコードレビューと「物理移動を含む」PR マージを介さなければならない。
-*   **Domain Guardrails:** 全てのファイルは `id` (例: ADR: `adr-008-physical-state-lifecycle`, Task: `task-008-01`) を持ち、ディレクトリ位置に応じたバリデーション（ID形式、依存関係の循環チェック等）をパスしなければならない。
+
+*   **Domain Guardrails:** 全てのファイルは `id` を持ち、ID形式や依存関係の整合性チェックをパスしなければならない。具体的な構造的制約については [Metadata Structure (Invariants)](arch-structure-007-metadata.md#invariants-validation-rules) を参照。
+
 *   **Atomic Move:** 状態の遷移は、ファイルシステムの `mv` 操作（または Git による移動）として表現される。

@@ -1,41 +1,35 @@
-# Reconnaissance Report: Architecture Refactoring for ADR-008
+# Reconnaissance Report (Scouting Facts) - Issue #315
 
-## 1. Context & Objectives
-- **Trigger**: Approval of ADR-008 (Cleanup & Scanner Foundation).
-- **Goal**: Refactor architecture documentation (`docs/architecture/`) to align with ADR-008 and prepare for the roadmap (ADR-009 to ADR-012).
-- **Core Strategy**: "Subtraction" (Remove debts from ADR-003) and "Scanner Foundation" (Physical state based detection).
+## 1. 調査の目的 (Objective)
+- ADR-008 (Cleanup & Scanner Foundation) に基づき、`arch-structure-issue-kit.md` の更新内容と `arch-structure-007-metadata.md` に追加すべき Invariants を特定する。
 
-## 2. Evidence (Current State)
+## 2. 収集された事実 (Facts & Evidence)
 
-### 2.1. New Standards (SSOT)
-- **ADR-008**: `reqs/design/_approved/adr-008-automation-cleanup.md`
-    - **Decision**: Remove `WorkflowUseCase`, `ApprovalUseCase`, `auto-approve-docs.yml`, and ID write-back logic.
-    - **New Mechanism**: Physical file scanning (`reqs/` traversal), `dry-run`, `visualize` (Mermaid), and Pydantic-based domain guardrails.
-- **Roadmap**: `reqs/design/_inbox/status-and-plan.md`
-    - **Flow**: Manual PR/Merge for approval (No auto-move).
-    - **Steps**: ADR-008 (Cleanup) -> ADR-009 (L1 Auto) -> ADR-010 (Task Activation) -> ...
+### 2.1. 現状のドキュメント状態 (Current State)
+- **`docs/architecture/arch-structure-issue-kit.md`**:
+  - `WorkflowUseCase`, `ApprovalUseCase` が存在し、Clean Architecture Lite の図解に含まれている。
+  - `Scanner` 関連の記述が全くない。
+- **`docs/architecture/arch-structure-007-metadata.md`**:
+  - メタデータ駆動型ライフサイクルのコンテナ図や DAG の概念図はあるが、バリデーションルール（Invariants）のセクションが不足している。
+- **`docs/architecture/arch-state-007-lifecycle.md`**:
+  - `Invariants (不変条件)` セクションがあり、Unique ID, Strict Dependency, Atomic Issue Creation, Hierarchy Priority が記述されている。
+- **`docs/architecture/arch-structure-008-scanner.md` (Reference)**:
+  - `FileSystemScanner`, `TaskParser`, `GraphBuilder`, `Visualizer` のコンポーネント定義とシーケンス図が存在する。
+  - `Quality Policy` に `Domain Guardrails` (ID形式, 依存性整合性) が記述されている。
 
-### 2.2. Documentation Candidates for Refactoring
-Located in `docs/architecture/`:
+### 2.2. ADR-008 による変更点 (ADR-008 Decisions)
+- **削除**: `WorkflowUseCase`, `ApprovalUseCase`, `auto-approve-docs.yml` (自動承認・書き戻しロジックの廃止)。
+- **追加**: `Scanner Foundation` (物理状態ベースのスキャナー)。
+- **Invariant**: ID形式 (`adr-\d{3}-.*`, `task-\d{3}-\d{2,}`), 循環参照禁止, 自己参照禁止。
 
-**To Be Removed/Archived (ADR-003 Debts):**
-- `arch-behavior-003-autopr.md`: Related to auto-PR logic (deprecated).
-- `arch-behavior-003-creation.md`: Related to old creation flow (deprecated).
-- `arch-state-003-task-lifecycle.md`: Old task lifecycle (deprecated).
-- `arch-structure-003-vqueue.md`: Virtual Queue concept (deprecated).
+### 2.3. 設計の根拠 (Design Evidence)
+- **`reqs/design/_approved/adr-008-automation-cleanup.md`**: 負債削除とスキャナー基盤構築を決定。
+- **`docs/architecture/plans/adr-008-automation-cleanup/definitions.md`**: スキャナーの概念とディレクトリマッピングを定義。
 
-**To Be Updated/Consolidated (ADR-007/008 Alignment):**
-- `arch-behavior-approval-flow.md`: Needs update to reflect "Manual PR/Merge" and removal of auto-approve.
-- `arch-state-007-lifecycle.md`: Needs update to reflect new "Physical State" lifecycle.
-- `arch-structure-007-metadata.md`: Needs update to include Pydantic domain guardrails.
-- `arch-structure-issue-kit.md`: Needs update to remove `WorkflowUseCase`/`ApprovalUseCase` and add `Scanner` components.
-- `arch-state-doc-lifecycle.md`: Needs verification (likely needs update regarding ID write-back removal).
+## 3. 特定された乖離と課題 (Gaps & Issues)
+- `arch-structure-issue-kit.md` が古いアーキテクチャ（ADR-003）のままであり、実装予定の `Scanner` 基盤が反映されていない。
+- `arch-structure-007-metadata.md` に、実装時に守るべき具体的なバリデーションルール（Invariants）が集約されていない。
 
-## 3. Findings
-- **Discrepancy**: The current architecture docs describe a "Virtual Queue" and "Auto-Approve" system (ADR-003) which contradicts the approved ADR-008 ("Physical Scanner" and "Manual Approval").
-- **Gap**: There is no diagram describing the new "Scanner Foundation" or the "DAG Visualization" feature mentioned in ADR-008.
-- **Opportunity**: The `_inbox` plans (ADR-009+) suggest a need for a "Metadata Integration" and "Gemini Relay" model, which should be kept in mind (extensibility) but not fully documented yet (YAGNI, focus on ADR-008 first).
-
-## 4. Risks
-- **Confusion**: Keeping ADR-003 docs active will confuse developers during the refactoring implementation.
-- **Scope Creep**: Trying to document ADR-009~012 behavior now is premature. Focus strictly on ADR-008 (Cleanup & Scanner) as the foundation.
+## 4. 依存関係の確認 (Dependencies)
+- `arch-structure-issue-kit.md` の更新は `arch-structure-008-scanner.md` の定義に依存する。
+- メタデータのバリデーションルールは `adr-008-automation-cleanup.md` および `definitions.md` に基づく。
