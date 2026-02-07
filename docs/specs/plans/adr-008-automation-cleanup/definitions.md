@@ -25,11 +25,12 @@
 
 ### 2.3. Error Handling Policy
 
-| Error Code          | Exception Class   | Description                             |
-| :------------------ | :---------------- | :-------------------------------------- |
-| _INVALID_METADATA_  | _ValidationError_ | ID format or required fields missing    |
-| _CYCLE_DETECTED_    | _GraphError_      | Circular dependency found in DAG        |
-| _ORPHAN_DEPENDENCY_ | _GraphError_      | `depends_on` ID not found in scan scope |
+| Error Code          | Exception Class   | Description                                         |
+| :------------------ | :---------------- | :-------------------------------------------------- |
+| _INVALID_METADATA_  | _ValidationError_ | ID format or required fields missing                |
+| _DUPLICATE_ID_      | _ValidationError_ | Same ID found in multiple files (including archive) |
+| _CYCLE_DETECTED_    | _GraphError_      | Circular dependency found in DAG                    |
+| _ORPHAN_DEPENDENCY_ | _GraphError_      | `depends_on` ID not found in scan scope             |
 
 ### 2.4. Cleanup Targets (Legacy Code)
 
