@@ -5,7 +5,8 @@
 ### Physical State Scanner (物理状態スキャナー)
 - **Definition**: A mechanism that determines the state of a Task or ADR solely based on its physical location in the file system, ignoring Git history or diffs.
 - **Rules**:
-  - `_inbox/`: Draft state.
+  - `_inbox/`: Draft state (ADR/Design Doc only).
+  - `reqs/tasks/<ADR-ID>/` root: Draft state (Task only).
   - `_approved/`: Approved state (ready for processing).
   - `_archive/`: Processed/Done state.
   - **Scanning Strategy**: Recursively walk the `reqs/` directory and determine the "Done" state by checking whether each file has a corresponding entry in `_archive/`.

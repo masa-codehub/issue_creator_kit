@@ -21,7 +21,7 @@ issue_id:
 
 ## 2. 参照資料・入力ファイル (Input Context)
 - [ ] `docs/specs/plans/adr-008-automation-cleanup/definitions.md`
-- [ ] `reqs/tasks/adr-008/_inbox/task-01-domain.md` ~ `task-05-cli.md`
+- [ ] `reqs/tasks/adr-008/task-01-domain.md` ~ `task-05-cli.md`
 
 ## 3. 統合手順 (Integration Steps)
 
