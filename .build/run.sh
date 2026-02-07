@@ -11,6 +11,10 @@ export UV_CONCURRENT_INSTALLS=4
 # ★ 追加設定: 警告が出ていたハードリンク問題を明示的に解決
 export UV_LINK_MODE=copy
 
+# ★ 追加設定: Windows資格情報マネージャーへの自動保存を防止
+# VS Code Dev Container の認証ブリッジをこのスクリプト内でのみ無効化
+export GIT_CONFIG_PARAMETERS="'credential.helper='"
+
 # 1. 依存関係の同期
 if [ -f "pyproject.toml" ]; then
     echo "Syncing dependencies..."
@@ -49,6 +53,7 @@ fi
 if [ -d ".git" ]; then
     echo "Installing pre-commit hooks..."
     uv run pre-commit install
+    uv run pre-commit autoupdate --repo https://github.com/astral-sh/ruff-pre-commit --repo https://github.com/DavidAnson/markdownlint-cli2
 fi
 
 # コンテキスト更新など
