@@ -2,7 +2,7 @@
 
 ## Context
 - **Bounded Context:** Task Lifecycle Management
-- **System Purpose:** ADR-007 で導入された「メタデータ駆動型ライフサイクル」を実現するための、フラットなファイル構造と論理的な依存関係（DAG）の定義。物理的な階層構造を排除し、認知負荷を最小化しつつ、自動化ツールによる精密な制御を可能にする。
+- **System Purpose:** ADR-007 で導入された「メタデータ駆動型ライフサイクル」を実現するための、フラットなファイル構造と論理的な依存関係（DAG）の定義。物理的な階層構造を排除し、認知負荷を最小化しつつ 、自動化ツールによる精密な制御を可能にする。
 
 ## Diagram (C4 Container & DAG)
 
@@ -138,7 +138,7 @@ graph LR
 
 ```
 
-- **Local Files:** 「予約票（Reservation Ticket）」および「履歴の控え」として機能。
+- **Local Files:** 「予約票（Reservation Ticket）」および「履歴の 控え」として機能。
 
 - **GitHub Issues:** 実作業における「唯一の正解（Active SSOT）」。
 
@@ -168,7 +168,7 @@ graph LR
 
 - **Data Reliability:** Sync (Git managed). Status field manages lifecycle (`Draft`, `Approved`).
 
-- **Trade-off:** 物理フォルダを `_inbox`, `_approved`, `_archive` の3つに限定することで、検索性を高める代わりに、詳細なカテゴリ分けはメタデータ（`tags` 等）に委ねている。
+- **Trade-off:** 物理フォルダを `_inbox`, `_approved`, `_archive` の3つに限定することで、検索性を高める代わりに、詳細なカテゴリ分け はメタデータ（`tags` 等）に委ねている。
 
 
 
@@ -178,7 +178,7 @@ graph LR
 
 - **Code Mapping:** `reqs/tasks/`
 
-- **Role (Domain-Centric):** 起票待ちのタスク案（予約票）および起票済みタスクの控え。
+- **Role (Domain-Centric):** 起票待ちのタスク案（予約票）および起 票済みタスクの控え。
 
 - **Layer (Clean Arch):** `Use Cases (Execution Plan)`
 
@@ -190,9 +190,9 @@ graph LR
 
 - **Tech Stack:** Markdown, YAML Frontmatter
 
-- **Data Reliability:** `ick CLI` による移動（Atomic Move）により、重複起票を防止。
+- **Data Reliability:** `ick CLI` による移動（Atomic Move）により 、重複起票を防止。
 
-- **Trade-off:** 物理ファイルをアーカイブとして残すことで、GitHub がダウンしても設計意図とタスクの履歴を Git 上で追跡可能にしている。
+- **Trade-off:** 物理ファイルをアーカイブとして残すことで、GitHub がダウンしても設計意図とタスクの履歴を Git 上で追跡可能にしている 。
 
 
 
@@ -202,7 +202,7 @@ graph LR
 
 - **Code Mapping:** `src/issue_creator_kit/`
 
-- **Role (Domain-Centric):** メタデータを解析し、有向非巡回グラフ（DAG）に基づいてタスクの起票・移動・同期を統制する。
+- **Role (Domain-Centric):** メタデータを解析し、有向非巡回グラフ （DAG）に基づいてタスクの起票・移動・同期を統制する。
 
 - **Layer (Clean Arch):** `Interface Adapters`
 
@@ -215,3 +215,52 @@ graph LR
 - **Tech Stack:** Python, `uv`, `PyYAML`
 
 - **Data Reliability:** 冪等性を担保。起票成功時のみ物理ファイルを `_archive/` へ移動させる。
+
+
+
+## Metadata Field Definitions & Guardrails (ADR-008)
+
+参照: [Physical State Lifecycle (ADR-008)](arch-state-007-lifecycle.md)
+
+本セクションでは、ドキュメントの整合性を担保するための「ドメイン・ガードレール（バリデーション規則）」を定義します。これらの規則は、`Scanner Foundation` における Pydantic モデルおよび `GraphBuilder` によって厳格に検証されます。
+
+### 1. Structural Invariants (構造的制約)
+
+| Rule | Description | Implementation Target |
+| :--- | :--- | :--- |
+| **Unique ID** | `id` はプロジェクト全域で一意でなければならない 。 | `TaskParser` |
+| **ID Format** | ADR は `adr-\d{3}-.*`、Task は `task-\d{3}-\d{2,}` (例: `task-008-01`) に合致すること。 | `TaskParser` (Regex) |
+| **Existence** | `depends_on` に指定された ID は、現在のスキャン 範囲内または `_archive/` 内に実在すること。 | `GraphBuilder` |
+| **No Self-Reference** | `id` が自分自身の ID を `depends_on` に 含めてはならない。 | `GraphBuilder` |
+| **No Cycles** | 依存関係がループ（循環参照）を形成してはならない。 | `GraphBuilder` (DAG Check) |
+
+### 2. Lifecycle Invariants (ライフサイクル制約)
+
+参照: [Physical State Lifecycle (ADR-008)](arch-state-007-lifecycle.md)
+
+| Rule | Description | Implementation Target |
+| :--- | :--- | :--- |
+| **Strict Dependency** | 全ての `depends_on` 対象が `Issued` または `Completed` 状態になるまで、自身の `status` は `Ready` に移行できない。 | `ick CLI / Sync Logic` |
+| **Atomic Issue Creation** | GitHub Issue が正常に作成されない限 り、物理ファイルは `_archive/` へ移動してはならない。 | `ick CLI / Create Logic` |
+| **Hierarchy Priority** | L3 タスクは、親となる L1 (ADR) および L2 (統合タスク) が `Issued` 以上であることを要する。 | `ick CLI / Validation` |
+
+### 3. Visualizing Invariants (DAG Validation)
+
+`depends_on` フィールドによる依存関係は、常に有向非巡回グラフ (DAG) を形成しなければなりません。
+
+```mermaid
+graph TD
+    subgraph Illegal_Patterns [Illegal Dependency Patterns]
+        A[Task A] --> A
+        style A fill:#ff9999
+
+        B[Task B] --> C[Task C]
+        C --> B
+        style B fill:#ff9999
+        style C fill:#ff9999
+    end
+```
+
+- **Self-Reference (自己参照):** `depends_on` に自分自身の ID を含めてはならない。
+- **Circular Dependency (循環参照):** 依存関係がループを形成してはならない（例: A -> B -> A）。
+- **Orphan Reference (不実在参照):** `depends_on` に指定された ID が実在しなければならない（※上図には未掲載だが検証対象）。

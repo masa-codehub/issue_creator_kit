@@ -23,12 +23,16 @@ graph TB
                 CLI[CLI Entrypoint]
             end
 
-            subgraph "Layer: Usecase (Business Logic)"
-                UC_WF[Workflow UseCase]
-                UC_APP[Approval UseCase]
-            end
-
-            subgraph "Layer: Domain (Core)"
+            subgraph "Layer: Domain (Core / Scanner Foundation)"
+                direction TB
+                subgraph "Scanner Foundation"
+                    SVC_SCAN[ScannerService]
+                    Visualizer[Visualizer]
+                    
+                    SVC_SCAN -.-> FSS[FileSystemScanner]
+                    SVC_SCAN -.-> Parser[TaskParser]
+                    SVC_SCAN -.-> Builder[GraphBuilder]
+                end
                 DOM_DOC[Document Entity]
             end
         end
@@ -41,25 +45,22 @@ graph TB
     end
 
     %% Dependencies (Solid: Source Code Dependency, Dotted: Runtime Flow/DI)
-    CLI --> UC_WF
-    CLI --> UC_APP
+    CLI --> SVC_SCAN
+    CLI --> Visualizer
     
+    Visualizer --> Builder
+
     %% Dependency Injection
     CLI -.-> INF_GH
     CLI -.-> INF_GIT
     CLI -.-> INF_FS
 
-    %% UseCase dependencies
-    UC_WF --> DOM_DOC
-    UC_APP --> DOM_DOC
+    %% Service dependencies
+    Parser --> DOM_DOC
+    Builder --> DOM_DOC
     
     %% Infrastructure Dependencies (Inversion of Control)
-    %% Note: UseCase defines the interface, Infrastructure implements it.
-    UC_WF -.-> INF_GH
-    UC_WF -.-> INF_GIT
-    UC_WF -.-> INF_FS
-    UC_APP -.-> INF_GH
-    UC_APP -.-> INF_FS
+    FSS -.-> INF_FS
     
     %% Infra Implementation
     INF_GH --> GH
@@ -68,13 +69,11 @@ graph TB
 
     %% Styling
     classDef cli fill:#eee,stroke:#333
-    classDef usecase fill:#efe,stroke:#333
     classDef domain fill:#fff,stroke:#333,stroke-width:2px
     classDef infra fill:#f9f9f9,stroke:#333
 
     class CLI cli
-    class UC_WF,UC_APP usecase
-    class DOM_DOC domain
+    class SVC_SCAN,FSS,Parser,Builder,Visualizer,DOM_DOC domain
     class INF_GH,INF_GIT,INF_FS infra
 ```
 
@@ -83,31 +82,39 @@ graph TB
 ### CLI Entrypoint
 - **Type:** Component
 - **Code Mapping:** `src/issue_creator_kit/cli.py`
-- **Role (Domain-Centric):** ユーザー（GitHub Actions）からの実行指示を受け取り、必要なAdapterを選択してUseCaseを起動する。
+- **Role (Domain-Centric):** ユーザー（GitHub Actions）からの実行 指示（`visualize` 等）を受け取り、必要なAdapterを選択して ScannerService を起動する。
 - **Layer (Clean Arch):** Interface (Controller)
 - **Dependencies:**
-    - **Downstream:** UseCase, Infrastructure (for DI)
+    - **Downstream:** ScannerService, Visualizer, Infrastructure (for DI)
 - **Tech Stack:** Python, Click/Argparse
 - **Data Reliability:** Stateless
 
-### Workflow / Approval UseCase
-- **Type:** Component
-- **Code Mapping:** `src/issue_creator_kit/usecase/*.py`
-- **Role (Domain-Centric):** ドキュメント承認プロセスやIssue起票フローの進行制御（オーケストレーション）を行う。
-- **Layer (Clean Arch):** Use Cases
+### Scanner Foundation
+- **Type:** Module / Service Group
+- **Reference:** [Scanner Foundation Structure (ADR-008)](arch-structure-008-scanner.md)
+- **Role (Domain-Centric):** 物理ファイルシステムの走査、Markdown 解析、依存関係グラフ（DAG）の構築およびグラフの可視化を統括する。
+- **Components:**
+    - **ScannerService**: 統合Facade。ファイルシステムスキャンとパースを調整する。
+    - **FileSystemScanner**: `reqs/` を走査し、未処理ファイルを抽 出する。
+    - **TaskParser**: Markdown のメタデータをパースし、Domain Entity へ変換する。
+    - **GraphBuilder**: `depends_on` に基づき DAG を構築する。
+    - **Visualizer**: 構築された DAG や関連メタデータを可視化用の 表現（グラフ図やレポート等）に変換する。
+- **Layer (Clean Arch):** Domain Services / Use Cases
 - **Dependencies:**
     - **Upstream:** CLI
-    - **Downstream:** Domain, Infrastructure (Concrete Adapters)
-- **Tech Stack:** Python (Pure Logic)
-- **Trade-off:** テスト容易性を優先し、外部システムの具体的な実装詳細をDIにより差し替え可能にし、テスト時にモック化を容易にしている。
+    - **Downstream:**
+        - **Document Entity**: Parser および Builder が依存。
+        - **Infrastructure (Adapters)**: FileSystemScanner が物理 I/O のために依存。
+- **Tech Stack:** Python 3.13, Pydantic v2
+- **Data Reliability:** Strong Consistency (物理ファイルの状態を正とする)。
 
 ### Document Entity
 - **Type:** Component
 - **Code Mapping:** `src/issue_creator_kit/domain/document.py`
-- **Role (Domain-Centric):** ドキュメントの構造（メタデータと本文）を表現し、テキストとの相互変換（解析・シリアライズ）ロジックを持つ。
+- **Role (Domain-Centric):** ドキュメントの構造（メタデータと本文 ）を表現し、テキストとの相互変換（解析・シリアライズ）ロジックを持つ。
 - **Layer (Clean Arch):** Entities (Domain)
 - **Dependencies:**
-    - **Upstream:** UseCase
+    - **Upstream:** Scanner Foundation (Parser/Builder)
     - **Downstream:** None
 - **Tech Stack:** Python, PyYAML
 
@@ -117,7 +124,7 @@ graph TB
 - **Role (Domain-Centric):** 外部世界（GitHub, Git, ファイルシステム）との具体的な通信・操作を実行する。
 - **Layer (Clean Arch):** Infrastructure
 - **Dependencies:**
-    - **Upstream:** CLI (Instantiation), UseCase (Call)
+    - **Upstream:** CLI (Instantiation), FileSystemScanner (Call)
     - **Downstream:** External Systems
 - **Tech Stack:** requests, Subprocess
 - **Data Reliability:** Fail-Fast (APIエラー時は即座に例外送出)

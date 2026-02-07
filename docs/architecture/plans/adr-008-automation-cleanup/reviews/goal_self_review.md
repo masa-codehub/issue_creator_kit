@@ -1,15 +1,17 @@
-# Self-Review Report (Goal Setting)
+# Self-Review: Goal Definition
 
-## 1. Quality Checks
-- [x] **Specific**: Is the goal clear? (Yes, "Establish execution plan", "Generate Issues")
-- [x] **Measurable**: Are verifications concrete? (Yes, file checks, grep)
-- [x] **Achievable**: Is it realistic? (Yes, standard planning process)
-- [x] **Relevant**: Does it serve the user's request? (Yes, "Plan refactoring")
-- [x] **Time-bound**: implied immediate.
+## 1. 具体性 (Specific)
+- [x] 「何を」「どこで」「どうする」が、誰が見ても明確か？
+  - 根拠：修正対象の 2 ファイルと、削除・追加すべき具体的な要素を明記。
 
-## 2. Risk Assessment
-- **Risk**: Missing some dependencies in the plan.
-- **Mitigation**: The `scouting-facts` report was thorough. I will use it to populate the `design-brief.md` update.
+## 2. 測定可能性 (Measurable)
+- [x] 完了したかどうかを客観的な証拠（コマンドの結果等）で判定できるか？
+  - 根拠：`grep` によるキーワード確認と、自己監査レポートの作成を完了条件に設定。
 
-## 3. Conclusion
-Goal is SMART and ready.
+## 3. 妥当性 (Relevant)
+- [x] この目標の達成は、ユーザーの真の意図（Why）の解決に直結しているか？
+  - 根拠：ADR-008 の方針を SSOT に反映させるという依頼に完全に合致。
+
+## 4. 判定 (Judgment)
+- [x] **合格 (PASS)**: 実行フェーズ（実装）へ移行可能。
+- [ ] **要修正 (RETRY)**: 目標を再定義すること。

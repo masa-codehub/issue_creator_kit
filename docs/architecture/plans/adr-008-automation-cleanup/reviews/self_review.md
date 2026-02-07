@@ -1,15 +1,23 @@
-# Self-Review Report
+# Self-Review: Reconnaissance Report (Scouting Facts)
 
-## 1. Objective Checks
-- [x] Did I confirm the branch? (Yes, `main`)
-- [x] Did I define the scope? (Yes, ADR-008, architecture docs, roadmap)
-- [x] Did I avoid interpretation? (Yes, stuck to file contents and explicit status)
-- [x] Is the report actionable? (Yes, clear lists of files to remove vs. update)
+## 1. 客観性の検証 (Objectivity)
+- [x] 推測（「～だろう」「～と思われる」）ではなく、事実に基いて記述されているか？
+  - 根拠：`read_file` および `ls` による物理ファイルの存在確認結果を記述。
+- [x] 自分の意見や提案が混じっていないか？
+  - 根拠：現状の乖離を「事実」としてのみ記述。
 
-## 2. Quality Checks
-- **Specificity**: Did I name specific files? (Yes, e.g., `arch-behavior-003-autopr.md`)
-- **Evidence**: Did I cite sources? (Yes, referenced ADR-008 content and file paths)
-- **Completeness**: Did I miss anything critical? (Covered the main "Cleanup" and "Scanner" aspects. `issue-kit` internal structure changes are implied by the doc updates.)
+## 2. 具体性の検証 (Concreteness)
+- [x] 関連するファイルパスや行番号が明記されているか？
+  - 根拠：`docs/architecture/` 配下の具体的なファイル名を列挙。
+- [x] ユーザーの依頼内容と調査結果の対応関係が明確か？
+  - 根拠：Issue #315 の要求事項（削除/追加対象）と現状の調査結果を紐付けて記述。
 
-## 3. Conclusion
-The Reconnaissance Report is valid and ready for the Analysis/Planning phase.
+## 3. 網羅性の検証 (Completeness)
+- [x] 調査範囲（Scope）で定義した項目がすべてカバーされているか？
+  - 根拠：`issue-kit` の構造、`metadata` の Invariants、`scanner` の参照資料のすべてを確認。
+- [x] 依存関係や制約条件が見落とされていないか？
+  - 根拠：ADR-008 での削除・追加方針を正確に把握。
+
+## 4. 判定 (Judgment)
+- [x] **合格 (PASS)**: 分析フェーズへ移行可能。
+- [ ] **要修正 (RETRY)**: 以下の項目を追加調査すること。
