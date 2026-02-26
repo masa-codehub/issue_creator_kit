@@ -1,0 +1,120 @@
+name: Task Automation Workflow
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'reqs/design/_approved/**'
+      - 'reqs/tasks/**/*.md'
+  # ADR-014: 外部リポジトリや他ジョブからの呼び出しインターフェース
+  workflow_call:
+    inputs:
+      root:
+        description: 'Root directory to scan'
+        required: false
+        default: 'reqs'
+        type: string
+      execute:
+        description: 'Actually create GitHub issues'
+        required: false
+        default: false
+        type: boolean
+      config_path:
+        description: 'Path to a JSON configuration file'
+        required: false
+        default: '.github/issue-kit-config.json'
+        type: string
+      issue_no:
+        description: 'Issue number for relay'
+        required: false
+        type: number
+      base_branch:
+        description: 'Base branch for PR'
+        required: false
+        default: 'main'
+        type: string
+    secrets:
+      gh_token:
+        description: 'GitHub Token'
+        required: true
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  task-automation:
+    runs-on: [self-hosted, CI]
+    env:
+      GITHUB_TOKEN: ${{ secrets.gh_token || secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+      GITHUB_REPOSITORY: ${{ github.repository }}
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ env.GITHUB_TOKEN }}
+
+      # 環境のセットアップ
+      - name: Install dependencies
+        run: bash .build/run.sh
+
+      # タスクの自動化処理 (Process または Relay) を実行する
+      # ADR-014: インラインスクリプトを排除し、パラメータ経由でシェルスクリプトを呼び出す
+      - name: Run Task Automation
+        run: |
+          # イベントの種類に応じたパラメータの決定
+          if [ "${{ github.event_name }}" = "push" ]; then
+            COMMAND="process"
+            FLAG="--execute"
+            ROOT_DIR="reqs"
+            CONFIG_PATH=".github/issue-kit-config.json"
+            ISSUE_NO=""
+          else
+            if [ -n "${{ inputs.issue_no }}" ]; then
+              COMMAND="relay"
+              ISSUE_NO="${{ inputs.issue_no }}"
+            else
+              COMMAND="process"
+              ISSUE_NO=""
+            fi
+            
+            if [ "${{ inputs.execute }}" = "true" ]; then
+              FLAG="--execute"
+            else
+              FLAG="--dry-run"
+            fi
+            
+            ROOT_DIR="${{ inputs.root || 'reqs' }}"
+            CONFIG_PATH="${{ inputs.config_path || '.github/issue-kit-config.json' }}"
+          fi
+
+          # スクリプトを引数付きで呼び出す
+          bash .github/workflows/script/task_automation.sh "$COMMAND" "$FLAG" "$ROOT_DIR" "$CONFIG_PATH" "$ISSUE_NO"
+
+      # 変更の有無を確認
+      - name: Check for changes
+        id: git-check
+        if: inputs.issue_no == null || inputs.issue_no == 0
+        run: |
+          if [[ -n $(git status --porcelain reqs/) ]]; then
+            echo "changes_detected=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changes_detected=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      # 処理済みタスクをアーカイブし、Pull Requestを作成する
+      # ADR-014: 環境変数への依存をなくし、引数でスクリプトを制御する
+      - name: Create Pull Request for Archived Tasks
+        if: |
+          (inputs.issue_no == null || inputs.issue_no == 0) &&
+          steps.git-check.outputs.changes_detected == 'true'
+        run: |
+          # コミットメッセージ、アクター、Email等を引数として渡す
+          bash .github/workflows/script/archive_and_pr.sh \
+            "${{ github.actor }}" \
+            "${{ secrets.COMMIT_USER_EMAIL }}" \
+            "${{ github.event.head_commit.message }}" \
+            "${{ inputs.base_branch || 'main' }}"

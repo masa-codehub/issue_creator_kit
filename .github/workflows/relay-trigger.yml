@@ -1,0 +1,30 @@
+name: Gemini Relay Trigger
+
+on:
+  issues:
+    types: [closed]
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  relay:
+    # 完了（completed）としてクローズされた場合のみリレーを実行
+    if: github.event.issue.state_reason == 'completed'
+    runs-on: [self-hosted, CI]
+    env:
+      GITHUB_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+      GITHUB_REPOSITORY: ${{ github.repository }}
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ env.GITHUB_TOKEN }}
+
+      - name: Install dependencies
+        run: bash .build/run.sh
+
+      - name: Run Gemini Relay
+        run: bash .github/workflows/script/task_automation.sh relay --execute "" "" "${{ github.event.issue.number }}"
