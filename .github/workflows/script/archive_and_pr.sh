@@ -58,24 +58,46 @@ echo "Configuring git user identity (Name: $GIT_USER, Email: $COMMIT_EMAIL)..."
 git config user.name "$GIT_USER"
 git config user.email "$COMMIT_EMAIL"
 
-# 5. ブランチの作成とコミット
-BRANCH_NAME="chore/archive-tasks-$(date +%Y%m%d-%H%M%S)"
-echo "Creating new branch: $BRANCH_NAME"
-git checkout -b "$BRANCH_NAME"
+# 5. ブランチの判定とコミット
+git fetch origin
 
-echo "Committing archived tasks..."
-git commit -m "chore: archive processed tasks"
+# Release Please のデフォルトブランチ名
+RP_BRANCH="release-please--branches--main"
 
-echo "Pushing branch to origin..."
-git push origin "$BRANCH_NAME"
+# Release PR 用ブランチに紐づくオープン PR の有無を確認
+OPEN_RP_PR_COUNT=$(gh pr list --head "$RP_BRANCH" --state open --json number --jq 'length')
 
-# 6. Pull Request の作成
-echo "Creating Pull Request to base branch '$BASE_BRANCH'..."
-gh pr create \
-  --title "chore: archive processed tasks" \
-  --body "Automated task archiving after issue creation. Please review and merge." \
-  --base "$BASE_BRANCH" \
-  --head "$BRANCH_NAME" \
-  --label chore
+if git ls-remote --exit-code --heads origin "$RP_BRANCH" > /dev/null && [ "$OPEN_RP_PR_COUNT" -gt 0 ]; then
+    echo "Release PR branch ($RP_BRANCH) with open PR exists. Merging archive changes into it..."
+    # リモートのPRブランチからローカル追跡ブランチを作成/更新してチェックアウト
+    git fetch origin "$RP_BRANCH:refs/heads/$RP_BRANCH"
+    git checkout "$RP_BRANCH"
+    
+    echo "Committing archived tasks to Release PR..."
+    git commit -m "chore: archive processed tasks"
+    
+    echo "Pushing branch to origin..."
+    git push origin "$RP_BRANCH"
+    echo "Archive changes successfully pushed to existing Release PR."
+else
+    BRANCH_NAME="chore/archive-tasks-$(date +%Y%m%d-%H%M%S)"
+    echo "Creating new standalone branch: $BRANCH_NAME"
+    git checkout -b "$BRANCH_NAME"
 
-echo "Pull Request successfully created."
+    echo "Committing archived tasks..."
+    git commit -m "chore: archive processed tasks"
+
+    echo "Pushing branch to origin..."
+    git push origin "$BRANCH_NAME"
+
+    # 6. Pull Request の作成
+    echo "Creating Pull Request to base branch '$BASE_BRANCH'..."
+    gh pr create \
+      --title "chore: archive processed tasks" \
+      --body "Automated task archiving after issue creation. Please review and merge." \
+      --base "$BASE_BRANCH" \
+      --head "$BRANCH_NAME" \
+      --label chore
+
+    echo "Standalone Pull Request successfully created."
+fi

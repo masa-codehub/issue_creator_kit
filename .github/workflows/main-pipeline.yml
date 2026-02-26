@@ -1,0 +1,56 @@
+name: Main Pipeline (Release & Tasks)
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  main-pipeline:
+    runs-on: [self-hosted, CI]
+    steps:
+      - name: Initialize Environment
+        run: |
+          # Prioritize runner environment variable (GITHUB_MCP_PAT) as requested by user philosophy for local environment consistency
+          TOKEN="${GITHUB_MCP_PAT:-${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}}"
+          echo "GITHUB_TOKEN=$TOKEN" >> "$GITHUB_ENV"
+
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ env.GITHUB_TOKEN }}
+
+      - name: Install dependencies
+        run: bash .build/run.sh
+
+      - name: Run Task Automation
+        run: bash .github/workflows/script/task_automation.sh process --execute reqs .github/issue-kit-config.json ""
+
+      - name: Check for task changes
+        id: git-check
+        run: |
+          if [[ -n $(git status --porcelain reqs/) ]]; then
+            echo "changes_detected=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changes_detected=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Run Release Please
+        uses: googleapis/release-please-action@v4
+        with:
+          release-type: python
+          token: ${{ env.GITHUB_TOKEN }}
+
+      - name: Combine Task Archive with Release PR or Create Standalone PR
+        if: steps.git-check.outputs.changes_detected == 'true'
+        run: |
+          bash .github/workflows/script/archive_and_pr.sh \
+            "${{ github.actor }}" \
+            "${{ secrets.COMMIT_USER_EMAIL }}" \
+            "${{ github.event.head_commit.message }}" \
+            "main"

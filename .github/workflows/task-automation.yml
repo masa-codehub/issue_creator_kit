@@ -1,12 +1,6 @@
 name: Task Automation Workflow
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'reqs/design/_approved/**'
-      - 'reqs/tasks/**/*.md'
   # ADR-014: 外部リポジトリや他ジョブからの呼び出しインターフェース
   workflow_call:
     inputs:
@@ -66,30 +60,22 @@ jobs:
       - name: Run Task Automation
         run: |
           # イベントの種類に応じたパラメータの決定
-          if [ "${{ github.event_name }}" = "push" ]; then
-            COMMAND="process"
-            FLAG="--execute"
-            ROOT_DIR="reqs"
-            CONFIG_PATH=".github/issue-kit-config.json"
-            ISSUE_NO=""
+          if [ -n "${{ inputs.issue_no }}" ]; then
+            COMMAND="relay"
+            ISSUE_NO="${{ inputs.issue_no }}"
           else
-            if [ -n "${{ inputs.issue_no }}" ]; then
-              COMMAND="relay"
-              ISSUE_NO="${{ inputs.issue_no }}"
-            else
-              COMMAND="process"
-              ISSUE_NO=""
-            fi
-            
-            if [ "${{ inputs.execute }}" = "true" ]; then
-              FLAG="--execute"
-            else
-              FLAG="--dry-run"
-            fi
-            
-            ROOT_DIR="${{ inputs.root || 'reqs' }}"
-            CONFIG_PATH="${{ inputs.config_path || '.github/issue-kit-config.json' }}"
+            COMMAND="process"
+            ISSUE_NO=""
           fi
+          
+          if [ "${{ inputs.execute }}" = "true" ]; then
+            FLAG="--execute"
+          else
+            FLAG="--dry-run"
+          fi
+          
+          ROOT_DIR="${{ inputs.root || 'reqs' }}"
+          CONFIG_PATH="${{ inputs.config_path || '.github/issue-kit-config.json' }}"
 
           # スクリプトを引数付きで呼び出す
           bash .github/workflows/script/task_automation.sh "$COMMAND" "$FLAG" "$ROOT_DIR" "$CONFIG_PATH" "$ISSUE_NO"
