@@ -1,0 +1,55 @@
+name: Gemini Review Analyzer
+
+on:
+  pull_request_review:
+    types: [submitted]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  analyze-comment:
+    if: |
+      github.actor == 'masa-codehub' &&
+      (
+        contains(github.event.pull_request.labels.*.name, vars.TRIGGER_LABEL || 'gemini') ||
+        contains(join(github.event.pull_request.labels.*.name), format('{0}:', vars.TRIGGER_LABEL || 'gemini'))
+      )
+    runs-on: [self-hosted, gemini]
+    concurrency:
+      group: gemini-review-analyzer-${{ github.event.pull_request.number }}
+      cancel-in-progress: false
+    env:
+      GITHUB_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          submodules: recursive
+          token: ${{ env.GITHUB_TOKEN }}
+
+      - name: Refresh Environment
+        run: |
+          echo "Refreshing environment by removing persistent artifacts..."
+          rm -rf .venv
+
+      - name: Initialize Environment
+        run: bash ./.build/run.sh
+
+      - name: Analyze Review Comment
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 20
+          max_attempts: 3
+          retry_on: error
+          command: bash ./.github/workflows/script/gemini_review_analyzer.sh
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
+          REVIEW_ID: ${{ github.event.review.id }}
+          REVIEW_AUTHOR: ${{ github.event.review.user.login }}
+          REVIEW_BODY: ${{ github.event.review.body }}

@@ -1,0 +1,48 @@
+{
+  "roles": [
+    {
+      "name": "SYSTEM_ARCHITECT",
+      "labels": ["task", "arch"],
+      "context": ".github/workflows/context/arch-prompt.md"
+    },
+    {
+      "name": "TECHNICAL_DESIGNER",
+      "labels": ["task", "spec"],
+      "context": ".github/workflows/context/spec-prompt.md"
+    },
+    {
+      "name": "BACKENDCODER",
+      "labels": ["task", "tdd"],
+      "context": ".github/workflows/context/tdd-prompt.md"
+    },
+    {
+      "name": "SYSTEM_ARCHITECT",
+      "labels": ["audit", "arch"],
+      "context": ".github/workflows/context/review-arch-prompt.md"
+    },
+    {
+      "name": "TECHNICAL_DESIGNER",
+      "labels": ["audit", "spec"],
+      "context": ".github/workflows/context/review-spec-prompt.md"
+    },
+    {
+      "name": "BACKENDCODER",
+      "labels": ["audit", "tdd"],
+      "context": ".github/workflows/context/review-tdd-prompt.md"
+    },
+    {
+      "name": "SYSTEM_ARCHITECT",
+      "labels": ["plan", "arch"]
+    },
+    {
+      "name": "TECHNICAL_DESIGNER",
+      "labels": ["plan", "spec"]
+    },
+    {
+      "name": "BACKENDCODER",
+      "labels": ["plan", "tdd"]
+    }
+  ],
+  "default_role": "BACKENDCODER",
+  "trigger_label": "gemini"
+}

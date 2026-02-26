@@ -1,0 +1,136 @@
+# ===================================================================
+# 1. プロジェクト固有設定 (新規プロジェクト作成時にここを編集)
+# ===================================================================
+[project]
+name = "issue_creator_kit"
+version = "0.1.1"
+description = "Project with Issue Creator Kit automation."
+readme = "README.md"
+requires-python = ">=3.13"
+authors = [
+  { name = "masa-codehub", email = "masa-codehub@sample.com" },
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+# --- プロジェクト固有の依存関係 ---
+dependencies = [
+    "python-frontmatter>=1.1.0",
+    "pydantic>=2.10.0",
+    "requests>=2.32.0",
+    "pyyaml>=6.0.2",
+]
+
+[project.scripts]
+issue-kit = "issue_creator_kit.cli:main"
+ick = "issue_creator_kit.cli:main"
+
+[project.urls]
+Repository = "https://github.com/masa-codehub/issue_creator_kit"
+
+# ===================================================================
+# 2. 共通開発環境設定 (標準的なツールセット)
+# ===================================================================
+[project.optional-dependencies]
+# テスト用標準パッケージ
+test = [
+    "pytest>=8.3.0",
+    "pytest-cov>=6.0.0",
+    "pytest-xdist>=3.6.0",
+    "responses>=0.25.0",
+    "pyfakefs>=5.7.0,<7.0.0",
+]
+# 開発用標準パッケージ (Core Trio: ruff, mypy, pytest)
+dev = [
+    "ruff==0.6.0",
+    "mypy==1.10.1",
+    "pre-commit>=4.0.0",
+    "types-PyYAML",
+    "types-requests",
+    "commitizen",
+    "python-semantic-release",
+    "build",
+    # testの依存関係を明示
+    "pytest>=8.3.0",
+    "pytest-cov>=6.0.0",
+    "pytest-xdist>=3.6.0",
+    "responses>=0.25.0",
+    "pyfakefs>=5.7.0,<7.0.0",
+]
+
+# ===================================================================
+# 3. 共通ツール設定 (チーム標準の静的解析・テストルール)
+# ===================================================================
+# ★ ここから下はプロジェクトを跨いで原則共通。
+# ★ 固有のパッケージ名に依存しない「抽象化」された設定。
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+# --- setuptools (自動パッケージ検出) ---
+[tool.setuptools.packages.find]
+where = ["src", "."]
+include = ["*"]
+exclude = ["tests*"]
+
+# --- Ruff (Linter & Formatter) ---
+[tool.ruff]
+line-length = 88
+
+[tool.ruff.lint]
+select = [
+    "E", "W", "F", "I", "B", "C4", "UP", "N", "T20", "SIM", "RET", "ERA"
+]
+ignore = [
+    "E501", "B008", "C901"
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["N802", "N803"]
+# CLIツールはprint許可 (共通的な除外設定)
+"**/cli.py" = ["T201"]
+
+[tool.ruff.format]
+# Black互換のフォーマット設定
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+# --- Mypy (Type Checker) ---
+[tool.mypy]
+ignore_missing_imports = false
+# パッケージ名ではなく、ディレクトリベースで指定
+mypy_path = "src"
+explicit_package_bases = true
+check_untyped_defs = true
+
+[[tool.mypy.overrides]]
+module = ["punq", "frontmatter", "google.*"]
+ignore_missing_imports = true
+
+# --- Pytest ---
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+pythonpath = ["src", "."]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning",
+    "ignore::UserWarning",
+]
+# covに対象パッケージ名を書かず、srcディレクトリ全体を指定することで抽象化
+addopts = "-v --tb=short --strict-markers --cov=src --cov-report=term-missing -n auto"
+asyncio_mode = "auto"
+markers = [
+    "slow: marks tests as slow",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+]
+junit_family = "xunit2"
