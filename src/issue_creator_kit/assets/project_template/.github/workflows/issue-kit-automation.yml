@@ -1,0 +1,34 @@
+name: Issue Creator Kit Automation
+
+on:
+  # 1. 設計書やタスクがメインブランチにプッシュされたときに自動処理（プロセス）を実行
+  push:
+    branches:
+      - main
+    paths:
+      - 'reqs/design/_approved/**'
+      - 'reqs/tasks/**/*.md'
+  # 2. Issueが完了としてクローズされたときに後続タスクを起動（リレー）
+  issues:
+    types: [closed]
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  automation:
+    # 外部リポジトリ(masa-codehub/issue_creator_kit)の再利用可能ワークフローを呼び出す
+    # 注意: @main の部分は、安定運用のためリリースタグ (例: @v0.1.0) に変更することを推奨します
+    uses: masa-codehub/issue_creator_kit/.github/workflows/task-automation.yml@main
+    with:
+      # 処理対象のディレクトリ
+      root: "reqs"
+      # pushイベントの場合のみ実際にIssueを作成・更新する (それ以外は dry-run)
+      execute: ${{ github.event_name == 'push' }}
+      # Issueが完了(completed)としてクローズされた場合、その番号を渡してリレーを実行する
+      issue_no: ${{ github.event.issue.state_reason == 'completed' && github.event.issue.number || null }}
+    secrets:
+      # (必須) ワークフロー内でIssueやPRを作成するためのGitHubトークン
+      gh_token: ${{ secrets.GITHUB_TOKEN }}

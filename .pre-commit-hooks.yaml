@@ -1,0 +1,23 @@
+- id: ick-visualize
+  name: Issue Kit Visualize
+  description: Visualize dependencies of issues and ADRs.
+  entry: ick visualize
+  language: python
+  pass_filenames: false
+  always_run: true
+
+- id: ick-check
+  name: Issue Kit Check
+  description: Statically validate task files (ID consistency, cycles, etc.).
+  entry: ick check
+  language: python
+  pass_filenames: false
+  always_run: true
+
+- id: ick-sync-relay
+  name: Issue Kit Sync Relay
+  description: Synchronize issues and transition states (Dry-run).
+  entry: ick sync-relay --dry-run
+  language: python
+  pass_filenames: false
+  always_run: true

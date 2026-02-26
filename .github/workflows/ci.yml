@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  pull_request:
+
+permissions:
+  issues: write
+  pull-requests: write
+  contents: write
+
+jobs:
+  build:
+    runs-on: [self-hosted, CI]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+
+      - name: Install dependencies
+        run: bash .build/run.sh
+
+      - name: Verify Task Automation Workflow
+        run: bash tests/verify_workflow.sh
+
+      - name: Run checks with pre-commit
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+        run: |
+          # pre-commit を uv 環境内で実行
+          uv run pre-commit run --all-files
+
+      - name: Sync Issue Labels
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+        run: |
+          bash .github/workflows/script/sync_issue_labels.sh "${{ github.event.pull_request.number }}"
+
+      - name: Monitor Copilot Review
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+          GITHUB_USER: ${{ github.repository_owner }}
+        run: |
+          bash .github/workflows/script/monitor_external_review.sh "${{ github.event.pull_request.number }}"
+
