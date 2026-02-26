@@ -24,8 +24,8 @@ repos:
 
   # 4. Dogfooding: Distributed Hooks (this repo)
   # Validate task structure using the remote repository definition
-  - repo: https://github.com/masa-codehub/dev_issue_creator_kit
-    rev: 5ac5515c2f3658718c66ed90cd38625e1be1da3e
+  - repo: https://github.com/masa-codehub/issue_creator_kit
+    rev: main
     hooks:
       - id: ick-check
         files: ^reqs/
