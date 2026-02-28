@@ -93,4 +93,5 @@ jobs:
           GH_TOKEN: ${{ env.GITHUB_TOKEN }}
           RELEASE_TAG_NAME: ${{ github.event.release.tag_name }}
           SYNC_DEST_DIR: template-repo
+          SKIP_TAG: "true"
         run: bash ./dev-repo/.github/workflows/script/commit_and_push_sync.sh
