@@ -3,9 +3,6 @@ set -e
 
 DEST_DIR="${SYNC_DEST_DIR:-template-repo}"
 
-# ターゲット先の中のファイルを一旦空にする（.git履歴は残す）
-find "$DEST_DIR" -mindepth 1 -maxdepth 1 ! -name '.git' -exec rm -rf {} +
-
 cd dev-repo
 
 # YAMLからrsync用のフィルタールールを生成
@@ -28,4 +25,6 @@ with open("../filter-rules.txt", "w") as f:
 cd ..
 
 # dev-repo から template-repo へ必要なファイルだけコピー
-rsync -av --filter="merge filter-rules.txt" dev-repo/ "$DEST_DIR"/
+# --delete オプションをつけることで、dev-repo 側で削除されたファイルは
+# template-repo 側（の同期対象ディレクトリ内）でも削除されます。
+rsync -av --delete --filter="merge filter-rules.txt" dev-repo/ "$DEST_DIR"/
