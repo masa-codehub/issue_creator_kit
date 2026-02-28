@@ -3,7 +3,7 @@
 # ===================================================================
 [project]
 name = "issue_creator_kit"
-version = "0.4.1"
+version = "0.5.0"
 description = "Project with Issue Creator Kit automation."
 readme = "README.md"
 requires-python = ">=3.13"
@@ -38,6 +38,9 @@ Repository = "https://github.com/masa-codehub/issue_creator_kit"
 # The target repository for public syncing
 # This value is used by .github/workflows/sync-to-public.yml
 public_repo = "masa-codehub/issue_creator_kit"
+# The target repository for template syncing
+# This value is used by .github/workflows/sync-to-template.yml
+template_repo = "masa-codehub/gemini_agent"
 
 # ===================================================================
 # 2. 共通開発環境設定 (標準的なツールセット)

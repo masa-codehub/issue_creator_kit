@@ -1,0 +1,96 @@
+name: Sync to Target Repositories
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  sync-public:
+    name: Sync to Public Repository
+    runs-on: [self-hosted, CI]
+    steps:
+      - name: Initialize Token
+        run: |
+          TOKEN="${GITHUB_MCP_PAT:-${{ secrets.GH_PAT }}}"
+          echo "GITHUB_TOKEN=$TOKEN" >> "$GITHUB_ENV"
+
+      - name: Checkout Dev Repo
+        uses: actions/checkout@v4
+        with:
+          path: dev-repo
+
+      - name: Initialize Environment
+        run: bash ./dev-repo/.build/run.sh
+
+      - name: Check Target Repository Configuration
+        id: check-repo
+        env:
+          FALLBACK_OWNER: ${{ vars.GITHUB_USER || env.GITHUB_USER || github.repository_owner }}
+          FALLBACK_REPO: ${{ vars.PUBLIC_REPO || env.PUBLIC_REPO }}
+        run: bash ./dev-repo/.github/workflows/script/check_sync_target.sh
+
+      - name: Checkout Public Repo
+        if: steps.check-repo.outputs.skip == 'false'
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.SYNC_OWNER }}/${{ env.SYNC_REPO }}
+          token: ${{ env.GITHUB_TOKEN }}
+          path: public-repo
+
+      - name: Sync files
+        if: steps.check-repo.outputs.skip == 'false'
+        run: bash ./dev-repo/.github/workflows/script/sync_files.sh
+
+      - name: Commit and Push to Public Repo
+        if: steps.check-repo.outputs.skip == 'false'
+        env:
+          GH_TOKEN: ${{ env.GITHUB_TOKEN }}
+          RELEASE_TAG_NAME: ${{ github.event.release.tag_name }}
+        run: bash ./dev-repo/.github/workflows/script/commit_and_push_sync.sh
+
+  sync-template:
+    name: Sync to Template Repository
+    runs-on: [self-hosted, CI]
+    steps:
+      - name: Initialize Token
+        run: |
+          TOKEN="${GITHUB_MCP_PAT:-${{ secrets.GH_PAT }}}"
+          echo "GITHUB_TOKEN=$TOKEN" >> "$GITHUB_ENV"
+
+      - name: Checkout Dev Repo
+        uses: actions/checkout@v4
+        with:
+          path: dev-repo
+
+      - name: Initialize Environment
+        run: bash ./dev-repo/.build/run.sh
+
+      - name: Check Target Repository Configuration
+        id: check-repo
+        env:
+          SYNC_TARGET_KEY: template_repo
+          FALLBACK_OWNER: ${{ vars.GITHUB_USER || env.GITHUB_USER || github.repository_owner }}
+          FALLBACK_REPO: ${{ vars.TEMPLATE_REPO || env.TEMPLATE_REPO }}
+        run: bash ./dev-repo/.github/workflows/script/check_sync_target.sh
+
+      - name: Checkout Template Repo
+        if: steps.check-repo.outputs.skip == 'false'
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.SYNC_OWNER }}/${{ env.SYNC_REPO }}
+          token: ${{ env.GITHUB_TOKEN }}
+          path: template-repo
+
+      - name: Sync files
+        if: steps.check-repo.outputs.skip == 'false'
+        env:
+          SYNC_DEST_DIR: template-repo
+        run: bash ./dev-repo/.github/workflows/script/sync_template_files.sh
+
+      - name: Commit and Push to Template Repo
+        if: steps.check-repo.outputs.skip == 'false'
+        env:
+          GH_TOKEN: ${{ env.GITHUB_TOKEN }}
+          RELEASE_TAG_NAME: ${{ github.event.release.tag_name }}
+          SYNC_DEST_DIR: template-repo
+        run: bash ./dev-repo/.github/workflows/script/commit_and_push_sync.sh

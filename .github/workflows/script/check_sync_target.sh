@@ -1,10 +1,12 @@
 #!/bin/bash
 set -e
 
+TARGET_KEY="${SYNC_TARGET_KEY:-public_repo}"
+
 # 1. Try to read from pyproject.toml
 PYPROJECT_REPO=""
 if [ -f "dev-repo/pyproject.toml" ]; then
-  PYPROJECT_REPO=$(grep -A 5 "\[tool\.sync\]" dev-repo/pyproject.toml | grep "^public_repo\s*=" | cut -d'"' -f2 || true)
+  PYPROJECT_REPO=$(grep -A 10 "\[tool\.sync\]" dev-repo/pyproject.toml | grep "^${TARGET_KEY}\s*=" | cut -d'"' -f2 || true)
 fi
 
 # 2. Determine final REPO and OWNER

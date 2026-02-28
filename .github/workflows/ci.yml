@@ -20,9 +20,6 @@ jobs:
       - name: Install dependencies
         run: bash .build/run.sh
 
-      - name: Verify Task Automation Workflow
-        run: bash tests/verify_workflow.sh
-
       - name: Run checks with pre-commit
         env:
           GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}

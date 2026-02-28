@@ -1,0 +1,15 @@
+# テンプレートリポジトリに同期するファイル・ディレクトリの許可リスト (rsyncのincludeルール)
+# ディレクトリ配下をすべて含める場合は `/***` を使用します。
+include:
+  - "/.github/***"
+  - "/.build/***"
+  - ".gitignore"
+  - ".gitmodules"
+  - ".markdownlint-cli2.yaml"
+  - ".pre-commit-config.yaml"
+  - "LICENSE"
+
+# テンプレートリポジトリに同期しないファイル・ディレクトリの除外リスト (rsyncのexcludeルール)
+# includeルールよりも優先されます。
+exclude:
+  - "/.git/"
