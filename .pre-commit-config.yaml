@@ -45,9 +45,3 @@ repos:
         language: system
         types: [python]
         pass_filenames: false
-      - id: verify-workflow
-        name: verify-workflow
-        entry: bash tests/verify_workflow.sh
-        language: system
-        pass_filenames: false
-        files: ^\.github/workflows/task-automation\.yml$

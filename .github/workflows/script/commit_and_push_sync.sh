@@ -1,7 +1,8 @@
 #!/bin/bash
 set -e
 
-cd public-repo
+DEST_DIR="${SYNC_DEST_DIR:-public-repo}"
+cd "$DEST_DIR"
 
 git config user.name "${GITHUB_USER:-github-actions[bot]}"
 git config user.email "${GITHUB_EMAIL:-github-actions[bot]@users.noreply.github.com}"
