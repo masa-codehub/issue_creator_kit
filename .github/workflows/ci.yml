@@ -12,6 +12,12 @@ jobs:
   build:
     runs-on: [self-hosted, CI]
     steps:
+      - name: Check GH_PAT for submodules
+        run: |
+          if [ -z "${{ secrets.GH_PAT }}" ]; then
+            echo "::warning title=Missing GH_PAT::GH_PAT is not set. Private submodule checkout might fail. If it fails with 'Repository not found', please add GH_PAT to GitHub Secrets with 'repo' scope."
+          fi
+
       - uses: actions/checkout@v4
         with:
           submodules: recursive
