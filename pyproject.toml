@@ -3,7 +3,7 @@
 # ===================================================================
 [project]
 name = "issue_creator_kit"
-version = "0.5.1"
+version = "0.5.2"
 description = "Project with Issue Creator Kit automation."
 readme = "README.md"
 requires-python = ">=3.13"

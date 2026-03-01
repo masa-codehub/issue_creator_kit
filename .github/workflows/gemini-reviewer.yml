@@ -24,14 +24,19 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
     steps:
+      - name: Check GH_PAT for submodules
+        run: |
+          if [ -z "${{ secrets.GH_PAT }}" ]; then
+            echo "::warning title=Missing GH_PAT::GH_PAT is not set. Private submodule checkout might fail. If it fails with 'Repository not found', please add GH_PAT to GitHub Secrets with 'repo' scope."
+          fi
+
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.ref }}
           repository: ${{ github.event.pull_request.head.repo.full_name }}
           submodules: recursive
-          token: ${{ env.GITHUB_TOKEN }}
-
+          token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
       - name: Refresh Environment
         run: |
           echo "Refreshing environment by removing persistent artifacts..."
