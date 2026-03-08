@@ -10,7 +10,7 @@ fi
 # 必須ツールの存在確認
 for cmd in gemini gh envsubst jq; do
   if ! command -v "$cmd" >/dev/null 2>&1; then
-    echo "Error: Required command '$cmd' not found. Please ensure it is installed in the runner environment."
+    echo "Error: Required command '$cmd' not found."
     exit 1
   fi
 done
@@ -22,9 +22,6 @@ if ! gh auth status >/dev/null 2>&1; then
 fi
 
 # PR全体の全レビューコメントを全取得して整形
-echo "Fetching all review comments for PR #$PR_NUMBER..."
-echo "Debug: PR_LABELS='${PR_LABELS}'"
-
 ALL_REVIEW_COMMENTS=$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER/comments" \
   --jq 'sort_by(.created_at) | .[] | "### File: \(.path) (Line: \(.line // .original_line))\n#### Author: \(.user.login)\n#### Comment:\n\(.body)\n\n#### Code Context:\n```diff\n\(.diff_hunk)\n```\n"')
 
@@ -35,25 +32,36 @@ fi
 
 export REVIEW_COMMENTS_FORMATTED="$ALL_REVIEW_COMMENTS"
 
-# 仮想環境のアクティベート (ick コマンドを使うために先に実行)
+# 仮想環境のアクティベート
 if [ -f ".venv/bin/activate" ]; then
   source ".venv/bin/activate"
 fi
 
-# ick dispatch でロール（エージェント名）とコンテキストファイル（プロンプト）を決定
-ROLE=$(ick dispatch --labels "$PR_LABELS" || echo "UNKNOWN")
-CONTEXT_FILE=$(ick dispatch --labels "$PR_LABELS" --get-context || echo "UNKNOWN")
-
-if [ "$ROLE" = "UNKNOWN" ] || [ "$CONTEXT_FILE" = "UNKNOWN" ]; then
-  echo "Error: No matching gemini role or context file found for labels: $PR_LABELS"
+# ワークフローで確定した AGENT_ROLE を使用
+if [ -z "$AGENT_ROLE" ]; then
+  echo "Error: AGENT_ROLE is not set."
   exit 1
 fi
 
-echo "Selected Agent Role: $ROLE"
-echo "Selected Context File: $CONTEXT_FILE"
+# ick dispatch でレビュー用コンテキストファイル（プロンプト）を決定
+# 1. issue-kit-config.json から "reviews" 要素を抽出し、一時的に "roles" キーとして持つ設定ファイルを作成
+# 2. その一時ファイルを ick dispatch に渡す
+TEMP_CONFIG=$(mktemp "${RUNNER_TEMP:-/tmp}/config.XXXXXX.json")
+trap 'rm -f "$TEMP_CONFIG"' EXIT
 
-export TASK_TYPE="$ROLE"
+jq '.roles = .reviews | del(.reviews)' .github/issue-kit-config.json > "$TEMP_CONFIG"
 
+CONTEXT_FILE=$(uv tool run --from git+https://github.com/masa-codehub/issue_creator_kit.git ick dispatch --labels "$PR_LABELS" --config-path "$TEMP_CONFIG" --get-context || echo "UNKNOWN")
+
+if [ "$CONTEXT_FILE" = "UNKNOWN" ]; then
+  echo "Error: No matching gemini review context found for labels: $PR_LABELS"
+  exit 1
+fi
+
+echo "Selected Agent Role: $AGENT_ROLE"
+echo "Review Context File: $CONTEXT_FILE"
+
+export TASK_TYPE="$AGENT_ROLE"
 
 # プロンプトファイルの存在確認
 if [ ! -f "$CONTEXT_FILE" ]; then
@@ -61,29 +69,14 @@ if [ ! -f "$CONTEXT_FILE" ]; then
   exit 1
 fi
 
-# 一時ファイルの作成 (一意なパス)
+# 一時プロンプトファイルの作成
 PROMPT_FILE="$(mktemp "${RUNNER_TEMP:-/tmp}/prompt.XXXXXX.md")"
-RESPONSE_FILE="$(mktemp "${RUNNER_TEMP:-/tmp}/response.XXXXXX.md")"
-trap 'rm -f "$PROMPT_FILE" "$RESPONSE_FILE"' EXIT
+trap 'rm -f "$TEMP_CONFIG" "$PROMPT_FILE"' EXIT
 
 # プロンプトの生成 (envsubst でホワイトリスト展開)
 export PR_NUMBER REVIEW_AUTHOR REVIEW_BODY GITHUB_REPOSITORY TASK_TYPE
 envsubst '$PR_NUMBER $REVIEW_AUTHOR $REVIEW_BODY $REVIEW_COMMENTS_FORMATTED $GITHUB_REPOSITORY $TASK_TYPE' < "${CONTEXT_FILE}" > "$PROMPT_FILE"
 
 echo "--- Gemini Analysis Start ---"
-
-# Gemini CLI を実行
-# --yolo: ユーザー確認なしで実行 (CI/CD用)
-# cat "$PROMPT_FILE" | gemini --yolo -m "gemini-3-flash-preview" > "$RESPONSE_FILE"
 cat "$PROMPT_FILE" | gemini --yolo -m "gemini-3-flash-preview"
-
 echo "--- Gemini Analysis End ---"
-
-# # GitHub CLI でコメントを投稿
-# if [ -f "$RESPONSE_FILE" ] && [ -s "$RESPONSE_FILE" ]; then
-#   echo "Posting summary comment to PR #${PR_NUMBER}..."
-#   gh pr comment "$PR_NUMBER" --body-file "$RESPONSE_FILE"
-# else
-#   echo "Error: Gemini produced empty response."
-#   exit 1
-# fi
