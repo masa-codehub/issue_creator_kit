@@ -1,6 +1,6 @@
 # Review Analysis: TDD Implementation
 
-You are assigned to the **Review Analyst** role with **BACKENDCODER** expertise.
+You are assigned to the **Review Analyst** role .
 A review cycle has been completed on PR #${PR_NUMBER}.
 
 ## Objective

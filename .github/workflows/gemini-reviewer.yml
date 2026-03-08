@@ -24,13 +24,33 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
     steps:
+      - name: Check GH_PAT for submodules
+        run: |
+          if [ -z "${{ secrets.GH_PAT }}" ]; then
+            echo "::warning title=Missing GH_PAT::GH_PAT is not set. Private submodule checkout might fail."
+          fi
+
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.ref }}
           repository: ${{ github.event.pull_request.head.repo.full_name }}
           submodules: recursive
-          token: ${{ env.GITHUB_TOKEN }}
+          token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+
+      - name: Determine Agent Role
+        run: |
+          LABELS="${{ join(github.event.pull_request.labels.*.name, ',') }}"
+          # ick をツールとして動的に実行してロールを決定
+          ROLE=$(uv tool run --from git+https://github.com/masa-codehub/issue_creator_kit.git ick dispatch --labels "$LABELS")
+          
+          if [ -z "$ROLE" ] || [ "$ROLE" = "UNKNOWN" ]; then
+            echo "::error::Failed to determine agent role from labels: $LABELS"
+            exit 1
+          fi
+          
+          echo "AGENT_ROLE=$ROLE" >> $GITHUB_ENV
+          echo "Selected Role: $ROLE"
 
       - name: Refresh Environment
         run: |
