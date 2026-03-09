@@ -19,7 +19,7 @@
 
 `<!-- metadata: { ... } -->` 内に含まれる JSON の構造。
 
-- `id`, `type` (常に "task"), `parent`, `title`, `status`, `role`, `phase`, `depends_on`, `labels`, `issue_id`.
+- `id`, `type`, `parent`, `title`, `status`, `role`, `phase`, `depends_on`, `labels`, `issue_id`.
 
 ## 3. Interfaces (API/Methods)
 
@@ -44,11 +44,47 @@
 2. HTML コメント `<!-- metadata: {JSON} -->` を生成。
 3. **Safety Padding**: `<!--` と JSON、および JSON と `-->` の間に必ず 1 つ以上の半角スペースを挿入し、コメント破壊を防ぐ。
 
-### 4.3. Label Synthesis
+### 4.3. Label Synthesis (Label Inference)
 
-1. システムラベル: `task`, `adr:{num}` (num は ADR 番号 3桁)。
-2. カスタムラベル: フロントマター由来の `task.labels`。
-3. 除外: `role`, `phase` はラベルに含めない。
+ADR-015 に基づき、`Task` または `ADR` モデルから GitHub ラベルを自動合成する。
+
+#### 4.3.1. 抽出ルール (Extraction Rules)
+
+- **Task ドキュメントの場合**:
+  - `type`: 単一の文字列値（`task` または `integration`）をそのまま抽出。
+  - `adr:{NNN}`: 親 ADR ID (`parent`) から 3 桁の番号（例: `adr-015` -> `adr:015`）を抽出。
+  - `role`: 単一の文字列値（例: `arch`, `spec`, `tdd`）が存在する場合、そのまま抽出。
+  - `phase`: 単一の文字列値（例: `plan`, `impl`, `audit`）が存在する場合、そのまま抽出。
+- **ADR ドキュメントの場合**:
+  - `adr` ラベルのみを付与し、属性抽出（role, phase 等）は行わない。
+- **手動ラベル**: `doc.labels` に含まれる値をそのまま採用。
+
+#### 4.3.2. 除外規則 (Exclusion Rules)
+
+- **Exclusion Rule**: `gemini` ラベルは、起票時（`IssueRenderer` の処理範囲）には合成結果に含めてはならない。
+- **Deduplication**: 重複するラベルは 1 つに統合する。
+
+#### 4.3.3. ソート順 (Sorting Priority)
+
+最終的なラベルリストは、以下の優先順位に従って構成する。同一カテゴリ内ではアルファベット順（A-Z）でソートする。
+
+1. **システムラベル (System)**:
+   - `type` (例: `task`), `adr:{NNN}` (例: `adr:015`)
+   - ※システムラベル内に限り、`type` を必ず先頭とする固定順とする（`structure-renderer.md` 遵守）。
+2. **属性ラベル (Attribute)**:
+   - `role` (例: `arch`), `phase` (例: `plan`)
+   - アルファベット順（例: `plan` -> `spec`）。
+3. **手動指定ラベル (Manual)**:
+   - 上記以外のラベル。
+   - アルファベット順。
+
+#### 4.3.4. 合成例
+
+| 入力 (Task Metadata)                                                                  | 合成結果 (Sorted Labels)                           |
+| :------------------------------------------------------------------------------------ | :------------------------------------------------- |
+| `type: task`, `parent: adr-015`, `role: spec`, `phase: plan`, `labels: ["P1"]`        | `["task", "adr:015", "plan", "spec", "P1"]`        |
+| `type: integration`, `parent: adr-012`, `role: tdd`, `phase: impl`, `labels: ["bug"]` | `["integration", "adr:012", "impl", "tdd", "bug"]` |
+| ADR ドキュメント                                                                      | `["adr"]`                                          |
 
 ## 5. Traceability
 
