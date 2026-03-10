@@ -159,6 +159,9 @@ class TaskActivationUseCase:
             except Exception as e:
                 logger.warning(f"L1 Sync failed: {e}")
 
+        # Step 6: Initial Ignition (ADR-015)
+        self._ignite_independent_tasks(tasks, in_memory_map)
+
         status = ActivationStatus.SUCCESS
         if failed_tasks:
             status = (
@@ -168,6 +171,34 @@ class TaskActivationUseCase:
             )
 
         return ActivationResult(successful_issues, failed_tasks, status)
+
+    def _ignite_independent_tasks(
+        self, tasks: list[Task], in_memory_map: dict[str, int]
+    ) -> None:
+        """
+        Add 'gemini' label to independent tasks (best-effort).
+        """
+        # Filter independent tasks that have been successfully mapped to an issue number
+        ignitable_tasks = [
+            (task, in_memory_map[task.id])
+            for task in tasks
+            if not task.depends_on and in_memory_map.get(task.id) is not None
+        ]
+
+        if not ignitable_tasks:
+            return
+
+        logger.info(f"Starting initial ignition for {len(ignitable_tasks)} tasks")
+
+        for task, issue_no in ignitable_tasks:
+            try:
+                self.github.add_labels(issue_no, ["gemini"])
+                logger.info(f"Ignited task {task.id} (Issue #{issue_no})")
+            except GitHubAPIError as e:
+                # Best-effort: log and continue
+                logger.warning(
+                    f"Failed to ignite task {task.id} (Issue #{issue_no}): {e}"
+                )
 
     def _check_idempotency(self, task: Task, root_path: Path) -> int | None:
         # Check archive first

@@ -1,6 +1,6 @@
 # Review Analysis: Specification
 
-You are assigned to the **Review Analyst** role with **TECHNICAL_DESIGNER** expertise.
+You are assigned to the **Review Analyst** role .
 A review cycle has been completed on PR #${PR_NUMBER}.
 
 ## Objective

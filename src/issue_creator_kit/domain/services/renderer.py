@@ -179,18 +179,39 @@ class IssueRenderer:
         return f"<!-- metadata:{json_str} -->"
 
     def _synthesize_labels(self, doc: DocumentType) -> list[str]:
-        """Synthesize system and custom labels."""
+        """
+        Synthesize GitHub labels based on metadata and manual labels.
+        Excludes 'gemini' and applies categorical sorting.
+        """
         if isinstance(doc, ADR):
             return ["adr"]
 
-        # Case for Task
-        labels = ["task"]
+        excluded = {"gemini"}
+        seen: set[str] = set()
+        final_labels: list[str] = []
+
+        def add_labels(candidates: list[str], sort: bool = False) -> None:
+            iterable = sorted(candidates) if sort else candidates
+            for label in iterable:
+                if label not in seen and label not in excluded:
+                    final_labels.append(label)
+                    seen.add(label)
+
+        # 1. System Labels (type first, then adr:NNN)
+        system: list[str] = [doc.type]
         if doc.adr_number:
-            labels.append(f"adr:{doc.adr_number}")
+            system.append(f"adr:{doc.adr_number}")
+        add_labels(system, sort=False)
 
-        # Add custom labels from doc.labels
-        for label in doc.labels:
-            if label not in labels:
-                labels.append(label)
+        # 2. Attribute Labels (role, phase) - sorted A-Z
+        attributes = []
+        if doc.role:
+            attributes.append(doc.role)
+        if doc.phase:
+            attributes.append(doc.phase)
+        add_labels(attributes, sort=True)
 
-        return labels
+        # 3. Manual Labels - sorted A-Z
+        add_labels(doc.labels, sort=True)
+
+        return final_labels

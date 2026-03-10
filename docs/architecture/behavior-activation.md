@@ -39,41 +39,57 @@ sequenceDiagram
     participant SY as L1SyncService
     participant FS as FileSystem
 
-    Note over CLI, FS: 1. Preparation & Sorting
-    CLI->>UC: execute(root_path, l1_id)
-    UC->>GB: build_graph(documents)
-    GB-->>UC: execution_order (list[TaskID])
+    rect rgb(240, 240, 240)
+        Note over CLI, FS: Preparation & Sorting
+        CLI->>UC: execute(root_path, l1_id)
+        UC->>GB: build_graph(documents)
+        GB-->>UC: execution_order (list[TaskID])
+    end
 
-    Note over CLI, FS: 2. Sequential Creation & Rendering
-    loop For each task_id in execution_order
-        UC->>UC: _check_idempotency(task)
-        Note right of UC: Search local archive & GitHub titles
+    rect rgb(255, 255, 240)
+        Note over CLI, FS: Sequential Creation & Rendering
+        loop For each task_id in execution_order
+            UC->>UC: _check_idempotency(task)
+            Note right of UC: Search local archive & GitHub titles
 
-        alt Task already has Issue
-            UC->>UC: in_memory_map[task_id] = existing_no
-            Note over CLI, FS: 3a. Physical Fixation (Retry)
-            UC->>FS: move_file(path, "_archive/ID-IssueNo.md")
-        else Task needs creation
-            UC->>IR: render(task, in_memory_map)
-            Note right of IR: 1. Resolve task-IDs to #IssueNo<br/>2. Format JSON Metadata<br/>3. Generate ## Dependencies
-            IR-->>UC: RenderedIssue (title, body, labels)
+            alt Task already has Issue
+                UC->>UC: in_memory_map[task_id] = existing_no
+                Note over CLI, FS: Physical Fixation (Retry)
+                UC->>FS: move_file(path, "_archive/ID-IssueNo.md")
+            else Task needs creation
+                UC->>IR: render(task, in_memory_map)
+                Note right of IR: 1. Resolve task-IDs to #IssueNo<br/>2. Format JSON Metadata<br/>3. Generate ## Dependencies
+                IR-->>UC: RenderedIssue (title, body, labels)
 
-            UC->>GH: create_issue(RenderedIssue)
-            GH-->>UC: IssueNo (e.g., 456)
-            UC->>UC: in_memory_map[task_id] = IssueNo
+                UC->>GH: create_issue(RenderedIssue)
+                GH-->>UC: IssueNo (e.g., 456)
+                UC->>UC: in_memory_map[task_id] = IssueNo
 
-            Note over CLI, FS: 3b. Physical Fixation (Archive)
-            UC->>FS: move_file(path, "_archive/ID-IssueNo.md")
+                Note over CLI, FS: Physical Fixation (Archive)
+                UC->>FS: move_file(path, "_archive/ID-IssueNo.md")
+            end
         end
     end
 
-    Note over CLI, FS: 4. L1 Checklist Sync (Batch)
-    UC->>SY: sync_checklist(l1_id, in_memory_map)
-    SY->>GH: get_issue(l1_id)
-    GH-->>SY: body
-    SY->>SY: replace_ids_with_numbers(body, in_memory_map)
-    SY->>GH: patch_issue(l1_id, body_with_resolved_ids)
-    GH-->>SY: success
+    rect rgb(240, 255, 240)
+        Note over CLI, FS: L1 Checklist Sync (Batch)
+        UC->>SY: sync_checklist(l1_id, in_memory_map)
+        SY->>GH: get_issue(l1_id)
+        GH-->>SY: body
+        SY->>SY: replace_ids_with_numbers(body, in_memory_map)
+        SY->>GH: patch_issue(l1_id, body_with_resolved_ids)
+        GH-->>SY: success
+    end
+
+    rect rgb(240, 240, 255)
+        Note over CLI, FS: Initial Ignition (Batch)
+        UC->>UC: _ignite_independent_tasks(in_memory_map)
+        Note right of UC: Identify issues with empty depends_on
+        loop For each issue_no in independent_issue_nos
+            UC->>GH: add_labels(issue_no, ["gemini"])
+            GH-->>UC: success
+        end
+    end
 
     UC-->>CLI: ActivationResult
 ```
@@ -82,7 +98,12 @@ sequenceDiagram
 
 - **Consistency Model**: `[Eventual Consistency]`
 - **ID Propagation Strategy**: `IssueRenderer` は `in_memory_map` を参照し、依存先タスクの ID を `#IssueNo` に置換する。この際、長い ID から順に置換することで部分一致の誤爆を防ぐ。
+- **Initial Ignition (Post-Creation)**:
+  - **タイミング**: 全てのタスク起票と L1 同期が正常に完了した直後に実行される。
+  - **判定ロジック**: `depends_on` が空（`[]` または `None`）のタスクのみを着火対象とする。
+  - **目的**: AI エージェント（Gemini）が、依存関係の構築が不十分な状態で作業を開始することを防ぐ（Race Condition の防止）。
 - **Failure Scenarios**:
   - **GitHub API Error**: 起票に失敗した場合、そのタスクをスキップし、ステータスを `PARTIAL_SUCCESS` にする。メモリ上のマップは維持されるため、後続の依存がないタスクは処理を継続可能。
   - **L1 Sync Failure**: L1 の更新に失敗しても、タスク自体の起票とアーカイブは完了しているため、システム全体の整合性は保たれる。
+  - **Initial Ignition Failure**: 着火（ラベル付与）に失敗した場合でも、リレーエンジンの次回実行タイミング（例: Issue Close イベント、`sync-relay --execute`、`issue-kit process` の再実行）や、手動でのラベル付与などの回復手段により、再着火が期待できる。ただし、これらのトリガが発火しない場合は、着火が行われない可能性がある。
   - **Archive Failure**: ファイル移動に失敗した場合、次回実行時に「Idempotency Check」によって既に Issue が存在することを検知し、アーカイブ処理のみを再試行する。
