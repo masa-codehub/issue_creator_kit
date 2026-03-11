@@ -19,6 +19,7 @@ class Metadata(BaseModel):
 
     # IDs must contain only lowercase letters, numbers, and hyphens.
     id: str = Field(..., pattern=r"^[a-z0-9-]+$")
+    title: str | None = None
     status: str
     date: str | None = None
 
