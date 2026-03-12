@@ -9,22 +9,49 @@ permissions:
   issues: write
   pull-requests: write
 
+# 同じ Issue でラベルが付け直された場合、古いジョブをキャンセルして最新を優先する
+concurrency:
+  group: gemini-handler-${{ github.event.issue.number }}
+  cancel-in-progress: true
+
 jobs:
   gemini-implementation:
-    # 新しく付与されたラベル (github.event.label.name) が TRIGGER_LABEL (デフォルト: 'gemini') の場合のみ実行
-    # startsWith を使用し、'gemini' だけでなく 'gemini:arch' などのプレフィックス付きにも対応する
-    if: startsWith(github.event.label.name, vars.TRIGGER_LABEL || 'gemini')
+    # 1. vars.TRIGGER_LABEL が設定されていればそれを使用、なければ 'gemini' を使用
+    # 2. その値と完全一致するか、またはその値 + ':' で始まる場合のみ実行（意図しない前方一致を防止）
+    if: |
+      (github.event.label.name == (vars.TRIGGER_LABEL || 'gemini')) ||
+      startsWith(github.event.label.name, format('{0}:', vars.TRIGGER_LABEL || 'gemini'))
     runs-on: [self-hosted, gemini]
     env:
       GITHUB_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
 
     steps:
+      - name: Check GH_PAT for submodules
+        run: |
+          if [ -z "${{ secrets.GH_PAT }}" ]; then
+            echo "::warning title=Missing GH_PAT::GH_PAT is not set. Private submodule checkout might fail. If it fails with 'Repository not found', please add GH_PAT to GitHub Secrets with 'repo' scope."
+          fi
+
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           submodules: recursive
-          token: ${{ env.GITHUB_TOKEN }}
+          token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+
+      - name: Determine Agent Role
+        run: |
+          LABELS="${{ join(github.event.issue.labels.*.name, ',') }}"
+          # ick をツールとして動的に実行してロールを決定
+          ROLE=$(uv tool run --from git+https://github.com/masa-codehub/issue_creator_kit.git ick dispatch --labels "$LABELS")
+          
+          if [ -z "$ROLE" ] || [ "$ROLE" = "UNKNOWN" ]; then
+            echo "::error::Failed to determine agent role from labels: $LABELS"
+            exit 1
+          fi
+          
+          echo "AGENT_ROLE=$ROLE" >> $GITHUB_ENV
+          echo "Selected Role: $ROLE"
 
       - name: Refresh Environment
         run: |

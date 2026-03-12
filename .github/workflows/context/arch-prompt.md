@@ -1,6 +1,6 @@
 # Architecture Drafting
 
-You are assigned to the `SYSTEM_ARCHITECT` role.
+You are assigned to the `TECHNICAL_DESIGNER` role.
 The user has requested an architecture update via GitHub Issue #${ISSUE_NUMBER}.
 
 ## Objective

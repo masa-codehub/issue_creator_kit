@@ -159,6 +159,9 @@ class TaskActivationUseCase:
             except Exception as e:
                 logger.warning(f"L1 Sync failed: {e}")
 
+        # Step 6: Initial Ignition (ADR-015)
+        self._ignite_independent_tasks(tasks, in_memory_map)
+
         status = ActivationStatus.SUCCESS
         if failed_tasks:
             status = (
@@ -168,6 +171,34 @@ class TaskActivationUseCase:
             )
 
         return ActivationResult(successful_issues, failed_tasks, status)
+
+    def _ignite_independent_tasks(
+        self, tasks: list[Task], in_memory_map: dict[str, int]
+    ) -> None:
+        """
+        Add 'gemini' label to independent tasks (best-effort).
+        """
+        # Filter independent tasks that have been successfully mapped to an issue number
+        ignitable_tasks = [
+            (task, in_memory_map[task.id])
+            for task in tasks
+            if not task.depends_on and in_memory_map.get(task.id) is not None
+        ]
+
+        if not ignitable_tasks:
+            return
+
+        logger.info(f"Starting initial ignition for {len(ignitable_tasks)} tasks")
+
+        for task, issue_no in ignitable_tasks:
+            try:
+                self.github.add_labels(issue_no, ["gemini"])
+                logger.info(f"Ignited task {task.id} (Issue #{issue_no})")
+            except GitHubAPIError as e:
+                # Best-effort: log and continue
+                logger.warning(
+                    f"Failed to ignite task {task.id} (Issue #{issue_no}): {e}"
+                )
 
     def _check_idempotency(self, task: Task, root_path: Path) -> int | None:
         # Check archive first
@@ -198,15 +229,17 @@ class TaskActivationUseCase:
             raise DomainError(f"Task {task.id} has no path")
 
         dst_path = root_path / "tasks" / "_archive" / f"{task.id}-{issue_no}.md"
-        if dst_path.exists():
-            logger.info(f"Task {task.id} already archived at {dst_path}")
-            return
 
         try:
-            self.fs.move_file(task.path, dst_path)
+            # Use overwrite=True to ensure the source file is moved even if the destination exists.
+            # This prevents files from remaining in reqs/tasks/ during retries or syncs.
+            self.fs.move_file(task.path, dst_path, overwrite=True)
             logger.info(f"Task {task.id} archived to {dst_path}")
-        except FileExistsError:
-            logger.warning(f"Archive destination already exists: {dst_path}")
+        except FileNotFoundError:
+            # Source file might have been moved already by another process or manual action
+            logger.info(
+                f"Task {task.id} source file not found, likely already archived."
+            )
         except Exception as e:
             logger.error(f"Archive failed for {task.id}: {e}")
             raise
