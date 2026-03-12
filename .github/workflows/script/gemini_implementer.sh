@@ -7,22 +7,27 @@ LABELS="${ISSUE_LABELS}"
 echo "Processing Issue #${ISSUE_NUMBER}: ${ISSUE_TITLE}"
 echo "Debug: LABELS='${LABELS}'"
 
-# 仮想環境のアクティベート (ick コマンドを使うために先に実行)
+# 仮想環境のアクティベート
 if [ -f ".venv/bin/activate" ]; then
   source ".venv/bin/activate"
 fi
 
-# ick dispatch でロール（エージェント名）とコンテキストファイル（プロンプト）を決定
-# 設定ファイルは .github/issue-kit-config.json をデフォルトで使用
-ROLE=$(ick dispatch --labels "$LABELS" || echo "UNKNOWN")
-CONTEXT_FILE=$(ick dispatch --labels "$LABELS" --get-context || echo "UNKNOWN")
-
-if [ "$ROLE" = "UNKNOWN" ] || [ "$CONTEXT_FILE" = "UNKNOWN" ]; then
-  echo "Error: No matching gemini role or context file found for labels: $LABELS"
+# ワークフローで確定した AGENT_ROLE を使用
+if [ -z "$AGENT_ROLE" ]; then
+  echo "Error: AGENT_ROLE is not set. It should be determined in the workflow step."
   exit 1
 fi
 
-echo "Selected Agent Role: $ROLE"
+# CONTEXT_FILE の取得 (ick dispatch を再度実行するが、ツールとして実行)
+# ※将来的にワークフローからパスを渡せるようにするとなお良い
+CONTEXT_FILE=$(uv tool run --from git+https://github.com/masa-codehub/issue_creator_kit.git ick dispatch --labels "$LABELS" --get-context || echo "UNKNOWN")
+
+if [ "$CONTEXT_FILE" = "UNKNOWN" ]; then
+  echo "Error: Failed to determine context file for role: $AGENT_ROLE"
+  exit 1
+fi
+
+echo "Selected Agent Role: $AGENT_ROLE"
 echo "Selected Context File: $CONTEXT_FILE"
 
 
@@ -48,7 +53,7 @@ echo "--- Gemini Execution Start ---"
 # gemini コマンドの存在確認
 if ! command -v gemini >/dev/null 2>&1; then
   echo "Error: 'gemini' command not found."
-  echo "Please install or activate the environment that provides the 'gemini' CLI (e.g., create and activate .venv with gemini installed)."
+  echo "Please install or activate the environment that provides the 'gemini' CLI."
   exit 1
 fi
 
@@ -56,4 +61,3 @@ fi
 cat prompt.md | gemini --yolo -m "gemini-3-flash-preview"
 
 echo "--- Gemini Execution End ---"
-

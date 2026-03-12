@@ -22,17 +22,23 @@ repos:
         types: [markdown]
         exclude: ^CHANGELOG\.md$
 
-  # 4. Dogfooding: Distributed Hooks (this repo)
-  # Validate task structure using the remote repository definition
+  # 4. Dogfooding: Remote Reference (Production & Distribution)
   - repo: https://github.com/masa-codehub/issue_creator_kit
-    rev: main
+    rev: v0.5.2
     hooks:
       - id: ick-check
+        name: Issue Kit Check (Remote)
         files: ^reqs/
 
-  # 5. Local Hooks (Development & Testing)
+  # 5. Local Hooks (Development & Speed)
   - repo: local
     hooks:
+      - id: ick-check-local
+        name: Issue Kit Check (Local)
+        entry: uv run python -m issue_creator_kit.cli check --root reqs
+        language: system
+        pass_filenames: false
+        files: ^reqs/
       - id: mypy
         name: mypy
         entry: uv run mypy
