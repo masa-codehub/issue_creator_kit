@@ -24,8 +24,8 @@ ADR_ID_PATTERN = re.compile(r"^adr-\d{3}(?:-[a-z0-9-]+)?$")
 
 # --- Constants ---
 
-VALID_ROLES = {"arch", "spec", "tdd", "audit", "plan"}
-VALID_PHASES = {"arch", "spec", "tdd", "audit", "plan"}
+VALID_ROLES = {"arch", "spec", "tdd", "audit"}
+VALID_PHASES = {"arch", "spec", "tdd", "audit", "plan", "impl"}
 LEGACY_PHASES = {
     "domain",
     "infrastructure",
