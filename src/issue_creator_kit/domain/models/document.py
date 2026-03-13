@@ -18,14 +18,14 @@ from pydantic import (
 TASK_ID_PATTERN = re.compile(r"^task-\d{3}-\d{2,}$")
 LEGACY_TASK_ID_PATTERN = re.compile(r"^\d{3}-T\d+(-[A-Z0-9-]+)?$")
 
-# ADRID: ^adr-\d{3}(?:-[a-z0-9-]+)?$ (Allows both full and minimal forms for flexibility)
-ADR_ID_PATTERN = re.compile(r"^adr-\d{3}(?:-[a-z0-9-]+)?$")
+# ADRID: ^(adr|design)-\d{3}(?:-[a-z0-9-]+)?$ (Allows both full and minimal forms for flexibility)
+ADR_ID_PATTERN = re.compile(r"^(adr|design)-\d{3}(?:-[a-z0-9-]+)?$")
 
 
 # --- Constants ---
 
-VALID_ROLES = {"arch", "spec", "tdd", "audit", "plan"}
-VALID_PHASES = {"arch", "spec", "tdd", "audit", "plan"}
+VALID_ROLES = {"arch", "spec", "tdd", "audit"}
+VALID_PHASES = {"arch", "spec", "tdd", "audit", "plan", "impl"}
 LEGACY_PHASES = {
     "domain",
     "infrastructure",
@@ -49,7 +49,7 @@ def validate_adr_id(v: str) -> str:
     """Validate ADR ID format."""
     if not ADR_ID_PATTERN.match(v):
         raise ValueError(
-            f"Invalid ADR ID format: {v}. Expected adr-XXX or adr-XXX-slug."
+            f"Invalid ADR ID format: {v}. Expected adr-XXX or design-XXX (optionally with slug)."
         )
     return v
 
@@ -120,13 +120,20 @@ class ADR(BaseModel):
     """ADR (Architecture Decision Record) metadata model."""
 
     id: ADRID
-    type: Literal["adr"]
+    type: Literal["adr", "design-doc"]
     title: str
     status: Literal["Draft", "Approved", "Postponed", "Superseded", "Implemented"]
     date: DateStr = None
     depends_on: list[TaskID | ADRID | LegacyTaskID] = Field(default_factory=list)
+    labels: list[str] = Field(default_factory=list)
     path: Path | None = Field(default=None, exclude=True)
     content: str = ""
+
+    @property
+    def adr_number(self) -> int | None:
+        """Extract the 3-digit number from the ID (e.g., adr-010 -> 10, design-001 -> 1)."""
+        match = re.search(r"(?:adr|design)-(\d{3})", self.id)
+        return int(match.group(1)) if match else None
 
 
 class Task(BaseModel):
@@ -155,10 +162,10 @@ class Task(BaseModel):
         return self
 
     @property
-    def adr_number(self) -> str | None:
-        """Extract the 3-digit ADR number from the parent ID (e.g., adr-010 -> 010)."""
-        match = re.search(r"adr-(\d{3})", self.parent)
-        return match.group(1) if match else None
+    def adr_number(self) -> int | None:
+        """Extract the 3-digit ADR/DesignDoc number from the parent ID (e.g., adr-010 -> 10, design-001 -> 1)."""
+        match = re.search(r"(?:adr|design)-(\d{3})", self.parent)
+        return int(match.group(1)) if match else None
 
 
 # --- Union & Discrimination ---
