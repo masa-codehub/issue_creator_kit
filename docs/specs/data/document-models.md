@@ -15,7 +15,7 @@
 
 | Term              | Base Type | Regex / Constraints                                                      | Description                             |
 | :---------------- | :-------- | :----------------------------------------------------------------------- | :-------------------------------------- |
-| **ADRID**         | `str`     | `^adr-\d{3}(?:-[a-z0-9-]+)?$`                                            | ADR のユニーク識別子。                  |
+| **ADRID**         | `str`     | `^(adr&#124;design)-\d{3}(?:-[a-z0-9-]+)?$`                              | ADR または DesignDoc のユニーク識別子。 |
 | **TaskID**        | `str`     | `^task-\d{3}-\d{2,}$`                                                    | タスクのユニーク識別子。                |
 | **LegacyTaskID**  | `str`     | `^\d{3}-T\d+(-[A-Z0-9-]+)?$`                                             | 読み取り専用でサポートされる旧形式 ID。 |
 | **Status (ADR)**  | `str`     | `Literal['Draft', 'Approved', 'Postponed', 'Superseded', 'Implemented']` | ADR のライフサイクル状態。              |
@@ -30,14 +30,15 @@
 
 #### ADR Model
 
-| Field        | Type                    | Required | Description                          |
-| :----------- | :---------------------- | :------- | :----------------------------------- |
-| `id`         | `ADRID`                 | Yes      | ADR 識別子。                         |
-| `type`       | `Literal["adr"]`        | Yes      | **必須**（デフォルト値禁止）。       |
-| `title`      | `str`                   | Yes      | ADR のタイトル。                     |
-| `status`     | `Status (ADR)`          | Yes      | 現在の状態。                         |
-| `date`       | `str`                   | No       | ISO 8601 形式の作成/更新日。         |
-| `depends_on` | `list[TaskID \| ADRID]` | Yes      | 依存先リスト（デフォルトは空配列）。 |
+| Field        | Type                                    | Required | Description                          |
+| :----------- | :-------------------------------------- | :------- | :----------------------------------- |
+| `id`         | `ADRID`                                 | Yes      | ADR / DesignDoc 識別子。             |
+| `type`       | `Literal["adr", "design-doc"]`          | Yes      | **必須**（デフォルト値禁止）。       |
+| `title`      | `str`                                   | Yes      | ドキュメントのタイトル。             |
+| `status`     | `Status (ADR)`                          | Yes      | 現在の状態。                         |
+| `date`       | `str`                                   | No       | ISO 8601 形式の作成/更新日。         |
+| `depends_on` | `list[TaskID \| ADRID \| LegacyTaskID]` | Yes      | 依存先リスト（デフォルトは空配列）。 |
+| `labels`     | `list[str]`                             | No       | GitHub ラベルリスト。                |
 
 #### Task Model
 
@@ -47,31 +48,44 @@
 | `type`       | `Literal["task", "integration"]` | Yes      | **必須**（デフォルト値禁止）。                         |
 | `title`      | `str`                            | Yes      | タスクのタイトル。                                     |
 | `status`     | `Status (Task)`                  | Yes      | 現在の状態。                                           |
-| `parent`     | `ADRID`                          | Yes      | 親となる ADR の ID。                                   |
+| `parent`     | `ADRID`                          | Yes      | 親となる ADR / DesignDoc の ID。                       |
 | `role`       | `str`                            | No       | 担当ロール（`arch`, `spec`, `tdd`）。                  |
 | `phase`      | `str`                            | No       | 工程フェーズ。                                         |
 | `depends_on` | `list[TaskID]`                   | Yes      | 依存先タスク ID リスト。                               |
 | `issue_id`   | `int`                            | No       | GitHub Issue 番号（`status` が `Issued` 以降で必須）。 |
 | `labels`     | `list[str]`                      | No       | GitHub ラベルリスト。                                  |
 
+#### Derived Properties (Read-only)
+
+| Property     | Return Type   | Logic / Description                                                                                                                                                        |
+| :----------- | :------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `adr_number` | `int \| None` | parent（Task）または id（ADR）から 3 桁の数値を抽出 し、整数として返す。 `adr-016` -> `16`, `design-001` -> `1`。 パースに失敗した場合は `None` を返し、例外を送出しない。 |
+
 ### 2.3. Example Implementation (Python)
 
 ```python
+import re
 from typing import Annotated, Literal, Union, Optional
 from pydantic import BaseModel, Field, TypeAdapter
 
 # Value Objects with strict validation (ADR-013 Compliance)
-ADRID = Annotated[str, Field(pattern=r"^adr-\d{3}(?:-[a-z0-9-]+)?$")]
+ADRID = Annotated[str, Field(pattern=r"^(adr|design)-\d{3}(?:-[a-z0-9-]+)?$")]
 TaskID = Annotated[str, Field(pattern=r"^task-\d{3}-\d{2,}$")]
 LegacyTaskID = Annotated[str, Field(pattern=r"^\d{3}-T\d+(-[A-Z0-9-]+)?$")]
 
 class ADR(BaseModel):
     id: ADRID
-    type: Literal["adr"]  # No default value (Strict)
+    type: Literal["adr", "design-doc"]  # No default value (Strict)
     title: str
     status: Literal["Draft", "Approved", "Postponed", "Superseded", "Implemented"]
     date: Optional[str] = None
     depends_on: list[Union[TaskID, ADRID, LegacyTaskID]] = Field(default_factory=list)
+    labels: list[str] = Field(default_factory=list)
+
+    @property
+    def adr_number(self) -> Optional[int]:
+        match = re.search(r"(?:adr|design)-(\d{3})", self.id)
+        return int(match.group(1)) if match else None
 
 class Task(BaseModel):
     id: TaskID
@@ -84,6 +98,11 @@ class Task(BaseModel):
     depends_on: list[Union[TaskID, LegacyTaskID]] = Field(default_factory=list)
     issue_id: Optional[int] = Field(None, gt=0)
     labels: list[str] = Field(default_factory=list)
+
+    @property
+    def adr_number(self) -> Optional[int]:
+        match = re.search(r"(?:adr|design)-(\d{3})", self.parent)
+        return int(match.group(1)) if match else None
 
 # Discriminated Union for strict validation
 DocumentType = Annotated[Union[Task, ADR], Field(discriminator="type")]

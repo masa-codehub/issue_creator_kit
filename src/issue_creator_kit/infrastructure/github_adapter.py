@@ -300,6 +300,30 @@ class GitHubAdapter(IGitHubAdapter):
         self._execute_with_retry(do_add_labels)
 
     @require_repo
+    def update_issue_labels(self, issue_number: int, labels: list[str]) -> None:
+        """
+        Replace all existing labels with a new list.
+
+        This is a destructive operation: the label set on the issue will be
+        completely replaced with the given ``labels``. Any existing labels that
+        are not included in ``labels`` will be removed.
+
+        Therefore, you must include *all* labels that you want to remain on the
+        issue in the ``labels`` argument, not only the labels you want to add.
+
+        Uses a PUT request to atomically replace labels.
+        """
+        api_url = (
+            f"https://api.github.com/repos/{self.repo}/issues/{issue_number}/labels"
+        )
+        data = {"labels": labels}
+
+        def do_put_labels() -> requests.Response:
+            return requests.put(api_url, headers=self._get_headers(), json=data)
+
+        self._execute_with_retry(do_put_labels)
+
+    @require_repo
     def add_comment(self, issue_number: int, body: str) -> None:
         """
         Add a comment to an issue or pull request.

@@ -52,6 +52,27 @@
 
 - **Contract**: 指定された `task_id` を持つ Issue の状態を確認する。
 
+### 3.5. `add_labels(issue_number: int, labels: list[str]) -> None`
+
+- **Signature**: `add_labels(issue_number: int, labels: list[str]) -> None`
+- **Contract**: 指定された Issue または Pull Request に `labels` リストを追加する。既存のラベルは保持される。
+- **Method**: `POST /repos/{owner}/{repo}/issues/{issue_number}/labels`
+- **Payload**: `{"labels": labels}`
+- **Note**:
+  - 既存のラベルを維持しつつ、新しいラベルのみを追加したい場合に使用する。
+
+### 3.6. `update_issue_labels(issue_number: int, labels: list[str]) -> None`
+
+- **Signature**: `update_issue_labels(issue_number: int, labels: list[str]) -> None`
+- **Contract**: 指定された Issue または Pull Request のラベルを、提供された `labels` リストで完全に置き換える。
+- **Method**: `PUT /repos/{owner}/{repo}/issues/{issue_number}/labels`
+- **Payload**: `{"labels": labels}`
+- **Constraint**: このメソッドは非追加的な（既存ラベルの削除を伴う）操作を行うため、呼び出し側は保持すべき全てのラベルを明示的に引数に含める必要がある。
+- **Note**:
+  - 既存のラベルセットを完全に上書きしたい場合に使用する。
+  - フェーズ遷移など、特定のラベルを正確に入れ替えたい場合に適している。
+  - **重要**: 空の `labels` リストを渡した場合、当該 Issue から全てのラベルが削除される。
+
 ## 4. Logic & Algorithms
 
 ### 4.1. Deterministic Selection
