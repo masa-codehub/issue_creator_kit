@@ -65,9 +65,11 @@ class L1AutomationUseCase:
                 # No need to search further.
                 break
 
-            # Search by label "adr:{number}" and "L1"
-            labels = self.get_labels(adr.id)
-            existing_issue = self.github.search_issues_by_label(labels)
+            # Search by identity labels ("L1" and "{prefix}:{number}")
+            # We separate identity from initial labels (arch/plan) to ensure
+            # idempotency even if existing issues lack those labels.
+            identity_labels = self.get_identity_labels(adr.id)
+            existing_issue = self.github.search_issues_by_label(identity_labels)
 
             if existing_issue is None:
                 unprocessed_adrs.append(adr)
@@ -96,7 +98,7 @@ class L1AutomationUseCase:
         # Create Issue
         metadata = self._create_metadata(target_adr)
         body = self._prepare_issue_body(target_adr, metadata)
-        labels = self.get_labels(target_adr.id)
+        labels = self.get_initial_labels(target_adr.id)
 
         # Ensure labels exist before creating the issue
         self.github.ensure_labels_exist(labels)
@@ -117,19 +119,34 @@ class L1AutomationUseCase:
         ]
 
     @staticmethod
-    def get_labels(adr_id: str) -> list[str]:
+    def get_identity_labels(adr_id: str) -> list[str]:
         """
-        Generate labels for the issue.
-        Format: ['adr:{number}', 'L1']
-        Example: 'adr-009' -> ['adr:009', 'L1']
+        Generate identity labels for searching existing issues.
+        Format: ['L1', 'adr:NNN' or 'design:NNN']
         """
-        # Extract number from 'adr-XXX' or 'adr-XXX-slug'
-        match = re.search(r"adr-(\d{3})", adr_id)
+        match = re.search(r"^(adr|design)-(\d{3})", adr_id)
         if match:
-            number = match.group(1)
-            return [f"adr:{number}", "L1"]
-        # Fallback if ID doesn't match standard pattern (though Scanner validates it)
-        return [f"adr:{adr_id}", "L1"]
+            prefix = match.group(1)
+            number = match.group(2)
+            return sorted([f"{prefix}:{number}", "L1"])
+
+        # Fallback if ID doesn't match standard pattern
+        prefix = "design" if adr_id.startswith("design") else "adr"
+        return sorted([f"{prefix}:{adr_id}", "L1"])
+
+    @staticmethod
+    def get_initial_labels(adr_id: str) -> list[str]:
+        """
+        Generate labels to be applied when creating a new issue.
+        Includes identity labels plus initial phase ('arch' or 'spec') and 'plan'.
+        """
+        identity = L1AutomationUseCase.get_identity_labels(adr_id)
+
+        # Determine phase
+        # design-* -> spec, adr-* -> arch
+        phase = "spec" if adr_id.startswith("design") else "arch"
+
+        return sorted(identity + [phase, "plan"])
 
     @staticmethod
     def _create_metadata(adr: ADR) -> dict[str, Any]:

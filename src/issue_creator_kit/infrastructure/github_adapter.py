@@ -50,12 +50,30 @@ class GitHubAdapter(IGitHubAdapter):
             "color": "d4c5f9",
             "description": "ADRに対応する最上位管理Issueであることを示す階層ラベル。",
         },
+        "arch": {
+            "color": "0e8a16",
+            "description": "Architecture design phase",
+        },
+        "spec": {
+            "color": "fbca04",
+            "description": "Specification design phase",
+        },
+        "tdd": {
+            "color": "1d76db",
+            "description": "TDD implementation phase",
+        },
+        "plan": {
+            "color": "d4c5f9",
+            "description": "Planning phase",
+        },
+        "audit": {
+            "color": "d93f0b",
+            "description": "Audit/Review phase",
+        },
     }
-    ADR_LABEL_PATTERN = re.compile(r"^adr:(\d{3})$")
+    ADR_LABEL_PATTERN = re.compile(r"^(adr|design):(\d{3})$")
     ADR_LABEL_COLOR = "0052cc"
-    ADR_LABEL_DESCRIPTION = (
-        "ADR IDを一意に識別する。`{NNN}` は3桁ゼロ埋めの数値（例: `adr:009`）。"
-    )
+    ADR_LABEL_DESCRIPTION = "ADR/DesignDoc IDを一意に識別する。`{NNN}` は3桁ゼロ埋めの数値（例: `adr:009`, `design:016`）。"
 
     def __init__(self, token: str | None = None, repo: str | None = None):
         self.token = (
@@ -298,6 +316,30 @@ class GitHubAdapter(IGitHubAdapter):
             return requests.post(api_url, headers=self._get_headers(), json=data)
 
         self._execute_with_retry(do_add_labels)
+
+    @require_repo
+    def update_issue_labels(self, issue_number: int, labels: list[str]) -> None:
+        """
+        Replace all existing labels with a new list.
+
+        This is a destructive operation: the label set on the issue will be
+        completely replaced with the given ``labels``. Any existing labels that
+        are not included in ``labels`` will be removed.
+
+        Therefore, you must include *all* labels that you want to remain on the
+        issue in the ``labels`` argument, not only the labels you want to add.
+
+        Uses a PUT request to atomically replace labels.
+        """
+        api_url = (
+            f"https://api.github.com/repos/{self.repo}/issues/{issue_number}/labels"
+        )
+        data = {"labels": labels}
+
+        def do_put_labels() -> requests.Response:
+            return requests.put(api_url, headers=self._get_headers(), json=data)
+
+        self._execute_with_retry(do_put_labels)
 
     @require_repo
     def add_comment(self, issue_number: int, body: str) -> None:
@@ -588,12 +630,15 @@ class GitHubAdapter(IGitHubAdapter):
         if label_name in self.LABEL_ATTRIBUTES:
             return self.LABEL_ATTRIBUTES[label_name]
 
-        # 2. Pattern-based mapping (adr:{NNN})
+        # 2. Pattern-based mapping (adr/design:{NNN})
         match = self.ADR_LABEL_PATTERN.match(label_name)
         if match:
+            prefix = match.group(1)
+            number = match.group(2)
+            label_type = "ADR" if prefix == "adr" else "DesignDoc"
             return {
                 "color": self.ADR_LABEL_COLOR,
-                "description": f"ADR ID {match.group(1)} を一意に識別するためのラベル。",
+                "description": f"{label_type} ID {number} を一意に識別するためのラベル。",
             }
 
         return None
