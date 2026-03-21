@@ -1,5 +1,8 @@
 import re
 
+# Phase sequence for ADR/DesignDoc lifecycle
+PHASE_ORDER = ["arch", "spec", "tdd"]
+
 # Regex to parse dependency items in the format: - [ ] #123 (id)
 # Group 1: Issue Number, Group 2: Task/ADR ID
 RE_DEPENDENCY_ITEM = re.compile(r"-\s*\[[ x]\]\s*#(\d+)\s*\(([\w-]+)\)")
