@@ -5,6 +5,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from issue_creator_kit.domain.constants import PHASE_ORDER
 from issue_creator_kit.domain.exceptions import DomainError
 from issue_creator_kit.domain.interfaces import IGitHubAdapter
 from issue_creator_kit.domain.models.document import ADR
@@ -65,9 +66,11 @@ class L1AutomationUseCase:
                 # No need to search further.
                 break
 
-            # Search by label "adr:{number}" and "L1"
-            labels = self.get_labels(adr.id)
-            existing_issue = self.github.search_issues_by_label(labels)
+            # Search by identity labels ("L1" and "{prefix}:{number}")
+            # We separate identity from initial labels (arch/plan) to ensure
+            # idempotency even if existing issues lack those labels.
+            identity_labels = self.get_identity_labels(adr.id)
+            existing_issue = self.github.search_issues_by_label(identity_labels)
 
             if existing_issue is None:
                 unprocessed_adrs.append(adr)
@@ -117,19 +120,70 @@ class L1AutomationUseCase:
         ]
 
     @staticmethod
+    def sort_labels(labels: list[str]) -> list[str]:
+        """
+        Sort labels according to L1 Initial Labeling Strategy Specification.
+        Order: [Phase, plan, L1, ID, Others...]
+        """
+        phase_labels = set(PHASE_ORDER)
+        identity_pattern = re.compile(r"^(adr|design):\d{3}$")
+
+        # Deduplicate
+        unique_labels = list(set(labels))
+
+        # 1. Identify categories
+        found_phases = [label for label in unique_labels if label in phase_labels]
+        found_plan = [label for label in unique_labels if label == "plan"]
+        found_l1 = [label for label in unique_labels if label == "L1"]
+        found_ids = [label for label in unique_labels if identity_pattern.match(label)]
+
+        # 2. Others (sorted alphabetically)
+        categorized = set(found_phases + found_plan + found_l1 + found_ids)
+        others = sorted([label for label in unique_labels if label not in categorized])
+
+        # 3. Construct final list
+        # Standard: Exactly one phase, but if multiple exist (error state), we sort them.
+        return sorted(found_phases) + found_plan + found_l1 + sorted(found_ids) + others
+
+    @staticmethod
+    def get_identity_labels(adr_id: str) -> list[str]:
+        """
+        Generate identity labels for searching existing issues.
+        Format: ['L1', 'adr:NNN' or 'design:NNN']
+        """
+        match = re.search(r"^(adr|design)-(\d{3})", adr_id)
+        if match:
+            prefix = match.group(1)
+            number = match.group(2)
+            return L1AutomationUseCase.sort_labels([f"{prefix}:{number}", "L1"])
+
+        # Error if ID doesn't match standard pattern
+        raise DomainError(
+            f"Invalid ADR/DesignDoc ID format: {adr_id}. "
+            "Must be 'adr-XXX' or 'design-XXX'."
+        )
+
+    @staticmethod
     def get_labels(adr_id: str) -> list[str]:
         """
-        Generate labels for the issue.
-        Format: ['adr:{number}', 'L1']
-        Example: 'adr-009' -> ['adr:009', 'L1']
+        Generate labels to be applied when creating a new issue.
+        Includes phase ('arch' or 'spec'), 'plan', 'L1', and identity label.
+        Order: [Phase, plan, L1, ID]
         """
-        # Extract number from 'adr-XXX' or 'adr-XXX-slug'
-        match = re.search(r"adr-(\d{3})", adr_id)
+        match = re.search(r"^(adr|design)-(\d{3})", adr_id)
         if match:
-            number = match.group(1)
-            return [f"adr:{number}", "L1"]
-        # Fallback if ID doesn't match standard pattern (though Scanner validates it)
-        return [f"adr:{adr_id}", "L1"]
+            prefix = match.group(1)
+            number = match.group(2)
+            phase = "spec" if prefix == "design" else "arch"
+            return L1AutomationUseCase.sort_labels(
+                [phase, "plan", "L1", f"{prefix}:{number}"]
+            )
+
+        # Error if ID doesn't match standard pattern
+        raise DomainError(
+            f"Invalid ADR/DesignDoc ID format: {adr_id}. "
+            "Must be 'adr-XXX' or 'design-XXX'."
+        )
 
     @staticmethod
     def _create_metadata(adr: ADR) -> dict[str, Any]:
