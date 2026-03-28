@@ -23,12 +23,13 @@ repos:
         exclude: ^CHANGELOG\.md$
 
   # 4. Dogfooding: Remote Reference (Production & Distribution)
-  - repo: https://github.com/masa-codehub/issue_creator_kit
-    rev: v0.5.2
-    hooks:
-      - id: ick-check
-        name: Issue Kit Check (Remote)
-        files: ^reqs/
+  # NOTE: Temporarily disabled until ADR-015/016 changes (impl phase) are merged to main.
+  # - repo: https://github.com/masa-codehub/issue_creator_kit
+  #   rev: main
+  #   hooks:
+  #     - id: ick-check
+  #       name: Issue Kit Check (Remote)
+  #       files: ^reqs/
 
   # 5. Local Hooks (Development & Speed)
   - repo: local
