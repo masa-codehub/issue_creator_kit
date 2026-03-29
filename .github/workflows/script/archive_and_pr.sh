@@ -23,6 +23,21 @@ BASE_BRANCH="${4:-main}"
 
 echo "=== Archiving and Pull Request Creation ==="
 
+# 0. 物理的なアーカイブ移動処理
+# status: Issued になっているタスクファイルを _archive 配下へ移動する
+echo "Scanning for issued tasks to archive..."
+find reqs/tasks -maxdepth 2 -name "*.md" -not -path "*/_archive/*" | while read -r file; do
+    if grep -q "status: Issued" "$file"; then
+        # 親ディレクトリ名（adr-NNN など）を取得
+        PARENT_DIR=$(basename "$(dirname "$file")")
+        ARCHIVE_DIR="reqs/tasks/_archive/$PARENT_DIR"
+        
+        echo "Archiving: $file -> $ARCHIVE_DIR/"
+        mkdir -p "$ARCHIVE_DIR"
+        mv "$file" "$ARCHIVE_DIR/"
+    fi
+done
+
 # 1. 変更の有無を確認
 # reqs/ ディレクトリ内の変更をすべてステージングし、差分がない場合は終了
 git add -A reqs/

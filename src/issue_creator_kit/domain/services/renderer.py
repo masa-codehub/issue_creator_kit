@@ -183,9 +183,6 @@ class IssueRenderer:
         Synthesize GitHub labels based on metadata and manual labels.
         Excludes 'gemini' and applies categorical sorting.
         """
-        if isinstance(doc, ADR):
-            return ["adr"]
-
         excluded = {"gemini"}
         seen: set[str] = set()
         final_labels: list[str] = []
@@ -197,21 +194,27 @@ class IssueRenderer:
                     final_labels.append(label)
                     seen.add(label)
 
-        # 1. System Labels (type first, then adr:NNN)
+        # 1. System Labels (type first, then adr:NNN / design:NNN)
         system: list[str] = [doc.type]
-        if doc.adr_number:
-            system.append(f"adr:{doc.adr_number}")
+        if doc.adr_number is not None:
+            # source_id determines label prefix (adr: or design:)
+            source_id = doc.parent if isinstance(doc, Task) else doc.id
+            prefix = "design" if source_id.startswith("design-") else "adr"
+            system.append(f"{prefix}:{doc.adr_number:03d}")
         add_labels(system, sort=False)
 
         # 2. Attribute Labels (role, phase) - sorted A-Z
         attributes = []
-        if doc.role:
-            attributes.append(doc.role)
-        if doc.phase:
-            attributes.append(doc.phase)
+        role = getattr(doc, "role", None)
+        if role:
+            attributes.append(role)
+        phase = getattr(doc, "phase", None)
+        if phase:
+            attributes.append(phase)
         add_labels(attributes, sort=True)
 
         # 3. Manual Labels - sorted A-Z
-        add_labels(doc.labels, sort=True)
+        manual_labels = getattr(doc, "labels", [])
+        add_labels(manual_labels, sort=True)
 
         return final_labels
