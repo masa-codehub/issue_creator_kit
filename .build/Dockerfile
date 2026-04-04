@@ -23,10 +23,22 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     procps \
     sudo \
     tar \
+    unzip \
     zlib1g-dev \
+    openjdk-17-jre-headless \
     && rm -rf /var/lib/apt/lists/*
 
-# 3. GitHub CLI のインストール (wgetを使わずcurlで実行)
+# 3. OPA (Open Policy Agent) のインストール
+RUN curl -L -o /usr/local/bin/opa https://openpolicyagent.org/downloads/latest/opa_linux_$(dpkg --print-architecture)_static \
+    && chmod 755 /usr/local/bin/opa
+
+# 4. Structurizr CLI のインストール
+RUN curl -L -o structurizr-cli.zip https://github.com/structurizr/cli/releases/download/v2024.03.03/structurizr-cli.zip \
+    && unzip structurizr-cli.zip -d /usr/local/bin/structurizr-cli \
+    && rm structurizr-cli.zip \
+    && ln -s /usr/local/bin/structurizr-cli/structurizr.sh /usr/local/bin/structurizr
+
+# 5. GitHub CLI のインストール (wgetを使わずcurlで実行)
 RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | \
     dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
     && chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \

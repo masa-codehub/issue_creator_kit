@@ -21,7 +21,7 @@ COMMIT_EMAIL="${2:-}"
 COMMIT_MSG="${3:-}"
 BASE_BRANCH="${4:-main}"
 
-echo "=== Archiving and Pull Request Creation ==="
+echo "=== Committing Process Assets and PR Creation ==="
 
 # 1. 変更の有無を確認
 # reqs/ ディレクトリ内の変更をすべてステージングし、差分がない場合は終了
@@ -74,7 +74,7 @@ if git ls-remote --exit-code --heads origin "$RP_BRANCH" > /dev/null && [ "$OPEN
     git checkout "$RP_BRANCH"
     
     echo "Committing archived tasks to Release PR..."
-    git commit -m "chore: archive processed tasks"
+    git commit -m "chore: commit processed tasks and roadmap updates"
     
     echo "Pushing branch to origin..."
     git push origin "$RP_BRANCH"
@@ -85,7 +85,7 @@ else
     git checkout -b "$BRANCH_NAME"
 
     echo "Committing archived tasks..."
-    git commit -m "chore: archive processed tasks"
+    git commit -m "chore: commit processed tasks and roadmap updates"
 
     echo "Pushing branch to origin..."
     git push origin "$BRANCH_NAME"
@@ -93,7 +93,7 @@ else
     # 6. Pull Request の作成
     echo "Creating Pull Request to base branch '$BASE_BRANCH'..."
     gh pr create \
-      --title "chore: archive processed tasks" \
+      --title "chore: commit processed tasks and roadmap updates" \
       --body "Automated task archiving after issue creation. Please review and merge." \
       --base "$BASE_BRANCH" \
       --head "$BRANCH_NAME" \
