@@ -31,7 +31,7 @@ class ICKErrorHandler:
     into human-friendly messages in Japanese, following the project's UX spec.
     """
 
-    # Translation map based on docs/specs/interface/error-reporting.md
+    # Translation map based on design/specs/interface/error-reporting.md
     TRANSLATION_MAP = {
         "MISSING_FIELD": "{field} は必須項目です。YAML Frontmatter に追加してください",
         "INVALID_ID": "ID 形式が不正です。期待される形式: task-XXX-NN (例: task-014-01)",

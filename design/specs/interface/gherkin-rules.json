@@ -1,0 +1,7 @@
+{
+  "no-dupe-scenario-names": "on",
+  "no-unnamed-features": "on",
+  "max-scenarios-per-file": ["on", 10],
+  "no-superfluous-tags": "on",
+  "scenario-size": ["on", { "steps-length": {"Scenario": 10, "Background": 5} }]
+}

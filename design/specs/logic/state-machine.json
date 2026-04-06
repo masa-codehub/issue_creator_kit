@@ -1,0 +1,156 @@
+{
+  "id": "orchestrator",
+  "initial": "idle",
+  "context": {
+    "retryCount": 0,
+    "maxRetries": 3
+  },
+  "states": {
+    "idle": {
+      "on": {
+        "START": "scanning"
+      }
+    },
+    "scanning": {
+      "invoke": {
+        "src": "interfaces",
+        "id": "scan_files",
+        "onDone": {
+          "target": "validating",
+          "actions": "assign_documents"
+        },
+        "onError": {
+          "target": "failed",
+          "actions": "log_error"
+        }
+      }
+    },
+    "validating": {
+      "invoke": {
+        "src": "builder",
+        "id": "validate_graph",
+        "onDone": {
+          "target": "topological_sorting",
+          "actions": "assign_graph"
+        },
+        "onError": {
+          "target": "failed",
+          "actions": "log_validation_error"
+        }
+      }
+    },
+    "topological_sorting": {
+      "invoke": {
+        "src": "builder",
+        "id": "sort_tasks",
+        "onDone": {
+          "target": "processing_tasks",
+          "actions": "assign_order"
+        },
+        "onError": "failed"
+      }
+    },
+    "processing_tasks": {
+      "initial": "idempotency_checking",
+      "states": {
+        "idempotency_checking": {
+          "invoke": {
+            "src": "interfaces",
+            "id": "check_github",
+            "onDone": [
+              {
+                "target": "resolving_dependencies",
+                "cond": "is_not_created"
+              },
+              {
+                "target": "skipping",
+                "cond": "is_already_created"
+              }
+            ],
+            "onError": "#orchestrator.failed"
+          }
+        },
+        "resolving_dependencies": {
+          "on": {
+            "RESOLVED": "creating_issue"
+          }
+        },
+        "creating_issue": {
+          "invoke": {
+            "src": "interfaces",
+            "id": "create_github_issue",
+            "onDone": {
+              "target": "registering_success",
+              "actions": "update_cache"
+            },
+            "onError": "#orchestrator.failed"
+          }
+        },
+        "registering_success": {
+          "on": {
+            "NEXT": "idempotency_checking",
+            "DONE": "#orchestrator.syncing_l1"
+          }
+        },
+        "skipping": {
+          "on": {
+            "NEXT": "idempotency_checking",
+            "DONE": "#orchestrator.syncing_l1"
+          }
+        },
+        "failed": {
+          "type": "final"
+        }
+      }
+    },
+    "syncing_l1": {
+      "initial": "attempting",
+      "states": {
+        "attempting": {
+          "invoke": {
+            "src": "l1_sync",
+            "id": "sync_checklist",
+            "onDone": "#orchestrator.cleaning_up",
+            "onError": [
+              {
+                "target": "retrying",
+                "cond": "is_conflict"
+              },
+              {
+                "target": "#orchestrator.failed"
+              }
+            ]
+          }
+        },
+        "retrying": {
+          "after": {
+            "1000": [
+              {
+                "target": "attempting",
+                "cond": "can_retry",
+                "actions": "increment_retry"
+              },
+              {
+                "target": "#orchestrator.failed"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "cleaning_up": {
+      "invoke": {
+        "src": "interfaces",
+        "id": "remove_files",
+        "onDone": "finished",
+        "onError": "failed"
+      }
+    },
+    "finished": {
+      "type": "final"
+    },
+    "failed": {
+      "type": "final"
+    }
+  }
+}

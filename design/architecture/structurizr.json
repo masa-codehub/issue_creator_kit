@@ -1,0 +1,990 @@
+{
+  "configuration" : { },
+  "description" : "Description",
+  "documentation" : {
+    "sections" : [ {
+      "content" : "# Workspace JSON の生成について\n\nこの `design/architecture/structurizr.json` は、`workspace.dsl` を Structurizr CLI などでエクスポートした生成物です。\n\n- SSOT（単一の情報源）は `workspace.dsl` です。\n- `workspace.dsl` を変更した場合は、本ファイルも必ず再生成してください。\n\n## 生成手順 (一例)\n\n```bash\nstructurizr export -workspace design/architecture/workspace.dsl -format json -output design/architecture/\n```\n\n※ 実際のコマンドやパスはプロジェクトの運用に合わせて調整してください。\n\n## 更新タイミング\n\n- アーキテクチャ図や C4 モデルを変更した際 (`workspace.dsl` を編集したタイミング)\n- リリース前に設計ドキュメントを最新化したいタイミング\n\n本ファイルを手編集するのではなく、必ず `workspace.dsl` から再生成する運用としてください。\n",
+      "filename" : "workspace-json.md",
+      "format" : "Markdown",
+      "order" : 1,
+      "title" : ""
+    } ]
+  },
+  "id" : 0,
+  "model" : {
+    "people" : [ {
+      "description" : "The person who defines design and tasks.",
+      "id" : "1",
+      "location" : "Unspecified",
+      "name" : "Architect",
+      "properties" : {
+        "structurizr.dsl.identifier" : "architect"
+      },
+      "relationships" : [ {
+        "description" : "Pushes designs and issues",
+        "destinationId" : "64",
+        "id" : "66",
+        "properties" : {
+          "structurizr.dsl.identifier" : "ac000c2c-ea9e-4e9d-affb-7188b50a8128"
+        },
+        "sourceId" : "1",
+        "tags" : "Relationship",
+        "technology" : "Git/HTTPS"
+      } ],
+      "tags" : "Element,Person"
+    }, {
+      "description" : "The person who implements issues and performs PR reviews.",
+      "id" : "2",
+      "location" : "Unspecified",
+      "name" : "Developer",
+      "properties" : {
+        "structurizr.dsl.identifier" : "developer"
+      },
+      "relationships" : [ {
+        "description" : "Pushes implementations and reviews PRs",
+        "destinationId" : "64",
+        "id" : "67",
+        "properties" : {
+          "structurizr.dsl.identifier" : "7eedf8b9-a900-4ffd-996f-a2ced27a8f0e"
+        },
+        "sourceId" : "2",
+        "tags" : "Relationship",
+        "technology" : "Git/HTTPS"
+      } ],
+      "tags" : "Element,Person"
+    }, {
+      "description" : "The agent that decomposes tasks, creates PRs, and implements issues.",
+      "id" : "3",
+      "location" : "Unspecified",
+      "name" : "AI Agent",
+      "properties" : {
+        "structurizr.dsl.identifier" : "agent"
+      },
+      "relationships" : [ {
+        "description" : "Decomposes tasks and implements issues",
+        "destinationId" : "64",
+        "id" : "68",
+        "properties" : {
+          "structurizr.dsl.identifier" : "b1d253b3-31d3-44b1-96c9-33d933ada506"
+        },
+        "sourceId" : "3",
+        "tags" : "Relationship",
+        "technology" : "Git/HTTPS"
+      } ],
+      "tags" : "Element,Person"
+    } ],
+    "softwareSystems" : [ {
+      "containers" : [ {
+        "components" : [ {
+          "description" : "Entry point and command definitions.",
+          "documentation" : { },
+          "id" : "6",
+          "name" : "CLI/Runner",
+          "properties" : {
+            "structurizr.dsl.identifier" : "main"
+          },
+          "relationships" : [ {
+            "description" : "Requests issue creation",
+            "destinationId" : "8",
+            "id" : "23",
+            "properties" : {
+              "structurizr.dsl.identifier" : "3f616259-610e-4eb0-9171-7d75ea5bb8fd"
+            },
+            "sourceId" : "6",
+            "tags" : "Relationship"
+          }, {
+            "description" : "Requests issue creation",
+            "destinationId" : "7",
+            "id" : "24",
+            "linkedRelationshipId" : "23",
+            "sourceId" : "6"
+          }, {
+            "description" : "Requests activation",
+            "destinationId" : "9",
+            "id" : "27",
+            "properties" : {
+              "structurizr.dsl.identifier" : "08ddfd6b-84f1-484d-bf62-24e18a97915d"
+            },
+            "sourceId" : "6",
+            "tags" : "Relationship"
+          }, {
+            "description" : "Requests scan",
+            "destinationId" : "10",
+            "id" : "29",
+            "properties" : {
+              "structurizr.dsl.identifier" : "a7af3e3d-6719-4e72-95e2-5b9c23606c35"
+            },
+            "sourceId" : "6",
+            "tags" : "Relationship"
+          } ],
+          "tags" : "Element,Component,Layer:Interface,Type:Component",
+          "technology" : "cli.py, __main__.py"
+        } ],
+        "description" : "Handles user input and starts UseCases.",
+        "documentation" : { },
+        "id" : "5",
+        "name" : "CLI Entrypoint",
+        "properties" : {
+          "structurizr.dsl.identifier" : "cli"
+        },
+        "relationships" : [ {
+          "description" : "Requests issue creation",
+          "destinationId" : "8",
+          "id" : "25",
+          "linkedRelationshipId" : "23",
+          "sourceId" : "5"
+        }, {
+          "description" : "Requests issue creation",
+          "destinationId" : "7",
+          "id" : "26",
+          "linkedRelationshipId" : "23",
+          "sourceId" : "5"
+        }, {
+          "description" : "Requests activation",
+          "destinationId" : "9",
+          "id" : "28",
+          "linkedRelationshipId" : "27",
+          "sourceId" : "5"
+        }, {
+          "description" : "Requests scan",
+          "destinationId" : "10",
+          "id" : "30",
+          "linkedRelationshipId" : "29",
+          "sourceId" : "5"
+        }, {
+          "description" : "Starts UseCase",
+          "destinationId" : "7",
+          "id" : "58",
+          "properties" : {
+            "structurizr.dsl.identifier" : "bc78b67e-41f1-4b51-b13e-f8b0a7aff952"
+          },
+          "sourceId" : "5",
+          "tags" : "Relationship"
+        }, {
+          "description" : "Initializes for DI",
+          "destinationId" : "19",
+          "id" : "59",
+          "properties" : {
+            "structurizr.dsl.identifier" : "1642633d-3aed-4e50-a12b-40d23d4418f3"
+          },
+          "sourceId" : "5",
+          "tags" : "Relationship"
+        } ],
+        "tags" : "Element,Container,Layer:Interface",
+        "technology" : "Python/Click"
+      }, {
+        "components" : [ {
+          "description" : "Automatically creates L1 issues from ADRs.",
+          "documentation" : { },
+          "id" : "8",
+          "name" : "L1AutomationUseCase",
+          "properties" : {
+            "structurizr.dsl.identifier" : "l1_auto"
+          },
+          "relationships" : [ {
+            "description" : "Scans files",
+            "destinationId" : "17",
+            "id" : "31",
+            "properties" : {
+              "structurizr.dsl.identifier" : "28b50624-6391-4036-b419-98121e6e60bf"
+            },
+            "sourceId" : "8",
+            "tags" : "Relationship"
+          }, {
+            "description" : "Scans files",
+            "destinationId" : "12",
+            "id" : "32",
+            "linkedRelationshipId" : "31",
+            "sourceId" : "8"
+          }, {
+            "description" : "Creates/Searches issues",
+            "destinationId" : "14",
+            "id" : "35",
+            "properties" : {
+              "structurizr.dsl.identifier" : "6a8a10b6-b039-4151-adc4-03d87f38a9ff"
+            },
+            "sourceId" : "8",
+            "tags" : "Relationship"
+          } ],
+          "tags" : "Element,Component,Layer:UseCase,Type:Component",
+          "technology" : "l1_automation_usecase.py"
+        }, {
+          "description" : "Creates L2/L3 issues from task drafts.",
+          "documentation" : { },
+          "id" : "9",
+          "name" : "TaskActivationUseCase",
+          "properties" : {
+            "structurizr.dsl.identifier" : "task_act"
+          },
+          "relationships" : [ {
+            "description" : "Builds dependency graph",
+            "destinationId" : "15",
+            "id" : "37",
+            "properties" : {
+              "structurizr.dsl.identifier" : "10ac1c30-0f30-4299-91ee-0a4300b61d9d"
+            },
+            "sourceId" : "9",
+            "tags" : "Relationship"
+          }, {
+            "description" : "Builds dependency graph",
+            "destinationId" : "12",
+            "id" : "38",
+            "linkedRelationshipId" : "37",
+            "sourceId" : "9"
+          }, {
+            "description" : "Generates issue body",
+            "destinationId" : "16",
+            "id" : "40",
+            "properties" : {
+              "structurizr.dsl.identifier" : "09f32599-c389-4043-84a5-4bb6ca964029"
+            },
+            "sourceId" : "9",
+            "tags" : "Relationship"
+          }, {
+            "description" : "Creates issues",
+            "destinationId" : "14",
+            "id" : "42",
+            "properties" : {
+              "structurizr.dsl.identifier" : "72f82e07-70c6-4541-83fa-6e299c023812"
+            },
+            "sourceId" : "9",
+            "tags" : "Relationship"
+          }, {
+            "description" : "Moves files to archive",
+            "destinationId" : "14",
+            "id" : "43",
+            "properties" : {
+              "structurizr.dsl.identifier" : "32fe3452-7ad6-43e5-9026-1bc669a513ab"
+            },
+            "sourceId" : "9",
+            "tags" : "Relationship"
+          }, {
+            "description" : "Syncs L1 checklist",
+            "destinationId" : "18",
+            "id" : "44",
+            "properties" : {
+              "structurizr.dsl.identifier" : "ba2664ea-ae66-48a2-bbc9-30d094b73248"
+            },
+            "sourceId" : "9",
+            "tags" : "Relationship"
+          } ],
+          "tags" : "Element,Component,Layer:UseCase,Type:Component",
+          "technology" : "task_activation_usecase.py"
+        }, {
+          "description" : "Scans physical files and summarizes the current state.",
+          "documentation" : { },
+          "id" : "10",
+          "name" : "ScannerUseCase",
+          "properties" : {
+            "structurizr.dsl.identifier" : "scanner_uc"
+          },
+          "relationships" : [ {
+            "description" : "Scans files",
+            "destinationId" : "17",
+            "id" : "47",
+            "properties" : {
+              "structurizr.dsl.identifier" : "05a5f2f8-606f-4c5d-972b-bf0e9107a718"
+            },
+            "sourceId" : "10",
+            "tags" : "Relationship"
+          }, {
+            "description" : "Scans files",
+            "destinationId" : "12",
+            "id" : "48",
+            "linkedRelationshipId" : "47",
+            "sourceId" : "10"
+          } ],
+          "tags" : "Element,Component,Layer:UseCase,Type:Component",
+          "technology" : "scanner_usecase.py"
+        }, {
+          "description" : "Validates document consistency and dependencies.",
+          "documentation" : { },
+          "id" : "11",
+          "name" : "Validator",
+          "properties" : {
+            "structurizr.dsl.identifier" : "validator"
+          },
+          "tags" : "Element,Component,Layer:UseCase,Type:Component",
+          "technology" : "validator.py"
+        } ],
+        "description" : "Application-specific business rules.",
+        "documentation" : { },
+        "id" : "7",
+        "name" : "UseCase Layer",
+        "properties" : {
+          "structurizr.dsl.identifier" : "usecase"
+        },
+        "relationships" : [ {
+          "description" : "Scans files",
+          "destinationId" : "17",
+          "id" : "33",
+          "linkedRelationshipId" : "31",
+          "sourceId" : "7"
+        }, {
+          "description" : "Scans files",
+          "destinationId" : "12",
+          "id" : "34",
+          "linkedRelationshipId" : "31",
+          "sourceId" : "7"
+        }, {
+          "description" : "Creates/Searches issues",
+          "destinationId" : "14",
+          "id" : "36",
+          "linkedRelationshipId" : "35",
+          "sourceId" : "7"
+        }, {
+          "description" : "Builds dependency graph",
+          "destinationId" : "15",
+          "id" : "39",
+          "linkedRelationshipId" : "37",
+          "sourceId" : "7"
+        }, {
+          "description" : "Generates issue body",
+          "destinationId" : "16",
+          "id" : "41",
+          "linkedRelationshipId" : "40",
+          "sourceId" : "7"
+        }, {
+          "description" : "Syncs L1 checklist",
+          "destinationId" : "18",
+          "id" : "45",
+          "linkedRelationshipId" : "44",
+          "sourceId" : "7"
+        }, {
+          "description" : "Uses domain models",
+          "destinationId" : "12",
+          "id" : "60",
+          "properties" : {
+            "structurizr.dsl.identifier" : "396eead6-a146-4e3a-998d-1d03502406d1"
+          },
+          "sourceId" : "7",
+          "tags" : "Relationship"
+        } ],
+        "tags" : "Element,Container,Layer:UseCase",
+        "technology" : "Python"
+      }, {
+        "components" : [ {
+          "description" : "Domain model representing ADRs and tasks.",
+          "documentation" : { },
+          "id" : "13",
+          "name" : "DocumentModel",
+          "properties" : {
+            "structurizr.dsl.identifier" : "doc_model"
+          },
+          "tags" : "Element,Component,Layer:Domain,Type:Component",
+          "technology" : "models/document.py"
+        }, {
+          "description" : "Abstraction for external adapters (GitHub, FileSystem).",
+          "documentation" : { },
+          "id" : "14",
+          "name" : "Interfaces",
+          "properties" : {
+            "structurizr.dsl.identifier" : "interfaces"
+          },
+          "tags" : "Element,Component,Layer:Domain,Type:Component,Type:Interface",
+          "technology" : "interfaces.py"
+        }, {
+          "description" : "Builds dependency graphs between documents.",
+          "documentation" : { },
+          "id" : "15",
+          "name" : "GraphBuilder",
+          "properties" : {
+            "structurizr.dsl.identifier" : "builder"
+          },
+          "relationships" : [ {
+            "description" : "Uses model",
+            "destinationId" : "13",
+            "id" : "49",
+            "properties" : {
+              "structurizr.dsl.identifier" : "96cf214d-95d1-4df1-b4fc-12a0f58648d0"
+            },
+            "sourceId" : "15",
+            "tags" : "Relationship"
+          } ],
+          "tags" : "Element,Component,Layer:Domain,Type:Component",
+          "technology" : "services/builder.py"
+        }, {
+          "description" : "Renders issue body with metadata.",
+          "documentation" : { },
+          "id" : "16",
+          "name" : "IssueRenderer",
+          "properties" : {
+            "structurizr.dsl.identifier" : "renderer"
+          },
+          "relationships" : [ {
+            "description" : "Uses model",
+            "destinationId" : "13",
+            "id" : "50",
+            "properties" : {
+              "structurizr.dsl.identifier" : "d11dee99-fbb8-4eaf-82fe-e4d294324053"
+            },
+            "sourceId" : "16",
+            "tags" : "Relationship"
+          } ],
+          "tags" : "Element,Component,Layer:Domain,Type:Component",
+          "technology" : "services/renderer.py"
+        }, {
+          "description" : "Extracts metadata from physical files.",
+          "documentation" : { },
+          "id" : "17",
+          "name" : "ScannerService",
+          "properties" : {
+            "structurizr.dsl.identifier" : "scanner_svc"
+          },
+          "relationships" : [ {
+            "description" : "Generates model",
+            "destinationId" : "13",
+            "id" : "51",
+            "properties" : {
+              "structurizr.dsl.identifier" : "00ad5a09-a8a0-4969-b1b4-9daf829cb2de"
+            },
+            "sourceId" : "17",
+            "tags" : "Relationship"
+          } ],
+          "tags" : "Element,Component,Layer:Domain,Type:Component",
+          "technology" : "services/scanner.py"
+        }, {
+          "description" : "Updates the parent issue (L1) checklist.",
+          "documentation" : { },
+          "id" : "18",
+          "name" : "L1SyncService",
+          "properties" : {
+            "structurizr.dsl.identifier" : "l1_sync"
+          },
+          "relationships" : [ {
+            "description" : "Updates issue body",
+            "destinationId" : "14",
+            "id" : "46",
+            "properties" : {
+              "structurizr.dsl.identifier" : "d6080cbc-9aca-4ced-a267-2e4a3dc49f0a"
+            },
+            "sourceId" : "18",
+            "tags" : "Relationship"
+          } ],
+          "tags" : "Element,Component,Layer:Domain,Type:Component",
+          "technology" : "services/l1_sync.py"
+        } ],
+        "description" : "Domain models, entities, and services.",
+        "documentation" : { },
+        "id" : "12",
+        "name" : "Domain Layer",
+        "properties" : {
+          "structurizr.dsl.identifier" : "domain"
+        },
+        "relationships" : [ {
+          "description" : "Executes logic between entities",
+          "destinationId" : "12",
+          "id" : "61",
+          "properties" : {
+            "structurizr.dsl.identifier" : "e37b28fa-c65d-4ed8-ac63-f04084202cca"
+          },
+          "sourceId" : "12",
+          "tags" : "Relationship"
+        } ],
+        "tags" : "Element,Container,Layer:Domain",
+        "technology" : "Python/Pydantic"
+      }, {
+        "components" : [ {
+          "description" : "Wrapper for GitHub REST API.",
+          "documentation" : { },
+          "id" : "20",
+          "name" : "GitHubAdapter",
+          "properties" : {
+            "structurizr.dsl.identifier" : "gh_adapter"
+          },
+          "relationships" : [ {
+            "description" : "Implements",
+            "destinationId" : "14",
+            "id" : "52",
+            "properties" : {
+              "structurizr.dsl.identifier" : "c5ff076a-0907-49ba-b150-3676253e25a6"
+            },
+            "sourceId" : "20",
+            "tags" : "Relationship"
+          }, {
+            "description" : "Implements",
+            "destinationId" : "12",
+            "id" : "53",
+            "linkedRelationshipId" : "52",
+            "sourceId" : "20"
+          } ],
+          "tags" : "Element,Component,Layer:Infrastructure,Type:Component",
+          "technology" : "github_adapter.py"
+        }, {
+          "description" : "Wrapper for physical file operations.",
+          "documentation" : { },
+          "id" : "21",
+          "name" : "FileSystemAdapter",
+          "properties" : {
+            "structurizr.dsl.identifier" : "fs_adapter"
+          },
+          "relationships" : [ {
+            "description" : "Implements",
+            "destinationId" : "14",
+            "id" : "56",
+            "properties" : {
+              "structurizr.dsl.identifier" : "0b4a41c7-c26f-4223-b87d-63769f03e2a1"
+            },
+            "sourceId" : "21",
+            "tags" : "Relationship"
+          }, {
+            "description" : "Implements",
+            "destinationId" : "12",
+            "id" : "57",
+            "linkedRelationshipId" : "56",
+            "sourceId" : "21"
+          } ],
+          "tags" : "Element,Component,Layer:Infrastructure,Type:Component",
+          "technology" : "filesystem.py"
+        } ],
+        "description" : "External communications (GitHub, Git, FS).",
+        "documentation" : { },
+        "id" : "19",
+        "name" : "Infrastructure Layer",
+        "properties" : {
+          "structurizr.dsl.identifier" : "infra"
+        },
+        "relationships" : [ {
+          "description" : "Implements",
+          "destinationId" : "14",
+          "id" : "54",
+          "linkedRelationshipId" : "52",
+          "sourceId" : "19"
+        }, {
+          "description" : "Implements",
+          "destinationId" : "12",
+          "id" : "55",
+          "linkedRelationshipId" : "52",
+          "sourceId" : "19"
+        }, {
+          "description" : "Converts to domain model",
+          "destinationId" : "12",
+          "id" : "62",
+          "properties" : {
+            "structurizr.dsl.identifier" : "58e27eab-4753-46db-8c00-5bf50aa09487"
+          },
+          "sourceId" : "19",
+          "tags" : "Relationship"
+        }, {
+          "description" : "Persists metadata",
+          "destinationId" : "22",
+          "id" : "63",
+          "properties" : {
+            "structurizr.dsl.identifier" : "820f1001-fe82-47b2-95a4-f18da56b4417"
+          },
+          "sourceId" : "19",
+          "tags" : "Relationship",
+          "technology" : "SQL/SQLite"
+        }, {
+          "description" : "Calls REST API",
+          "destinationId" : "64",
+          "id" : "72",
+          "properties" : {
+            "structurizr.dsl.identifier" : "3d618bc5-f608-4cd7-b4a1-34b2908a8a10"
+          },
+          "sourceId" : "19",
+          "tags" : "Relationship",
+          "technology" : "HTTPS"
+        }, {
+          "description" : "Operates physical files",
+          "destinationId" : "65",
+          "id" : "73",
+          "properties" : {
+            "structurizr.dsl.identifier" : "f3e19ec4-54f0-414b-ad23-dcca5ddacb45"
+          },
+          "sourceId" : "19",
+          "tags" : "Relationship",
+          "technology" : "File I/O"
+        } ],
+        "tags" : "Element,Container,Layer:Infrastructure",
+        "technology" : "Python"
+      }, {
+        "description" : "Stores ADR and Task metadata for traceability.",
+        "documentation" : { },
+        "id" : "22",
+        "name" : "Metadata Database",
+        "properties" : {
+          "structurizr.dsl.identifier" : "database"
+        },
+        "tags" : "Element,Container,Layer:Infrastructure,Type:Database",
+        "technology" : "SQLite"
+      } ],
+      "description" : "A toolkit to automate document movement and issue creation.",
+      "documentation" : { },
+      "id" : "4",
+      "location" : "Unspecified",
+      "name" : "Issue Creator Kit",
+      "properties" : {
+        "structurizr.dsl.identifier" : "ick"
+      },
+      "relationships" : [ {
+        "description" : "Creates issues, operates on PRs",
+        "destinationId" : "64",
+        "id" : "70",
+        "properties" : {
+          "structurizr.dsl.identifier" : "31acbd7d-f2ac-4200-a0d0-76a90e882a63"
+        },
+        "sourceId" : "4",
+        "tags" : "Relationship",
+        "technology" : "REST API"
+      }, {
+        "description" : "Searches, reads, and moves files",
+        "destinationId" : "65",
+        "id" : "71",
+        "properties" : {
+          "structurizr.dsl.identifier" : "4b7e007b-98f1-48f8-9d62-131cc019f502"
+        },
+        "sourceId" : "4",
+        "tags" : "Relationship",
+        "technology" : "File I/O"
+      } ],
+      "tags" : "Element,Software System,Layer:System"
+    }, {
+      "description" : "External platform for repo management, CI/CD, and Issues/PRs.",
+      "documentation" : { },
+      "id" : "64",
+      "location" : "Unspecified",
+      "name" : "GitHub",
+      "properties" : {
+        "structurizr.dsl.identifier" : "github"
+      },
+      "relationships" : [ {
+        "description" : "Triggers workflows",
+        "destinationId" : "4",
+        "id" : "69",
+        "properties" : {
+          "structurizr.dsl.identifier" : "08b75259-cc52-4efb-b898-79bf8bfc12a6"
+        },
+        "sourceId" : "64",
+        "tags" : "Relationship",
+        "technology" : "GitHub Actions"
+      } ],
+      "tags" : "Element,Software System,External"
+    }, {
+      "description" : "Where documents (ADR/Task) are physically stored.",
+      "documentation" : { },
+      "id" : "65",
+      "location" : "Unspecified",
+      "name" : "File System",
+      "properties" : {
+        "structurizr.dsl.identifier" : "fs"
+      },
+      "tags" : "Element,Software System,External"
+    } ]
+  },
+  "name" : "Issue Creator Kit",
+  "properties" : {
+    "structurizr.dsl" : "d29ya3NwYWNlICJJc3N1ZSBDcmVhdG9yIEtpdCIgewogICAgbW9kZWwgewogICAgICAgICMgQWN0b3JzCiAgICAgICAgYXJjaGl0ZWN0ID0gcGVyc29uICJBcmNoaXRlY3QiICJUaGUgcGVyc29uIHdobyBkZWZpbmVzIGRlc2lnbiBhbmQgdGFza3MuIgogICAgICAgIGRldmVsb3BlciA9IHBlcnNvbiAiRGV2ZWxvcGVyIiAiVGhlIHBlcnNvbiB3aG8gaW1wbGVtZW50cyBpc3N1ZXMgYW5kIHBlcmZvcm1zIFBSIHJldmlld3MuIgogICAgICAgIGFnZW50ID0gcGVyc29uICJBSSBBZ2VudCIgIlRoZSBhZ2VudCB0aGF0IGRlY29tcG9zZXMgdGFza3MsIGNyZWF0ZXMgUFJzLCBhbmQgaW1wbGVtZW50cyBpc3N1ZXMuIgoKICAgICAgICAjIFN5c3RlbXMKICAgICAgICBpY2sgPSBzb2Z0d2FyZVN5c3RlbSAiSXNzdWUgQ3JlYXRvciBLaXQiICJBIHRvb2xraXQgdG8gYXV0b21hdGUgZG9jdW1lbnQgbW92ZW1lbnQgYW5kIGlzc3VlIGNyZWF0aW9uLiIgewogICAgICAgICAgICB0YWdzICJMYXllcjpTeXN0ZW0iCgogICAgICAgICAgICBjbGkgPSBjb250YWluZXIgIkNMSSBFbnRyeXBvaW50IiAiSGFuZGxlcyB1c2VyIGlucHV0IGFuZCBzdGFydHMgVXNlQ2FzZXMuIiAiUHl0aG9uL0NsaWNrIiB7CiAgICAgICAgICAgICAgICB0YWdzICJMYXllcjpJbnRlcmZhY2UiCiAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgIG1haW4gPSBjb21wb25lbnQgIkNMSS9SdW5uZXIiICJFbnRyeSBwb2ludCBhbmQgY29tbWFuZCBkZWZpbml0aW9ucy4iICJjbGkucHksIF9fbWFpbl9fLnB5IiB7CiAgICAgICAgICAgICAgICAgICAgdGFncyAiTGF5ZXI6SW50ZXJmYWNlIiAiVHlwZTpDb21wb25lbnQiCiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgIH0KICAgICAgICAgICAgdXNlY2FzZSA9IGNvbnRhaW5lciAiVXNlQ2FzZSBMYXllciIgIkFwcGxpY2F0aW9uLXNwZWNpZmljIGJ1c2luZXNzIHJ1bGVzLiIgIlB5dGhvbiIgewogICAgICAgICAgICAgICAgdGFncyAiTGF5ZXI6VXNlQ2FzZSIKICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgbDFfYXV0byA9IGNvbXBvbmVudCAiTDFBdXRvbWF0aW9uVXNlQ2FzZSIgIkF1dG9tYXRpY2FsbHkgY3JlYXRlcyBMMSBpc3N1ZXMgZnJvbSBBRFJzLiIgImwxX2F1dG9tYXRpb25fdXNlY2FzZS5weSIgewogICAgICAgICAgICAgICAgICAgIHRhZ3MgIkxheWVyOlVzZUNhc2UiICJUeXBlOkNvbXBvbmVudCIKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgIHRhc2tfYWN0ID0gY29tcG9uZW50ICJUYXNrQWN0aXZhdGlvblVzZUNhc2UiICJDcmVhdGVzIEwyL0wzIGlzc3VlcyBmcm9tIHRhc2sgZHJhZnRzLiIgInRhc2tfYWN0aXZhdGlvbl91c2VjYXNlLnB5IiB7CiAgICAgICAgICAgICAgICAgICAgdGFncyAiTGF5ZXI6VXNlQ2FzZSIgIlR5cGU6Q29tcG9uZW50IgogICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgc2Nhbm5lcl91YyA9IGNvbXBvbmVudCAiU2Nhbm5lclVzZUNhc2UiICJTY2FucyBwaHlzaWNhbCBmaWxlcyBhbmQgc3VtbWFyaXplcyB0aGUgY3VycmVudCBzdGF0ZS4iICJzY2FubmVyX3VzZWNhc2UucHkiIHsKICAgICAgICAgICAgICAgICAgICB0YWdzICJMYXllcjpVc2VDYXNlIiAiVHlwZTpDb21wb25lbnQiCiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICB2YWxpZGF0b3IgPSBjb21wb25lbnQgIlZhbGlkYXRvciIgIlZhbGlkYXRlcyBkb2N1bWVudCBjb25zaXN0ZW5jeSBhbmQgZGVwZW5kZW5jaWVzLiIgInZhbGlkYXRvci5weSIgewogICAgICAgICAgICAgICAgICAgIHRhZ3MgIkxheWVyOlVzZUNhc2UiICJUeXBlOkNvbXBvbmVudCIKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgfQogICAgICAgICAgICBkb21haW4gPSBjb250YWluZXIgIkRvbWFpbiBMYXllciIgIkRvbWFpbiBtb2RlbHMsIGVudGl0aWVzLCBhbmQgc2VydmljZXMuIiAiUHl0aG9uL1B5ZGFudGljIiB7CiAgICAgICAgICAgICAgICB0YWdzICJMYXllcjpEb21haW4iCiAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgIGRvY19tb2RlbCA9IGNvbXBvbmVudCAiRG9jdW1lbnRNb2RlbCIgIkRvbWFpbiBtb2RlbCByZXByZXNlbnRpbmcgQURScyBhbmQgdGFza3MuIiAibW9kZWxzL2RvY3VtZW50LnB5IiB7CiAgICAgICAgICAgICAgICAgICAgdGFncyAiTGF5ZXI6RG9tYWluIiAiVHlwZTpDb21wb25lbnQiCiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICBpbnRlcmZhY2VzID0gY29tcG9uZW50ICJJbnRlcmZhY2VzIiAiQWJzdHJhY3Rpb24gZm9yIGV4dGVybmFsIGFkYXB0ZXJzIChHaXRIdWIsIEZpbGVTeXN0ZW0pLiIgImludGVyZmFjZXMucHkiIHsKICAgICAgICAgICAgICAgICAgICB0YWdzICJMYXllcjpEb21haW4iICJUeXBlOkNvbXBvbmVudCIgIlR5cGU6SW50ZXJmYWNlIgogICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgYnVpbGRlciA9IGNvbXBvbmVudCAiR3JhcGhCdWlsZGVyIiAiQnVpbGRzIGRlcGVuZGVuY3kgZ3JhcGhzIGJldHdlZW4gZG9jdW1lbnRzLiIgInNlcnZpY2VzL2J1aWxkZXIucHkiIHsKICAgICAgICAgICAgICAgICAgICB0YWdzICJMYXllcjpEb21haW4iICJUeXBlOkNvbXBvbmVudCIKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgIHJlbmRlcmVyID0gY29tcG9uZW50ICJJc3N1ZVJlbmRlcmVyIiAiUmVuZGVycyBpc3N1ZSBib2R5IHdpdGggbWV0YWRhdGEuIiAic2VydmljZXMvcmVuZGVyZXIucHkiIHsKICAgICAgICAgICAgICAgICAgICB0YWdzICJMYXllcjpEb21haW4iICJUeXBlOkNvbXBvbmVudCIKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgIHNjYW5uZXJfc3ZjID0gY29tcG9uZW50ICJTY2FubmVyU2VydmljZSIgIkV4dHJhY3RzIG1ldGFkYXRhIGZyb20gcGh5c2ljYWwgZmlsZXMuIiAic2VydmljZXMvc2Nhbm5lci5weSIgewogICAgICAgICAgICAgICAgICAgIHRhZ3MgIkxheWVyOkRvbWFpbiIgIlR5cGU6Q29tcG9uZW50IgogICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgbDFfc3luYyA9IGNvbXBvbmVudCAiTDFTeW5jU2VydmljZSIgIlVwZGF0ZXMgdGhlIHBhcmVudCBpc3N1ZSAoTDEpIGNoZWNrbGlzdC4iICJzZXJ2aWNlcy9sMV9zeW5jLnB5IiB7CiAgICAgICAgICAgICAgICAgICAgdGFncyAiTGF5ZXI6RG9tYWluIiAiVHlwZTpDb21wb25lbnQiCiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgIH0KICAgICAgICAgICAgaW5mcmEgPSBjb250YWluZXIgIkluZnJhc3RydWN0dXJlIExheWVyIiAiRXh0ZXJuYWwgY29tbXVuaWNhdGlvbnMgKEdpdEh1YiwgR2l0LCBGUykuIiAiUHl0aG9uIiB7CiAgICAgICAgICAgICAgICB0YWdzICJMYXllcjpJbmZyYXN0cnVjdHVyZSIKICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgZ2hfYWRhcHRlciA9IGNvbXBvbmVudCAiR2l0SHViQWRhcHRlciIgIldyYXBwZXIgZm9yIEdpdEh1YiBSRVNUIEFQSS4iICJnaXRodWJfYWRhcHRlci5weSIgewogICAgICAgICAgICAgICAgICAgIHRhZ3MgIkxheWVyOkluZnJhc3RydWN0dXJlIiAiVHlwZTpDb21wb25lbnQiCiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICBmc19hZGFwdGVyID0gY29tcG9uZW50ICJGaWxlU3lzdGVtQWRhcHRlciIgIldyYXBwZXIgZm9yIHBoeXNpY2FsIGZpbGUgb3BlcmF0aW9ucy4iICJmaWxlc3lzdGVtLnB5IiB7CiAgICAgICAgICAgICAgICAgICAgdGFncyAiTGF5ZXI6SW5mcmFzdHJ1Y3R1cmUiICJUeXBlOkNvbXBvbmVudCIKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgfQoKICAgICAgICAgICAgZGF0YWJhc2UgPSBjb250YWluZXIgIk1ldGFkYXRhIERhdGFiYXNlIiAiU3RvcmVzIEFEUiBhbmQgVGFzayBtZXRhZGF0YSBmb3IgdHJhY2VhYmlsaXR5LiIgIlNRTGl0ZSIgewogICAgICAgICAgICAgICAgdGFncyAiTGF5ZXI6SW5mcmFzdHJ1Y3R1cmUiICJUeXBlOkRhdGFiYXNlIgogICAgICAgICAgICB9CgogICAgICAgICAgICAjIFJlbGF0aW9uc2hpcHMgYmV0d2VlbiBjb21wb25lbnRzCiAgICAgICAgICAgIG1haW4gLT4gbDFfYXV0byAiUmVxdWVzdHMgaXNzdWUgY3JlYXRpb24iCiAgICAgICAgICAgIG1haW4gLT4gdGFza19hY3QgIlJlcXVlc3RzIGFjdGl2YXRpb24iCiAgICAgICAgICAgIG1haW4gLT4gc2Nhbm5lcl91YyAiUmVxdWVzdHMgc2NhbiIKICAgICAgICAgICAgCiAgICAgICAgICAgIGwxX2F1dG8gLT4gc2Nhbm5lcl9zdmMgIlNjYW5zIGZpbGVzIgogICAgICAgICAgICBsMV9hdXRvIC0+IGludGVyZmFjZXMgIkNyZWF0ZXMvU2VhcmNoZXMgaXNzdWVzIgogICAgICAgICAgICAKICAgICAgICAgICAgdGFza19hY3QgLT4gYnVpbGRlciAiQnVpbGRzIGRlcGVuZGVuY3kgZ3JhcGgiCiAgICAgICAgICAgIHRhc2tfYWN0IC0+IHJlbmRlcmVyICJHZW5lcmF0ZXMgaXNzdWUgYm9keSIKICAgICAgICAgICAgdGFza19hY3QgLT4gaW50ZXJmYWNlcyAiQ3JlYXRlcyBpc3N1ZXMiCiAgICAgICAgICAgIHRhc2tfYWN0IC0+IGludGVyZmFjZXMgIk1vdmVzIGZpbGVzIHRvIGFyY2hpdmUiCiAgICAgICAgICAgIHRhc2tfYWN0IC0+IGwxX3N5bmMgIlN5bmNzIEwxIGNoZWNrbGlzdCIKICAgICAgICAgICAgCiAgICAgICAgICAgIGwxX3N5bmMgLT4gaW50ZXJmYWNlcyAiVXBkYXRlcyBpc3N1ZSBib2R5IgogICAgICAgICAgICAKICAgICAgICAgICAgc2Nhbm5lcl91YyAtPiBzY2FubmVyX3N2YyAiU2NhbnMgZmlsZXMiCiAgICAgICAgICAgIAogICAgICAgICAgICBidWlsZGVyIC0+IGRvY19tb2RlbCAiVXNlcyBtb2RlbCIKICAgICAgICAgICAgcmVuZGVyZXIgLT4gZG9jX21vZGVsICJVc2VzIG1vZGVsIgogICAgICAgICAgICBzY2FubmVyX3N2YyAtPiBkb2NfbW9kZWwgIkdlbmVyYXRlcyBtb2RlbCIKICAgICAgICAgICAgCiAgICAgICAgICAgIGdoX2FkYXB0ZXIgLT4gaW50ZXJmYWNlcyAiSW1wbGVtZW50cyIKICAgICAgICAgICAgZnNfYWRhcHRlciAtPiBpbnRlcmZhY2VzICJJbXBsZW1lbnRzIgoKICAgICAgICAgICAgIyBDb250YWluZXIgcmVsYXRpb25zaGlwcyAoZm9yIHN1bW1hcnkpCiAgICAgICAgICAgIGNsaSAtPiB1c2VjYXNlICJTdGFydHMgVXNlQ2FzZSIKICAgICAgICAgICAgY2xpIC0+IGluZnJhICJJbml0aWFsaXplcyBmb3IgREkiCiAgICAgICAgICAgIHVzZWNhc2UgLT4gZG9tYWluICJVc2VzIGRvbWFpbiBtb2RlbHMiCiAgICAgICAgICAgIGRvbWFpbiAtPiBkb21haW4gIkV4ZWN1dGVzIGxvZ2ljIGJldHdlZW4gZW50aXRpZXMiCiAgICAgICAgICAgIGluZnJhIC0+IGRvbWFpbiAiQ29udmVydHMgdG8gZG9tYWluIG1vZGVsIgogICAgICAgICAgICBpbmZyYSAtPiBkYXRhYmFzZSAiUGVyc2lzdHMgbWV0YWRhdGEiICJTUUwvU1FMaXRlIgogICAgICAgIH0KICAgICAgICBnaXRodWIgPSBzb2Z0d2FyZVN5c3RlbSAiR2l0SHViIiAiRXh0ZXJuYWwgcGxhdGZvcm0gZm9yIHJlcG8gbWFuYWdlbWVudCwgQ0kvQ0QsIGFuZCBJc3N1ZXMvUFJzLiIgewogICAgICAgICAgICB0YWdzICJFeHRlcm5hbCIKICAgICAgICB9CiAgICAgICAgZnMgPSBzb2Z0d2FyZVN5c3RlbSAiRmlsZSBTeXN0ZW0iICJXaGVyZSBkb2N1bWVudHMgKEFEUi9UYXNrKSBhcmUgcGh5c2ljYWxseSBzdG9yZWQuIiB7CiAgICAgICAgICAgIHRhZ3MgIkV4dGVybmFsIgogICAgICAgIH0KCiAgICAgICAgIyBSZWxhdGlvbnNoaXBzIChBY3RvcnMgdG8gU3lzdGVtcykKICAgICAgICBhcmNoaXRlY3QgLT4gZ2l0aHViICJQdXNoZXMgZGVzaWducyBhbmQgaXNzdWVzIiAiR2l0L0hUVFBTIgogICAgICAgIGRldmVsb3BlciAtPiBnaXRodWIgIlB1c2hlcyBpbXBsZW1lbnRhdGlvbnMgYW5kIHJldmlld3MgUFJzIiAiR2l0L0hUVFBTIgogICAgICAgIGFnZW50IC0+IGdpdGh1YiAiRGVjb21wb3NlcyB0YXNrcyBhbmQgaW1wbGVtZW50cyBpc3N1ZXMiICJHaXQvSFRUUFMiCgogICAgICAgICMgUmVsYXRpb25zaGlwcyAoU3lzdGVtcyB0byBTeXN0ZW1zKQogICAgICAgIGdpdGh1YiAtPiBpY2sgIlRyaWdnZXJzIHdvcmtmbG93cyIgIkdpdEh1YiBBY3Rpb25zIgogICAgICAgIGljayAtPiBnaXRodWIgIkNyZWF0ZXMgaXNzdWVzLCBvcGVyYXRlcyBvbiBQUnMiICJSRVNUIEFQSSIKICAgICAgICBpY2sgLT4gZnMgIlNlYXJjaGVzLCByZWFkcywgYW5kIG1vdmVzIGZpbGVzIiAiRmlsZSBJL08iCgogICAgICAgICMgUmVsYXRpb25zaGlwcyAoQ29udGFpbmVycyB0byBTeXN0ZW1zKQogICAgICAgIGluZnJhIC0+IGdpdGh1YiAiQ2FsbHMgUkVTVCBBUEkiICJIVFRQUyIKICAgICAgICBpbmZyYSAtPiBmcyAiT3BlcmF0ZXMgcGh5c2ljYWwgZmlsZXMiICJGaWxlIEkvTyIKICAgIH0KCiAgICB2aWV3cyB7CiAgICAgICAgc3lzdGVtQ29udGV4dCBpY2sgIlN5c3RlbUNvbnRleHQiIHsKICAgICAgICAgICAgaW5jbHVkZSAqCiAgICAgICAgICAgIGF1dG9MYXlvdXQgbHIKICAgICAgICB9CgogICAgICAgIGNvbnRhaW5lciBpY2sgIkNvbnRhaW5lclZpZXciIHsKICAgICAgICAgICAgaW5jbHVkZSAqCiAgICAgICAgICAgIGF1dG9MYXlvdXQgbHIKICAgICAgICB9CgogICAgICAgIGNvbXBvbmVudCBjbGkgIkNMSV9Db21wb25lbnRWaWV3IiB7CiAgICAgICAgICAgIGluY2x1ZGUgKgogICAgICAgICAgICBhdXRvTGF5b3V0IGxyCiAgICAgICAgfQoKICAgICAgICBjb21wb25lbnQgdXNlY2FzZSAiVXNlQ2FzZV9Db21wb25lbnRWaWV3IiB7CiAgICAgICAgICAgIGluY2x1ZGUgKgogICAgICAgICAgICBhdXRvTGF5b3V0IGxyCiAgICAgICAgfQoKICAgICAgICBjb21wb25lbnQgZG9tYWluICJEb21haW5fQ29tcG9uZW50VmlldyIgewogICAgICAgICAgICBpbmNsdWRlICoKICAgICAgICAgICAgYXV0b0xheW91dCBscgogICAgICAgIH0KCiAgICAgICAgY29tcG9uZW50IGluZnJhICJJbmZyYXN0cnVjdHVyZV9Db21wb25lbnRWaWV3IiB7CiAgICAgICAgICAgIGluY2x1ZGUgKgogICAgICAgICAgICBhdXRvTGF5b3V0IGxyCiAgICAgICAgfQoKICAgICAgICBzdHlsZXMgewogICAgICAgICAgICBlbGVtZW50ICJFeHRlcm5hbCIgewogICAgICAgICAgICAgICAgYmFja2dyb3VuZCAjOTk5OTk5CiAgICAgICAgICAgICAgICBjb2xvciAjZmZmZmZmCiAgICAgICAgICAgIH0KICAgICAgICAgICAgZWxlbWVudCAiU29mdHdhcmUgU3lzdGVtIiB7CiAgICAgICAgICAgICAgICBiYWNrZ3JvdW5kICMxMTY4YmQKICAgICAgICAgICAgICAgIGNvbG9yICNmZmZmZmYKICAgICAgICAgICAgfQogICAgICAgICAgICBlbGVtZW50ICJDb250YWluZXIiIHsKICAgICAgICAgICAgICAgIGJhY2tncm91bmQgIzQzOGRkNQogICAgICAgICAgICAgICAgY29sb3IgI2ZmZmZmZgogICAgICAgICAgICB9CiAgICAgICAgICAgIGVsZW1lbnQgIlBlcnNvbiIgewogICAgICAgICAgICAgICAgc2hhcGUgUGVyc29uCiAgICAgICAgICAgICAgICBiYWNrZ3JvdW5kICMwODQyN2IKICAgICAgICAgICAgICAgIGNvbG9yICNmZmZmZmYKICAgICAgICAgICAgfQogICAgICAgIH0KICAgIH0KCiAgICAhZG9jcyBkb2NzLwp9Cg=="
+  },
+  "views" : {
+    "componentViews" : [ {
+      "automaticLayout" : {
+        "applied" : false,
+        "edgeSeparation" : 0,
+        "implementation" : "Graphviz",
+        "nodeSeparation" : 300,
+        "rankDirection" : "LeftRight",
+        "rankSeparation" : 300,
+        "vertices" : false
+      },
+      "containerId" : "5",
+      "elements" : [ {
+        "id" : "6",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "7",
+        "x" : 0,
+        "y" : 0
+      } ],
+      "externalContainerBoundariesVisible" : false,
+      "key" : "CLI_ComponentView",
+      "order" : 3,
+      "relationships" : [ {
+        "id" : "24"
+      } ]
+    }, {
+      "automaticLayout" : {
+        "applied" : false,
+        "edgeSeparation" : 0,
+        "implementation" : "Graphviz",
+        "nodeSeparation" : 300,
+        "rankDirection" : "LeftRight",
+        "rankSeparation" : 300,
+        "vertices" : false
+      },
+      "containerId" : "7",
+      "elements" : [ {
+        "id" : "5",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "8",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "9",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "10",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "11",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "12",
+        "x" : 0,
+        "y" : 0
+      } ],
+      "externalContainerBoundariesVisible" : false,
+      "key" : "UseCase_ComponentView",
+      "order" : 4,
+      "relationships" : [ {
+        "id" : "25"
+      }, {
+        "id" : "28"
+      }, {
+        "id" : "30"
+      }, {
+        "id" : "32"
+      }, {
+        "id" : "38"
+      }, {
+        "id" : "48"
+      }, {
+        "id" : "61"
+      } ]
+    }, {
+      "automaticLayout" : {
+        "applied" : false,
+        "edgeSeparation" : 0,
+        "implementation" : "Graphviz",
+        "nodeSeparation" : 300,
+        "rankDirection" : "LeftRight",
+        "rankSeparation" : 300,
+        "vertices" : false
+      },
+      "containerId" : "12",
+      "elements" : [ {
+        "id" : "7",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "13",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "14",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "15",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "16",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "17",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "18",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "19",
+        "x" : 0,
+        "y" : 0
+      } ],
+      "externalContainerBoundariesVisible" : false,
+      "key" : "Domain_ComponentView",
+      "order" : 5,
+      "relationships" : [ {
+        "id" : "33"
+      }, {
+        "id" : "36"
+      }, {
+        "id" : "39"
+      }, {
+        "id" : "41"
+      }, {
+        "id" : "45"
+      }, {
+        "id" : "46"
+      }, {
+        "id" : "49"
+      }, {
+        "id" : "50"
+      }, {
+        "id" : "51"
+      }, {
+        "id" : "54"
+      } ]
+    }, {
+      "automaticLayout" : {
+        "applied" : false,
+        "edgeSeparation" : 0,
+        "implementation" : "Graphviz",
+        "nodeSeparation" : 300,
+        "rankDirection" : "LeftRight",
+        "rankSeparation" : 300,
+        "vertices" : false
+      },
+      "containerId" : "19",
+      "elements" : [ {
+        "id" : "12",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "20",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "21",
+        "x" : 0,
+        "y" : 0
+      } ],
+      "externalContainerBoundariesVisible" : false,
+      "key" : "Infrastructure_ComponentView",
+      "order" : 6,
+      "relationships" : [ {
+        "id" : "53"
+      }, {
+        "id" : "57"
+      }, {
+        "id" : "61"
+      } ]
+    } ],
+    "configuration" : {
+      "branding" : { },
+      "styles" : {
+        "elements" : [ {
+          "background" : "#999999",
+          "color" : "#ffffff",
+          "tag" : "External"
+        }, {
+          "background" : "#1168bd",
+          "color" : "#ffffff",
+          "tag" : "Software System"
+        }, {
+          "background" : "#438dd5",
+          "color" : "#ffffff",
+          "tag" : "Container"
+        }, {
+          "background" : "#08427b",
+          "color" : "#ffffff",
+          "shape" : "Person",
+          "tag" : "Person"
+        } ]
+      },
+      "terminology" : { }
+    },
+    "containerViews" : [ {
+      "automaticLayout" : {
+        "applied" : false,
+        "edgeSeparation" : 0,
+        "implementation" : "Graphviz",
+        "nodeSeparation" : 300,
+        "rankDirection" : "LeftRight",
+        "rankSeparation" : 300,
+        "vertices" : false
+      },
+      "elements" : [ {
+        "id" : "5",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "7",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "12",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "19",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "22",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "64",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "65",
+        "x" : 0,
+        "y" : 0
+      } ],
+      "externalSoftwareSystemBoundariesVisible" : false,
+      "key" : "ContainerView",
+      "order" : 2,
+      "relationships" : [ {
+        "id" : "26"
+      }, {
+        "id" : "34"
+      }, {
+        "id" : "55"
+      }, {
+        "id" : "58"
+      }, {
+        "id" : "59"
+      }, {
+        "id" : "60"
+      }, {
+        "id" : "61"
+      }, {
+        "id" : "62"
+      }, {
+        "id" : "63"
+      }, {
+        "id" : "72"
+      }, {
+        "id" : "73"
+      } ],
+      "softwareSystemId" : "4"
+    } ],
+    "systemContextViews" : [ {
+      "automaticLayout" : {
+        "applied" : false,
+        "edgeSeparation" : 0,
+        "implementation" : "Graphviz",
+        "nodeSeparation" : 300,
+        "rankDirection" : "LeftRight",
+        "rankSeparation" : 300,
+        "vertices" : false
+      },
+      "elements" : [ {
+        "id" : "4",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "64",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "65",
+        "x" : 0,
+        "y" : 0
+      } ],
+      "enterpriseBoundaryVisible" : true,
+      "key" : "SystemContext",
+      "order" : 1,
+      "relationships" : [ {
+        "id" : "69"
+      }, {
+        "id" : "70"
+      }, {
+        "id" : "71"
+      } ],
+      "softwareSystemId" : "4"
+    } ]
+  }
+}
