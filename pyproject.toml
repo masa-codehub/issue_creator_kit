@@ -3,7 +3,7 @@
 # ===================================================================
 [project]
 name = "issue_creator_kit"
-version = "0.9.2"
+version = "0.15.4"
 description = "Project with Issue Creator Kit automation."
 readme = "README.md"
 requires-python = ">=3.13"
@@ -64,6 +64,7 @@ dev = [
     "commitizen",
     "python-semantic-release",
     "build",
+    "checkov",
     # testの依存関係を明示
     "pytest>=8.3.0",
     "pytest-cov>=6.0.0",

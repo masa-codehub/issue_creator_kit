@@ -110,6 +110,28 @@ class IGitHubAdapter(ABC):
         pass
 
     @abstractmethod
+    def update_issue_labels(self, issue_number: int, labels: list[str]) -> None:
+        """
+        Replace all existing labels of an issue with the given list.
+
+        This method performs a full replacement of the issue's labels:
+        all existing labels are removed first, and then the given labels
+        are applied.
+
+        IMPORTANT:
+            Callers must pass *all* labels that should remain on the issue.
+            Any label that is currently set on the issue but not included
+            in ``labels`` will be removed.
+
+        Note:
+            - Use ``add_labels`` if you only want to add labels while keeping
+              the existing ones intact.
+            - Use ``update_issue_labels`` when you want to overwrite the
+              complete set of labels.
+        """
+        pass
+
+    @abstractmethod
     def search_issues_by_label(
         self, labels: list[str], state: str = "open"
     ) -> int | None:
