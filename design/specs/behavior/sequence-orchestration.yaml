@@ -1,0 +1,26 @@
+type: Test
+spec:
+  id: orchestration-flow
+  name: Orchestration and L1 Sync Flow (ADR-017)
+  trigger:
+    type: http
+    httpRequest:
+      url: http://ick/process
+      method: POST
+  specs:
+    - selector: span[service.name="task_act" name="execute"]
+      assertions:
+        - attr:tracetest.selected_spans.count = 1
+    - selector: span[service.name="l1_sync" name="sync_checklist"]
+      assertions:
+        - attr:tracetest.selected_spans.count = 1
+    - selector: span[service.name="gh_adapter" name="get_issue"]
+      assertions:
+        - attr:tracetest.selected_spans.count = 1
+    - selector: span[service.name="gh_adapter" name="patch_issue"]
+      assertions:
+        - attr:tracetest.selected_spans.count >= 1
+        - attr:http.request.header.if_match exists
+    - selector: span[service.name="gh_adapter" name="patch_issue" http.status_code=409]
+      assertions:
+        - attr:tracetest.selected_spans.count = 1
