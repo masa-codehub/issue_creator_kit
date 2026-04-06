@@ -209,6 +209,13 @@ logs/
 .gemini/GEMINI.md
 messages/
 
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
 # Track package-lock.json
 !package-lock.json
 

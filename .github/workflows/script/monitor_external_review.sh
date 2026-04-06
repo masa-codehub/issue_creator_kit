@@ -51,7 +51,7 @@ check_status() {
   # 最新の外部レビュー完了時刻 (Strict author whitelist match)
   T_REVIEW_END=$(echo "$data" | jq -r --argjson actors "$(printf '%s\n' "${EXTERNAL_ACTORS[@]}" | jq -R . | jq -s .)" '
     (.reviews // [])
-    | map(select(.author.login as $login | $actors | any(. == $login)))
+    | map(select((.author.login // empty) | . as $login | $actors | any(. == $login)))
     | sort_by(.submittedAt) | .[-1].submittedAt // "1970-01-01T00:00:00Z"
   ')
 
@@ -60,9 +60,9 @@ check_status() {
     --arg user "$CURRENT_USER" \
     --argjson patterns "$(printf '%s\n' "${MARKER_PATTERNS[@]}" | jq -R . | jq -s .)" '
     (
-      [(.comments // [])[] | select(.author.login == $user and ((.body // "") as $b | $patterns | any($b | contains(.)))) | {createdAt: .createdAt}]
+      [(.comments // [])[] | select(.author.login == $user and ((.body // "") | . as $b | $patterns | any($b | contains(.)))) | {createdAt: .createdAt}]
       +
-      [(.reviews // [])[] | select(.author.login == $user and ((.body // "") as $b | $patterns | any($b | contains(.)))) | {createdAt: .submittedAt}]
+      [(.reviews // [])[] | select(.author.login == $user and ((.body // "") | . as $b | $patterns | any($b | contains(.)))) | {createdAt: .submittedAt}]
     )
     | sort_by(.createdAt)
     | .[-1].createdAt // "1970-01-01T00:00:00Z"
@@ -70,7 +70,7 @@ check_status() {
 
   # マーカーコメントの最新時刻
   T_MARKER=$(echo "$data" | jq -r --argjson patterns "$(printf '%s\n' "${MARKER_PATTERNS[@]}" | jq -R . | jq -s .)" '
-    [(.comments // [])[] | select((.body // "") as $b | $patterns | any($b | contains(.)))]
+    [(.comments // [])[] | select((.body // "") | . as $b | $patterns | any($b | contains(.)))]
     | sort_by(.createdAt) | .[-1].createdAt // "1970-01-01T00:00:00Z"
   ')
 
@@ -78,9 +78,8 @@ check_status() {
   HAS_NEW_REQUEST=$(echo "$data" | jq -r --argjson actors "$(printf '%s\n' "${EXTERNAL_ACTORS[@]}" | jq -R . | jq -s .)" '
     (.reviewRequests // [])
     | map(
-        .requestedReviewer.login // .login // empty
-        | as $login
-        | ($actors | any(. == $login))
+        (.requestedReviewer.login // .login // empty) as $login
+        | $actors | any(. == $login)
       )
     | any
     | if . then "yes" else "no" end

@@ -169,7 +169,7 @@ class OrchestratorService:
             return None
 
         target_adr = adrs[0]
-        labels = L1AutomationUseCase.get_labels(target_adr.id)
+        labels = L1AutomationUseCase.get_identity_labels(target_adr.id)
         issue_no = self.github.search_issues_by_label(labels)
 
         if issue_no:

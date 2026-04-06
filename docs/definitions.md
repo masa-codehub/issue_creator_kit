@@ -81,6 +81,7 @@ stateDiagram-v2
 | `tdd`   | TDDに基づくコーディング、ユニットテスト、および統合検証を行う工程。  |
 | `audit` | 実装成果物の品質監査、SSOT整合性確認を行う工程。                     |
 | `plan`  | 次フェーズの実行計画策定、タスク分割を行う工程。                     |
+| `impl`  | 実際にコードやドキュメントを「実施」する主たる作業工程。             |
 
 ### 3.2. Task Role
 
@@ -88,11 +89,10 @@ stateDiagram-v2
 
 | Role    | Agent / Responsibility | Responsibility Details                                     |
 | :------ | :--------------------- | :--------------------------------------------------------- |
-| `arch`  | `SYSTEM_ARCHITECT`     | 全体構造の維持、ADRの執筆、境界の防衛。                    |
+| `arch`  | `SYSTEM_ARCHITECT`     | 全体構造의 維持、ADRの執筆、境界の防衛。                   |
 | `spec`  | `TECHNICAL_DESIGNER`   | 詳細仕様の策定、スキーマ設計、TDDの前提条件定義。          |
 | `tdd`   | `BACKENDCODER`         | 堅牢なコードの実装、テストのパス、リファクタリングの実行。 |
 | `audit` | `TECHNICAL_DESIGNER`   | 実装成果物の品質監査、仕様整合性の確認。                   |
-| `plan`  | `SYSTEM_ARCHITECT`     | 次フェーズの実行計画策定、タスク分割。                     |
 
 ---
 
