@@ -10,7 +10,7 @@ Analyze **all review comments** provided and propose the necessary specification
 ## Instructions
 
 1. **Analyze & Plan:** Execute `activate_skill{name: "analyzing-github-reviews"}` to analyze the comments and formulate a classification and fix plan.
-2. **Draft Proposals:** Based on the analysis, execute `activate_skill{name: "drafting-specs"}` to formulate specific specification modification proposals.
+2. **Draft Proposals:** Based on the analysis, execute `activate_skill{name: "acting-specs"}` to formulate specific specification modification proposals.
 3. **Record & Finalize:** Execute `activate_skill{name: "recording-changes"}` to record the analysis results.
 
 ## Review Context

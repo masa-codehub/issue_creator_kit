@@ -81,10 +81,14 @@ class DocumentParser:
         """
         stem = path.stem
 
-        # If the filename starts with a prefix indicating it's an ADR or Task,
+        # If the filename starts with a prefix indicating it's an ADR, DesignDoc, or Task,
         # return the stem. The Pydantic model validator will perform the
         # detailed format validation, centralizing the logic.
-        if stem.startswith("adr-") or stem.startswith("task-"):
+        if (
+            stem.startswith("adr-")
+            or stem.startswith("design-")
+            or stem.startswith("task-")
+        ):
             return stem
 
         return None

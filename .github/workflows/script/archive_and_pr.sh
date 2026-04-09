@@ -21,7 +21,7 @@ COMMIT_EMAIL="${2:-}"
 COMMIT_MSG="${3:-}"
 BASE_BRANCH="${4:-main}"
 
-echo "=== Archiving and Pull Request Creation ==="
+echo "=== Committing Process Assets and PR Creation ==="
 
 # 1. 変更の有無を確認
 # reqs/ ディレクトリ内の変更をすべてステージングし、差分がない場合は終了
@@ -74,7 +74,18 @@ if git ls-remote --exit-code --heads origin "$RP_BRANCH" > /dev/null && [ "$OPEN
     git checkout "$RP_BRANCH"
     
     echo "Committing archived tasks to Release PR..."
-    git commit -m "chore: archive processed tasks"
+    # 今回コミット対象である reqs/ 配下の staged files のみに対象を限定する
+    # 品質ゲートを迂回しないため、失敗時は処理を停止する
+    mapfile -t REQS_STAGED_FILES < <(git diff --cached --name-only --diff-filter=ACMR -- reqs/)
+    if [ "${#REQS_STAGED_FILES[@]}" -gt 0 ]; then
+        if ! uv run pre-commit run --files "${REQS_STAGED_FILES[@]}"; then
+            echo "Error: pre-commit checks failed for staged reqs/ files. Aborting Release PR update."
+            exit 1
+        fi
+        # 自動修正が含まれた場合、再度ステージングする (reqs/ に限定)
+        git add -A reqs/
+    fi
+    git commit --no-verify -m "chore: commit processed tasks and roadmap updates"
     
     echo "Pushing branch to origin..."
     git push origin "$RP_BRANCH"
@@ -85,7 +96,18 @@ else
     git checkout -b "$BRANCH_NAME"
 
     echo "Committing archived tasks..."
-    git commit -m "chore: archive processed tasks"
+    # 今回コミット対象である reqs/ 配下の staged files のみに対象を限定する
+    # 品質ゲートを迂回しないため、失敗時は処理を停止する
+    mapfile -t REQS_STAGED_FILES < <(git diff --cached --name-only --diff-filter=ACMR -- reqs/)
+    if [ "${#REQS_STAGED_FILES[@]}" -gt 0 ]; then
+        if ! uv run pre-commit run --files "${REQS_STAGED_FILES[@]}"; then
+            echo "Error: pre-commit checks failed for staged reqs/ files. Aborting Standalone PR creation."
+            exit 1
+        fi
+        # 自動修正が含まれた場合、再度ステージングする (reqs/ に限定)
+        git add -A reqs/
+    fi
+    git commit --no-verify -m "chore: commit processed tasks and roadmap updates"
 
     echo "Pushing branch to origin..."
     git push origin "$BRANCH_NAME"
@@ -93,7 +115,7 @@ else
     # 6. Pull Request の作成
     echo "Creating Pull Request to base branch '$BASE_BRANCH'..."
     gh pr create \
-      --title "chore: archive processed tasks" \
+      --title "chore: commit processed tasks and roadmap updates" \
       --body "Automated task archiving after issue creation. Please review and merge." \
       --base "$BASE_BRANCH" \
       --head "$BRANCH_NAME" \
