@@ -12,8 +12,8 @@
     },
     {
       "name": "SYSTEM_ARCHITECT",
-      "labels": ["plan", "tdd"],
-      "context": ".github/workflows/context/plan-tdd-prompt.md"
+      "labels": ["plan", "implement"],
+      "context": ".github/workflows/context/plan-implement-prompt.md"
     },
     {
       "name": "TECHNICAL_DESIGNER",
@@ -27,8 +27,8 @@
     },
     {
       "name": "BACKENDCODER",
-      "labels": ["task", "tdd"],
-      "context": ".github/workflows/context/tdd-prompt.md"
+      "labels": ["task", "implement"],
+      "context": ".github/workflows/context/implement-prompt.md"
     }
   ],
   "reviews": [
@@ -44,8 +44,8 @@
     },
     {
       "name": "SYSTEM_ARCHITECT",
-      "labels": ["plan", "tdd"],
-      "context": ".github/workflows/context/review-tdd-prompt.md"
+      "labels": ["plan", "implement"],
+      "context": ".github/workflows/context/review-implement-prompt.md"
     },
     {
       "name": "TECHNICAL_DESIGNER",
@@ -59,8 +59,8 @@
     },
     {
       "name": "BACKENDCODER",
-      "labels": ["task", "tdd"],
-      "context": ".github/workflows/context/review-tdd-prompt.md"
+      "labels": ["task", "implement"],
+      "context": ".github/workflows/context/review-implement-prompt.md"
     }
   ],
   "default_role": "BACKENDCODER",

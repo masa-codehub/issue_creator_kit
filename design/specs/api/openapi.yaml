@@ -1,0 +1,299 @@
+openapi: 3.0.3
+info:
+  title: GitHub API Boundary Specification (ADR-017)
+  description: Detailed contract for GitHub Adapter's interactions with the GitHub REST API.
+  version: 1.0.0
+  contact:
+    name: Issue Creator Kit Maintainers
+    url: https://github.com/masa-codehub/dev_issue_creator_kit
+servers:
+  - url: https://api.github.com
+    description: GitHub REST API v3
+tags:
+  - name: gh_adapter
+    description: Operations performed by the GitHub Adapter.
+paths:
+  /repos/{owner}/{repo}/issues/{issue_number}:
+    get:
+      summary: Get an issue
+      description: Retrieves a specific issue or pull request from the GitHub repository.
+      operationId: getIssue
+      tags:
+        - gh_adapter
+      parameters:
+        - name: owner
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: repo
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: issue_number
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Issue found
+          headers:
+            ETag:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/issue"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          description: Issue not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error_response"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+    patch:
+      summary: Update an issue
+      description: Updates the body of a specific issue or pull request.
+      operationId: updateIssue
+      tags:
+        - gh_adapter
+      parameters:
+        - name: owner
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: repo
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: issue_number
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: If-Match
+          in: header
+          description: ETag for optimistic locking
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - body
+              properties:
+                body:
+                  type: string
+      responses:
+        "200":
+          description: Issue updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/issue"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "412":
+          description: Precondition Failed (ETag mismatch)
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /repos/{owner}/{repo}/issues/{issue_number}/labels:
+    post:
+      summary: Add labels to an issue
+      description: Adds a list of labels to a specific issue or pull request.
+      operationId: addLabels
+      tags:
+        - gh_adapter
+      parameters:
+        - name: owner
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: repo
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: issue_number
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - labels
+              properties:
+                labels:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        "200":
+          description: Labels added
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/label"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+    put:
+      summary: Replace all labels for an issue
+      description: Replaces all existing labels for an issue with a new list of labels.
+      operationId: replaceLabels
+      tags:
+        - gh_adapter
+      parameters:
+        - name: owner
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: repo
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: issue_number
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - labels
+              properties:
+                labels:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        "200":
+          description: Labels replaced
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/label"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /search/issues:
+    get:
+      summary: Search issues and pull requests
+      description: Searches for issues or pull requests using the GitHub Search API.
+      operationId: searchIssues
+      tags:
+        - gh_adapter
+      parameters:
+        - name: q
+          in: query
+          required: true
+          description: Query string containing metadata and labels
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Search results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total_count:
+                    type: integer
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/issue"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+components:
+  responses:
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/error_response"
+    InternalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/error_response"
+  schemas:
+    issue:
+      type: object
+      required:
+        - number
+        - state
+        - body
+        - updated_at
+      properties:
+        number:
+          type: integer
+        state:
+          type: string
+          enum: [open, closed]
+        body:
+          type: string
+        updated_at:
+          type: string
+          format: date-time
+        labels:
+          type: array
+          items:
+            $ref: "#/components/schemas/label"
+    label:
+      type: object
+      properties:
+        name:
+          type: string
+        color:
+          type: string
+    error_response:
+      type: object
+      properties:
+        message:
+          type: string
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              resource:
+                type: string
+              field:
+                type: string
+              code:
+                type: string

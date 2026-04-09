@@ -215,14 +215,14 @@ def _validate_execution_guards(args):
     """Ensure --execute or --dry-run is specified and they are mutually exclusive."""
     if not (args.execute or args.dry_run):
         print(
-            "Error: Either --execute or --dry-run must be specified.",
+            "[FAIL] Error: Either --execute or --dry-run must be specified.",
             file=sys.stderr,
         )
         sys.exit(2)
 
     if args.execute and args.dry_run:
         print(
-            "Error: --execute and --dry-run are mutually exclusive.",
+            "[FAIL] Error: --execute and --dry-run are mutually exclusive.",
             file=sys.stderr,
         )
         sys.exit(2)

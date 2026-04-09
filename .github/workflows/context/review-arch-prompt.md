@@ -10,7 +10,7 @@ Analyze **all review comments** provided and propose appropriate architectural r
 ## Instructions
 
 1. **Analyze & Plan:** Execute `activate_skill{name: "analyzing-github-reviews"}` to analyze the comments and formulate a fix plan.
-2. **Draft Proposals:** Based on the analysis, execute `activate_skill{name: "drafting-architecture"}` to formulate specific architectural change proposals.
+2. **Draft Proposals:** Based on the analysis, execute `activate_skill{name: "acting-architecture"}` to formulate specific architectural change proposals.
 3. **Record & Finalize:** Execute `activate_skill{name: "recording-changes"}` to record the results.
 
 ## Review Context

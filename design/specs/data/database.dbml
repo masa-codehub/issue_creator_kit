@@ -1,0 +1,83 @@
+// ADR-017 Metadata Database Schema
+// Normalized DB design for document traceability with SQLite compatibility
+
+TableGroup "Metadata Database" {
+    traceable_items
+    l1_documents
+    l2_tasks
+    dependencies
+}
+
+// Common base table for all traceable nodes (Documents and Tasks)
+// This resolves the Polymorphic Foreign Key issue in the dependency graph.
+Table traceable_items {
+    id varchar [pk, note: 'Unique ID (e.g., adr-001 or task-001-01)']
+    type varchar [not null, note: 'document or task']
+    created_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+    
+    Note: 'Unified graph node for traceability.'
+}
+
+Table l1_documents {
+    id varchar [pk, note: 'ADR or DesignDoc ID (e.g., adr-001)']
+    type varchar [note: 'adr or design-doc']
+    title varchar [not null]
+    status varchar [not null, note: 'Draft, Approved, Postponed, Superseded, Implemented']
+    date date [note: 'Document creation date']
+    created_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+    updated_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+
+    indexes {
+        status
+        type
+    }
+
+    Note: 'L1 documents representing architecture decisions or high-level designs.'
+}
+
+Table l2_tasks {
+    id varchar [pk, note: 'Task ID (e.g., task-001-01)']
+    type varchar [not null, note: 'task or integration']
+    title varchar [not null]
+    status varchar [not null, note: 'Draft, Ready, Issued, Completed, Cancelled']
+    parent_id varchar [not null]
+    role varchar [note: 'arch, spec, implement']
+    phase varchar [note: 'arch, spec, implement']
+    issue_id integer [note: 'GitHub Issue number']
+    created_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+    updated_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+
+    indexes {
+        parent_id
+        issue_id
+        status
+    }
+
+    Note: 'L2 tasks derived from L1 documents.'
+}
+
+Table dependencies {
+    dependent_id varchar [not null]
+    depends_on_id varchar [not null]
+    created_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+    updated_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+
+    indexes {
+        (dependent_id, depends_on_id) [pk]
+        depends_on_id
+    }
+    
+    Note: 'Graph relationship between traceable items.'
+}
+
+// Relationships
+// L1 and L2 items are types of traceable items (Inheritance/Base Table)
+Ref: l1_documents.id - traceable_items.id
+Ref: l2_tasks.id - traceable_items.id
+
+// Task to Document relationship (L2 -> L1)
+Ref: l2_tasks.parent_id > l1_documents.id
+
+// Dependency graph relationship (Node -> Node)
+Ref: dependencies.dependent_id > traceable_items.id
+Ref: dependencies.depends_on_id > traceable_items.id

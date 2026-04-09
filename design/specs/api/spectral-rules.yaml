@@ -1,0 +1,18 @@
+extends: ["spectral:oas"]
+rules:
+  must-have-standard-errors:
+    description: All APIs must define 400 and 500 error responses.
+    given: $.paths[*][*].responses
+    then:
+      - field: "400"
+        function: truthy
+      - field: "500"
+        function: truthy
+  property-names-snake-case:
+    description: Property names must be snake_case.
+    given: "$..properties"
+    then:
+      field: "@key"
+      function: pattern
+      functionOptions:
+        match: "^[a-z0-9_]+$"

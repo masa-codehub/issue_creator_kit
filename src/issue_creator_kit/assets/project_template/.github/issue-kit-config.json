@@ -12,8 +12,8 @@
     },
     {
       "name": "BACKENDCODER",
-      "labels": ["task", "tdd"],
-      "context": ".github/workflows/context/tdd-prompt.md"
+      "labels": ["task", "implement"],
+      "context": ".github/workflows/context/implement-prompt.md"
     },
     {
       "name": "SYSTEM_ARCHITECT",
@@ -27,8 +27,8 @@
     },
     {
       "name": "BACKENDCODER",
-      "labels": ["audit", "tdd"],
-      "context": ".github/workflows/context/review-tdd-prompt.md"
+      "labels": ["audit", "implement"],
+      "context": ".github/workflows/context/review-implement-prompt.md"
     },
     {
       "name": "SYSTEM_ARCHITECT",
@@ -40,7 +40,7 @@
     },
     {
       "name": "BACKENDCODER",
-      "labels": ["plan", "tdd"]
+      "labels": ["plan", "implement"]
     }
   ],
   "default_role": "BACKENDCODER",
