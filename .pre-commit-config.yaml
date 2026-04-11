@@ -23,8 +23,8 @@ repos:
         exclude: ^CHANGELOG\.md$
 
   # 4. Dogfooding: Remote Reference (Production & Distribution)
-  - repo: https://github.com/masa-codehub/dev_issue_creator_kit
-    rev: main  # In development, this points to the main branch
+  - repo: https://github.com/masa-codehub/issue_creator_kit
+    rev: main
     hooks:
       - id: ick-check
         name: Issue Kit Check (Remote)
