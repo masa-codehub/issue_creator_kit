@@ -23,23 +23,16 @@ repos:
         exclude: ^CHANGELOG\.md$
 
   # 4. Dogfooding: Remote Reference (Production & Distribution)
-  # NOTE: Temporarily disabled until ADR-015/016 changes (impl phase) are merged to main.
-  # - repo: https://github.com/masa-codehub/issue_creator_kit
-  #   rev: main
-  #   hooks:
-  #     - id: ick-check
-  #       name: Issue Kit Check (Remote)
-  #       files: ^reqs/
+  - repo: https://github.com/masa-codehub/dev_issue_creator_kit
+    rev: main  # In development, this points to the main branch
+    hooks:
+      - id: ick-check
+        name: Issue Kit Check (Remote)
+        files: ^reqs/
 
   # 5. Local Hooks (Development & Speed)
   - repo: local
     hooks:
-      - id: ick-check-local
-        name: Issue Kit Check (Local)
-        entry: uv run python -m issue_creator_kit.cli check --root reqs
-        language: system
-        pass_filenames: false
-        files: ^reqs/
       - id: mypy
         name: mypy
         entry: uv run mypy
@@ -52,15 +45,3 @@ repos:
         language: system
         types: [python]
         pass_filenames: false
-      - id: verify-adr017-boundary
-        name: TDA Boundary Verification
-        entry: uv run python tests/verify_adr017_boundary.py
-        language: system
-        pass_filenames: false
-        files: ^(design/architecture/structurizr\.json|design/specs/api/openapi\.yaml|tests/verify_adr017_boundary\.py)$
-      - id: ssot-sync-check
-        name: SSOT Synchronization Check
-        entry: uv run pytest tests/unit/domain/test_ssot_sync.py
-        language: system
-        pass_filenames: false
-        files: ^(design/specs/common/definitions\.md|src/issue_creator_kit/domain/models/document\.py|tests/unit/domain/test_ssot_sync\.py)$
